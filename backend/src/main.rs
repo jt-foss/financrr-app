@@ -88,8 +88,9 @@ fn configure_logger() {
 }
 
 fn configure_api(cfg: &mut web::ServiceConfig) {
-	cfg.service(web::scope("/api").configure(configure_api_v1)
-		.wrap(NormalizePath::new(middleware::TrailingSlash::Trim)));
+	cfg.service(
+		web::scope("/api").configure(configure_api_v1).wrap(NormalizePath::new(middleware::TrailingSlash::Trim)),
+	);
 }
 
 fn configure_api_v1(cfg: &mut web::ServiceConfig) {
