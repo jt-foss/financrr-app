@@ -14,6 +14,6 @@
 
 ## Other specific features
 
-For frontend specific features see [Frontend Features](./frontend.md)
+For frontend specific features see [Frontend Features](./features/frontend.md)
 <br>
-For backend specific features see [Backend Features](./backend.md)
+For backend specific features see [Backend Features](./features/backend.md)
