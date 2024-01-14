@@ -31,7 +31,7 @@ thiserror = "1.0.52"
 
 # Generating openapi spec
 utoipa = { version = "4.1.0", features = ["actix_extras", "openapi_extensions"] }
-utoipa-swagger-ui = { version = "5.0.0", features = ["actix-web", "debug-embed"] }
+utoipa-swagger-ui = { version = "6.0.0", features = ["actix-web", "debug-embed"] }
 
 # Logging
 log.workspace = true
