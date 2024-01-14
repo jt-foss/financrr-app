@@ -2,6 +2,7 @@
 
 
 ## General Features
+
 - [ ] Budgets
 - [ ] Categories
 - [ ] Accounts
