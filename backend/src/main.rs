@@ -68,11 +68,10 @@ async fn main() -> std::io::Result<()> {
 
 	HttpServer::new(move || {
 		App::new()
+			.configure(configure_api)
 			.service(SwaggerUi::new("/swagger-ui/{_:.*}").url("/api-docs/openapi.json", openapi.clone()))
-			.service(web::scope("/api").service(web::scope("/v1")))
 			.wrap(Logger::default())
 			.wrap(Compress::default())
-		//.wrap(NormalizePath::new(middleware::TrailingSlash::Trim)) Does not work because of swagger TODO fix!
 	})
 	.bind(("127.0.0.1", Config::get_config().port))?
 	.run()
@@ -86,4 +85,13 @@ fn configure_logger() {
 		.with_timestamp_format(format_description!("[year]-[month]-[day] [hour]:[minute]:[second]"))
 		.init()
 		.unwrap();
+}
+
+fn configure_api(cfg: &mut web::ServiceConfig) {
+	cfg.service(web::scope("/api").configure(configure_api_v1)
+		.wrap(NormalizePath::new(middleware::TrailingSlash::Trim)));
+}
+
+fn configure_api_v1(cfg: &mut web::ServiceConfig) {
+	cfg.service(web::scope("/v1"));
 }

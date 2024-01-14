@@ -1,10 +1,13 @@
-# Money
+# Financrr Backend
 
-Your personal finance manager.
+The backend for your personal finance manager.
+<br>
+Know your money!
 
 ## Swagger-UI
 
 We have a swagger-ui instance running at `http://localhost:8080/swagger-ui/`.<br>
+**DO NOT REMOVE THE TRAILING SLASH**
 **Be aware that you have to change the url based on your settings. (`.env` config file and/or reverse proxies)**<br>
 You can use it to test the API and to get a better understanding of the API.
 
@@ -18,10 +21,6 @@ There is no way to use another database!
 
 - easier to develop, maintain and test
 - we can optimize both (the database and the application) for each other -> better performance
-
-## Planned
-
-- Publish to Dockerhub and supply installation instructions
 
 ## Docker
 
