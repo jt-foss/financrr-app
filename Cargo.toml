@@ -19,7 +19,7 @@ rust-version = "1.75.0"
 
 [workspace.dependencies]
 # ORM
-sea-orm = { version = "0.12.10", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros", "mock"] }
+sea-orm = { version = "0.12.11", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros", "mock"] }
 
 # Async runtime
 tokio = { version = "1.35.1", features = ["rt", "macros", "rt-multi-thread"] }
