@@ -531,7 +531,7 @@ dependencies = [
  "futures-io",
  "futures-lite 2.2.0",
  "parking",
- "polling 3.3.1",
+ "polling 3.3.2",
  "rustix 0.38.30",
  "slab",
  "tracing",
@@ -654,6 +654,34 @@ name = "autocfg"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d468802bab17cbc0cc575e9b053f41e72aa36bfa6b7f55e3529ffa43161b97fa"
+
+[[package]]
+name = "backend"
+version = "0.1.0"
+dependencies = [
+ "actix-identity",
+ "actix-session",
+ "actix-web",
+ "anyhow",
+ "derive_more",
+ "dotenvy",
+ "entity",
+ "futures",
+ "log",
+ "migration",
+ "rand",
+ "redis",
+ "sea-orm",
+ "serde",
+ "serde_json",
+ "simple_logger",
+ "thiserror",
+ "time",
+ "tokio",
+ "url",
+ "utoipa",
+ "utoipa-swagger-ui",
+]
 
 [[package]]
 name = "backtrace"
@@ -1154,34 +1182,6 @@ name = "dotenvy"
 version = "0.15.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1aaf95b3e5c8f23aa320147307562d361db0ae0d51242340f558153b4eb2439b"
-
-[[package]]
-name = "ehkurz-backend"
-version = "0.1.0"
-dependencies = [
- "actix-identity",
- "actix-session",
- "actix-web",
- "anyhow",
- "derive_more",
- "dotenvy",
- "entity",
- "futures",
- "log",
- "migration",
- "rand",
- "redis",
- "sea-orm",
- "serde",
- "serde_json",
- "simple_logger",
- "thiserror",
- "time",
- "tokio",
- "url",
- "utoipa",
- "utoipa-swagger-ui",
-]
 
 [[package]]
 name = "either"
@@ -2220,9 +2220,9 @@ dependencies = [
 
 [[package]]
 name = "polling"
-version = "3.3.1"
+version = "3.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cf63fa624ab313c11656b4cda960bfc46c410187ad493c41f6ba2d8c1e991c9e"
+checksum = "545c980a3880efd47b2e262f6a4bb6daad6555cf3367aa9c4e52895f69537a41"
 dependencies = [
  "cfg-if",
  "concurrent-queue",
@@ -2747,9 +2747,9 @@ dependencies = [
 
 [[package]]
 name = "sea-orm-cli"
-version = "0.12.10"
+version = "0.12.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "acc21813f3a91462280bee40632298a555eafe9dd8feb74917f9c24514214c2e"
+checksum = "747f032e4abd58a6cacdb21275cc13448b4ff4b368f5f578ece465957ae7b417"
 dependencies = [
  "chrono",
  "clap",
@@ -2778,9 +2778,9 @@ dependencies = [
 
 [[package]]
 name = "sea-orm-migration"
-version = "0.12.10"
+version = "0.12.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b3d06dac448288ceb630994b420cd8d5410543c0b09367f40ed505c2f03b266a"
+checksum = "412643baf225b37ae1313c0344c10bff6ec1fae72cdec1c7b591cc7c833134d2"
 dependencies = [
  "async-trait",
  "clap",
@@ -3003,9 +3003,9 @@ dependencies = [
 
 [[package]]
 name = "smallvec"
-version = "1.11.2"
+version = "1.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4dccd0940a2dcdf68d092b8cbab7dc0ad8fa938bf95787e1b916b0e3d0e8e970"
+checksum = "2593d31f82ead8df961d8bd23a64c2ccf2eb5dd34b0a34bfb4dd54011c72009e"
 
 [[package]]
 name = "socket2"

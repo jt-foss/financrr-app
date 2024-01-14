@@ -20,13 +20,3 @@ updates:
     schedule:
       interval: "daily"
       time: "06:00"
-  - package-ecosystem: "docker"
-    directory: "/docker/pgadmin"
-    schedule:
-      interval: "daily"
-      time: "06:00"
-  - package-ecosystem: "docker"
-    directory: "/docker/db"
-    schedule:
-      interval: "daily"
-      time: "06:00"

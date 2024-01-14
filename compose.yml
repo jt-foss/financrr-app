@@ -7,7 +7,8 @@ services:
     init: true
     restart: unless-stopped
     volumes:
-      - ./:/usr/src/demon
+      - ./:/usr/src/financrr
+      - .env:/home/financrr/.env
     ports:
       - "127.0.0.1:3000:80"
     depends_on:

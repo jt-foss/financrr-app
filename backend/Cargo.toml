@@ -1,5 +1,5 @@
 [package]
-name = "ehkurz-backend"
+name = "backend"
 version.workspace = true
 edition.workspace = true
 

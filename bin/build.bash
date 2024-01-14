@@ -8,16 +8,6 @@ WORK_DIR="$(pwd)"
 cd "$(dirname "$0")"
 cd ..
 
-echo "Checking sudo permissions!"
-# check if executed with sudo
-if [ "$EUID" -ne 0 ]
-  then echo "Please run as root"
-  exit
-fi
-
-echo "Changing permissions..."
-sudo chmod -R 777 system/postgres-data
-
 echo "Building containers."
 docker compose build
 

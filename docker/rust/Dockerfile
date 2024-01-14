@@ -1,37 +1,21 @@
 FROM rust:1.75.0-alpine3.19 as builder
 
-WORKDIR /usr/src/demon
-RUN apk upgrade
-RUN apk add --no-cache musl-dev curl
-
-# Install cargo-leptos
-RUN curl --proto '=https' --tlsv1.2 -LsSf https://github.com/leptos-rs/cargo-leptos/releases/download/0.2.5/cargo-leptos-installer.sh | sh
-
-# Add the WASM target
-RUN rustup target add wasm32-unknown-unknown
-
-# Make an /app dir, which everything will eventually live in
-RUN mkdir -p /app
-WORKDIR /app
+WORKDIR /usr/src/financrr
 COPY . .
+RUN apk add --no-cache musl-dev
 
-# Build the app
-RUN cargo-leptos build --release -vv
+RUN cargo build --release
 
 FROM alpine:3.19.0
 RUN apk update
 
-# Copy the server binary to the /app directory
-COPY --from=builder /app/target/release/server /app/
-# /target/site contains our JS/WASM/CSS, etc.
-COPY --from=builder /app/target/site /app/site
-WORKDIR /app
+RUN addgroup -g 1000 -S financrr; \
+        adduser -u 1000 -S -D -G financrr -H -h /home/financrr -s /bin/sh financrr;
 
-# Set any required env variables and
-ENV RUST_LOG="info"
-ENV LEPTOS_SITE_ADDR="0.0.0.0:80"
-ENV LEPTOS_SITE_ROOT="site"
-EXPOSE 80
+#COPY --from=builder --chown=1000:1000 /usr/local/cargo/bin/financrr /home/financrr/financrr
+COPY --from=builder --chown=1000:1000 /usr/src/financrr/target/release/backend /home/financrr/financrr
 
-# Run the server
-CMD ["/app/server"]
+RUN chmod +x /home/financrr/financrr
+USER financrr
+WORKDIR /home/financrr
+ENTRYPOINT ["/home/financrr/financrr"]

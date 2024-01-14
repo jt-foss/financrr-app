@@ -29,20 +29,14 @@ We use docker to run the application.<br>
 It is designed to run behind a reverse proxy.<br>
 To run it:
 
-1. execute `sudo bin/build.bash`
+1. execute `bash bin/build.bash`
 2. execute `docker compose up -d`
-
-## Related Projects
-
-Here a projects listed that are related to this project.
-
-- [Eh-Kurz GUI](https://github.com/DenuxPlays/EhKurz-Web) A GUI for this project.
 
 ## Development
 
 We use docker in two different ways.<br>
-In development we use docker to only run the database and (if you want) pgAdmin.<br>
-We do this with the following command: `docker compose up -d db pgadmin`
+In development we use docker to only run the databases.<br>
+We do this with the following command: `docker compose up -d db cache`
 
 In production, we use docker to run the whole application.<br>
 We do this with the following command: `docker compose up -d`
@@ -58,5 +52,7 @@ want to clutter our system with a lot of dependencies.
 ### Setup
 
 1. execute `bin/install.bash`
-2. execute `sudo bin/build.bash`
+2. execute `bin/build.bash`
+3. starte the docker containers with `docker compose up -d`
+4. (optional) see the logs with `docker compose logs -f`
 
