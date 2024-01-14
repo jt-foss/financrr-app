@@ -72,7 +72,7 @@ async fn main() -> std::io::Result<()> {
 			.service(web::scope("/api").service(web::scope("/v1")))
 			.wrap(Logger::default())
 			.wrap(Compress::default())
-			.wrap(NormalizePath::new(middleware::TrailingSlash::Trim))
+		//.wrap(NormalizePath::new(middleware::TrailingSlash::Trim)) Does not work because of swagger TODO fix!
 	})
 	.bind(("127.0.0.1", Config::get_config().port))?
 	.run()
