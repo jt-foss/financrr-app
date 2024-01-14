@@ -1,0 +1,16 @@
+[package]
+name = "migration"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+# Async runtime
+async-std = { version = "1.12.0", features = ["attributes", "tokio1"] }
+
+# Entity
+entity = { path = "../entity" }
+
+# Sea-orm
+sea-orm.workspace = true
+sea-orm-migration = "0.12.10"
+log.workspace = true

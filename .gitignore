@@ -1,0 +1,12 @@
+# App
+/system
+.env
+tests/http-client.private.env.json
+
+
+# IDEs / Codeeditors
+/.idea
+
+# Rust
+/target
+

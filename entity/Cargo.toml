@@ -1,0 +1,20 @@
+[package]
+name = "entity"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+# Encryption
+rand = "0.8.5"
+rust-argon2 = "2.1.0"
+
+# Error handling
+anyhow = "1.0.79"
+thiserror = "1.0.56"
+
+# Utils
+chrono = "0.4.31"
+
+# Workspace
+sea-orm.workspace = true
+tokio.workspace = true

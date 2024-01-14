@@ -1,0 +1,26 @@
+name: Format
+permissions: write-all
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  format:
+    name: rustfmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "date=$(date -d '1 month ago' +'%Y-%m-%d')" >> $GITHUB_ENV
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: nightly-${{ env.date }}
+          components: rustfmt
+      - uses: LoliGothick/rustfmt-check@master
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          toolchain: nightly-${{ env.date }}
+          flags: --all
+          args: --config-path=./rustfmt.toml
+          working-directory: .

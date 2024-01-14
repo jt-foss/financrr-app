@@ -1,0 +1,45 @@
+[package]
+name = "ehkurz-backend"
+version.workspace = true
+edition.workspace = true
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# Actix
+actix-web = { version = "4.4.1", features = ["rustls"] }
+actix-session = { version = "0.9.0", features = ["redis", "redis-rs-session"]}
+actix-identity = "0.7.0"
+
+# Database / ORM
+sea-orm.workspace = true
+entity = { path = "../entity" }
+migration = { path = "../migration" }
+redis = "0.24.0"
+
+# Async runtime and utilities
+tokio.workspace = true
+futures = "0.3.30"
+
+# Serialization and deserialization
+serde = { version = "1.0.193", features = ["derive"] }
+serde_json = "1.0.108"
+
+# Error handling
+anyhow = "1.0.77"
+thiserror = "1.0.52"
+
+# Generating openapi spec
+utoipa = { version = "4.1.0", features = ["actix_extras", "openapi_extensions"] }
+utoipa-swagger-ui = { version = "5.0.0", features = ["actix-web", "debug-embed"] }
+
+# Logging
+log.workspace = true
+simple_logger = "4.3.3"
+time = "0.3.31" #Needed for giving timestamps to logs
+
+# Utils
+rand = "0.8.5"
+url = "2.5.0"
+dotenvy = "0.15.7"
+derive_more = "0.99.17"

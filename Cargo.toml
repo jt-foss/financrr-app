@@ -1,0 +1,28 @@
+[workspace]
+members = [
+	"entity",
+	"migration",
+	"backend"
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+authors = ["Timon Klinkert <DenuxPlays@users.noreply.github.com>"]
+description = "Your personal finance manager"
+license = "AGPL-3"
+repository = "https://github.com/DenuxPlays/EhKurz"
+homepage = "https://github.com/DenuxPlays/EhKurz"
+readme = "README.md"
+edition = "2021"
+rust-version = "1.75.0"
+
+[workspace.dependencies]
+# ORM
+sea-orm = { version = "0.12.10", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros", "mock"] }
+
+# Async runtime
+tokio = { version = "1.35.1", features = ["rt", "macros", "rt-multi-thread"] }
+
+# Utils
+log = "0.4.20"
