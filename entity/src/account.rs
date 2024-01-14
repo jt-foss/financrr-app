@@ -7,6 +7,7 @@ use sea_orm::entity::prelude::*;
 pub struct Model {
 	#[sea_orm(primary_key)]
 	pub id: i32,
+	pub user_id: i32,
 	#[sea_orm(column_type = "Text", unique)]
 	pub name: String,
 	#[sea_orm(column_type = "Text", nullable)]
@@ -26,11 +27,25 @@ pub enum Relation {
 		on_delete = "NoAction"
 	)]
 	Currency,
+	#[sea_orm(
+		belongs_to = "super::user::Entity",
+		from = "Column::UserId",
+		to = "super::user::Column::Id",
+		on_update = "NoAction",
+		on_delete = "NoAction"
+	)]
+	User,
 }
 
 impl Related<super::currency::Entity> for Entity {
 	fn to() -> RelationDef {
 		Relation::Currency.def()
+	}
+}
+
+impl Related<super::user::Entity> for Entity {
+	fn to() -> RelationDef {
+		Relation::User.def()
 	}
 }
 

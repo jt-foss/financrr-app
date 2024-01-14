@@ -14,7 +14,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      redis:
+      cache:
         condition: service_healthy
 
   db:
@@ -35,7 +35,7 @@ services:
       timeout: 3s
       retries: 3
 
-  redis:
+  cache:
     image: redis:7-alpine3.19
     init: true
     restart: unless-stopped
