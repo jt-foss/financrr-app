@@ -1,14 +1,14 @@
 use std::env;
 use std::str::FromStr;
 
-use crate::CONFIG;
 use log::LevelFilter;
+
+use crate::CONFIG;
 
 #[derive(Debug)]
 pub struct Config {
-	pub domain: String,
-	pub port: u16,
-	pub https: bool,
+	pub address: String,
+	pub session_secret: String,
 	pub database: DatabaseConfig,
 	pub cache: RedisConfig,
 }
@@ -41,11 +41,10 @@ impl Config {
 		)
 	}
 
-	pub fn build_config() -> Config {
+	pub fn load() -> Config {
 		Config {
-			domain: get_env_or_error("DOMAIN"),
-			port: get_env_or_error("PORT").parse::<u16>().expect("Could not parse PORT to u16!"),
-			https: get_env_or_default("HTTPS", "false").parse::<bool>().expect("Could not parse HTTPS to bool!"),
+			address: get_env_or_error("ADDRESS"),
+			session_secret: get_env_or_error("SESSION_SECRET"),
 			database: DatabaseConfig::build_config(),
 			cache: RedisConfig::build_config(),
 		}
@@ -53,7 +52,7 @@ impl Config {
 
 	pub fn get_config<'a>() -> &'a Config {
 		CONFIG.get().unwrap_or_else(|| {
-			CONFIG.set(Config::build_config()).expect("Could not load and set config!");
+			CONFIG.set(Config::load()).expect("Could not load and set config!");
 			CONFIG.get().expect("Could not get config!")
 		})
 	}

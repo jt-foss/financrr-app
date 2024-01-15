@@ -6,6 +6,8 @@ services:
       dockerfile: docker/rust/Dockerfile
     init: true
     restart: unless-stopped
+    environment:
+      TZ: ${TIMEZONE}
     volumes:
       - ./:/usr/src/financrr
       - .env:/home/financrr/.env
@@ -22,6 +24,7 @@ services:
     init: true
     restart: unless-stopped
     environment:
+      TZ: ${TIMEZONE}
       POSTGRES_USER: ${DATABASE_USER}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       POSTGRES_DB: ${DATABASE_NAME}
@@ -39,6 +42,8 @@ services:
     image: redis:7-alpine3.19
     init: true
     restart: unless-stopped
+    environment:
+      TZ: ${TIMEZONE}
     ports:
       - "127.0.0.1:6379:6379"
     healthcheck:

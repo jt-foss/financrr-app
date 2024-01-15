@@ -1,5 +1,9 @@
+use actix_identity::IdentityMiddleware;
 use std::sync::OnceLock;
 
+use actix_session::storage::RedisSessionStore;
+use actix_session::SessionMiddleware;
+use actix_web::cookie::{Key, SameSite};
 use actix_web::middleware::{Compress, NormalizePath};
 use actix_web::{
 	middleware,
@@ -16,22 +20,25 @@ use utoipa::openapi::Components;
 use utoipa::{Modify, OpenApi};
 use utoipa_swagger_ui::SwaggerUi;
 
-use crate::config::Config;
-use crate::database::connection::establish_database_connection;
-use crate::util::db::get_database_connection;
 use entity::utility::loading::load_schema;
 use migration::Migrator;
 use migration::MigratorTrait;
 
+use crate::config::Config;
+use crate::controller::status::status_controller;
+use crate::controller::user::user_controller;
+use crate::database::connection::{establish_database_connection, get_database_connection};
+
+pub mod authentication;
 pub mod config;
+pub mod controller;
 pub mod database;
-pub mod util;
 
 pub static DB: OnceLock<DatabaseConnection> = OnceLock::new();
 pub static CONFIG: OnceLock<Config> = OnceLock::new();
 
 #[derive(OpenApi)]
-#[openapi(paths(), components(schemas()), tags())]
+#[openapi(paths(controller::status::health, controller::status::test_session,), components(schemas()), tags())]
 struct ApiDoc;
 
 struct SecurityAddon;
@@ -54,11 +61,14 @@ async fn main() -> std::io::Result<()> {
 	configure_logger();
 
 	info!("Starting up...");
-	CONFIG.set(Config::build_config()).expect("Could not load config!");
+	CONFIG.set(Config::load()).expect("Could not load config!");
 	DB.set(establish_database_connection().await).expect("Could not set database!");
 
 	info!("Loading schema...");
 	load_schema(get_database_connection()).await;
+
+	info!("Loading redis...");
+	let store = RedisSessionStore::new(Config::get_config().cache.get_url()).await.expect("Could not load redis!");
 
 	info!("Migrating database...");
 	Migrator::up(get_database_connection(), None).await.expect("Could not migrate database!");
@@ -72,8 +82,17 @@ async fn main() -> std::io::Result<()> {
 			.service(SwaggerUi::new("/swagger-ui/{_:.*}").url("/api-docs/openapi.json", openapi.clone()))
 			.wrap(Logger::default())
 			.wrap(Compress::default())
+			.wrap(IdentityMiddleware::default())
+			.wrap(
+				SessionMiddleware::builder(store.clone(), get_secret_key())
+					// allow the cookie to be accessed from javascript
+					.cookie_http_only(false)
+					// allow the cookie only from the current domain
+					.cookie_same_site(SameSite::Strict)
+					.build(),
+			)
 	})
-	.bind(("127.0.0.1", Config::get_config().port))?
+	.bind(&Config::get_config().address)?
 	.run()
 	.await
 }
@@ -87,6 +106,10 @@ fn configure_logger() {
 		.unwrap();
 }
 
+fn get_secret_key() -> Key {
+	Key::from(Config::get_config().session_secret.as_bytes())
+}
+
 fn configure_api(cfg: &mut web::ServiceConfig) {
 	cfg.service(
 		web::scope("/api").configure(configure_api_v1).wrap(NormalizePath::new(middleware::TrailingSlash::Trim)),
@@ -94,5 +117,5 @@ fn configure_api(cfg: &mut web::ServiceConfig) {
 }
 
 fn configure_api_v1(cfg: &mut web::ServiceConfig) {
-	cfg.service(web::scope("/v1"));
+	cfg.service(web::scope("/v1").configure(status_controller).configure(user_controller));
 }
