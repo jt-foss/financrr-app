@@ -14,7 +14,7 @@ erDiagram
 	}
 
 	Currency {
-		ind id UK
+		int id UK
 		string name "NotNull"
 		string symbol "NotNull"
 		string iso_code PK "NotNull"
