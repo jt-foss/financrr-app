@@ -1,6 +1,8 @@
 {
   "helloWorld": "Hello World!",
-  "@helloWorld": {
-    "description": "The conventional newborn programmer greeting"
-  }
+  "@helloWorld": {},
+  "brandName": "financrr",
+  "@brandName": {},
+  "brandSlogan": "Know your money",
+  "@brandSlogan": {}
 }
