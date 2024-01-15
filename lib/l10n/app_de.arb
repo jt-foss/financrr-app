@@ -1,4 +1,6 @@
 {
   "helloWorld": "Hallo Welt!",
-  "@helloWorld": {}
+  "@helloWorld": {},
+  "brandSlogan": "Der moderne Finanzmanager",
+  "@brandSlogan": {}
 }
