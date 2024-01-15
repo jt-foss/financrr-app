@@ -1,1 +1,4 @@
-{}
+{
+  "helloWorld": "Hello World!",
+  "@helloWorld": {}
+}
