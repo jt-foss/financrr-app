@@ -40,6 +40,7 @@ dependencies:
   intl: any
 
 dev_dependencies:
+  flutter_launcher_icons: "^0.13.1"
   flutter_test:
     sdk: flutter
 
@@ -93,3 +94,10 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+flutter_launcher_icons:
+  web:
+    generate: true
+    image_path: assets/logo/financrr_logo.png
+    background_color: '#FF0000'
+    theme_color: '#FF0000'

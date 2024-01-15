@@ -3,9 +3,9 @@
     "short_name": "financrr_frontend",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#FF0000",
+    "theme_color": "#FF0000",
+    "description": "financrr — Know your money",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
