@@ -2,5 +2,7 @@
   "helloWorld": "Hello World!!!",
   "@helloWorld": {
     "description": "The conventional newborn programmer greeting"
-  }
+  },
+  "test_string": "This is a test!",
+  "@test_string": {}
 }
