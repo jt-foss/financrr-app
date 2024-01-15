@@ -1,4 +1,6 @@
 {
   "helloWorld": "Hallo Welt!!!",
-  "@helloWorld": {}
+  "@helloWorld": {},
+  "test_string": "Dies ist ein Test!",
+  "@test_string": {}
 }
