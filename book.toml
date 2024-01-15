@@ -7,3 +7,9 @@ title = "Financrr Documentation"
 
 [output.html]
 site-url = "/docs/" # Fix 404 error
+additional-js = ["mermaid.min.js", "mermaid-init.js"]
+
+[preprocessor]
+
+[preprocessor.mermaid]
+command = "mdbook-mermaid"
