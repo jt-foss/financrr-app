@@ -29,6 +29,7 @@ use crate::config::Config;
 use crate::controller::status::status_controller;
 use crate::controller::user::user_controller;
 use crate::database::connection::{establish_database_connection, get_database_connection};
+use utoipauto::utoipauto;
 
 pub mod authentication;
 pub mod config;
@@ -38,9 +39,10 @@ pub mod database;
 pub static DB: OnceLock<DatabaseConnection> = OnceLock::new();
 pub static CONFIG: OnceLock<Config> = OnceLock::new();
 
+#[utoipauto]
 #[derive(OpenApi)]
-#[openapi(paths(controller::status::health, controller::status::test_session,), components(schemas()), tags())]
-struct ApiDoc;
+#[openapi(components(responses(AuthenticationResponse)), modifiers(&SecurityAddon))]
+pub struct ApiDoc;
 
 struct SecurityAddon;
 

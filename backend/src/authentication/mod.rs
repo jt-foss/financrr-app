@@ -3,8 +3,15 @@ use entity::prelude::User;
 use entity::user::Model;
 use sea_orm::EntityTrait;
 use serde::{Deserialize, Serialize};
+use utoipa::{ToResponse, ToSchema};
 
-#[derive(Deserialize)]
+#[derive(ToResponse)]
+pub enum AuthenticationResponse {
+	#[response(description = "Invalid credentials or not logged in.")]
+	UNAUTHORIZED
+}
+
+#[derive(Deserialize, ToSchema)]
 pub struct Credentials {
 	pub username: String,
 	pub password: String,
