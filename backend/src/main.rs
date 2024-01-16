@@ -112,11 +112,7 @@ fn get_secret_key() -> Key {
 }
 
 fn configure_api(cfg: &mut web::ServiceConfig) {
-	cfg.service(
-		web::scope("/api")
-			.wrap(NormalizePath::new(TrailingSlash::Trim))
-			.configure(configure_api_v1)
-	);
+	cfg.service(web::scope("/api").wrap(NormalizePath::new(TrailingSlash::Trim)).configure(configure_api_v1));
 }
 
 fn configure_api_v1(cfg: &mut web::ServiceConfig) {

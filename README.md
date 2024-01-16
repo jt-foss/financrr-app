@@ -22,6 +22,18 @@ There is no way to use another database!
 - easier to develop, maintain and test
 - we can optimize both (the database and the application) for each other -> better performance
 
+## Default Login
+
+We provide a default user for every fresh installation.
+<br>
+You can log in with the following credentials:
+
+| Username | Password    |
+|----------|-------------|
+| admin    | Financrr123 |
+
+**We strongly advise you to change the password for production deployments!**
+
 ## Docker
 
 We use docker to run the application.<br>
