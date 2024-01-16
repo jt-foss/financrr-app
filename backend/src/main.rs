@@ -1,6 +1,6 @@
-use actix_identity::IdentityMiddleware;
 use std::sync::OnceLock;
 
+use actix_identity::IdentityMiddleware;
 use actix_session::storage::RedisSessionStore;
 use actix_session::SessionMiddleware;
 use actix_web::cookie::{Key, SameSite};
@@ -20,6 +20,7 @@ use time::macros::format_description;
 use utoipa::openapi::Components;
 use utoipa::{Modify, OpenApi};
 use utoipa_swagger_ui::SwaggerUi;
+use utoipauto::utoipauto;
 
 use entity::utility::loading::load_schema;
 use migration::Migrator;
@@ -29,7 +30,6 @@ use crate::config::Config;
 use crate::controller::status::status_controller;
 use crate::controller::user::user_controller;
 use crate::database::connection::{establish_database_connection, get_database_connection};
-use utoipauto::utoipauto;
 
 pub mod authentication;
 pub mod config;
@@ -39,12 +39,14 @@ pub mod database;
 pub static DB: OnceLock<DatabaseConnection> = OnceLock::new();
 pub static CONFIG: OnceLock<Config> = OnceLock::new();
 
-#[utoipauto]
+#[utoipauto(paths = "./backend/src/controller,./backend/src/authentication")]
 #[derive(OpenApi)]
-#[openapi(components(responses(AuthenticationResponse)), modifiers(&SecurityAddon))]
+#[openapi(
+modifiers(&SecurityAddon)
+)]
 pub struct ApiDoc;
 
-struct SecurityAddon;
+pub struct SecurityAddon;
 
 impl Modify for SecurityAddon {
 	fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {

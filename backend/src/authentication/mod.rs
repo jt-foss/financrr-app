@@ -8,7 +8,7 @@ use utoipa::{ToResponse, ToSchema};
 #[derive(ToResponse)]
 pub enum AuthenticationResponse {
 	#[response(description = "Invalid credentials or not logged in.")]
-	UNAUTHORIZED
+	UNAUTHORIZED,
 }
 
 #[derive(Deserialize, ToSchema)]

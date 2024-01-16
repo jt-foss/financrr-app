@@ -1,6 +1,6 @@
 use actix_identity::Identity;
-use actix_web::{delete, HttpMessage, HttpRequest, HttpResponse, post, Responder, web};
 use actix_web::web::Json;
+use actix_web::{delete, post, web, HttpMessage, HttpRequest, HttpResponse, Responder};
 
 use crate::authentication::{AuthenticationResponse, Credentials, UserLogin};
 

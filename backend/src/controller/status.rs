@@ -1,4 +1,4 @@
-use actix_web::{get, HttpResponse, Responder, web};
+use actix_web::{get, web, HttpResponse, Responder};
 
 pub fn status_controller(cfg: &mut web::ServiceConfig) {
 	cfg.service(web::scope("/status").service(health));
@@ -11,6 +11,6 @@ responses(
 path = "/api/v1/status/health",
 tag = "Status")]
 #[get("/health")]
-pub async fn health() -> impl Responder {
+async fn health() -> impl Responder {
 	HttpResponse::Ok().json("healthy")
 }
