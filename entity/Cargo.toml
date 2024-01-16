@@ -4,9 +4,6 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
-# Actic
-actix-session = { version = "0.9.0", features = ["redis", "redis-rs-session"] }
-
 # Encryption
 rand = "0.8.5"
 rust-argon2 = "2.1.0"

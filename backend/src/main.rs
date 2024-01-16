@@ -13,6 +13,7 @@ use actix_web::{
 };
 use dotenvy::dotenv;
 use log::{info, LevelFilter};
+use middleware::TrailingSlash;
 use sea_orm::DatabaseConnection;
 use simple_logger::SimpleLogger;
 use time::macros::format_description;
@@ -78,8 +79,6 @@ async fn main() -> std::io::Result<()> {
 
 	HttpServer::new(move || {
 		App::new()
-			.configure(configure_api)
-			.service(SwaggerUi::new("/swagger-ui/{_:.*}").url("/api-docs/openapi.json", openapi.clone()))
 			.wrap(Logger::default())
 			.wrap(Compress::default())
 			.wrap(IdentityMiddleware::default())
@@ -91,6 +90,8 @@ async fn main() -> std::io::Result<()> {
 					.cookie_same_site(SameSite::Strict)
 					.build(),
 			)
+			.configure(configure_api)
+			.service(SwaggerUi::new("/swagger-ui/{_:.*}").url("/api-docs/openapi.json", openapi.clone()))
 	})
 	.bind(&Config::get_config().address)?
 	.run()
@@ -112,7 +113,9 @@ fn get_secret_key() -> Key {
 
 fn configure_api(cfg: &mut web::ServiceConfig) {
 	cfg.service(
-		web::scope("/api").configure(configure_api_v1).wrap(NormalizePath::new(middleware::TrailingSlash::Trim)),
+		web::scope("/api")
+			.wrap(NormalizePath::new(TrailingSlash::Trim))
+			.configure(configure_api_v1)
 	);
 }
 
