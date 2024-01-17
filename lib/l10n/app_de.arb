@@ -34,5 +34,9 @@
   "loginButtonSignIn": "Anmelden",
   "@loginButtonSignIn": {},
   "loginBiometricsGeneric": "Mit Biometrie anmelden",
-  "@loginBiometricsGeneric": {}
+  "@loginBiometricsGeneric": {},
+  "errorUnknown": "Ein unbekannter Fehler ist aufgetreten. Bitte versuche es später erneut.",
+  "@errorUnknown": {},
+  "errorUnauthorized": "Sieht so aus als hättest du dich bei deinen Anmeldedaten vertippt. Bitte versuche es erneut.",
+  "@errorUnauthorized": {}
 }
