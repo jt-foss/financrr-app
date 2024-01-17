@@ -34,5 +34,9 @@
   "loginFieldHostCustomAdd": "Add custom Host…",
   "@loginFieldHostCustomAdd": {},
   "loginFieldHostCustom": "{url} — Version {version}",
-  "@loginFieldHostCustom": {}
+  "@loginFieldHostCustom": {},
+  "loginFailedCredentials": "Seems like you've got your credentials wrong. Please try again.",
+  "@loginFailedCredentials": {},
+  "loginFailedUnknown": "An unknown error occurred. Please try again later.",
+  "@loginFailedUnknown": {}
 }
