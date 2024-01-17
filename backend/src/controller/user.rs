@@ -1,7 +1,6 @@
 use actix_identity::Identity;
-use actix_web::{delete, HttpMessage, HttpRequest, HttpResponse, post, Responder, web};
 use actix_web::web::Json;
-use log::info;
+use actix_web::{delete, post, web, HttpMessage, HttpRequest, HttpResponse, Responder};
 
 use crate::authentication::{Credentials, UserLogin};
 use crate::util::utoipa::Unauthorized;
@@ -20,10 +19,9 @@ request_body = Credentials,
 tag = "User")]
 #[post("/login")]
 pub async fn login(request: HttpRequest, credentials: Json<Credentials>) -> impl Responder {
+	// TODO only try to authenticate when the user isn't already logged in
 	match UserLogin::authenticate(credentials.into_inner()).await {
-		Some(user) => {
-			Identity::login(&request.extensions(), user.id.to_string()).unwrap()
-		},
+		Some(user) => Identity::login(&request.extensions(), user.id.to_string()).unwrap(),
 		None => return HttpResponse::Unauthorized(),
 	};
 
@@ -40,10 +38,11 @@ tag = "User")]
 #[delete("/logout")]
 pub async fn logout(identity: Identity) -> impl Responder {
 	if !is_identity_valid(&identity) {
-		HttpResponse::Unauthorized()
+		return HttpResponse::Unauthorized();
 	}
 	identity.logout();
-	return HttpResponse::Ok();
+
+	HttpResponse::Ok()
 }
 
 fn is_identity_valid(identity: &Identity) -> bool {

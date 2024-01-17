@@ -1,5 +1,5 @@
-use std::sync::OnceLock;
 use actix_identity::config::LogoutBehaviour;
+use std::sync::OnceLock;
 
 use actix_identity::IdentityMiddleware;
 use actix_session::config::CookieContentSecurity;
@@ -88,9 +88,7 @@ async fn main() -> std::io::Result<()> {
 		App::new()
 			.wrap(Logger::default())
 			.wrap(Compress::default())
-			.wrap(IdentityMiddleware::builder()
-				.logout_behaviour(LogoutBehaviour::PurgeSession)
-				.build())
+			.wrap(IdentityMiddleware::builder().logout_behaviour(LogoutBehaviour::PurgeSession).build())
 			.wrap(
 				SessionMiddleware::builder(store.clone(), get_secret_key())
 					// allow the cookie to be accessed from javascript
