@@ -21,6 +21,6 @@
   "@loginFieldPassword": {},
   "loginBiometricsFaceID": "Login using FaceID",
   "@loginBiometricsFaceID": {},
-  "loginFieldHostCustom": "Add custom host...",
+  "loginFieldHostCustom": "Add custom host…",
   "@loginFieldHostCustom": {}
 }
