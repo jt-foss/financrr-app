@@ -3,7 +3,7 @@
   "@brandName": {},
   "brandSlogan": "Know your money",
   "@brandSlogan": {},
-  "loginBiometricsTouchID": "Login using TouchID",
+  "loginBiometricsTouchID": "Login using Touch ID",
   "@loginBiometricsTouchID": {},
   "loginBiometricsGenericFingerprint": "Login using Fingerprint",
   "@loginBiometricsGenericFingerprint": {},
@@ -17,7 +17,7 @@
   "@loginFieldEmail": {},
   "loginFieldPassword": "Password",
   "@loginFieldPassword": {},
-  "loginBiometricsFaceID": "Login using FaceID",
+  "loginBiometricsFaceID": "Login using Face ID",
   "@loginBiometricsFaceID": {},
   "settingsHostSave": "Save Host",
   "@settingsHostSave": {},
@@ -33,6 +33,6 @@
   "@settingsHostPort": {},
   "loginFieldHostCustomAdd": "Add custom Host…",
   "@loginFieldHostCustomAdd": {},
-  "loginFieldHostCustom": "{url} ",
+  "loginFieldHostCustom": "{url} — Version {version}",
   "@loginFieldHostCustom": {}
 }
