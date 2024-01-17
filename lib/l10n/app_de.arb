@@ -34,7 +34,5 @@
   "loginButtonSignIn": "Anmelden",
   "@loginButtonSignIn": {},
   "loginBiometricsGeneric": "Mit Biometrie anmelden",
-  "@loginBiometricsGeneric": {},
-  "loginFailedCredentials": "Sieht so aus, als würden deine Anmeldedaten nicht stimmen. Bitte versuche es erneut.",
-  "@loginFailedCredentials": {}
+  "@loginBiometricsGeneric": {}
 }
