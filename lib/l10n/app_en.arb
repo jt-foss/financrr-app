@@ -20,5 +20,17 @@
   "loginBiometricsFaceID": "Login using FaceID",
   "@loginBiometricsFaceID": {},
   "loginFieldHostCustom": "Add custom host…",
-  "@loginFieldHostCustom": {}
+  "@loginFieldHostCustom": {},
+  "settingsHostSave": "Save Host",
+  "@settingsHostSave": {},
+  "loginButtonSignInAwait": "Signing you in…",
+  "@loginButtonSignInAwait": {},
+  "loginButtonSignIn": "Sign In",
+  "@loginButtonSignIn": {},
+  "loginBiometricsGeneric": "Login using Biometrics",
+  "@loginBiometricsGeneric": {},
+  "settingsHostURL": "URL",
+  "@settingsHostURL": {},
+  "settingsHostPort": "Port",
+  "@settingsHostPort": {}
 }
