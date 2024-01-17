@@ -11,7 +11,7 @@
   "@settingsHostPort": {},
   "loginBiometricsTouchID": "Mit Touch ID anmelden",
   "@loginBiometricsTouchID": {},
-  "loginFieldHostCustom": "{url} — Version {version}",
+  "loginFieldHostCustom": "{url} ({version})",
   "@loginFieldHostCustom": {},
   "loginBiometricsGenericFingerprint": "Mit Fingerabdruck anmelden",
   "@loginBiometricsGenericFingerprint": {},
@@ -34,5 +34,9 @@
   "loginButtonSignIn": "Anmelden",
   "@loginButtonSignIn": {},
   "loginBiometricsGeneric": "Mit Biometrie anmelden",
-  "@loginBiometricsGeneric": {}
+  "@loginBiometricsGeneric": {},
+  "loginFailedCredentials": "Sieht so aus, als würden deine Anmeldedaten nicht stimmen. Bitte versuche es erneut.",
+  "@loginFailedCredentials": {},
+  "loginFailedUnknown": "Ein unbekannter Fehler ist aufgetreten. Bitte versuche es später erneut.",
+  "@loginFailedUnknown": {}
 }
