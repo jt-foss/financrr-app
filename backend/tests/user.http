@@ -1,0 +1,15 @@
+### Login
+POST http://127.0.0.1:8080/api/v1/user/login
+accept: */*
+Content-Type: application/json
+
+{
+    "password": "{{password}}",
+    "username": "{{username}}"
+}
+
+###
+
+
+### Logout
+DELETE {{url}}/user/logout

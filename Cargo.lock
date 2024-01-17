@@ -660,23 +660,16 @@ dependencies = [
  "actix-identity",
  "actix-session",
  "actix-web",
- "anyhow",
- "derive_more",
  "dotenvy",
  "entity",
- "futures",
  "log",
  "migration",
- "rand",
  "redis",
  "sea-orm",
  "serde",
  "serde_json",
  "simple_logger",
- "thiserror",
  "time",
- "tokio",
- "url",
  "utoipa",
  "utoipa-swagger-ui",
  "utoipauto",
@@ -3428,19 +3421,7 @@ dependencies = [
  "pin-project-lite",
  "signal-hook-registry",
  "socket2 0.5.5",
- "tokio-macros",
  "windows-sys 0.48.0",
-]
-
-[[package]]
-name = "tokio-macros"
-version = "2.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5b8a1e28f2deaa14e508979454cb3a223b10b938b45af148bc0986de36f1923b"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.48",
 ]
 
 [[package]]

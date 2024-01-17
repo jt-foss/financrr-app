@@ -1,6 +1,8 @@
 use std::sync::OnceLock;
+use actix_identity::config::LogoutBehaviour;
 
 use actix_identity::IdentityMiddleware;
+use actix_session::config::CookieContentSecurity;
 use actix_session::storage::RedisSessionStore;
 use actix_session::SessionMiddleware;
 use actix_web::cookie::{Key, SameSite};
@@ -86,13 +88,16 @@ async fn main() -> std::io::Result<()> {
 		App::new()
 			.wrap(Logger::default())
 			.wrap(Compress::default())
-			.wrap(IdentityMiddleware::default())
+			.wrap(IdentityMiddleware::builder()
+				.logout_behaviour(LogoutBehaviour::PurgeSession)
+				.build())
 			.wrap(
 				SessionMiddleware::builder(store.clone(), get_secret_key())
 					// allow the cookie to be accessed from javascript
 					.cookie_http_only(false)
 					// allow the cookie only from the current domain
 					.cookie_same_site(SameSite::Strict)
+					.cookie_content_security(CookieContentSecurity::Signed)
 					.build(),
 			)
 			.configure(configure_api)
