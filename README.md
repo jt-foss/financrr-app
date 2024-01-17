@@ -22,6 +22,22 @@ There is no way to use another database!
 - easier to develop, maintain and test
 - we can optimize both (the database and the application) for each other -> better performance
 
+### Performance Configuration
+
+We provide an optimized configuration for PostgreSQL.
+<br>
+This file based upon a general resource configuration:
+
+1. **OS Type:** linux
+2. **DB Type:** mixed
+3. **Total Memory (RAM):** 6 GB
+4. **CPUs num:** 4
+5. **Connections num:** 100
+6. **Data Storage:** ssd
+
+If you want to optimize this configuration for your system we recommend using this
+tool [here](https://pgtune.leopard.in.ua/).
+
 ## Default Login
 
 We provide a default user for every fresh installation.

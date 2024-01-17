@@ -2,7 +2,8 @@ use actix_identity::Identity;
 use actix_web::web::Json;
 use actix_web::{delete, post, web, HttpMessage, HttpRequest, HttpResponse, Responder};
 
-use crate::authentication::{AuthenticationResponse, Credentials, UserLogin};
+use crate::authentication::{Credentials, UserLogin};
+use crate::util::utoipa::Unauthorized;
 
 pub fn user_controller(cfg: &mut web::ServiceConfig) {
 	cfg.service(web::scope("/user").service(login).service(logout));
@@ -11,7 +12,7 @@ pub fn user_controller(cfg: &mut web::ServiceConfig) {
 #[utoipa::path(post,
 responses(
 (status = 200, description = "Successfully logged in", content_type = "application/json"),
-(status = 401, response = AuthenticationResponse)
+(status = 401, response = Unauthorized)
 ),
 path = "/api/v1/user/login",
 request_body = Credentials,
@@ -29,12 +30,12 @@ pub async fn login(request: HttpRequest, credentials: Json<Credentials>) -> impl
 #[utoipa::path(delete,
 responses(
 (status = 200, description = "Successfully logged out"),
-(status = 401, response = AuthenticationResponse)
+(status = 401, response = Unauthorized)
 ),
 path = "/api/v1/user/logout",
 tag = "User")]
 #[delete("/logout")]
-pub async fn logout(identity: Identity) -> actix_web::Result<impl Responder> {
+pub async fn logout(identity: Identity) -> impl Responder {
 	identity.logout();
-	Ok(HttpResponse::Ok())
+	HttpResponse::Ok()
 }

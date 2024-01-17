@@ -35,11 +35,12 @@ pub mod authentication;
 pub mod config;
 pub mod controller;
 pub mod database;
+pub mod util;
 
 pub static DB: OnceLock<DatabaseConnection> = OnceLock::new();
 pub static CONFIG: OnceLock<Config> = OnceLock::new();
 
-#[utoipauto(paths = "./backend/src/controller,./backend/src/authentication")]
+#[utoipauto(paths = "./backend/src")]
 #[derive(OpenApi)]
 #[openapi(
 modifiers(&SecurityAddon)

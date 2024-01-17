@@ -32,6 +32,7 @@ services:
       - "127.0.0.1:5432:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
+      - ./docker/db/postgresql.conf::/etc/postgresql.conf
     healthcheck:
       test: [ "CMD-SHELL", "sh -c 'pg_isready -U ${DATABASE_USER} -d ${DATABASE_NAME} || exit 1'" ]
       interval: 10s

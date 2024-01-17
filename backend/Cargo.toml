@@ -15,6 +15,7 @@ actix-identity = "0.7.0"
 sea-orm.workspace = true
 entity = { path = "../entity" }
 migration = { path = "../migration" }
+redis = "0.24.0"
 
 # Async runtime and utilities
 tokio.workspace = true
@@ -42,3 +43,4 @@ time = "0.3.31" #Needed for giving timestamps to logs
 rand = "0.8.5"
 url = "2.5.0"
 dotenvy = "0.15.7"
+derive_more = "0.99.17"

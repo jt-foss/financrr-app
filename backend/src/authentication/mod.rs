@@ -1,15 +1,11 @@
-use crate::database::connection::get_database_connection;
-use entity::prelude::User;
-use entity::user::Model;
 use sea_orm::EntityTrait;
 use serde::{Deserialize, Serialize};
-use utoipa::{ToResponse, ToSchema};
+use utoipa::ToSchema;
 
-#[derive(ToResponse)]
-pub enum AuthenticationResponse {
-	#[response(description = "Invalid credentials or not logged in.")]
-	UNAUTHORIZED,
-}
+use entity::prelude::User;
+use entity::user::Model;
+
+use crate::database::connection::get_database_connection;
 
 #[derive(Deserialize, ToSchema)]
 pub struct Credentials {
