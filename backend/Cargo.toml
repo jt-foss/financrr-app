@@ -14,6 +14,10 @@ actix-web = { version = "4.4.1", features = ["rustls-0_21", "secure-cookies"] }
 actix-session = { version = "0.9.0", features = ["redis", "redis-rs-session"] }
 actix-identity = "0.7.0"
 
+# Validation
+actix-web-validator = "5.0.1"
+validator = { version = "0.16.1", features = ["derive"] }
+
 # Database / ORM
 sea-orm.workspace = true
 entity = { path = "../entity" }

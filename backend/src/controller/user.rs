@@ -1,10 +1,10 @@
 use crate::api::ApiError;
 use actix_identity::Identity;
-use actix_web::web::Json;
+use actix_web_validator::Json;
 use actix_web::{delete, error, post, web, Error, HttpMessage, HttpRequest, HttpResponse, Responder};
 
 use crate::authentication::{Credentials, UserLogin};
-use crate::util::utoipa::Unauthorized;
+use crate::util::utoipa::{Unauthorized, ValidationError};
 
 pub fn user_controller(cfg: &mut web::ServiceConfig) {
 	cfg.service(web::scope("/user").service(login).service(logout));
@@ -13,7 +13,8 @@ pub fn user_controller(cfg: &mut web::ServiceConfig) {
 #[utoipa::path(post,
 responses(
 (status = 200, description = "Successfully logged in", content_type = "application/json"),
-(status = 401, response = Unauthorized)
+(status = 401, response = Unauthorized),
+(status = 400, response = ValidationError)
 ),
 path = "/api/v1/user/login",
 request_body = Credentials,
@@ -50,3 +51,8 @@ fn is_identity_valid(identity: &Identity) -> Result<(), Error> {
 		Err(_) => Err(error::ErrorUnauthorized(ApiError::invalid_session())),
 	}
 }
+
+// #[post("/user")]
+// pub async fn register() -> actix_web::Result<impl Responder> {
+// 	todo!()
+// }

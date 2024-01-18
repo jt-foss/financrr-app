@@ -6,9 +6,11 @@ use entity::prelude::User;
 use entity::user::Model;
 
 use crate::database::connection::get_database_connection;
+use validator::Validate;
 
-#[derive(Deserialize, ToSchema)]
+#[derive(Deserialize, ToSchema, Validate)]
 pub struct Credentials {
+	#[validate(length(min = 3))]
 	pub username: String,
 	pub password: String,
 }
