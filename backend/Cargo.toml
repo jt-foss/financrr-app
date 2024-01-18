@@ -36,3 +36,4 @@ time = "0.3.31" #Needed for giving timestamps to logs
 
 # Utils
 dotenvy = "0.15.7"
+derive_more= "0.99"

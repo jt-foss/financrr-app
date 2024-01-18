@@ -33,6 +33,7 @@ use crate::controller::status::status_controller;
 use crate::controller::user::user_controller;
 use crate::database::connection::{establish_database_connection, get_database_connection};
 
+pub mod api;
 pub mod authentication;
 pub mod config;
 pub mod controller;

@@ -1,6 +1,7 @@
+use crate::api::ApiError;
 use actix_identity::Identity;
 use actix_web::web::Json;
-use actix_web::{delete, post, web, HttpMessage, HttpRequest, HttpResponse, Responder};
+use actix_web::{delete, error, post, web, Error, HttpMessage, HttpRequest, HttpResponse, Responder};
 
 use crate::authentication::{Credentials, UserLogin};
 use crate::util::utoipa::Unauthorized;
@@ -36,15 +37,16 @@ responses(
 path = "/api/v1/user/logout",
 tag = "User")]
 #[delete("/logout")]
-pub async fn logout(identity: Identity) -> impl Responder {
-	if !is_identity_valid(&identity) {
-		return HttpResponse::Unauthorized();
-	}
+pub async fn logout(identity: Identity) -> actix_web::Result<impl Responder> {
+	is_identity_valid(&identity)?;
 	identity.logout();
 
-	HttpResponse::Ok()
+	Ok(HttpResponse::Ok())
 }
 
-fn is_identity_valid(identity: &Identity) -> bool {
-	identity.id().is_ok()
+fn is_identity_valid(identity: &Identity) -> Result<(), Error> {
+	match identity.id() {
+		Ok(_) => Ok(()),
+		Err(_) => Err(error::ErrorUnauthorized(ApiError::invalid_session())),
+	}
 }
