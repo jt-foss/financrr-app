@@ -36,5 +36,7 @@
   "loginFieldHostCustom": "{url} ({version})",
   "@loginFieldHostCustom": {},
   "errorUnknown": "An unknown error occurred. Please try again later.",
-  "@errorUnknown": {}
+  "@errorUnknown": {},
+  "errorUnauthorized": "Seems like you've got your credentials wrong. Please try again.",
+  "@errorUnauthorized": {}
 }
