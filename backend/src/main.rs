@@ -1,6 +1,6 @@
-use actix_identity::config::LogoutBehaviour;
 use std::sync::OnceLock;
 
+use actix_identity::config::LogoutBehaviour;
 use actix_identity::IdentityMiddleware;
 use actix_session::config::CookieContentSecurity;
 use actix_session::storage::RedisSessionStore;
@@ -8,11 +8,12 @@ use actix_session::SessionMiddleware;
 use actix_web::cookie::{Key, SameSite};
 use actix_web::middleware::{Compress, NormalizePath};
 use actix_web::{
-	middleware,
+	error, middleware,
 	middleware::Logger,
 	web::{self},
-	App, HttpServer,
+	App, HttpResponse, HttpServer,
 };
+use actix_web_validator::{Error, JsonConfig};
 use dotenvy::dotenv;
 use log::{info, LevelFilter};
 use middleware::TrailingSlash;
@@ -32,6 +33,7 @@ use crate::config::Config;
 use crate::controller::status::status_controller;
 use crate::controller::user::user_controller;
 use crate::database::connection::{establish_database_connection, get_database_connection};
+use crate::util::validation::ValidationErrorJsonPayload;
 
 pub mod api;
 pub mod authentication;
@@ -99,6 +101,7 @@ async fn main() -> std::io::Result<()> {
 					.cookie_content_security(CookieContentSecurity::Signed)
 					.build(),
 			)
+			.app_data(JsonConfig::default().error_handler(|err, _| handle_validation_error(err)))
 			.configure(configure_api)
 			.service(SwaggerUi::new("/swagger-ui/{_:.*}").url("/api-docs/openapi.json", openapi.clone()))
 	})
@@ -118,6 +121,17 @@ fn configure_logger() {
 
 fn get_secret_key() -> Key {
 	Key::from(Config::get_config().session_secret.as_bytes())
+}
+
+fn handle_validation_error(err: Error) -> actix_web::Error {
+	let json_error = match &err {
+		Error::Validate(error) => ValidationErrorJsonPayload::from(error),
+		_ => ValidationErrorJsonPayload {
+			message: err.to_string(),
+			fields: Vec::new(),
+		},
+	};
+	error::InternalError::from_response(err, HttpResponse::BadRequest().json(json_error)).into()
 }
 
 fn configure_api(cfg: &mut web::ServiceConfig) {
