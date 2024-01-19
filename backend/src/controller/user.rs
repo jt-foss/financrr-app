@@ -1,7 +1,7 @@
 use crate::api::ApiError;
 use actix_identity::Identity;
-use actix_web_validator::Json;
 use actix_web::{delete, error, post, web, Error, HttpMessage, HttpRequest, HttpResponse, Responder};
+use actix_web_validator::Json;
 
 use crate::authentication::{Credentials, UserLogin};
 use crate::util::utoipa::{Unauthorized, ValidationError};
