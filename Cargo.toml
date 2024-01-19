@@ -26,3 +26,9 @@ tokio = { version = "1.35.1", features = ["rt", "macros", "rt-multi-thread"] }
 
 # Utils
 log = "0.4.20"
+
+[profile.release]
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
