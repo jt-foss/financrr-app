@@ -11,6 +11,7 @@
 - [ ] custom currencies
 - [ ] Import/Export
 - [ ] Family (or multiple users) Accounts
+- [ ] scan bills and add to transaction
 
 ## Other specific features
 
