@@ -14,3 +14,6 @@ entity = { path = "../entity" }
 sea-orm.workspace = true
 sea-orm-migration = "0.12.10"
 log.workspace = true
+
+# Utils
+chrono = "0.4.31"

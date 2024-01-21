@@ -15,6 +15,7 @@ impl MigrationTrait for Migration {
 		let user = user::ActiveModel {
 			username: Set("admin".to_string()),
 			password: Set(hashed_password.to_string()),
+			created_at: Set(chrono::Local::now().naive_local()),
 			..Default::default()
 		};
 		match user.insert(manager.get_connection()).await {
