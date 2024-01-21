@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Docker Compose Build
 
 on:
   push:
@@ -14,5 +14,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Prepare for build
+      run: bash bin/install.bash
     - name: Build the Docker compose images
-      run: docker compose build
+      run: bash bin/build.bash
