@@ -18,4 +18,5 @@ COPY --from=builder --chown=1000:1000 /usr/src/financrr/target/release/backend /
 RUN chmod +x /home/financrr/financrr
 USER financrr
 WORKDIR /home/financrr
+ENV ADDRESS=0.0.0.0:80
 ENTRYPOINT ["/home/financrr/financrr"]

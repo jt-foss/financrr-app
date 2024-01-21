@@ -1,9 +1,11 @@
 use crate::api::ApiError;
 use actix_identity::Identity;
+use actix_session::Session;
 use actix_web::{delete, error, post, web, Error, HttpMessage, HttpRequest, HttpResponse, Responder};
 use actix_web_validator::Json;
 
 use crate::authentication::{Credentials, RegisterUser, UserLogin};
+use crate::util::constant;
 use crate::util::utoipa::{Unauthorized, ValidationError};
 
 pub fn user_controller(cfg: &mut web::ServiceConfig) {
@@ -34,14 +36,18 @@ path = "/api/v1/user/login",
 request_body = Credentials,
 tag = "User")]
 #[post("/login")]
-pub async fn login(request: HttpRequest, credentials: Json<Credentials>) -> impl Responder {
-	// TODO only try to authenticate when the user isn't already logged in
-	match UserLogin::authenticate(credentials.into_inner()).await {
-		Some(user) => Identity::login(&request.extensions(), user.id.to_string()).unwrap(),
-		None => return HttpResponse::Unauthorized(),
-	};
+pub async fn login(request: HttpRequest, session: Session, credentials: Json<Credentials>) -> impl Responder {
+	if let Ok(Some(_)) = session.get::<String>(constant::IDENTITY_ID_KEY) {
+		return HttpResponse::Ok();
+	}
 
-	HttpResponse::Ok()
+	return match UserLogin::authenticate(credentials.into_inner()).await {
+		Some(user) => {
+			Identity::login(&request.extensions(), user.id.to_string()).unwrap();
+			HttpResponse::Ok()
+		}
+		None => HttpResponse::Unauthorized(),
+	};
 }
 
 #[utoipa::path(delete,
