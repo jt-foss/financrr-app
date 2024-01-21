@@ -3,11 +3,25 @@ use actix_identity::Identity;
 use actix_web::{delete, error, post, web, Error, HttpMessage, HttpRequest, HttpResponse, Responder};
 use actix_web_validator::Json;
 
-use crate::authentication::{Credentials, UserLogin};
+use crate::authentication::{Credentials, RegisterUser, UserLogin};
 use crate::util::utoipa::{Unauthorized, ValidationError};
 
 pub fn user_controller(cfg: &mut web::ServiceConfig) {
-	cfg.service(web::scope("/user").service(login).service(logout));
+	cfg.service(web::scope("/user").service(register).service(login).service(logout));
+}
+
+#[utoipa::path(post,
+responses(
+(status = 200, description = "Successfully registered.", content_type = "application/json"),
+(status = 400, response = ValidationError)
+),
+path = "/api/v1/user/register",
+request_body = RegisterUser,
+tag = "User"
+)]
+#[post("/register")]
+pub async fn register(_user: Json<RegisterUser>) -> actix_web::Result<impl Responder> {
+	Ok(HttpResponse::NotImplemented())
 }
 
 #[utoipa::path(post,

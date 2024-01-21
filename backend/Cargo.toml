@@ -18,6 +18,9 @@ actix-identity = "0.7.0"
 actix-web-validator = "5.0.1"
 validator = { version = "0.16.1", features = ["derive"] }
 
+# Async runtime
+tokio.workspace = true
+
 # Database / ORM
 sea-orm.workspace = true
 entity = { path = "../entity" }
@@ -41,3 +44,4 @@ time = "0.3.31" #Needed for giving timestamps to logs
 # Utils
 dotenvy = "0.15.7"
 derive_more= "0.99"
+regex = {  version = "1.10.2", features = ["std", "perf", "unicode"] }

@@ -1,21 +1,31 @@
 use sea_orm::EntityTrait;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use utoipa::ToSchema;
+use validator::Validate;
 
 use entity::prelude::User;
 use entity::user::Model;
 
 use crate::database::connection::get_database_connection;
-use validator::Validate;
+use crate::util::validation::validate_password;
+
+#[derive(Deserialize, ToSchema, Validate)]
+pub struct RegisterUser {
+	#[validate(length(min = 1))]
+	pub username: String,
+	#[validate(email)]
+	pub email: Option<String>,
+	#[validate(custom = "validate_password")]
+	pub password: String,
+}
 
 #[derive(Deserialize, ToSchema, Validate)]
 pub struct Credentials {
-	#[validate(length(min = 3))]
+	#[validate(length(min = 1))]
 	pub username: String,
 	pub password: String,
 }
 
-#[derive(Serialize)]
 pub struct UserLogin {
 	pub id: i32,
 	pub username: String,

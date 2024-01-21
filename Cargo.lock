@@ -689,11 +689,13 @@ dependencies = [
  "log",
  "migration",
  "redis",
+ "regex",
  "sea-orm",
  "serde",
  "serde_json",
  "simple_logger",
  "time",
+ "tokio",
  "utoipa",
  "utoipa-swagger-ui",
  "utoipauto",
@@ -3017,9 +3019,9 @@ dependencies = [
 
 [[package]]
 name = "smallvec"
-version = "1.13.0"
+version = "1.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3b187f0231d56fe41bfb12034819dd2bf336422a5866de41bc3fec4b2e3883e8"
+checksum = "e6ecd384b10a64542d77071bd64bd7b231f4ed5940fba55e98c3de13824cf3d7"
 
 [[package]]
 name = "socket2"
@@ -3475,7 +3477,19 @@ dependencies = [
  "pin-project-lite",
  "signal-hook-registry",
  "socket2 0.5.5",
+ "tokio-macros",
  "windows-sys 0.48.0",
+]
+
+[[package]]
+name = "tokio-macros"
+version = "2.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5b8a1e28f2deaa14e508979454cb3a223b10b938b45af148bc0986de36f1923b"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.48",
 ]
 
 [[package]]
