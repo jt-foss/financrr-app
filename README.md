@@ -11,6 +11,8 @@ The backend for financrr - The most modern finance manager you've ever seen!
 
 **NOTE:** When deploying, it is highly recommended to use this in combination with a [reverse proxy](https://www.cloudflare.com/learning/cdn/glossary/reverse-proxy/#:~:text=A%20reverse%20proxy%20is%20a,security%2C%20performance%2C%20and%20reliability.). See: [Reverse proxy quick-start - Caddy Documentation](https://caddyserver.com/docs/quick-starts/reverse-proxy)
 
+**NOTE:** Building on windows is currently broken. See [this issue](https://github.com/ProbablyClem/utoipauto/issues/10) for more information.
+
 ### Getting Started (Docker Compose)
 
 1. run `bin/install.bash`
