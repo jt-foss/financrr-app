@@ -48,6 +48,10 @@ pub static CONFIG: OnceLock<Config> = OnceLock::new();
 #[utoipauto(paths = "./backend/src")]
 #[derive(OpenApi)]
 #[openapi(
+tags(
+(name = "Status", description = "Endpoints that contain information about the health status of the server."),
+(name = "User", description = "Endpoints for user management.")
+),
 modifiers(&SecurityAddon)
 )]
 pub struct ApiDoc;

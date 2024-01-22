@@ -4,6 +4,7 @@ pub mod prelude;
 
 pub mod account;
 pub mod currency;
+pub mod error;
 pub mod transaction;
 pub mod user;
 pub mod utility;

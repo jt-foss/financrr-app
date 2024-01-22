@@ -1,29 +1,20 @@
-use crate::api::ApiError;
 use actix_identity::Identity;
 use actix_session::Session;
-use actix_web::{delete, error, post, web, Error, HttpMessage, HttpRequest, HttpResponse, Responder};
+use actix_web::{delete, post, web, HttpMessage, HttpRequest, HttpResponse, Responder};
 use actix_web_validator::Json;
+use sea_orm::ActiveModelTrait;
 
+use entity::prelude::User;
+
+use crate::api::ApiError;
 use crate::authentication::{Credentials, RegisterUser, UserLogin};
-use crate::util::constant;
-use crate::util::utoipa::{Unauthorized, ValidationError};
+use crate::database::connection::get_database_connection;
+use crate::util::identity::{is_identity_valid, is_signed_in};
+use crate::util::utoipa::{InternalServerError, Unauthorized, ValidationError};
+use crate::util::validation::{validate_unique_username, ValidationErrorJsonPayload};
 
 pub fn user_controller(cfg: &mut web::ServiceConfig) {
 	cfg.service(web::scope("/user").service(register).service(login).service(logout));
-}
-
-#[utoipa::path(post,
-responses(
-(status = 200, description = "Successfully registered.", content_type = "application/json"),
-(status = 400, response = ValidationError)
-),
-path = "/api/v1/user/register",
-request_body = RegisterUser,
-tag = "User"
-)]
-#[post("/register")]
-pub async fn register(_user: Json<RegisterUser>) -> actix_web::Result<impl Responder> {
-	Ok(HttpResponse::NotImplemented())
 }
 
 #[utoipa::path(post,
@@ -37,7 +28,7 @@ request_body = Credentials,
 tag = "User")]
 #[post("/login")]
 pub async fn login(request: HttpRequest, session: Session, credentials: Json<Credentials>) -> impl Responder {
-	if let Ok(Some(_)) = session.get::<String>(constant::IDENTITY_ID_KEY) {
+	if is_signed_in(&session) {
 		return HttpResponse::Ok();
 	}
 
@@ -65,14 +56,34 @@ pub async fn logout(identity: Identity) -> actix_web::Result<impl Responder> {
 	Ok(HttpResponse::Ok())
 }
 
-fn is_identity_valid(identity: &Identity) -> Result<(), Error> {
-	match identity.id() {
-		Ok(_) => Ok(()),
-		Err(_) => Err(error::ErrorUnauthorized(ApiError::invalid_session())),
+#[utoipa::path(post,
+responses(
+(status = 200, description = "Successfully registered.", content_type = "application/json"),
+(status = 409, description = "User is signed in."),
+(status = 400, response = ValidationError),
+(status = 500, response = InternalServerError)
+),
+path = "/api/v1/user/register",
+request_body = RegisterUser,
+tag = "User"
+)]
+#[post("/register")]
+pub async fn register(session: Session, user: Json<RegisterUser>) -> Result<impl Responder, ApiError> {
+	validate_username(&user.username).await?;
+	if is_signed_in(&session) {
+		return Err(ApiError::signed_in());
+	}
+
+	let user = user.into_inner();
+	match User::register(user.username, user.email, user.password) {
+		Ok(user) => {
+			user.insert(get_database_connection()).await.map_err(ApiError::from)?;
+			Ok(HttpResponse::Ok())
+		}
+		Err(e) => Err(ApiError::from(e)),
 	}
 }
 
-// #[post("/user")]
-// pub async fn register() -> actix_web::Result<impl Responder> {
-// 	todo!()
-// }
+async fn validate_username(username: &str) -> Result<(), ApiError> {
+	validate_unique_username(username).await.map_err(|e| ApiError::from(ValidationErrorJsonPayload::from(e)))
+}

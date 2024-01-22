@@ -3,9 +3,6 @@ name = "backend"
 version.workspace = true
 edition.workspace = true
 
-[package.metadata.cargo-machete]
-ignored = ["serde_json"]
-
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
@@ -17,9 +14,6 @@ actix-identity = "0.7.0"
 # Validation
 actix-web-validator = "5.0.1"
 validator = { version = "0.16.1", features = ["derive"] }
-
-# Async runtime
-tokio.workspace = true
 
 # Database / ORM
 sea-orm.workspace = true

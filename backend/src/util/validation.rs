@@ -8,16 +8,20 @@ use serde_json::Value;
 use utoipa::ToSchema;
 use validator::ValidationError;
 
+use entity::prelude::User;
+
+use crate::database::connection::get_database_connection;
+
 pub const MIN_PASSWORD_LENGTH: usize = 16;
 pub const MAX_PASSWORD_LENGTH: usize = 128;
 
-#[derive(Serialize, ToSchema)]
+#[derive(Debug, Serialize, ToSchema)]
 pub struct ValidationErrorJsonPayload {
 	pub message: String,
 	pub fields: Vec<FieldError>,
 }
 
-#[derive(Serialize, ToSchema)]
+#[derive(Debug, Serialize, ToSchema)]
 pub struct FieldError {
 	pub field_name: String,
 	pub code: String,
@@ -31,6 +35,17 @@ impl From<&validator::ValidationErrors> for ValidationErrorJsonPayload {
 		for (index, field, error) in errors {
 			field_errors.insert(index as usize, map_field_error(field.as_str(), error))
 		}
+		ValidationErrorJsonPayload {
+			message: "Validation error".to_owned(),
+			fields: field_errors,
+		}
+	}
+}
+
+impl From<ValidationError> for ValidationErrorJsonPayload {
+	fn from(error: ValidationError) -> Self {
+		let mut field_errors: Vec<FieldError> = Vec::new();
+		field_errors.insert(0, map_field_error("", &error));
 		ValidationErrorJsonPayload {
 			message: "Validation error".to_owned(),
 			fields: field_errors,
@@ -70,7 +85,7 @@ pub fn validate_password(password: &str) -> Result<(), ValidationError> {
 		error.add_param(Cow::from("digit"), &"Must contain at least one digit");
 	}
 
-	let special_character = Regex::new("[!@#$%^&*(),.?\":{}|<>]").unwrap();
+	let special_character = Regex::new("[€§!@#$%^&*(),.?\":{}|<>]").unwrap();
 	if !special_character.is_match(password) {
 		error.add_param(Cow::from("special_character"), &"Must contain at least one special character");
 	}
@@ -82,11 +97,10 @@ pub fn validate_password(password: &str) -> Result<(), ValidationError> {
 	Ok(())
 }
 
-// #[tokio::main]
-// pub async fn validate_unique_username(username: &str) -> Result<(), validator::ValidationError> {
-// 	if (User::find_by_username(username.to_string()).one(get_database_connection()).await).is_ok() {
-// 		return Err(validator::ValidationError::new("Username is not unique"));
-// 	}
-//
-// 	Ok(())
-// }
+pub async fn validate_unique_username(username: &str) -> Result<(), ValidationError> {
+	match User::find_by_username(username.to_string()).one(get_database_connection()).await {
+		Ok(Some(_)) => Err(ValidationError::new("Username is not unique")),
+		Err(_) => Err(ValidationError::new("Internal server error")),
+		_ => Ok(()),
+	}
+}
