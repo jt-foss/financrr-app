@@ -16,6 +16,7 @@ impl MigrationTrait for Migration {
 			username: Set("admin".to_string()),
 			password: Set(hashed_password.to_string()),
 			created_at: Set(chrono::Local::now().naive_local()),
+			is_admin: Set(true),
 			..Default::default()
 		};
 		match user.insert(manager.get_connection()).await {

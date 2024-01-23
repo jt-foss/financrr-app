@@ -29,16 +29,14 @@ use entity::utility::loading::load_schema;
 use migration::Migrator;
 use migration::MigratorTrait;
 
+use crate::api::status::controller::status_controller;
+use crate::api::user::controller::user_controller;
 use crate::config::Config;
-use crate::controller::status::status_controller;
-use crate::controller::user::user_controller;
 use crate::database::connection::{establish_database_connection, get_database_connection};
 use crate::util::validation::ValidationErrorJsonPayload;
 
 pub mod api;
-pub mod authentication;
 pub mod config;
-pub mod controller;
 pub mod database;
 pub mod util;
 

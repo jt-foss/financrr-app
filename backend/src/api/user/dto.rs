@@ -1,13 +1,17 @@
+use crate::database::connection::get_database_connection;
+use crate::util::validation::validate_password;
+use entity::prelude::User;
+use entity::user::Model;
 use sea_orm::EntityTrait;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use validator::Validate;
 
-use entity::prelude::User;
-use entity::user::Model;
-
-use crate::database::connection::get_database_connection;
-use crate::util::validation::validate_password;
+#[derive(Serialize)]
+pub struct UserRegistration {
+	username: String,
+	password: String,
+}
 
 #[derive(Deserialize, ToSchema, Validate)]
 pub struct RegisterUser {

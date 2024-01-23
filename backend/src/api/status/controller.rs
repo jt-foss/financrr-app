@@ -1,7 +1,6 @@
 use actix_web::{get, web, HttpResponse, Responder};
-use serde::Serialize;
-use utoipa::ToSchema;
 
+use crate::api::status::dto::HealthResponse;
 use crate::config::Config;
 use crate::database::connection::get_database_connection;
 
@@ -9,19 +8,13 @@ pub fn status_controller(cfg: &mut web::ServiceConfig) {
 	cfg.service(web::scope("/status").service(health));
 }
 
-#[derive(Serialize, ToSchema)]
-pub struct HealthResponse {
-	healthy: bool,
-	details: Option<String>,
-}
-
 #[utoipa::path(get,
 responses(
 (status = 200, description = "healthy", content_type = "application/json", body = HealthResponse),
 (status = 503, description = "Service is unhealthy", content_type = "application/json", body = HealthResponse, example = json!(
 {
-	"healthy": false,
-	"details": "PostgreSQL connection failed"
+"healthy": false,
+"details": "PostgreSQL connection failed"
 }
 ))),
 path = "/api/v1/status/health",

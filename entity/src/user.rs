@@ -17,6 +17,7 @@ pub struct Model {
 	#[sea_orm(column_type = "Text")]
 	pub password: String,
 	pub created_at: DateTime,
+	pub is_admin: bool,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
@@ -63,6 +64,7 @@ impl Entity {
 			email: Set(email),
 			password: Set(hashed_password),
 			created_at: Set(chrono::Local::now().naive_local()),
+			is_admin: Set(false),
 			..Default::default()
 		})
 	}

@@ -4,10 +4,10 @@ use actix_web::{delete, post, web, HttpMessage, HttpRequest, HttpResponse, Respo
 use actix_web_validator::Json;
 use sea_orm::ActiveModelTrait;
 
+use crate::api::error::ApiError;
+use crate::api::user::dto::{Credentials, RegisterUser, UserLogin};
 use entity::prelude::User;
 
-use crate::api::ApiError;
-use crate::authentication::{Credentials, RegisterUser, UserLogin};
 use crate::database::connection::get_database_connection;
 use crate::util::identity::{is_identity_valid, is_signed_in};
 use crate::util::utoipa::{InternalServerError, Unauthorized, ValidationError};

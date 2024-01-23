@@ -2,7 +2,7 @@ use actix_identity::Identity;
 use actix_session::Session;
 use actix_web::{error, Error};
 
-use crate::api::ApiError;
+use crate::api::error::ApiError;
 use crate::util::constant;
 
 pub fn is_identity_valid(identity: &Identity) -> Result<(), Error> {
