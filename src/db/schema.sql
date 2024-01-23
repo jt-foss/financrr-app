@@ -13,7 +13,8 @@ CREATE TABLE "user"
 	username   TEXT UNIQUE NOT NULL,
 	email      TEXT UNIQUE,
 	password   TEXT        NOT NULL,
-	created_at TIMESTAMP   NOT NULL DEFAULT current_timestamp
+	created_at TIMESTAMP   NOT NULL DEFAULT current_timestamp,
+	is_admin   BOOLEAN     NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE account

@@ -19,6 +19,7 @@ erDiagram
 		string email UK "Nullable"
 		string password UK "Hashed and salted Password"
 		timestamp created_at "NotNull"
+		bool is_admin "NotNull"
 	}
 	User }o--o{ Account: "many to many"
 
