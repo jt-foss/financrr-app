@@ -21,7 +21,6 @@ erDiagram
 		timestamp created_at "NotNull"
 		bool is_admin "NotNull"
 	}
-	User }o--o{ Account: "many to many"
 
 	Account {
 		int id PK
@@ -33,7 +32,6 @@ erDiagram
 		Currency currency FK "NotNull"
 		timestamp created_at "NotNull"
 	}
-	Account }o--o{ User: "many to many"
 	Account ||--|| Currency: "one to one"
 
 	UserAccount {
