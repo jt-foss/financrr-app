@@ -12,6 +12,9 @@ pub fn is_identity_valid(identity: &Identity) -> Result<(), Error> {
 	}
 }
 
-pub fn is_signed_in(session: &Session) -> bool {
-	matches!(session.get::<String>(constant::IDENTITY_ID_KEY), Ok(Some(_)))
+pub fn is_signed_in(session: &Session) -> Result<(), ApiError> {
+	match session.get::<String>(constant::IDENTITY_ID_KEY) {
+		Ok(Some(_)) => Ok(()),
+		_ => Err(ApiError::signed_in()),
+	}
 }

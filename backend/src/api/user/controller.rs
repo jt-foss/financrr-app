@@ -28,7 +28,7 @@ request_body = Credentials,
 tag = "User")]
 #[post("/login")]
 pub async fn login(request: HttpRequest, session: Session, credentials: Json<Credentials>) -> impl Responder {
-	if is_signed_in(&session) {
+	if is_signed_in(&session).is_err() {
 		return HttpResponse::Ok();
 	}
 
@@ -70,9 +70,7 @@ tag = "User"
 #[post("/register")]
 pub async fn register(session: Session, user: Json<RegisterUser>) -> Result<impl Responder, ApiError> {
 	validate_username(&user.username).await?;
-	if is_signed_in(&session) {
-		return Err(ApiError::signed_in());
-	}
+	is_signed_in(&session)?;
 
 	let user = user.into_inner();
 	match User::register(user.username, user.email, user.password) {
