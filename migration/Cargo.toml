@@ -16,4 +16,4 @@ sea-orm-migration = "0.12.10"
 log.workspace = true
 
 # Utils
-chrono = "0.4.31"
+chrono = "0.4.32"
