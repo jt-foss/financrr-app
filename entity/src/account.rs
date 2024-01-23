@@ -7,11 +7,13 @@ use sea_orm::entity::prelude::*;
 pub struct Model {
 	#[sea_orm(primary_key)]
 	pub id: i32,
-	pub user_id: i32,
+	pub owner: i32,
 	#[sea_orm(column_type = "Text", unique)]
 	pub name: String,
 	#[sea_orm(column_type = "Text", nullable)]
 	pub description: Option<String>,
+	#[sea_orm(column_type = "Text", nullable, unique)]
+	pub iban: Option<String>,
 	pub balance: i32,
 	pub currency: i32,
 	pub created_at: DateTime,
@@ -29,12 +31,14 @@ pub enum Relation {
 	Currency,
 	#[sea_orm(
 		belongs_to = "super::user::Entity",
-		from = "Column::UserId",
+		from = "Column::Owner",
 		to = "super::user::Column::Id",
 		on_update = "NoAction",
 		on_delete = "NoAction"
 	)]
 	User,
+	#[sea_orm(has_many = "super::user_account::Entity")]
+	UserAccount,
 }
 
 impl Related<super::currency::Entity> for Entity {
@@ -43,9 +47,18 @@ impl Related<super::currency::Entity> for Entity {
 	}
 }
 
+impl Related<super::user_account::Entity> for Entity {
+	fn to() -> RelationDef {
+		Relation::UserAccount.def()
+	}
+}
+
 impl Related<super::user::Entity> for Entity {
 	fn to() -> RelationDef {
-		Relation::User.def()
+		super::user_account::Relation::User.def()
+	}
+	fn via() -> Option<RelationDef> {
+		Some(super::user_account::Relation::Account.def().rev())
 	}
 }
 

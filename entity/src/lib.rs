@@ -7,4 +7,5 @@ pub mod currency;
 pub mod error;
 pub mod transaction;
 pub mod user;
+pub mod user_account;
 pub mod utility;

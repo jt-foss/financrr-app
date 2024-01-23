@@ -4,3 +4,4 @@ pub use super::account::Entity as Account;
 pub use super::currency::Entity as Currency;
 pub use super::transaction::Entity as Transaction;
 pub use super::user::Entity as User;
+pub use super::user_account::Entity as UserAccount;
