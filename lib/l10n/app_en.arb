@@ -9,8 +9,6 @@
   "@loginBiometricsGenericFingerprint": {},
   "loginFieldHost": "Host",
   "@loginFieldHost": {},
-  "loginGreeting2": "Good to see you!",
-  "@loginGreeting2": {},
   "loginFieldEmail": "E-Mail",
   "@loginFieldEmail": {},
   "loginFieldPassword": "Password",
