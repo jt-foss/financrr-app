@@ -21,7 +21,7 @@ CREATE TABLE account
 (
 	id          SERIAL PRIMARY KEY,
 	owner       INTEGER REFERENCES "user" (id)   NOT NULL,
-	name        TEXT UNIQUE                      NOT NULL,
+	name        TEXT                             NOT NULL,
 	description TEXT,
 	iban        TEXT UNIQUE,
 	balance     INTEGER                          NOT NULL DEFAULT 0,

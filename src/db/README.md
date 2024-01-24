@@ -25,7 +25,7 @@ erDiagram
 	Account {
 		int id PK
 		User owner FK "NotNull"
-		string name UK "NotNull"
+		string name "NotNull"
 		string description "Nullable"
 		string iban UK "Nullable"
 		int balance "NotNull"
