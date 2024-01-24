@@ -2,7 +2,9 @@ use std::borrow::Cow;
 use std::collections::HashMap;
 
 use actix_web_validator::error::flatten_errors;
+use iban::Iban;
 use regex::Regex;
+use sea_orm::EntityTrait;
 use serde::Serialize;
 use serde_json::Value;
 use utoipa::ToSchema;
@@ -102,5 +104,19 @@ pub async fn validate_unique_username(username: &str) -> Result<(), ValidationEr
 		Ok(Some(_)) => Err(ValidationError::new("Username is not unique")),
 		Err(_) => Err(ValidationError::new("Internal server error")),
 		_ => Ok(()),
+	}
+}
+
+pub fn validate_iban(iban: &str) -> Result<(), ValidationError> {
+	match iban.parse::<Iban>() {
+		Ok(_) => Ok(()),
+		Err(_) => Err(ValidationError::new("IBAN is invalid")),
+	}
+}
+
+pub async fn validate_currency_exists(id: i32) -> Result<(), ValidationError> {
+	match entity::currency::Entity::find_by_id(id).one(get_database_connection()).await {
+		Ok(Some(_)) => Ok(()),
+		_ => Err(ValidationError::new("Currency does not exist")),
 	}
 }

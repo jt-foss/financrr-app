@@ -6,6 +6,7 @@ use derive_more::{Display, Error};
 use sea_orm::DbErr;
 use serde::{Serialize, Serializer};
 use utoipa::ToSchema;
+use validator::ValidationError;
 
 use entity::error::EntityError;
 
@@ -52,10 +53,34 @@ impl ApiError {
 		}
 	}
 
+	pub fn invalid_identity() -> Self {
+		Self {
+			status_code: StatusCode::UNAUTHORIZED,
+			details: "Invalid identity provided.".to_string(),
+			reference: None,
+		}
+	}
+
 	pub fn signed_in() -> Self {
 		Self {
 			status_code: StatusCode::CONFLICT,
 			details: "User is signed in.".to_string(),
+			reference: None,
+		}
+	}
+
+	pub fn invalid_credentials() -> Self {
+		Self {
+			status_code: StatusCode::UNAUTHORIZED,
+			details: "Invalid credentials provided.".to_string(),
+			reference: None,
+		}
+	}
+
+	pub fn not_found(resource_name: &str) -> Self {
+		Self {
+			status_code: StatusCode::NOT_FOUND,
+			details: format!("Could not found {}", resource_name),
 			reference: None,
 		}
 	}
@@ -99,5 +124,11 @@ impl From<ValidationErrorJsonPayload> for ApiError {
 			details: value.message.clone(),
 			reference: serializable_struct,
 		}
+	}
+}
+
+impl From<ValidationError> for ApiError {
+	fn from(value: ValidationError) -> Self {
+		Self::from(ValidationErrorJsonPayload::from(value))
 	}
 }

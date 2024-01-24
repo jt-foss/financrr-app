@@ -18,6 +18,9 @@ edition = "2021"
 rust-version = "1.75.0"
 
 [workspace.dependencies]
+# Actix
+actix-identity = "0.7.0"
+
 # ORM
 sea-orm = { version = "0.12.11", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros", "mock"] }
 
