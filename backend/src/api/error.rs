@@ -13,7 +13,7 @@ use entity::error::EntityError;
 use crate::util::validation::ValidationErrorJsonPayload;
 
 #[derive(Debug, Display, Error, Serialize, ToSchema)]
-#[display(fmt = "Error details: {}", details)]
+#[display("Error details: {}", details)]
 pub struct ApiError {
 	#[serde(skip)]
 	pub status_code: StatusCode,

@@ -38,5 +38,5 @@ time = "0.3.31" #Needed for giving timestamps to logs
 
 # Utils
 dotenvy = "0.15.7"
-derive_more= "0.99"
+derive_more = { version = "1.0.0-beta.6", features = ["display", "error"] }
 regex = {  version = "1.10.3", features = ["std", "perf", "unicode"] }
