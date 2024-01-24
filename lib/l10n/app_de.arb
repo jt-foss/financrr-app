@@ -15,8 +15,6 @@
   "@loginFieldHostCustom": {},
   "loginBiometricsGenericFingerprint": "Mit Fingerabdruck anmelden",
   "@loginBiometricsGenericFingerprint": {},
-  "loginGreeting2": "Schön dich zu sehen!",
-  "@loginGreeting2": {},
   "loginFieldHost": "Host",
   "@loginFieldHost": {},
   "loginFieldEmail": "E-Mail",
