@@ -7,8 +7,6 @@
   "@settingsHostURL": {},
   "settingsHostPort": "Port",
   "@settingsHostPort": {},
-  "loginFieldPassword": "Passwort",
-  "@loginFieldPassword": {},
   "settingsHostSave": "Host speichern",
   "@settingsHostSave": {},
   "errorUnknown": "Ein unbekannter Fehler ist aufgetreten. Bitte versuche es später erneut.",
