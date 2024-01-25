@@ -9,8 +9,6 @@
   "@settingsHostURL": {},
   "settingsHostPort": "Port",
   "@settingsHostPort": {},
-  "loginBiometricsTouchID": "Mit Touch ID anmelden",
-  "@loginBiometricsTouchID": {},
   "loginFieldHostCustom": "{url} ({version})",
   "@loginFieldHostCustom": {},
   "loginBiometricsGenericFingerprint": "Mit Fingerabdruck anmelden",
