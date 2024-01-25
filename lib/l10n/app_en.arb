@@ -9,8 +9,6 @@
   "@loginBiometricsFaceID": {},
   "settingsHostSave": "Save Host",
   "@settingsHostSave": {},
-  "loginButtonSignInAwait": "Signing you in…",
-  "@loginButtonSignInAwait": {},
   "loginBiometricsGeneric": "Login using Biometrics",
   "@loginBiometricsGeneric": {},
   "settingsHostURL": "URL",
