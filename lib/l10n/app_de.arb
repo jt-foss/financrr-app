@@ -11,8 +11,6 @@
   "@settingsHostPort": {},
   "loginFieldHostCustom": "{url} ({version})",
   "@loginFieldHostCustom": {},
-  "loginBiometricsGenericFingerprint": "Mit Fingerabdruck anmelden",
-  "@loginBiometricsGenericFingerprint": {},
   "loginFieldHost": "Host",
   "@loginFieldHost": {},
   "loginFieldEmail": "E-Mail",
