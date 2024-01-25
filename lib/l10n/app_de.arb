@@ -11,8 +11,6 @@
   "@settingsHostPort": {},
   "loginFieldHostCustom": "{url} ({version})",
   "@loginFieldHostCustom": {},
-  "loginFieldHost": "Host",
-  "@loginFieldHost": {},
   "loginFieldEmail": "E-Mail",
   "@loginFieldEmail": {},
   "loginFieldPassword": "Passwort",
