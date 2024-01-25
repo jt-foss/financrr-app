@@ -5,8 +5,6 @@
   "@brandSlogan": {},
   "loginFieldPassword": "Password",
   "@loginFieldPassword": {},
-  "loginBiometricsFaceID": "Login using Face ID",
-  "@loginBiometricsFaceID": {},
   "settingsHostSave": "Save Host",
   "@settingsHostSave": {},
   "loginBiometricsGeneric": "Login using Biometrics",
