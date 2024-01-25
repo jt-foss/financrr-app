@@ -17,8 +17,6 @@
   "@loginBiometricsFaceID": {},
   "settingsHostSave": "Host speichern",
   "@settingsHostSave": {},
-  "loginButtonSignInAwait": "Melde an…",
-  "@loginButtonSignInAwait": {},
   "loginBiometricsGeneric": "Mit Biometrie anmelden",
   "@loginBiometricsGeneric": {},
   "errorUnknown": "Ein unbekannter Fehler ist aufgetreten. Bitte versuche es später erneut.",
