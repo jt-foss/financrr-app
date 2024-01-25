@@ -19,8 +19,6 @@
   "@settingsHostSave": {},
   "loginButtonSignInAwait": "Melde an…",
   "@loginButtonSignInAwait": {},
-  "loginButtonSignIn": "Anmelden",
-  "@loginButtonSignIn": {},
   "loginBiometricsGeneric": "Mit Biometrie anmelden",
   "@loginBiometricsGeneric": {},
   "errorUnknown": "Ein unbekannter Fehler ist aufgetreten. Bitte versuche es später erneut.",
