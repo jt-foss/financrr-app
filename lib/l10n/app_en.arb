@@ -3,8 +3,6 @@
   "@brandName": {},
   "brandSlogan": "Know your money",
   "@brandSlogan": {},
-  "settingsHostPort": "Port",
-  "@settingsHostPort": {},
   "errorUnknown": "An unknown error occurred. Please try again later.",
   "@errorUnknown": {},
   "errorUnauthorized": "Seems like you've got your credentials wrong. Please try again.",
