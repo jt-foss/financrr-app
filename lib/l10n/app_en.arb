@@ -11,8 +11,6 @@
   "@settingsHostSave": {},
   "loginButtonSignInAwait": "Signing you in…",
   "@loginButtonSignInAwait": {},
-  "loginButtonSignIn": "Sign In",
-  "@loginButtonSignIn": {},
   "loginBiometricsGeneric": "Login using Biometrics",
   "@loginBiometricsGeneric": {},
   "settingsHostURL": "URL",
