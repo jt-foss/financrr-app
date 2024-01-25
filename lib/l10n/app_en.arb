@@ -13,8 +13,6 @@
   "@settingsHostURL": {},
   "settingsHostPort": "Port",
   "@settingsHostPort": {},
-  "loginFieldHostCustomAdd": "Add custom Host…",
-  "@loginFieldHostCustomAdd": {},
   "errorUnknown": "An unknown error occurred. Please try again later.",
   "@errorUnknown": {},
   "errorUnauthorized": "Seems like you've got your credentials wrong. Please try again.",
