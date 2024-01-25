@@ -927,9 +927,9 @@ checksum = "fd16c4719339c4530435d38e511904438d07cce7950afa3718a84ac36c10e89e"
 
 [[package]]
 name = "chrono"
-version = "0.4.32"
+version = "0.4.33"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "41daef31d7a747c5c847246f36de49ced6f7403b4cdabc807a97b5cc184cda7a"
+checksum = "9f13690e35a5e4ace198e7beea2895d29f3a9cc55015fcebe6336bd2010af9eb"
 dependencies = [
  "android-tzdata",
  "iana-time-zone",
@@ -3832,18 +3832,18 @@ dependencies = [
 
 [[package]]
 name = "utoipauto"
-version = "0.1.7"
+version = "0.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c433118aaea459930abbb270e21370492d589a90918c20761ac3d5335d44f2ef"
+checksum = "aaeb4a069f093f23856ed25855e438cbd5cb5a445d37c8d7c449d841e170ed21"
 dependencies = [
  "utoipauto-macro",
 ]
 
 [[package]]
 name = "utoipauto-core"
-version = "0.1.7"
+version = "0.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "295647ca48197c3eb5548796f66281d9d5afea4ee3ffbdf5077dee3dc9bbbcfb"
+checksum = "c18d4d8f7b0f20bc2e7ee24c7a7bdbd4de78e8bfe2ac165e4582dd7f6258a7fa"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3852,9 +3852,9 @@ dependencies = [
 
 [[package]]
 name = "utoipauto-macro"
-version = "0.1.7"
+version = "0.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "706f151e3292e69f9742794a787a10b5fce94b3765d6ccad2ca2161bf3619026"
+checksum = "053ccc43c4b16da38ba76b43eee800e2e176fb2359b1d40a60468cfb91adf0ca"
 dependencies = [
  "proc-macro2",
  "quote",
