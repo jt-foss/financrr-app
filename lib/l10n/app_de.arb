@@ -11,8 +11,6 @@
   "@loginFieldPassword": {},
   "settingsHostSave": "Host speichern",
   "@settingsHostSave": {},
-  "loginBiometricsGeneric": "Mit Biometrie anmelden",
-  "@loginBiometricsGeneric": {},
   "errorUnknown": "Ein unbekannter Fehler ist aufgetreten. Bitte versuche es später erneut.",
   "@errorUnknown": {},
   "errorUnauthorized": "Sieht so aus als hättest du dich bei deinen Anmeldedaten vertippt. Bitte versuche es erneut.",
