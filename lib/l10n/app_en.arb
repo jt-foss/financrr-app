@@ -7,8 +7,6 @@
   "@loginFieldPassword": {},
   "settingsHostSave": "Save Host",
   "@settingsHostSave": {},
-  "loginBiometricsGeneric": "Login using Biometrics",
-  "@loginBiometricsGeneric": {},
   "settingsHostURL": "URL",
   "@settingsHostURL": {},
   "settingsHostPort": "Port",
