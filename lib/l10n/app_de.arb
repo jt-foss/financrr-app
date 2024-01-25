@@ -11,8 +11,6 @@
   "@settingsHostPort": {},
   "loginFieldHostCustom": "{url} ({version})",
   "@loginFieldHostCustom": {},
-  "loginFieldEmail": "E-Mail",
-  "@loginFieldEmail": {},
   "loginFieldPassword": "Passwort",
   "@loginFieldPassword": {},
   "loginBiometricsFaceID": "Mit Face ID anmelden",
