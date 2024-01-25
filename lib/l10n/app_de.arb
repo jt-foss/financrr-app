@@ -11,8 +11,6 @@
   "@settingsHostPort": {},
   "loginFieldPassword": "Passwort",
   "@loginFieldPassword": {},
-  "loginBiometricsFaceID": "Mit Face ID anmelden",
-  "@loginBiometricsFaceID": {},
   "settingsHostSave": "Host speichern",
   "@settingsHostSave": {},
   "loginBiometricsGeneric": "Mit Biometrie anmelden",
