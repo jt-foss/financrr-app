@@ -28,7 +28,5 @@
   "signUpMessage4": "Let's sign you up!",
   "@signUpMessage4": {},
   "settingsHostUnreachable": "Couldn't connect to financrr API service. Please check your host URL.",
-  "@settingsHostUnreachable": {},
-  "email": "E-Mail",
-  "@email": {}
+  "@settingsHostUnreachable": {}
 }
