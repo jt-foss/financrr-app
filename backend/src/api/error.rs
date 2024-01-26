@@ -21,7 +21,7 @@ pub struct ApiError {
 	pub reference: Option<SerializableStruct>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, ToSchema)]
 pub struct SerializableStruct {
 	serialized: serde_json::Value,
 }
@@ -77,10 +77,18 @@ impl ApiError {
 		}
 	}
 
-	pub fn not_found(resource_name: &str) -> Self {
+	pub fn resource_not_found(resource_name: &str) -> Self {
 		Self {
 			status_code: StatusCode::NOT_FOUND,
 			details: format!("Could not found {}", resource_name),
+			reference: None,
+		}
+	}
+
+	pub fn unauthorized() -> Self {
+		Self {
+			status_code: StatusCode::UNAUTHORIZED,
+			details: "Unauthorized.".to_string(),
 			reference: None,
 		}
 	}

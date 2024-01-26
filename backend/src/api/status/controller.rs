@@ -5,7 +5,7 @@ use crate::config::Config;
 use crate::database::connection::get_database_connection;
 
 pub fn status_controller(cfg: &mut web::ServiceConfig) {
-	cfg.service(web::scope("/status").service(health));
+	cfg.service(web::scope("/status").service(health).service(coffee));
 }
 
 #[utoipa::path(get,
@@ -38,6 +38,17 @@ async fn health() -> impl Responder {
 		healthy: true,
 		details: None,
 	})
+}
+
+#[utoipa::path(get,
+responses(
+(status = 418, description = "I'm a teapot"),
+),
+path = "/api/v1/status/coffee",
+tag = "Status")]
+#[get("/coffee")]
+pub async fn coffee() -> impl Responder {
+	HttpResponse::ImATeapot().finish()
 }
 
 async fn is_psql_reachable() -> bool {
