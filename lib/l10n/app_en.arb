@@ -72,5 +72,7 @@
   "genericPasswordEnter": "Enter your password",
   "@genericPasswordEnter": {},
   "settingsSelectHostOfficialTitle": "Official Server",
-  "@settingsSelectHostOfficialTitle": {}
+  "@settingsSelectHostOfficialTitle": {},
+  "helloWorld": "Hello World!",
+  "@helloWorld": {}
 }
