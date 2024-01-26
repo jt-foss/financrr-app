@@ -38,8 +38,8 @@ erDiagram
 		User user PK "References User.id"
 		Account account PK "References Account.id"
 	}
-	UserAccount ||--|| User: "many to one"
-	UserAccount ||--|| Account: "many to one"
+	UserAccount ||--|{ User: "many to one"
+	UserAccount ||--|{ Account: "many to one"
 
 	Transaction {
 		int id PK
