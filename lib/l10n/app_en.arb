@@ -50,5 +50,7 @@
   "signInMethodDivider": "OR",
   "@signInMethodDivider": {},
   "signInButtonGenericBiometrics": "Sign In using Biometrics",
-  "@signInButtonGenericBiometrics": {}
+  "@signInButtonGenericBiometrics": {},
+  "genericEmail": "E-Mail",
+  "@genericEmail": {}
 }
