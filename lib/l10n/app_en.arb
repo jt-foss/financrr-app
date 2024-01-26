@@ -29,8 +29,6 @@
   "@signUpMessage4": {},
   "settingsHostUnreachable": "Couldn't connect to financrr API service. Please check your host URL.",
   "@settingsHostUnreachable": {},
-  "signInPasswordFieldPlaceholder": "Enter your password",
-  "@signInPasswordFieldPlaceholder": {},
   "signInButtonTouchID": "Sign In using Touch ID",
   "@signInButtonTouchID": {},
   "signInButtonFingerprint": "Sign In using Fingerprint",
