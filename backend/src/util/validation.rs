@@ -2,6 +2,7 @@ use std::borrow::Cow;
 use std::collections::HashMap;
 
 use actix_web_validator::error::flatten_errors;
+use entity::currency;
 use iban::Iban;
 use regex::Regex;
 use sea_orm::EntityTrait;
@@ -37,7 +38,7 @@ impl From<&validator::ValidationErrors> for ValidationErrorJsonPayload {
 		for (index, field, error) in errors {
 			field_errors.insert(index as usize, map_field_error(field.as_str(), error))
 		}
-		ValidationErrorJsonPayload {
+		Self {
 			message: "Validation error".to_owned(),
 			fields: field_errors,
 		}
@@ -48,7 +49,7 @@ impl From<ValidationError> for ValidationErrorJsonPayload {
 	fn from(error: ValidationError) -> Self {
 		let mut field_errors: Vec<FieldError> = Vec::new();
 		field_errors.insert(0, map_field_error("", &error));
-		ValidationErrorJsonPayload {
+		Self {
 			message: "Validation error".to_owned(),
 			fields: field_errors,
 		}
@@ -115,7 +116,7 @@ pub fn validate_iban(iban: &str) -> Result<(), ValidationError> {
 }
 
 pub async fn validate_currency_exists(id: i32) -> Result<(), ValidationError> {
-	match entity::currency::Entity::find_by_id(id).one(get_database_connection()).await {
+	match currency::Entity::find_by_id(id).one(get_database_connection()).await {
 		Ok(Some(_)) => Ok(()),
 		_ => Err(ValidationError::new("Currency does not exist")),
 	}

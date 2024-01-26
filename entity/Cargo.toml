@@ -3,6 +3,9 @@ name = "entity"
 version.workspace = true
 edition.workspace = true
 
+[lints.clippy]
+wildcard_imports = "allow"
+
 [package.metadata.cargo-machete]
 ignored = ["rust-argon2"]
 

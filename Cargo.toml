@@ -17,6 +17,22 @@ readme = "README.md"
 edition = "2021"
 rust-version = "1.75.0"
 
+[workspace.lints.clippy]
+# Restriction
+absolute_paths = "warn"
+arithmetic_side_effects = "warn"
+
+# Pedantic
+wildcard-imports = "deny"
+cloned_instead_of_copied = "warn"
+explicit_iter_loop = "warn"
+unnecessary_wraps = "warn"
+unused_self = "warn"
+
+# Nursey
+cognitive_complexity = "deny"
+use_self = "warn"
+
 [workspace.dependencies]
 # Actix
 actix-identity = "0.7.0"

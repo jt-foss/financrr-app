@@ -19,9 +19,10 @@ use log::{info, LevelFilter};
 use middleware::TrailingSlash;
 use sea_orm::DatabaseConnection;
 use simple_logger::SimpleLogger;
+use std::io::Result;
 use time::macros::format_description;
 use utoipa::openapi::Components;
-use utoipa::{Modify, OpenApi};
+use utoipa::{openapi, Modify, OpenApi};
 use utoipa_swagger_ui::SwaggerUi;
 use utoipauto::utoipauto;
 
@@ -59,7 +60,7 @@ pub struct ApiDoc;
 pub struct SecurityAddon;
 
 impl Modify for SecurityAddon {
-	fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
+	fn modify(&self, openapi: &mut openapi::OpenApi) {
 		match openapi.components {
 			Some(_) => {}
 			None => {
@@ -71,7 +72,7 @@ impl Modify for SecurityAddon {
 }
 
 #[actix_web::main]
-async fn main() -> std::io::Result<()> {
+async fn main() -> Result<()> {
 	dotenv().ok();
 	configure_logger();
 

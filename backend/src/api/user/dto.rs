@@ -48,7 +48,7 @@ impl UserLogin {
 		match user {
 			Ok(Some(user)) => {
 				if user.verify_password(credentials.password.as_bytes()).unwrap_or(false) {
-					Some(UserLogin {
+					Some(Self {
 						id: user.id,
 						username: user.username,
 					})

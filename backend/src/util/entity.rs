@@ -7,8 +7,11 @@ pub async fn find_one_or_error<T>(select_stm: Select<T>) -> Result<T::Model, Api
 where
 	T: EntityTrait,
 {
-	let model =
-		select_stm.one(get_database_connection()).await.map_err(ApiError::from)?.ok_or(ApiError::not_found("User"))?;
+	let model = select_stm
+		.one(get_database_connection())
+		.await
+		.map_err(ApiError::from)?
+		.ok_or_else(|| ApiError::not_found("User"))?;
 
 	Ok(model)
 }

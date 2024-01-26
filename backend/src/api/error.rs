@@ -121,7 +121,7 @@ impl From<ValidationErrorJsonPayload> for ApiError {
 		let serializable_struct = SerializableStruct::new(&value).ok();
 		Self {
 			status_code: StatusCode::BAD_REQUEST,
-			details: value.message.clone(),
+			details: value.message,
 			reference: serializable_struct,
 		}
 	}

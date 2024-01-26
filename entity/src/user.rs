@@ -69,13 +69,13 @@ impl ActiveModel {
 }
 
 impl Entity {
-	pub fn find_by_username(username: String) -> Select<Entity> {
+	pub fn find_by_username(username: String) -> Select<Self> {
 		Self::find().filter(Column::Username.eq(username))
 	}
 
-	pub fn from_identity(identity: &Identity) -> Result<Select<Entity>, EntityError> {
+	pub fn from_identity(identity: &Identity) -> Result<Select<Self>, EntityError> {
 		let user_id = identity.id().map_err(EntityError::IdentityError)?;
 		let user_id = user_id.parse::<i32>().map_err(|_| EntityError::ParsingError)?;
-		Ok(Entity::find_by_id(user_id))
+		Ok(Self::find_by_id(user_id))
 	}
 }
