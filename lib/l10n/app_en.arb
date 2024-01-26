@@ -37,8 +37,6 @@
   "@signInButtonTouchID": {},
   "signInButtonFingerprint": "Sign In using Fingerprint",
   "@signInButtonFingerprint": {},
-  "signInPasswordFieldTitle": "Password",
-  "@signInPasswordFieldTitle": {},
   "signInButton": "Sign In",
   "@signInButton": {},
   "signInButtonFaceID": "Sign In using Face ID",
