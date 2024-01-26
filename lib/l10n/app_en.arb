@@ -43,8 +43,6 @@
   "@signInButtonFaceID": {},
   "genericPassword": "Password",
   "@genericPassword": {},
-  "signInEmailFieldTitle": "E-Mail",
-  "@signInEmailFieldTitle": {},
   "signInMethodDivider": "OR",
   "@signInMethodDivider": {},
   "signInButtonGenericBiometrics": "Sign In using Biometrics",
