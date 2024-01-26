@@ -43,7 +43,7 @@
   "@signInButton": {},
   "signInButtonFaceID": "Sign In using Face ID",
   "@signInButtonFaceID": {},
-  "genericPassword": "password",
+  "genericPassword": "Password",
   "@genericPassword": {},
   "signInEmailFieldTitle": "E-Mail",
   "@signInEmailFieldTitle": {},
