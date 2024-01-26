@@ -16,4 +16,5 @@ pub struct AccountCreation {
 	pub balance: i32,
 	#[validate(range(min = 0))]
 	pub currency_id: i32,
+	pub linked_user_ids: Option<Vec<i32>>,
 }

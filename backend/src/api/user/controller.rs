@@ -6,6 +6,7 @@ use sea_orm::ActiveModelTrait;
 
 use entity::user;
 
+use crate::api::dto::IdResponse;
 use crate::api::error::ApiError;
 use crate::api::user::dto::{Credentials, RegisterUser, UserLogin};
 use crate::database::connection::get_database_connection;
@@ -62,7 +63,7 @@ pub async fn logout(identity: Identity) -> Result<impl Responder, ApiError> {
 
 #[utoipa::path(post,
 responses(
-(status = 200, description = "Successfully registered.", content_type = "application/json"),
+(status = 200, description = "Successfully registered.", content_type = "application/json", body = IdResponse),
 (status = 409, description = "User is signed in."),
 (status = 400, response = ValidationError),
 (status = 500, response = InternalServerError)
@@ -79,8 +80,8 @@ pub async fn register(session: Session, user: Json<RegisterUser>) -> Result<impl
 	let user = user.into_inner();
 	match user::ActiveModel::register(user.username, user.email, user.password) {
 		Ok(user) => {
-			user.insert(get_database_connection()).await.map_err(ApiError::from)?;
-			Ok(HttpResponse::Ok())
+			let user = user.insert(get_database_connection()).await?;
+			Ok(HttpResponse::Ok().json(IdResponse::from(user)))
 		}
 		Err(e) => Err(ApiError::from(e)),
 	}
