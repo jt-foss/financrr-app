@@ -26,5 +26,9 @@
   "signUpMessage3": "A new user appears!",
   "@signUpMessage3": {},
   "signUpMessage4": "Let's sign you up!",
-  "@signUpMessage4": {}
+  "@signUpMessage4": {},
+  "settingsHostUnreachable": "Couldn't connect to financrr API service. Please check your host URL.",
+  "@settingsHostUnreachable": {},
+  "email": "E-Mail",
+  "@email": {}
 }
