@@ -1,6 +1,10 @@
 {
-  "helloWorld": "Hallo Welt!",
-  "@helloWorld": {},
   "brandSlogan": "Der moderne Finanzmanager",
-  "@brandSlogan": {}
+  "@brandSlogan": {},
+  "brandName": "financrr",
+  "@brandName": {},
+  "errorUnknown": "Ein unbekannter Fehler ist aufgetreten. Bitte versuche es später erneut.",
+  "@errorUnknown": {},
+  "errorUnauthorized": "Sieht so aus als hättest du dich bei deinen Anmeldedaten vertippt. Bitte versuche es erneut.",
+  "@errorUnauthorized": {}
 }
