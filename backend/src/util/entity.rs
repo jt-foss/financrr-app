@@ -15,3 +15,12 @@ where
 
 	Ok(model)
 }
+
+pub async fn find_all_or_error<T>(select_stm: Select<T>) -> Result<Vec<T::Model>, ApiError>
+where
+	T: EntityTrait,
+{
+	let models = select_stm.all(get_database_connection()).await.map_err(ApiError::from)?;
+
+	Ok(models)
+}

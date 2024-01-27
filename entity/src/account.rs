@@ -66,6 +66,16 @@ impl Related<super::user::Entity> for Entity {
 
 impl ActiveModelBehavior for ActiveModel {}
 
+impl Entity {
+	pub fn find_all_for_user(user_id: &i32) -> Select<Self> {
+		Self::find().filter(Column::Owner.eq(user_id.to_owned()))
+	}
+
+	pub fn find_by_id_and_user(id: &i32, user_id: &i32) -> Select<Self> {
+		Self::find().filter(Column::Id.eq(id.to_owned())).filter(Column::Owner.eq(user_id.to_owned()))
+	}
+}
+
 impl ActiveModel {
 	pub fn new(
 		user_id: &i32,

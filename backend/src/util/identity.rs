@@ -4,9 +4,9 @@ use actix_session::Session;
 use crate::api::error::ApiError;
 use crate::util::constant;
 
-pub fn is_identity_valid(identity: &Identity) -> Result<(), ApiError> {
+pub fn is_identity_valid(identity: &Identity) -> Result<i32, ApiError> {
 	match identity.id() {
-		Ok(_) => Ok(()),
+		Ok(id) => Ok(id.parse().map_err(|_| ApiError::invalid_identity())?),
 		Err(_) => Err(ApiError::invalid_identity()),
 	}
 }

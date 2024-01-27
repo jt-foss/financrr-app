@@ -3,6 +3,7 @@ use actix_web::http::header::ContentType;
 use actix_web::http::StatusCode;
 use actix_web::HttpResponse;
 use derive_more::{Display, Error};
+use log::error;
 use sea_orm::DbErr;
 use serde::{Serialize, Serializer};
 use utoipa::ToSchema;
@@ -13,7 +14,7 @@ use entity::error::EntityError;
 use crate::util::validation::ValidationErrorJsonPayload;
 
 #[derive(Debug, Display, Error, Serialize, ToSchema)]
-#[display("Error details: {}", details)]
+#[display("{}", serde_json::to_string(self).unwrap())]
 pub struct ApiError {
 	#[serde(skip)]
 	pub status_code: StatusCode,
@@ -92,6 +93,14 @@ impl ApiError {
 			reference: None,
 		}
 	}
+
+	pub fn from_error_vec(errors: Vec<Self>, status_code: StatusCode) -> Self {
+		Self {
+			status_code,
+			details: "Multiple errors occurred.".to_string(),
+			reference: SerializableStruct::new(&errors).ok(),
+		}
+	}
 }
 
 impl ResponseError for ApiError {
@@ -100,6 +109,10 @@ impl ResponseError for ApiError {
 	}
 
 	fn error_response(&self) -> HttpResponse {
+		if self.status_code.eq(&StatusCode::INTERNAL_SERVER_ERROR) {
+			error!("Internal server error: {}", self);
+		}
+
 		HttpResponse::build(self.status_code()).insert_header(ContentType::json()).json(self)
 	}
 }
