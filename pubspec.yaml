@@ -98,6 +98,6 @@ flutter:
 flutter_launcher_icons:
   web:
     generate: true
-    image_path: assets/logo/financrr_logo.png
+    image_path: assets/logo/logo_light_bg.png
     background_color: '#FF0000'
     theme_color: '#FF0000'
