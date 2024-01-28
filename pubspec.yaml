@@ -1,5 +1,5 @@
 name: restrr
-description: A starting point for Dart libraries or applications.
+description: Dart package which allows to communicate with the financrr REST API.
 version: 1.0.0
 # repository: https://github.com/my_org/my_repo
 
