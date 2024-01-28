@@ -3,6 +3,9 @@ name = "migration"
 version.workspace = true
 edition.workspace = true
 
+[lints]
+workspace = true
+
 [dependencies]
 # Async runtime
 async-std = { version = "1.12.0", features = ["attributes", "tokio1"] }

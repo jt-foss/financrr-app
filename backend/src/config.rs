@@ -41,8 +41,8 @@ impl Config {
 		)
 	}
 
-	pub fn load() -> Config {
-		Config {
+	pub fn load() -> Self {
+		Self {
 			address: get_env_or_error("ADDRESS"),
 			session_secret: get_env_or_error("SESSION_SECRET"),
 			database: DatabaseConfig::build_config(),
@@ -50,17 +50,17 @@ impl Config {
 		}
 	}
 
-	pub fn get_config<'a>() -> &'a Config {
+	pub fn get_config<'a>() -> &'a Self {
 		CONFIG.get().unwrap_or_else(|| {
-			CONFIG.set(Config::load()).expect("Could not load and set config!");
+			CONFIG.set(Self::load()).expect("Could not load and set config!");
 			CONFIG.get().expect("Could not get config!")
 		})
 	}
 }
 
 impl DatabaseConfig {
-	pub fn build_config() -> DatabaseConfig {
-		DatabaseConfig {
+	pub fn build_config() -> Self {
+		Self {
 			host: get_env_or_error("DATABASE_HOST"),
 			port: get_env_or_error("DATABASE_PORT").parse::<u16>().expect("Could not parse DATABASE_PORT to u16!"),
 			user: get_env_or_error("DATABASE_USER"),
@@ -83,8 +83,8 @@ impl DatabaseConfig {
 }
 
 impl RedisConfig {
-	pub fn build_config() -> RedisConfig {
-		RedisConfig {
+	pub fn build_config() -> Self {
+		Self {
 			host: get_env_or_error("REDIS_HOST"),
 			port: get_env_or_error("REDIS_PORT").parse::<u16>().expect("Could not parse REDIS_PORT to u16!"),
 		}
@@ -100,5 +100,5 @@ pub fn get_env_or_error(key: &str) -> String {
 }
 
 pub fn get_env_or_default(key: &str, default: &str) -> String {
-	env::var(key).unwrap_or(default.to_string())
+	env::var(key).unwrap_or_else(|_| default.to_string())
 }

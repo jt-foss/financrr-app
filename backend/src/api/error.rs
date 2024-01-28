@@ -3,16 +3,18 @@ use actix_web::http::header::ContentType;
 use actix_web::http::StatusCode;
 use actix_web::HttpResponse;
 use derive_more::{Display, Error};
+use log::error;
 use sea_orm::DbErr;
 use serde::{Serialize, Serializer};
 use utoipa::ToSchema;
+use validator::ValidationError;
 
 use entity::error::EntityError;
 
 use crate::util::validation::ValidationErrorJsonPayload;
 
 #[derive(Debug, Display, Error, Serialize, ToSchema)]
-#[display(fmt = "Error details: {}", details)]
+#[display("{}", serde_json::to_string(self).unwrap())]
 pub struct ApiError {
 	#[serde(skip)]
 	pub status_code: StatusCode,
@@ -20,7 +22,7 @@ pub struct ApiError {
 	pub reference: Option<SerializableStruct>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, ToSchema)]
 pub struct SerializableStruct {
 	serialized: serde_json::Value,
 }
@@ -52,11 +54,51 @@ impl ApiError {
 		}
 	}
 
+	pub fn invalid_identity() -> Self {
+		Self {
+			status_code: StatusCode::UNAUTHORIZED,
+			details: "Invalid identity provided.".to_string(),
+			reference: None,
+		}
+	}
+
 	pub fn signed_in() -> Self {
 		Self {
 			status_code: StatusCode::CONFLICT,
 			details: "User is signed in.".to_string(),
 			reference: None,
+		}
+	}
+
+	pub fn invalid_credentials() -> Self {
+		Self {
+			status_code: StatusCode::UNAUTHORIZED,
+			details: "Invalid credentials provided.".to_string(),
+			reference: None,
+		}
+	}
+
+	pub fn resource_not_found(resource_name: &str) -> Self {
+		Self {
+			status_code: StatusCode::NOT_FOUND,
+			details: format!("Could not found {}", resource_name),
+			reference: None,
+		}
+	}
+
+	pub fn unauthorized() -> Self {
+		Self {
+			status_code: StatusCode::UNAUTHORIZED,
+			details: "Unauthorized.".to_string(),
+			reference: None,
+		}
+	}
+
+	pub fn from_error_vec(errors: Vec<Self>, status_code: StatusCode) -> Self {
+		Self {
+			status_code,
+			details: "Multiple errors occurred.".to_string(),
+			reference: SerializableStruct::new(&errors).ok(),
 		}
 	}
 }
@@ -67,6 +109,10 @@ impl ResponseError for ApiError {
 	}
 
 	fn error_response(&self) -> HttpResponse {
+		if self.status_code.eq(&StatusCode::INTERNAL_SERVER_ERROR) {
+			error!("Internal server error: {}", self);
+		}
+
 		HttpResponse::build(self.status_code()).insert_header(ContentType::json()).json(self)
 	}
 }
@@ -96,8 +142,24 @@ impl From<ValidationErrorJsonPayload> for ApiError {
 		let serializable_struct = SerializableStruct::new(&value).ok();
 		Self {
 			status_code: StatusCode::BAD_REQUEST,
-			details: value.message.clone(),
+			details: value.message,
 			reference: serializable_struct,
+		}
+	}
+}
+
+impl From<ValidationError> for ApiError {
+	fn from(value: ValidationError) -> Self {
+		Self::from(ValidationErrorJsonPayload::from(value))
+	}
+}
+
+impl From<serde_json::Error> for ApiError {
+	fn from(value: serde_json::Error) -> Self {
+		Self {
+			status_code: StatusCode::BAD_REQUEST,
+			details: value.to_string(),
+			reference: None,
 		}
 	}
 }

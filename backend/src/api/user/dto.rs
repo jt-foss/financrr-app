@@ -1,11 +1,13 @@
-use crate::database::connection::get_database_connection;
-use crate::util::validation::validate_password;
-use entity::prelude::User;
-use entity::user::Model;
 use sea_orm::EntityTrait;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use validator::Validate;
+
+use entity::prelude::User;
+use entity::user::Model;
+
+use crate::database::connection::get_database_connection;
+use crate::util::validation::validate_password;
 
 #[derive(Serialize)]
 pub struct UserRegistration {
@@ -46,7 +48,7 @@ impl UserLogin {
 		match user {
 			Ok(Some(user)) => {
 				if user.verify_password(credentials.password.as_bytes()).unwrap_or(false) {
-					Some(UserLogin {
+					Some(Self {
 						id: user.id,
 						username: user.username,
 					})

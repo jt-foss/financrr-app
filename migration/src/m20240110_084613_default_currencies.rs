@@ -1,11 +1,13 @@
-use entity::currency;
-use entity::currency::ActiveModel as Currency;
-use entity::utility::loading::create_table_if_not_exist;
+use std::default::Default;
+
 use log::info;
 use sea_orm::ActiveModelTrait;
 use sea_orm::ActiveValue::Set;
 use sea_orm_migration::prelude::*;
-use std::default::Default;
+
+use entity::currency;
+use entity::currency::ActiveModel as Currency;
+use entity::utility::loading::create_table_if_not_exist;
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;

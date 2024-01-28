@@ -1,3 +1,4 @@
+use std::io::Result;
 use std::sync::OnceLock;
 
 use actix_identity::config::LogoutBehaviour;
@@ -21,7 +22,7 @@ use sea_orm::DatabaseConnection;
 use simple_logger::SimpleLogger;
 use time::macros::format_description;
 use utoipa::openapi::Components;
-use utoipa::{Modify, OpenApi};
+use utoipa::{openapi, Modify, OpenApi};
 use utoipa_swagger_ui::SwaggerUi;
 use utoipauto::utoipauto;
 
@@ -29,6 +30,7 @@ use entity::utility::loading::load_schema;
 use migration::Migrator;
 use migration::MigratorTrait;
 
+use crate::api::account::controller::account_controller;
 use crate::api::status::controller::status_controller;
 use crate::api::user::controller::user_controller;
 use crate::config::Config;
@@ -48,7 +50,8 @@ pub static CONFIG: OnceLock<Config> = OnceLock::new();
 #[openapi(
 tags(
 (name = "Status", description = "Endpoints that contain information about the health status of the server."),
-(name = "User", description = "Endpoints for user management.")
+(name = "User", description = "Endpoints for user management."),
+(name = "Account", description = "Endpoints for account management.")
 ),
 modifiers(&SecurityAddon)
 )]
@@ -57,7 +60,7 @@ pub struct ApiDoc;
 pub struct SecurityAddon;
 
 impl Modify for SecurityAddon {
-	fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
+	fn modify(&self, openapi: &mut openapi::OpenApi) {
 		match openapi.components {
 			Some(_) => {}
 			None => {
@@ -69,7 +72,7 @@ impl Modify for SecurityAddon {
 }
 
 #[actix_web::main]
-async fn main() -> std::io::Result<()> {
+async fn main() -> Result<()> {
 	dotenv().ok();
 	configure_logger();
 
@@ -141,5 +144,7 @@ fn configure_api(cfg: &mut web::ServiceConfig) {
 }
 
 fn configure_api_v1(cfg: &mut web::ServiceConfig) {
-	cfg.service(web::scope("/v1").configure(status_controller).configure(user_controller));
+	cfg.service(
+		web::scope("/v1").configure(status_controller).configure(user_controller).configure(account_controller),
+	);
 }

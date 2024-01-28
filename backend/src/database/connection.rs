@@ -1,7 +1,9 @@
+use std::time::Duration;
+
+use sea_orm::{ConnectOptions, Database, DatabaseConnection};
+
 use crate::config::Config;
 use crate::DB;
-use sea_orm::{ConnectOptions, Database, DatabaseConnection};
-use std::time::Duration;
 
 pub fn get_database_connection<'a>() -> &'a DatabaseConnection {
 	DB.get().expect("Could not get database connection!")

@@ -11,3 +11,7 @@ pub struct ValidationError;
 #[derive(ToResponse)]
 #[response(description = "Internal server error. Like DbError, HashingError, etc.")]
 pub struct InternalServerError;
+
+#[derive(ToResponse)]
+#[response(description = "Resource not found.")]
+pub struct ResourceNotFound;
