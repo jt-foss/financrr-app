@@ -2,7 +2,6 @@ use std::borrow::Cow;
 use std::collections::HashMap;
 
 use actix_web_validator::error::flatten_errors;
-use entity::currency;
 use iban::Iban;
 use regex::Regex;
 use sea_orm::EntityTrait;
@@ -11,6 +10,7 @@ use serde_json::Value;
 use utoipa::ToSchema;
 use validator::ValidationError;
 
+use entity::currency;
 use entity::prelude::User;
 
 use crate::database::connection::get_database_connection;

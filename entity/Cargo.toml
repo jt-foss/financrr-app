@@ -13,6 +13,9 @@ ignored = ["rust-argon2"]
 # Actix
 actix-identity.workspace = true
 
+# Serialization/Deserialization
+serde.workspace = true
+
 # Encryption
 rand = "0.8.5"
 rust-argon2 = "2.1.0"

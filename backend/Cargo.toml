@@ -26,7 +26,7 @@ migration = { path = "../migration" }
 redis = "0.24.0"
 
 # Serialization and deserialization
-serde = { version = "1.0.193", features = ["derive"] }
+serde.workspace = true
 serde_json = "1.0.111"
 
 # Generating openapi spec

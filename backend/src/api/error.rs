@@ -153,3 +153,13 @@ impl From<ValidationError> for ApiError {
 		Self::from(ValidationErrorJsonPayload::from(value))
 	}
 }
+
+impl From<serde_json::Error> for ApiError {
+	fn from(value: serde_json::Error) -> Self {
+		Self {
+			status_code: StatusCode::BAD_REQUEST,
+			details: value.to_string(),
+			reference: None,
+		}
+	}
+}

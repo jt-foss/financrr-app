@@ -1,3 +1,4 @@
+use std::io::Result;
 use std::sync::OnceLock;
 
 use actix_identity::config::LogoutBehaviour;
@@ -19,7 +20,6 @@ use log::{info, LevelFilter};
 use middleware::TrailingSlash;
 use sea_orm::DatabaseConnection;
 use simple_logger::SimpleLogger;
-use std::io::Result;
 use time::macros::format_description;
 use utoipa::openapi::Components;
 use utoipa::{openapi, Modify, OpenApi};

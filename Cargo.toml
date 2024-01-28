@@ -37,6 +37,9 @@ use_self = "warn"
 # Actix
 actix-identity = "0.7.0"
 
+# Serialization/Deserialization
+serde = { version = "1.0.193", features = ["derive"] }
+
 # ORM
 sea-orm = { version = "0.12.11", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros", "mock"] }
 
