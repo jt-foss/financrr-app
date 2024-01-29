@@ -31,6 +31,7 @@ use migration::Migrator;
 use migration::MigratorTrait;
 
 use crate::api::account::controller::account_controller;
+use crate::api::currency::controller::currency_controller;
 use crate::api::status::controller::status_controller;
 use crate::api::user::controller::user_controller;
 use crate::config::Config;
@@ -40,6 +41,7 @@ use crate::util::validation::ValidationErrorJsonPayload;
 pub mod api;
 pub mod config;
 pub mod database;
+pub mod permission;
 pub mod util;
 
 pub static DB: OnceLock<DatabaseConnection> = OnceLock::new();
@@ -51,7 +53,8 @@ pub static CONFIG: OnceLock<Config> = OnceLock::new();
 tags(
 (name = "Status", description = "Endpoints that contain information about the health status of the server."),
 (name = "User", description = "Endpoints for user management."),
-(name = "Account", description = "Endpoints for account management.")
+(name = "Account", description = "Endpoints for account management."),
+(name = "Currency", description = "Endpoints for currency management.")
 ),
 modifiers(&SecurityAddon)
 )]
@@ -145,6 +148,10 @@ fn configure_api(cfg: &mut web::ServiceConfig) {
 
 fn configure_api_v1(cfg: &mut web::ServiceConfig) {
 	cfg.service(
-		web::scope("/v1").configure(status_controller).configure(user_controller).configure(account_controller),
+		web::scope("/v1")
+			.configure(status_controller)
+			.configure(user_controller)
+			.configure(account_controller)
+			.configure(currency_controller),
 	);
 }

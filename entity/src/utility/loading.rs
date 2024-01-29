@@ -3,8 +3,8 @@ use sea_orm::{ConnectionTrait, DatabaseConnection, EntityTrait, Schema};
 use crate::prelude::{Account, Currency, Transaction, User, UserAccount};
 
 pub async fn load_schema(db: &DatabaseConnection) {
-	create_table_if_not_exist(Currency, db).await;
 	create_table_if_not_exist(User, db).await;
+	create_table_if_not_exist(Currency, db).await;
 	create_table_if_not_exist(Account, db).await;
 	create_table_if_not_exist(UserAccount, db).await;
 	create_table_if_not_exist(Transaction, db).await;

@@ -3,7 +3,10 @@
 use chrono::Local;
 use sea_orm::entity::prelude::*;
 use sea_orm::ActiveValue::Set;
+use sea_orm::Condition;
 use serde::{Deserialize, Serialize};
+
+use crate::user_account;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
 #[sea_orm(table_name = "account")]
@@ -36,8 +39,8 @@ pub enum Relation {
 		belongs_to = "super::user::Entity",
 		from = "Column::Owner",
 		to = "super::user::Column::Id",
-		on_update = "NoAction",
-		on_delete = "NoAction"
+		on_update = "Cascade",
+		on_delete = "Cascade"
 	)]
 	User,
 	#[sea_orm(has_many = "super::user_account::Entity")]
@@ -69,11 +72,24 @@ impl ActiveModelBehavior for ActiveModel {}
 
 impl Entity {
 	pub fn find_all_for_user(user_id: &i32) -> Select<Self> {
-		Self::find().filter(Column::Owner.eq(user_id.to_owned()))
+		let user_id = user_id.to_owned();
+
+		Self::find()
+			.left_join(user_account::Entity)
+			.filter(Condition::any().add(Column::Owner.eq(user_id)).add(user_account::Column::UserId.eq(user_id)))
 	}
 
 	pub fn find_by_id_and_user(id: &i32, user_id: &i32) -> Select<Self> {
 		Self::find().filter(Column::Id.eq(id.to_owned())).filter(Column::Owner.eq(user_id.to_owned()))
+	}
+
+	pub fn is_user_related(id: &i32, user_id: &i32) -> Select<Self> {
+		let id = id.to_owned();
+		let user_id = user_id.to_owned();
+
+		Self::find().left_join(user_account::Entity).filter(Condition::any().add(Column::Owner.eq(user_id)).add(
+			Condition::all().add(user_account::Column::AccountId.eq(id)).add(user_account::Column::UserId.eq(user_id)),
+		))
 	}
 }
 

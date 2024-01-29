@@ -1,7 +1,7 @@
 use utoipa::ToResponse;
 
 #[derive(ToResponse)]
-#[response(description = "Invalid credentials or not logged in.")]
+#[response(description = "Invalid credentials, not logged in or invalid session.")]
 pub struct Unauthorized;
 
 #[derive(ToResponse)]
