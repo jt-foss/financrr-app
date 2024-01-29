@@ -1,18 +1,31 @@
+import 'package:financrr_frontend/data/repositories.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/router.dart';
 import 'package:financrr_frontend/themes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_strategy/url_strategy.dart';
 
-void main() {
+import 'data/theme_repository.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   setPathUrlStrategy();
-  runApp(const FinancrrApp());
+  SharedPreferences.setPrefix('financrr.');
+  final SharedPreferences preferences = await SharedPreferences.getInstance();
+  const FlutterSecureStorage storage = FlutterSecureStorage();
+  await Repositories.init(storage, preferences);
+  final EffectiveThemePreferences themePreferences = await ThemeService.getOrInsertEffective();
+  runApp(FinancrrApp(themePreferences: themePreferences));
 }
 
 class FinancrrApp extends StatefulWidget {
-  const FinancrrApp({super.key});
+  final EffectiveThemePreferences themePreferences;
+
+  const FinancrrApp({super.key, required this.themePreferences});
 
   @override
   State<FinancrrApp> createState() => FinancrrAppState();
@@ -32,11 +45,9 @@ class FinancrrAppState extends State<FinancrrApp> {
   @override
   void initState() {
     super.initState();
-    // TODO: implement repositories
-    // _activeLightTheme = widget.themePreferences.currentLightTheme;
-    // _activeDarkTheme = widget.themePreferences.currentDarkTheme;
-    // _themeMode = widget.themePreferences.themeMode;
-    _themeMode = ThemeMode.light;
+    _activeLightTheme = widget.themePreferences.currentLightTheme;
+    _activeDarkTheme = widget.themePreferences.currentDarkTheme;
+    _themeMode = widget.themePreferences.themeMode;
   }
 
   @override
@@ -77,7 +88,7 @@ class FinancrrAppState extends State<FinancrrApp> {
         _activeDarkTheme = theme;
       }
       _themeMode = system ? ThemeMode.system : theme.themeMode;
-      // ThemeService.setThemePreferences(_activeLightTheme, _activeDarkTheme, _themeMode);
+      ThemeService.setThemePreferences(_activeLightTheme, _activeDarkTheme, _themeMode);
     });
   }
 }
