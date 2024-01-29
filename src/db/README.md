@@ -5,14 +5,6 @@
 ```mermaid
 
 erDiagram
-	Currency {
-		int id UK
-		string name "NotNull"
-		string symbol "NotNull"
-		string iso_code PK "NotNull"
-		int decimal_places "NotNull"
-	}
-
 	User {
 		int id PK
 		string username UK
@@ -21,6 +13,16 @@ erDiagram
 		timestamp created_at "NotNull"
 		bool is_admin "NotNull"
 	}
+
+	Currency {
+		int id PK
+		string name "NotNull"
+		string symbol "NotNull"
+		string iso_code "NotNull"
+		int decimal_places "NotNull"
+		User user FK "Nullable"
+	}
+	Currency }|--|| User: "many to one"
 
 	Account {
 		int id PK

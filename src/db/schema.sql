@@ -1,12 +1,3 @@
-CREATE TABLE currency
-(
-	id             SERIAL PRIMARY KEY,
-	name           TEXT        NOT NULL,
-	symbol         TEXT        NOT NULL,
-	iso_code       TEXT UNIQUE NOT NULL,
-	decimal_places INTEGER     NOT NULL
-);
-
 CREATE TABLE "user"
 (
 	id         SERIAL PRIMARY KEY,
@@ -17,16 +8,26 @@ CREATE TABLE "user"
 	is_admin   BOOLEAN     NOT NULL DEFAULT FALSE
 );
 
+CREATE TABLE currency
+(
+	id             SERIAL PRIMARY KEY,
+	name           TEXT    NOT NULL,
+	symbol         TEXT    NOT NULL,
+	iso_code       TEXT    NOT NULL,
+	decimal_places INTEGER NOT NULL,
+	"user"         INTEGER REFERENCES "user" (id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
 CREATE TABLE account
 (
 	id          SERIAL PRIMARY KEY,
-	owner       INTEGER REFERENCES "user" (id)   NOT NULL,
-	name        TEXT                             NOT NULL,
+	owner       INTEGER REFERENCES "user" (id) ON UPDATE CASCADE ON DELETE CASCADE NOT NULL,
+	name        TEXT                                                               NOT NULL,
 	description TEXT,
 	iban        TEXT UNIQUE,
-	balance     INTEGER                          NOT NULL DEFAULT 0,
-	currency    INTEGER REFERENCES Currency (id) NOT NULL,
-	created_at  TIMESTAMP                        NOT NULL DEFAULT current_timestamp
+	balance     INTEGER                                                            NOT NULL DEFAULT 0,
+	currency    INTEGER REFERENCES Currency (id)                                   NOT NULL,
+	created_at  TIMESTAMP                                                          NOT NULL DEFAULT current_timestamp
 );
 
 CREATE TABLE user_account
