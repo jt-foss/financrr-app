@@ -6,7 +6,7 @@ RUN apk add --no-cache musl-dev
 
 RUN cargo build --release
 
-FROM alpine:3.19.0
+FROM alpine:3.19.1
 RUN apk update
 
 RUN addgroup -g 1000 -S financrr; \
