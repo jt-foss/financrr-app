@@ -1,3 +1,4 @@
+import 'package:financrr_frontend/util/text_utils.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../../layout/adaptive_scaffold.dart';
@@ -15,6 +16,8 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  late final AppTextStyles textStyles = AppTextStyles.of(context);
+
   @override
   Widget build(BuildContext context) {
     return AdaptiveScaffold(
@@ -24,6 +27,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildPageVertical(Size size) {
-    return const SingleChildScrollView(child: Center(child: Column(children: [Text("TODO: login page")])));
+    return SingleChildScrollView(
+        child: Center(child: Column(children: [textStyles.bodyLarge.text('TODO: Implement Login Page')])));
   }
 }

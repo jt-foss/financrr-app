@@ -1,4 +1,4 @@
-import 'package:financrr_frontend/extensions.dart';
+import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

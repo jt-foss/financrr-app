@@ -33,6 +33,7 @@ class ContextNavigatorPageState extends State<ContextNavigatorPage> {
 
   Future _navigate() async {
     // TODO: impl navigation
+    await Future.delayed(const Duration(seconds: 2));
     context.goPath(LoginPage.pagePath.build());
   }
 
