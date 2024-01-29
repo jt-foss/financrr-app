@@ -3,11 +3,12 @@
 use actix_identity::Identity;
 use sea_orm::entity::prelude::*;
 use sea_orm::ActiveValue::Set;
+use serde::{Deserialize, Serialize};
 
 use crate::error::EntityError;
 use crate::utility::hashing::hash_string;
 
-#[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
+#[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
 #[sea_orm(table_name = "user")]
 pub struct Model {
 	#[sea_orm(primary_key)]
@@ -26,8 +27,16 @@ pub struct Model {
 pub enum Relation {
 	#[sea_orm(has_many = "super::account::Entity")]
 	Account,
+	#[sea_orm(has_many = "super::currency::Entity")]
+	Currency,
 	#[sea_orm(has_many = "super::user_account::Entity")]
 	UserAccount,
+}
+
+impl Related<super::currency::Entity> for Entity {
+	fn to() -> RelationDef {
+		Relation::Currency.def()
+	}
 }
 
 impl Related<super::user_account::Entity> for Entity {

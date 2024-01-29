@@ -15,7 +15,9 @@ use crate::api::account::dto::AccountDTO;
 use crate::api::dto::IdResponse;
 use crate::api::error::ApiError;
 use crate::database::connection::get_database_connection;
-use crate::util::entity::{find_all_or_error, find_one_or_error};
+use crate::permission::user::UserPermission;
+use crate::permission::PermissionOrUnauthorized;
+use crate::util::entity::{find_all, find_one_or_error};
 use crate::util::identity::is_identity_valid;
 use crate::util::utoipa::{InternalServerError, ResourceNotFound, Unauthorized, ValidationError};
 use crate::util::validation::validate_currency_exists;
@@ -33,13 +35,13 @@ responses(
 (status = 404, response = ResourceNotFound)
 ),
 path = "/api/v1/account/{account_id}",
-tag = "AccountDTO")]
+tag = "Account")]
 #[get("/{account_id}")]
 pub async fn get_one(identity: Identity, account_id: Path<i32>) -> Result<impl Responder, ApiError> {
 	let user_id = is_identity_valid(&identity)?;
-	let account =
-		find_one_or_error(account::Entity::find_by_id_and_user(&account_id.into_inner(), &user_id), "AccountDTO")
-			.await?;
+	let account_id = account_id.into_inner();
+	has_access(&identity, account_id).await?;
+	let account = find_one_or_error(account::Entity::find_by_id_and_user(&account_id, &user_id), "AccountDTO").await?;
 	let account = AccountDTO::from_db_model(account).await?;
 
 	Ok(HttpResponse::Ok().json(account))
@@ -51,7 +53,7 @@ responses(
 (status = 401, response = Unauthorized)
 ),
 path = "/api/v1/account",
-tag = "AccountDTO")]
+tag = "Account")]
 #[get("")]
 pub async fn get_all(identity: Identity) -> Result<impl Responder, ApiError> {
 	is_identity_valid(&identity)?;
@@ -70,7 +72,7 @@ responses(
 (status = 500, response = InternalServerError)
 ),
 path = "/api/v1/account",
-tag = "AccountDTO")]
+tag = "Account")]
 #[post("")]
 pub async fn create(identity: Identity, account: Json<AccountDTO>) -> Result<impl Responder, ApiError> {
 	is_identity_valid(&identity)?;
@@ -90,14 +92,14 @@ responses(
 (status = 500, response = InternalServerError)
 ),
 path = "/api/v1/account/{account_id}",
-tag = "AccountDTO")]
+tag = "Account")]
 #[delete("/{account_id}")]
 pub async fn delete(identity: Identity, account_id: Path<i32>) -> Result<impl Responder, ApiError> {
 	is_identity_valid(&identity)?;
+	let account_id = account_id.into_inner();
+	has_access(&identity, account_id).await?;
 	let user = find_one_or_error(User::from_identity(&identity)?, "User").await?;
-	let account = find_one_or_error(account::Entity::find_by_id(account_id.into_inner()), "AccountDTO")
-		.await?
-		.into_active_model();
+	let account = find_one_or_error(account::Entity::find_by_id(account_id), "AccountDTO").await?.into_active_model();
 
 	if account.owner.eq(&Set(user.id)) {
 		return Err(ApiError::unauthorized());
@@ -117,7 +119,7 @@ responses(
 (status = 500, response = InternalServerError)
 ),
 path = "/api/v1/account",
-tag = "AccountDTO")]
+tag = "Account")]
 #[patch("")]
 pub async fn update(identity: Identity, account: Json<AccountDTO>) -> Result<impl Responder, ApiError> {
 	let user_id = is_identity_valid(&identity)?;
@@ -166,7 +168,7 @@ async fn relation_exists(user_id: &i32, account_id: &i32) -> Result<bool, ApiErr
 }
 
 async fn get_accounts(user: &user::Model) -> Result<Vec<AccountDTO>, ApiError> {
-	let accounts: Vec<_> = find_all_or_error(account::Entity::find_all_for_user(&user.id))
+	let accounts: Vec<_> = find_all(account::Entity::find_all_for_user(&user.id))
 		.await?
 		.iter()
 		.map(|model| AccountDTO::from_db_model(model.to_owned()))
@@ -231,4 +233,8 @@ async fn update_relations(account_id: i32, linked_user_ids: Vec<i32>) -> Result<
 	}
 
 	Ok(())
+}
+
+async fn has_access(identity: &Identity, account_id: i32) -> Result<(), ApiError> {
+	UserPermission::from_identity(identity)?.get_account(account_id).access_or_unauthorized().await.map(|_| ())
 }

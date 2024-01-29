@@ -27,11 +27,12 @@ impl MigrationTrait for Migration {
 			let parts: Vec<&str> = line.split(',').collect();
 			if parts.len() == 4 {
 				let currency = Currency {
+					id: Default::default(),
 					name: Set(parts[0].to_string()),
 					symbol: Set(parts[1].to_string()),
 					iso_code: Set(parts[2].to_string()),
 					decimal_places: Set(parts[3].parse().expect("Could not parse decimal places")),
-					..Default::default()
+					user: Set(None),
 				};
 				currency.insert(manager.get_connection()).await.expect("Could not insert currency");
 			} else {

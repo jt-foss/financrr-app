@@ -44,3 +44,4 @@ dotenvy = "0.15.7"
 derive_more = { version = "1.0.0-beta.6", features = ["display", "error"] }
 regex = {  version = "1.10.3", features = ["std", "perf", "unicode"] }
 futures = "0.3.30"
+async-trait = "0.1.77"

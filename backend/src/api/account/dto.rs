@@ -7,7 +7,7 @@ use entity::account::Model;
 use entity::user;
 
 use crate::api::error::ApiError;
-use crate::util::entity::find_all_or_error;
+use crate::util::entity::find_all;
 use crate::util::validation::validate_iban;
 
 #[derive(Serialize, Deserialize, ToSchema, Validate, Clone)]
@@ -28,8 +28,7 @@ pub struct AccountDTO {
 
 impl AccountDTO {
 	pub async fn from_db_model(value: Model) -> Result<Self, ApiError> {
-		let linked_users =
-			find_all_or_error(value.find_related(user::Entity)).await?.iter().map(|model| model.id).collect();
+		let linked_users = find_all(value.find_related(user::Entity)).await?.iter().map(|model| model.id).collect();
 
 		Ok(Self {
 			id: value.id,
