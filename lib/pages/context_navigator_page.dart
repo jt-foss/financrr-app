@@ -1,10 +1,8 @@
 import 'dart:async';
 
-import 'package:financrr_frontend/data/theme_repository.dart';
 import 'package:financrr_frontend/pages/auth/login_page.dart';
 import 'package:financrr_frontend/themes.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 import '../layout/adaptive_scaffold.dart';
 import '../main.dart';
@@ -36,9 +34,9 @@ class ContextNavigatorPageState extends State<ContextNavigatorPage> {
 
   Future _navigate() async {
     // TODO: impl navigation
-    FinancrrApp.of(context).changeAppTheme(theme: AppThemes.light());
     await Future.delayed(const Duration(seconds: 2));
     if (!mounted) return;
+    FinancrrApp.of(context).changeAppTheme(theme: AppThemes.light());
     context.goPath(LoginPage.pagePath.build());
   }
 

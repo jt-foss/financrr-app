@@ -20,7 +20,7 @@ class AppThemes {
 
   static AppTheme light() {
     const FinancrrTheme financrrTheme = FinancrrTheme(
-        logoPath: 'assets/logo/logo_blue.svg',
+        logoPath: 'logo/logo_blue.svg',
         primaryAccentColor: Color(0xFF2C03E6),
         primaryTextColor: Color(0xFF000000),
         secondaryTextColor: Color(0xFF1C1B1F),
@@ -37,7 +37,7 @@ class AppThemes {
   // TODO: implement actual dark theme colors
   static AppTheme dark() {
     const FinancrrTheme financrrTheme = FinancrrTheme(
-        logoPath: 'assets/logo/logo_light.svg',
+        logoPath: 'logo/logo_light.svg',
         primaryAccentColor: Color(0xFF407BF8),
         primaryTextColor: Color(0xFFFFFFFF),
         secondaryTextColor: Color(0xFFBFBFBF),

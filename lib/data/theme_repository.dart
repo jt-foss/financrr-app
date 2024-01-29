@@ -73,7 +73,7 @@ class ThemeService {
 
   static Future<ThemePreferences> setThemePreferences(AppTheme lightTheme, AppTheme darkTheme, ThemeMode themeMode) async {
     final ThemePreferences preferences =
-    ThemePreferences(themeMode: themeMode, currentLightThemeId: lightTheme.id, currentDarkThemeId: darkTheme.id);
+        ThemePreferences(themeMode: themeMode, currentLightThemeId: lightTheme.id, currentDarkThemeId: darkTheme.id);
     await Repositories.themeRepository.save(preferences);
     return preferences;
   }

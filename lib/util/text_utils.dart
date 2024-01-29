@@ -11,7 +11,7 @@ class TextUtils {
         padding: EdgeInsets.only(bottom: bottomPadding ? 10 : 0, top: topPadding ? 20 : 0),
         child: AppTextStyles.of(context)
             .titleSmall
-            .text(title.toUpperCase(), color: theme.secondaryTextColor, fontWeightOverride: FontWeight.bold));
+            .text(title, color: theme.secondaryTextColor, fontWeightOverride: FontWeight.bold));
   }
 }
 
