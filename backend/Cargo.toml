@@ -37,7 +37,7 @@ utoipauto = "0.1.8"
 # Logging
 log.workspace = true
 simple_logger = "4.3.3"
-time = "0.3.31" #Needed for giving timestamps to logs
+time = "0.3.32" #Needed for giving timestamps to logs
 
 # Utils
 dotenvy = "0.15.7"
