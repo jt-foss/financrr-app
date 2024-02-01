@@ -107,7 +107,7 @@ class _LoginPageState extends State<LoginPage> {
         ZoomTapAnimation(
           child: Row(
             children: [
-              Padding(
+               Padding(
                 padding: const EdgeInsets.only(right: 5),
                 child: Icon(Icons.settings, size: 15, color: _financrrTheme.primaryAccentColor),
               ),
