@@ -3,7 +3,7 @@ use actix_identity::Identity;
 use crate::api::error::ApiError;
 use crate::permission::account::AccountPermission;
 use crate::permission::currency::CurrencyPermissions;
-use crate::util::identity::is_identity_valid;
+use crate::util::identity::validate_identity;
 
 #[derive(Clone)]
 pub struct UserPermission {
@@ -12,7 +12,7 @@ pub struct UserPermission {
 
 impl UserPermission {
 	pub fn from_identity(identity: &Identity) -> Result<Self, ApiError> {
-		let user_id = is_identity_valid(identity)?;
+		let user_id = validate_identity(identity)?;
 
 		Ok(Self {
 			user_id,

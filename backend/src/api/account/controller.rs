@@ -13,7 +13,7 @@ use crate::api::dto::IdResponse;
 use crate::api::error::ApiError;
 use crate::database::connection::get_database_connection;
 use crate::util::entity::{find_all, find_one_or_error};
-use crate::util::identity::is_identity_valid;
+use crate::util::identity::validate_identity;
 use crate::util::utoipa::{InternalServerError, ResourceNotFound, Unauthorized, ValidationError};
 use crate::util::validation::validate_currency_exists;
 
@@ -34,7 +34,7 @@ path = "/api/v1/account/{account_id}",
 tag = "Account")]
 #[get("/{account_id}")]
 pub async fn get_one(identity: Identity, account_id: Path<i32>) -> Result<impl Responder, ApiError> {
-	is_identity_valid(&identity)?;
+	validate_identity(&identity)?;
 	let account_id = account_id.into_inner();
 	let account = find_one_or_error(account::Entity::find_by_id(account_id), "Account").await?;
 	let account = AccountDTO::from_db_model(account).await?;
@@ -51,7 +51,7 @@ path = "/api/v1/account",
 tag = "Account")]
 #[get("")]
 pub async fn get_all(identity: Identity) -> Result<impl Responder, ApiError> {
-	is_identity_valid(&identity)?;
+	validate_identity(&identity)?;
 	let results = join_all(
 		find_all(account::Entity::find()).await?.iter().map(|model| AccountDTO::from_db_model(model.to_owned())),
 	)
@@ -85,7 +85,7 @@ path = "/api/v1/account",
 tag = "Account")]
 #[post("")]
 pub async fn create(identity: Identity, account: Json<AccountDTO>) -> Result<impl Responder, ApiError> {
-	is_identity_valid(&identity)?;
+	validate_identity(&identity)?;
 	let account = account.into_inner();
 	validate_currency_exists(account.currency).await?;
 	let account = create_new(&account).await?;
@@ -104,7 +104,7 @@ path = "/api/v1/account/{account_id}",
 tag = "Account")]
 #[delete("/{account_id}")]
 pub async fn delete(identity: Identity, account_id: Path<i32>) -> Result<impl Responder, ApiError> {
-	is_identity_valid(&identity)?;
+	validate_identity(&identity)?;
 	let account_id = account_id.into_inner();
 	let account = find_one_or_error(account::Entity::find_by_id(account_id), "AccountDTO").await?.into_active_model();
 
@@ -125,7 +125,7 @@ path = "/api/v1/account",
 tag = "Account")]
 #[patch("")]
 pub async fn update(identity: Identity, account: Json<AccountDTO>) -> Result<impl Responder, ApiError> {
-	is_identity_valid(&identity)?;
+	validate_identity(&identity)?;
 	validate_currency_exists(account.currency).await?;
 	let account = account.into_inner();
 	let model = update_account(account).await?;

@@ -10,7 +10,7 @@ use crate::api::dto::IdResponse;
 use crate::api::error::ApiError;
 use crate::api::user::dto::{Credentials, RegisterUser, UserLogin};
 use crate::database::connection::get_database_connection;
-use crate::util::identity::{is_identity_valid, is_signed_in};
+use crate::util::identity::{is_signed_in, validate_identity};
 use crate::util::utoipa::{InternalServerError, Unauthorized, ValidationError};
 use crate::util::validation::validate_unique_username;
 
@@ -55,7 +55,7 @@ path = "/api/v1/user/logout",
 tag = "User")]
 #[delete("/logout")]
 pub async fn logout(identity: Identity) -> Result<impl Responder, ApiError> {
-	is_identity_valid(&identity)?;
+	validate_identity(&identity)?;
 	identity.logout();
 
 	Ok(HttpResponse::Ok())

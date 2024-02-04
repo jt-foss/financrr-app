@@ -1,6 +1,6 @@
+use actix_identity::Identity;
 use actix_web::dev::Payload;
 use actix_web::{FromRequest, HttpRequest};
-use actix_web_validator::Json;
 use chrono::NaiveDateTime;
 use futures_util::future::LocalBoxFuture;
 use sea_orm::EntityTrait;
@@ -12,7 +12,8 @@ use entity::user;
 use entity::user::Model;
 
 use crate::api::error::ApiError;
-use crate::util::entity::find_one_or_error;
+use crate::util::entity::{count, find_one_or_error};
+use crate::util::identity::validate_identity;
 use crate::wrapper::types::phantom::Identifiable;
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Validate, ToSchema)]
@@ -38,6 +39,10 @@ impl User {
 	pub async fn find_by_id(id: i32) -> Result<Self, ApiError> {
 		Ok(Self::from(find_one_or_error(user::Entity::find_by_id(id), "User").await?))
 	}
+
+	pub async fn user_exists(id: i32) -> Result<bool, ApiError> {
+		Ok(count(user::Entity::find_by_id(id)).await? > 0)
+	}
 }
 
 impl From<user::Model> for User {
@@ -57,18 +62,11 @@ impl FromRequest for User {
 	type Error = ApiError;
 	type Future = LocalBoxFuture<'static, Result<Self, Self::Error>>;
 
-	fn from_request(req: &HttpRequest, payload: &mut Payload) -> Self::Future {
-		let fut = Json::<Self>::from_request(req, payload);
-		let _req = req.clone();
+	fn from_request(req: &HttpRequest, _payload: &mut Payload) -> Self::Future {
+		let req = req.clone();
 		Box::pin(async move {
-			match fut.await {
-				Ok(user) => {
-					let user = user.into_inner();
-
-					Ok(user)
-				}
-				Err(e) => Err(ApiError::from(e)),
-			}
+			let user_id = validate_identity(&Identity::extract(&req).into_inner()?)?;
+			Self::find_by_id(user_id).await
 		})
 	}
 }

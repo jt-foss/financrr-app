@@ -14,7 +14,7 @@ use crate::database::connection::get_database_connection;
 use crate::permission::user::UserPermission;
 use crate::permission::Permission;
 use crate::util::entity::{find_all, find_one, find_one_or_error};
-use crate::util::identity::is_identity_valid;
+use crate::util::identity::validate_identity;
 use crate::util::utoipa::{InternalServerError, ResourceNotFound, Unauthorized};
 
 pub fn currency_controller(cfg: &mut web::ServiceConfig) {
@@ -34,7 +34,7 @@ pub async fn get_all(identity: Option<Identity>) -> Result<impl Responder, ApiEr
 	let mut currencies = find_all(currency::Entity::find_all_with_no_user()).await?;
 	let mut user_currencies: Vec<currency::Model> = vec![];
 	if let Some(identity) = identity {
-		let user_id = is_identity_valid(&identity)?;
+		let user_id = validate_identity(&identity)?;
 		user_currencies = find_all(currency::Entity::find_all_with_user(user_id)).await?;
 	}
 	currencies.append(&mut user_currencies);
@@ -62,7 +62,7 @@ pub async fn get_one(identity: Option<Identity>, currency_id: Path<i32>) -> Resu
 	}
 
 	if let Some(identity) = identity {
-		let user_id = is_identity_valid(&identity)?;
+		let user_id = validate_identity(&identity)?;
 		currency = Some(CurrencyDTO::from(
 			find_one_or_error(currency::Entity::find_by_id_and_user(currency_id, user_id), "Currency").await?,
 		))
@@ -85,7 +85,7 @@ request_body = CurrencyCreation,
 tag = "Currency")]
 #[post("")]
 pub async fn create(identity: Identity, currency: Json<CurrencyCreation>) -> Result<impl Responder, ApiError> {
-	let user_id = is_identity_valid(&identity)?;
+	let user_id = validate_identity(&identity)?;
 	let currency = currency.into_inner();
 	let currency = create_new_currency(user_id, currency).await?;
 
@@ -103,7 +103,7 @@ path = "/api/v1/currency/{currency_id}",
 tag = "Currency")]
 #[delete("/{currency_id}")]
 pub async fn delete(identity: Identity, currency_id: Path<i32>) -> Result<impl Responder, ApiError> {
-	let user_id = is_identity_valid(&identity)?;
+	let user_id = validate_identity(&identity)?;
 	let currency_id = currency_id.into_inner();
 	let permissions = UserPermission::from_identity(&identity)?.get_currency(currency_id);
 	if !permissions.access().await? {
