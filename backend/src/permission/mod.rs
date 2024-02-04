@@ -2,8 +2,9 @@ use async_trait::async_trait;
 
 use crate::api::error::ApiError;
 
-mod account;
+pub mod account;
 pub mod currency;
+pub mod transaction;
 pub mod user;
 
 #[async_trait]
@@ -15,7 +16,7 @@ pub trait Permission {
 
 #[async_trait]
 pub trait PermissionOrUnauthorized {
-	async fn access_or_unauthorized(&self) -> Result<bool, ApiError>;
+	async fn access_or_unauthorized(&self) -> Result<(), ApiError>;
 
-	async fn delete_or_unauthorized(&self) -> Result<bool, ApiError>;
+	async fn delete_or_unauthorized(&self) -> Result<(), ApiError>;
 }

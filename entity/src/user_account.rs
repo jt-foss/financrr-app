@@ -45,3 +45,13 @@ impl Related<super::user::Entity> for Entity {
 }
 
 impl ActiveModelBehavior for ActiveModel {}
+
+impl Entity {
+	pub fn find_by_user_id(user_id: i32) -> Select<Self> {
+		Self::find().filter(Column::UserId.eq(user_id))
+	}
+
+	pub fn find_by_account_id(account_id: i32) -> Select<Self> {
+		Self::find().filter(Column::AccountId.eq(account_id))
+	}
+}

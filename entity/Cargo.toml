@@ -13,6 +13,10 @@ ignored = ["rust-argon2"]
 # Actix
 actix-identity.workspace = true
 
+# ORM
+sea-orm.workspace = true
+sea-query = "0.30.7"
+
 # Serialization/Deserialization
 serde.workspace = true
 
@@ -22,9 +26,6 @@ rust-argon2 = "2.1.0"
 
 # Error handling
 thiserror = "1.0.56"
-
-# Workspace
-sea-orm.workspace = true
 
 # Utils
 chrono = "0.4.33"

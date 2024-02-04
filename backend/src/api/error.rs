@@ -163,3 +163,13 @@ impl From<serde_json::Error> for ApiError {
 		}
 	}
 }
+
+impl From<actix_web::Error> for ApiError {
+	fn from(error: actix_web::Error) -> Self {
+		Self {
+			status_code: error.as_response_error().status_code(),
+			details: error.to_string(),
+			reference: None,
+		}
+	}
+}

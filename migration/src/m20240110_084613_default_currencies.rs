@@ -7,7 +7,7 @@ use sea_orm_migration::prelude::*;
 
 use entity::currency;
 use entity::currency::ActiveModel as Currency;
-use entity::utility::loading::create_table_if_not_exist;
+use entity::utility::loading::load_schema;
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;
@@ -44,7 +44,7 @@ impl MigrationTrait for Migration {
 
 	async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
 		manager.drop_table(Table::drop().table(currency::Entity).to_owned()).await.expect("Could not drop table");
-		create_table_if_not_exist(currency::Entity, manager.get_connection()).await;
+		load_schema(manager.get_connection()).await;
 		Ok(())
 	}
 }

@@ -38,13 +38,13 @@ use_self = "warn"
 actix-identity = "0.7.0"
 
 # Serialization/Deserialization
-serde = { version = "1.0.193", features = ["derive"] }
+serde = { version = "1.0.196", features = ["derive"] }
 
 # ORM
-sea-orm = { version = "0.12.11", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros", "mock"] }
+sea-orm = { version = "0.12.12", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros", "mock"] }
 
 # Async runtime
-tokio = { version = "1.35.1", features = ["rt", "macros", "rt-multi-thread"] }
+tokio = { version = "1.36.0", features = ["rt", "macros", "rt-multi-thread"] }
 
 # Utils
 log = "0.4.20"

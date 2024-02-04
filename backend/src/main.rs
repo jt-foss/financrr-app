@@ -33,6 +33,7 @@ use migration::MigratorTrait;
 use crate::api::account::controller::account_controller;
 use crate::api::currency::controller::currency_controller;
 use crate::api::status::controller::status_controller;
+use crate::api::transaction::controller::transaction_controller;
 use crate::api::user::controller::user_controller;
 use crate::config::Config;
 use crate::database::connection::{establish_database_connection, get_database_connection};
@@ -43,6 +44,7 @@ pub mod config;
 pub mod database;
 pub mod permission;
 pub mod util;
+pub mod wrapper;
 
 pub static DB: OnceLock<DatabaseConnection> = OnceLock::new();
 pub static CONFIG: OnceLock<Config> = OnceLock::new();
@@ -54,7 +56,8 @@ tags(
 (name = "Status", description = "Endpoints that contain information about the health status of the server."),
 (name = "User", description = "Endpoints for user management."),
 (name = "Account", description = "Endpoints for account management."),
-(name = "Currency", description = "Endpoints for currency management.")
+(name = "Currency", description = "Endpoints for currency management."),
+(name = "Transaction", description = "Endpoints for transaction management.")
 ),
 modifiers(&SecurityAddon)
 )]
@@ -152,6 +155,7 @@ fn configure_api_v1(cfg: &mut web::ServiceConfig) {
 			.configure(status_controller)
 			.configure(user_controller)
 			.configure(account_controller)
-			.configure(currency_controller),
+			.configure(currency_controller)
+			.configure(transaction_controller),
 	);
 }
