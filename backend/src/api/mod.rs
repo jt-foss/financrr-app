@@ -3,4 +3,5 @@ pub mod currency;
 pub mod dto;
 pub mod error;
 pub mod status;
+pub mod transaction;
 pub mod user;

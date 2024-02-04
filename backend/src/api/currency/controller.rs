@@ -81,6 +81,7 @@ responses(
 (status = 500, response = InternalServerError)
 ),
 path = "/api/v1/currency",
+request_body = CurrencyCreation,
 tag = "Currency")]
 #[post("")]
 pub async fn create(identity: Identity, currency: Json<CurrencyCreation>) -> Result<impl Responder, ApiError> {
