@@ -26,7 +26,6 @@ erDiagram
 
 	Account {
 		int id PK
-		User owner FK "NotNull"
 		string name "NotNull"
 		string description "Nullable"
 		string iban UK "Nullable"
@@ -34,7 +33,6 @@ erDiagram
 		Currency currency FK "NotNull"
 		timestamp created_at "NotNull"
 	}
-	Account ||--|| Currency: "one to one"
 
 	UserAccount {
 		User user PK "References User.id"
@@ -57,4 +55,4 @@ erDiagram
 ```
 ## SQL
 
-You can find the SQL script [here](./schema.sql).
+You can find the SQL script [here](https://github.com/financrr/backend/blob/main/entity/src/utility/schema.sql).
