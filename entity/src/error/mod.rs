@@ -7,8 +7,6 @@ pub enum EntityError {
 	HashingFailed(#[from] Error),
 	#[error("Internal database error occurred")]
 	DatabaseError(#[from] sea_orm::error::DbErr),
-	#[error("Could not get Id from Identity")]
-	IdentityError(#[from] actix_identity::error::GetIdentityError),
 	#[error("An parsing error occurred")]
 	ParsingError,
 }

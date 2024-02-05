@@ -2,17 +2,13 @@ use actix_identity::Identity;
 use actix_session::Session;
 use actix_web::{delete, post, web, HttpMessage, HttpRequest, HttpResponse, Responder};
 use actix_web_validator::Json;
-use sea_orm::ActiveModelTrait;
-
-use entity::user;
 
 use crate::api::dto::IdResponse;
 use crate::api::error::ApiError;
-use crate::api::user::dto::{Credentials, RegisterUser, UserLogin};
-use crate::database::connection::get_database_connection;
 use crate::util::identity::{is_signed_in, validate_identity};
 use crate::util::utoipa::{InternalServerError, Unauthorized, ValidationError};
-use crate::util::validation::validate_unique_username;
+use crate::wrapper::user::dto::{Credentials, UserRegistration};
+use crate::wrapper::user::User;
 
 pub fn user_controller(cfg: &mut web::ServiceConfig) {
 	cfg.service(web::scope("/user").service(register).service(login).service(logout));
@@ -20,7 +16,7 @@ pub fn user_controller(cfg: &mut web::ServiceConfig) {
 
 #[utoipa::path(post,
 responses(
-(status = 200, description = "Successfully logged in", content_type = "application/json"),
+(status = 204, description = "Successfully logged in", content_type = "application/json"),
 (status = 401, response = Unauthorized),
 (status = 400, response = ValidationError)
 ),
@@ -34,21 +30,18 @@ pub async fn login(
 	credentials: Json<Credentials>,
 ) -> Result<impl Responder, ApiError> {
 	if is_signed_in(&session).is_err() {
-		return Ok(HttpResponse::Ok());
+		return Ok(HttpResponse::NoContent());
 	}
 
-	return match UserLogin::authenticate(credentials.into_inner()).await {
-		Some(user) => {
-			Identity::login(&request.extensions(), user.id.to_string()).unwrap();
-			Ok(HttpResponse::Ok())
-		}
-		None => Err(ApiError::invalid_credentials()),
-	};
+	let user = User::authenticate(credentials.into_inner()).await?;
+	Identity::login(&request.extensions(), user.id.to_string()).unwrap();
+
+	Ok(HttpResponse::NoContent())
 }
 
 #[utoipa::path(delete,
 responses(
-(status = 200, description = "Successfully logged out"),
+(status = 204, description = "Successfully logged out"),
 (status = 401, response = Unauthorized)
 ),
 path = "/api/v1/user/logout",
@@ -58,7 +51,7 @@ pub async fn logout(identity: Identity) -> Result<impl Responder, ApiError> {
 	validate_identity(&identity)?;
 	identity.logout();
 
-	Ok(HttpResponse::Ok())
+	Ok(HttpResponse::NoContent())
 }
 
 #[utoipa::path(post,
@@ -69,20 +62,13 @@ responses(
 (status = 500, response = InternalServerError)
 ),
 path = "/api/v1/user/register",
-request_body = RegisterUser,
+request_body = UserRegistration,
 tag = "User"
 )]
 #[post("/register")]
-pub async fn register(session: Session, user: Json<RegisterUser>) -> Result<impl Responder, ApiError> {
+pub async fn register(session: Session, registration: UserRegistration) -> Result<impl Responder, ApiError> {
 	is_signed_in(&session)?;
-	validate_unique_username(user.username.as_str()).await?;
+	let user = User::register(registration).await?;
 
-	let user = user.into_inner();
-	match user::ActiveModel::register(user.username, user.email, user.password) {
-		Ok(user) => {
-			let user = user.insert(get_database_connection()).await?;
-			Ok(HttpResponse::Ok().json(IdResponse::from(user)))
-		}
-		Err(e) => Err(ApiError::from(e)),
-	}
+	Ok(HttpResponse::Ok().json(IdResponse::from(user)))
 }

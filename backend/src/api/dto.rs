@@ -2,7 +2,9 @@ use serde::Serialize;
 use utoipa::ToSchema;
 
 use entity::account::Model;
-use entity::{account, currency, user};
+use entity::{account, currency};
+
+use crate::wrapper::user::User;
 
 #[derive(Serialize, ToSchema)]
 pub struct IdResponse {
@@ -17,8 +19,8 @@ impl From<account::Model> for IdResponse {
 	}
 }
 
-impl From<user::Model> for IdResponse {
-	fn from(value: user::Model) -> Self {
+impl From<User> for IdResponse {
+	fn from(value: User) -> Self {
 		Self {
 			id: value.id,
 		}

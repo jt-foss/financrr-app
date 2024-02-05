@@ -34,9 +34,6 @@ cognitive_complexity = "deny"
 use_self = "warn"
 
 [workspace.dependencies]
-# Actix
-actix-identity = "0.7.0"
-
 # Serialization/Deserialization
 serde = { version = "1.0.196", features = ["derive"] }
 

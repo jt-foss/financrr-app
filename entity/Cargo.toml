@@ -10,9 +10,6 @@ wildcard_imports = "allow"
 ignored = ["rust-argon2"]
 
 [dependencies]
-# Actix
-actix-identity.workspace = true
-
 # ORM
 sea-orm.workspace = true
 sea-query = "0.30.7"
