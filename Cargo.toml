@@ -41,7 +41,7 @@ actix-identity = "0.7.0"
 serde = { version = "1.0.196", features = ["derive"] }
 
 # ORM
-sea-orm = { version = "0.12.12", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros", "mock"] }
+sea-orm = { version = "0.12.14", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros", "mock"] }
 
 # Async runtime
 tokio = { version = "1.36.0", features = ["rt", "macros", "rt-multi-thread"] }
