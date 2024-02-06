@@ -15,7 +15,7 @@ entity = { path = "../entity" }
 
 # Sea-orm
 sea-orm.workspace = true
-sea-orm-migration = "0.12.12"
+sea-orm-migration = "0.12.14"
 log.workspace = true
 
 # Utils
