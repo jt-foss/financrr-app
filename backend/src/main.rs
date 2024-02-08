@@ -42,7 +42,6 @@ use crate::util::validation::ValidationErrorJsonPayload;
 pub mod api;
 pub mod config;
 pub mod database;
-pub mod permission;
 pub mod util;
 pub mod wrapper;
 
@@ -52,6 +51,9 @@ pub static CONFIG: OnceLock<Config> = OnceLock::new();
 #[utoipauto(paths = "./backend/src")]
 #[derive(OpenApi)]
 #[openapi(
+schemas(
+crate::util::utoipa::PhantomSchema,
+),
 tags(
 (name = "Status", description = "Endpoints that contain information about the health status of the server."),
 (name = "User", description = "Endpoints for user management."),
@@ -59,7 +61,7 @@ tags(
 (name = "Currency", description = "Endpoints for currency management."),
 (name = "Transaction", description = "Endpoints for transaction management.")
 ),
-modifiers(&SecurityAddon)
+modifiers(& SecurityAddon)
 )]
 pub struct ApiDoc;
 

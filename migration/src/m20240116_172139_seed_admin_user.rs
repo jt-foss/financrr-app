@@ -5,6 +5,7 @@ use sea_orm_migration::prelude::*;
 use entity::prelude::User;
 use entity::user;
 use entity::utility::hashing::hash_string;
+use entity::utility::time::get_now;
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;
@@ -16,7 +17,7 @@ impl MigrationTrait for Migration {
 		let user = user::ActiveModel {
 			username: Set("admin".to_string()),
 			password: Set(hashed_password.to_string()),
-			created_at: Set(chrono::Local::now().naive_local()),
+			created_at: Set(get_now()),
 			is_admin: Set(true),
 			..Default::default()
 		};

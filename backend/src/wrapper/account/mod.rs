@@ -1,13 +1,15 @@
+use sea_orm::EntityTrait;
+use serde::{Deserialize, Serialize};
+use time::OffsetDateTime;
+use validator::Validate;
+
+use entity::account;
+
 use crate::api::error::ApiError;
 use crate::util::entity::find_one_or_error;
 use crate::util::validation::validate_iban;
 use crate::wrapper::currency::Currency;
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
-use chrono::NaiveDateTime;
-use entity::account;
-use sea_orm::EntityTrait;
-use serde::{Deserialize, Serialize};
-use validator::Validate;
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Validate)]
 pub struct Account {
@@ -19,7 +21,7 @@ pub struct Account {
 	#[validate(custom = "validate_iban")]
 	pub iban: Option<String>,
 	pub currency: Phantom<Currency>,
-	pub created_at: NaiveDateTime,
+	pub created_at: OffsetDateTime,
 }
 
 impl Identifiable for Account {

@@ -29,25 +29,23 @@ redis = "0.24.0"
 serde.workspace = true
 serde_json = "1.0.113"
 
-# Async runtime
-tokio.workspace = true
-
 # Generating openapi spec
-utoipa = { version = "4.2.0", features = ["actix_extras", "openapi_extensions"] }
+utoipa = { version = "4.2.0", features = ["actix_extras", "openapi_extensions", "time", "preserve_order"] }
 utoipa-swagger-ui = { version = "6.0.0", features = ["actix-web", "debug-embed"] }
-utoipauto = "0.1.8"
+utoipauto = "0.1.9"
 
 # Logging
 log.workspace = true
 simple_logger = "4.3.3"
-time = "0.3.34" #Needed for giving timestamps to logs
+
+# Date/Time
+time.workspace = true
 
 # Utils
 dotenvy = "0.15.7"
 derive_more = { version = "1.0.0-beta.6", features = ["display", "error"] }
 regex = {  version = "1.10.3", features = ["std", "perf", "unicode"] }
 async-trait = "0.1.77"
-chrono = "0.4.33"
 
 # Future Utils
 futures = "0.3.30"

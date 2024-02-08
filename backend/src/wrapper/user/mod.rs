@@ -1,10 +1,10 @@
 use actix_identity::Identity;
 use actix_web::dev::Payload;
 use actix_web::{FromRequest, HttpRequest};
-use chrono::NaiveDateTime;
 use futures_util::future::LocalBoxFuture;
 use sea_orm::{ActiveModelTrait, EntityTrait};
 use serde::{Deserialize, Serialize};
+use time::OffsetDateTime;
 use utoipa::ToSchema;
 
 use entity::prelude::User as DbUser;
@@ -15,7 +15,7 @@ use crate::api::error::ApiError;
 use crate::database::connection::get_database_connection;
 use crate::util::entity::{count, find_one, find_one_or_error};
 use crate::util::identity::validate_identity;
-use crate::wrapper::types::phantom::Identifiable;
+use crate::wrapper::types::phantom::{Identifiable, Phantom};
 use crate::wrapper::user::dto::UserRegistration;
 
 pub mod dto;
@@ -25,7 +25,7 @@ pub struct User {
 	pub id: i32,
 	pub username: String,
 	pub email: Option<String>,
-	pub created_at: NaiveDateTime,
+	pub created_at: OffsetDateTime,
 	pub is_admin: bool,
 }
 
@@ -82,6 +82,20 @@ impl FromRequest for User {
 			let user_id = validate_identity(&Identity::extract(&req).into_inner()?)?;
 
 			Self::find_by_id(user_id).await
+		})
+	}
+}
+
+impl FromRequest for Phantom<User> {
+	type Error = ApiError;
+	type Future = LocalBoxFuture<'static, Result<Self, Self::Error>>;
+
+	fn from_request(req: &HttpRequest, _payload: &mut Payload) -> Self::Future {
+		let req = req.clone();
+		Box::pin(async move {
+			let user_id = validate_identity(&Identity::extract(&req).into_inner()?)?;
+
+			Ok(Self::new(user_id))
 		})
 	}
 }

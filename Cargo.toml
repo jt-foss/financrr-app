@@ -15,7 +15,7 @@ repository = "https://github.com/financrr/backend"
 homepage = "https://github.com/financrr/backend"
 readme = "README.md"
 edition = "2021"
-rust-version = "1.75.0"
+rust-version = "1.76.0"
 
 [workspace.lints.clippy]
 # Restriction
@@ -38,10 +38,10 @@ use_self = "warn"
 serde = { version = "1.0.196", features = ["derive"] }
 
 # ORM
-sea-orm = { version = "0.12.14", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros", "mock"] }
+sea-orm = { version = "1.0.0-rc.1", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros", "mock"] }
 
-# Async runtime
-tokio = { version = "1.36.0", features = ["rt", "macros", "rt-multi-thread"] }
+# Date/Time
+time = "0.3.34"
 
 # Utils
 log = "0.4.20"

@@ -6,6 +6,7 @@ use sea_orm::ActiveValue::Set;
 use sea_orm::{ActiveModelTrait, EntityTrait, IntoActiveModel};
 
 use entity::transaction;
+use entity::utility::time::get_now;
 
 use crate::api::error::ApiError;
 use crate::api::transaction::dto::{TransactionCreation, TransactionDTO};
@@ -92,7 +93,7 @@ pub async fn delete(identity: Identity, transaction_id: Path<i32>) -> Result<imp
 }
 
 async fn create_new(transaction: TransactionCreation) -> Result<impl Responder, ApiError> {
-	let execution_date = transaction.executed_at.unwrap_or_else(|| chrono::Utc::now().naive_utc());
+	let execution_date = transaction.executed_at.unwrap_or_else(get_now);
 	let transaction = transaction::ActiveModel {
 		id: Set(Default::default()),
 		source: Set(transaction.source),
@@ -100,7 +101,7 @@ async fn create_new(transaction: TransactionCreation) -> Result<impl Responder, 
 		amount: Set(transaction.amount),
 		currency: Set(transaction.currency),
 		description: Set(transaction.description),
-		created_at: Set(chrono::Utc::now().naive_utc()),
+		created_at: Set(get_now()),
 		executed_at: Set(execution_date),
 	};
 

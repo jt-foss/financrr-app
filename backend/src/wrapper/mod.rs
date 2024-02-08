@@ -1,4 +1,5 @@
 pub mod account;
 pub mod currency;
-mod types;
+pub mod permission;
+pub mod types;
 pub mod user;

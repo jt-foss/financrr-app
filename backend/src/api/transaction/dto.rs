@@ -1,9 +1,10 @@
-use chrono::NaiveDateTime;
-use entity::transaction;
-use entity::transaction::Model;
 use serde::{Deserialize, Serialize};
+use time::OffsetDateTime;
 use utoipa::ToSchema;
 use validator::Validate;
+
+use entity::transaction;
+use entity::transaction::Model;
 
 #[derive(Deserialize, Serialize, ToSchema)]
 pub struct TransactionDTO {
@@ -13,8 +14,8 @@ pub struct TransactionDTO {
 	pub amount: i32,
 	pub currency: i32,
 	pub description: Option<String>,
-	pub created_at: NaiveDateTime,
-	pub executed_at: NaiveDateTime,
+	pub created_at: OffsetDateTime,
+	pub executed_at: OffsetDateTime,
 }
 
 #[derive(Deserialize, Serialize, ToSchema, Validate)]
@@ -24,7 +25,7 @@ pub struct TransactionCreation {
 	pub amount: i32,
 	pub currency: i32,
 	pub description: Option<String>,
-	pub executed_at: Option<NaiveDateTime>,
+	pub executed_at: Option<OffsetDateTime>,
 }
 
 impl From<transaction::Model> for TransactionDTO {

@@ -1,5 +1,6 @@
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::future::Future;
+
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 use crate::api::error::ApiError;
 
@@ -28,6 +29,10 @@ impl<T: Identifiable + Send + 'static> Phantom<T> {
 			self.inner = Some(T::from_id(self.id).await?);
 		}
 		Ok(self.inner.as_ref().unwrap())
+	}
+
+	pub fn get_id(&self) -> i32 {
+		self.id
 	}
 }
 

@@ -1,11 +1,11 @@
 CREATE TABLE IF NOT EXISTS "user"
 (
 	id         SERIAL PRIMARY KEY,
-	username   TEXT UNIQUE NOT NULL,
+	username   TEXT UNIQUE              NOT NULL,
 	email      TEXT UNIQUE,
-	password   TEXT        NOT NULL,
-	created_at TIMESTAMP   NOT NULL DEFAULT current_timestamp,
-	is_admin   BOOLEAN     NOT NULL DEFAULT FALSE
+	password   TEXT                     NOT NULL,
+	created_at timestamp with time zone NOT NULL DEFAULT current_timestamp,
+	is_admin   BOOLEAN                  NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS currency
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS account
 	iban        TEXT UNIQUE,
 	balance     INTEGER                          NOT NULL DEFAULT 0,
 	currency    INTEGER REFERENCES Currency (id) NOT NULL,
-	created_at  TIMESTAMP                        NOT NULL DEFAULT current_timestamp
+	created_at  timestamp with time zone         NOT NULL DEFAULT current_timestamp
 );
 
 CREATE TABLE IF NOT EXISTS user_account
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS transaction
 	amount      INTEGER                          NOT NULL,
 	currency    INTEGER REFERENCES Currency (id) NOT NULL,
 	description TEXT,
-	created_at  TIMESTAMP                        NOT NULL DEFAULT current_timestamp,
-	executed_at TIMESTAMP                        NOT NULL DEFAULT current_timestamp,
+	created_at  timestamp with time zone         NOT NULL DEFAULT current_timestamp,
+	executed_at timestamp with time zone         NOT NULL DEFAULT current_timestamp,
 	CHECK (source IS NOT NULL OR destination IS NOT NULL)
 );
