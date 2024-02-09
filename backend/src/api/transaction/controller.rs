@@ -29,7 +29,7 @@ path = "/api/v1/transaction/{transaction_id}",
 tag = "Transaction")]
 #[get("/{transaction_id}")]
 pub async fn get_one(identity: Identity, transaction_id: Path<i32>) -> Result<impl Responder, ApiError> {
-	validate_identity(&identity)?;
+	validate_identity(identity)?;
 	let transaction_id = transaction_id.into_inner();
 	let transaction =
 		TransactionDTO::from(find_one_or_error(transaction::Entity::find_by_id(transaction_id), "Transaction").await?);
@@ -47,7 +47,7 @@ path = "/api/v1/transaction",
 tag = "Transaction")]
 #[get("")]
 pub async fn get_all(identity: Identity) -> Result<impl Responder, ApiError> {
-	validate_identity(&identity)?;
+	validate_identity(identity)?;
 	let transactions = transaction::Entity::find().all(get_database_connection()).await?;
 	let transactions: Vec<TransactionDTO> = transactions.into_iter().map(TransactionDTO::from).collect();
 
@@ -65,7 +65,7 @@ request_body = TransactionCreation,
 tag = "Transaction")]
 #[post("")]
 pub async fn create(identity: Identity, currency: Json<TransactionCreation>) -> Result<impl Responder, ApiError> {
-	validate_identity(&identity)?;
+	validate_identity(identity)?;
 	let dto = create_new(currency.0).await?;
 
 	Ok(dto)
@@ -81,7 +81,7 @@ path = "/api/v1/transaction/{transaction_id}",
 tag = "Transaction")]
 #[delete("/{transaction_id}")]
 pub async fn delete(identity: Identity, transaction_id: Path<i32>) -> Result<impl Responder, ApiError> {
-	validate_identity(&identity)?;
+	validate_identity(identity)?;
 	let transaction_id = transaction_id.into_inner();
 	find_one_or_error(transaction::Entity::find_by_id(transaction_id), "Transaction")
 		.await?

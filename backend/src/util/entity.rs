@@ -1,4 +1,4 @@
-use sea_orm::{EntityTrait, Select};
+use sea_orm::{ActiveModelBehavior, DeleteMany, EntityTrait, IntoActiveModel, Select};
 
 use crate::api::error::ApiError;
 use crate::database::connection::get_database_connection;
@@ -26,4 +26,24 @@ pub async fn find_all<T: EntityTrait>(select_stm: Select<T>) -> Result<Vec<T::Mo
 pub async fn count<T: EntityTrait>(select_stm: Select<T>) -> Result<u64, ApiError> {
 	// TODO we need to fix this to use count() instead of find_all()
 	find_all(select_stm).await.map(|models| models.len() as u64)
+}
+
+pub async fn insert<T>(active_model: T) -> Result<<T::Entity as EntityTrait>::Model, ApiError>
+where
+	<T::Entity as EntityTrait>::Model: IntoActiveModel<T>,
+	T: ActiveModelBehavior + Send,
+{
+	active_model.insert(get_database_connection()).await.map_err(ApiError::from)
+}
+
+pub async fn update<T>(active_model: T) -> Result<<T::Entity as EntityTrait>::Model, ApiError>
+where
+	<T::Entity as EntityTrait>::Model: IntoActiveModel<T>,
+	T: ActiveModelBehavior + Send,
+{
+	active_model.update(get_database_connection()).await.map_err(ApiError::from)
+}
+
+pub async fn delete<T: EntityTrait>(delete: DeleteMany<T>) -> Result<(), ApiError> {
+	delete.exec(get_database_connection()).await.map(|_| ()).map_err(ApiError::from)
 }

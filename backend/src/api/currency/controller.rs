@@ -5,7 +5,7 @@ use log::info;
 
 use crate::api::error::ApiError;
 use crate::util::utoipa::{InternalServerError, ResourceNotFound, Unauthorized};
-use crate::wrapper::currency::dto::CurrencyCreation;
+use crate::wrapper::currency::dto::CurrencyDTO;
 use crate::wrapper::currency::Currency;
 use crate::wrapper::permission::Permission;
 use crate::wrapper::types::phantom::Phantom;
@@ -61,10 +61,10 @@ responses(
 (status = 500, response = InternalServerError)
 ),
 path = "/api/v1/currency",
-request_body = CurrencyCreation,
+request_body = CurrencyDTO,
 tag = "Currency")]
 #[post("")]
-pub async fn create(user: Phantom<User>, currency: Json<CurrencyCreation>) -> Result<impl Responder, ApiError> {
+pub async fn create(user: Phantom<User>, currency: Json<CurrencyDTO>) -> Result<impl Responder, ApiError> {
 	Ok(HttpResponse::Ok().json(Currency::new(currency.into_inner(), user.get_id()).await?))
 }
 
@@ -100,13 +100,18 @@ responses(
 (status = 500, response = InternalServerError)
 ),
 path = "/api/v1/currency/{currency_id}",
-request_body = Currency,
+request_body = CurrencyDTO,
 tag = "Currency")]
 #[patch("/{currency_id}")]
-pub async fn update(user: Phantom<User>, currency: Currency) -> Result<impl Responder, ApiError> {
+pub async fn update(
+	user: Phantom<User>,
+	update: CurrencyDTO,
+	currency_id: Path<i32>,
+) -> Result<impl Responder, ApiError> {
+	let currency = Currency::find_by_id(currency_id.into_inner()).await?;
 	if !currency.has_access(user.get_id()).await? {
 		return Err(ApiError::resource_not_found("Currency"));
 	}
 
-	Ok(HttpResponse::Ok().json(currency.update().await?))
+	Ok(HttpResponse::Ok().json(currency.update(update).await?))
 }

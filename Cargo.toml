@@ -41,9 +41,9 @@ serde = { version = "1.0.196", features = ["derive"] }
 sea-orm = { version = "1.0.0-rc.1", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros", "mock"] }
 
 # Date/Time
-time = "0.3.34"
+time = { version = "0.3.34", features = ["serde-human-readable"] }
 
-# Utils
+# Logging
 log = "0.4.20"
 
 [profile.release]

@@ -2,7 +2,7 @@ use actix_identity::Identity;
 use actix_web::dev::Payload;
 use actix_web::{FromRequest, HttpRequest};
 use futures_util::future::LocalBoxFuture;
-use sea_orm::{ActiveModelTrait, EntityTrait};
+use sea_orm::EntityTrait;
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 use utoipa::ToSchema;
@@ -12,8 +12,7 @@ use entity::user;
 use entity::user::Model;
 
 use crate::api::error::ApiError;
-use crate::database::connection::get_database_connection;
-use crate::util::entity::{count, find_one, find_one_or_error};
+use crate::util::entity::{count, find_one, find_one_or_error, insert};
 use crate::util::identity::validate_identity;
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 use crate::wrapper::user::dto::UserRegistration;
@@ -43,7 +42,7 @@ impl User {
 		Ok(Self::from(find_one_or_error(user::Entity::find_by_id(id), "User").await?))
 	}
 
-	pub async fn user_exists(id: i32) -> Result<bool, ApiError> {
+	pub async fn exists(id: i32) -> Result<bool, ApiError> {
 		Ok(count(user::Entity::find_by_id(id)).await? > 0)
 	}
 
@@ -64,7 +63,7 @@ impl User {
 	pub async fn register(registration: UserRegistration) -> Result<Self, ApiError> {
 		match user::ActiveModel::register(registration.username, registration.email, registration.password) {
 			Ok(user) => {
-				let user = user.insert(get_database_connection()).await?;
+				let user = insert(user).await?;
 				Ok(Self::from(user))
 			}
 			Err(e) => Err(ApiError::from(e)),
@@ -79,7 +78,7 @@ impl FromRequest for User {
 	fn from_request(req: &HttpRequest, _payload: &mut Payload) -> Self::Future {
 		let req = req.clone();
 		Box::pin(async move {
-			let user_id = validate_identity(&Identity::extract(&req).into_inner()?)?;
+			let user_id = validate_identity(Identity::extract(&req).into_inner()?)?;
 
 			Self::find_by_id(user_id).await
 		})
@@ -93,7 +92,8 @@ impl FromRequest for Phantom<User> {
 	fn from_request(req: &HttpRequest, _payload: &mut Payload) -> Self::Future {
 		let req = req.clone();
 		Box::pin(async move {
-			let user_id = validate_identity(&Identity::extract(&req).into_inner()?)?;
+			let user_id = validate_identity(Identity::extract(&req).into_inner()?)?;
+			User::exists(user_id).await?;
 
 			Ok(Self::new(user_id))
 		})

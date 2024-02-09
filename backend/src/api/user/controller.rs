@@ -3,9 +3,8 @@ use actix_session::Session;
 use actix_web::{delete, post, web, HttpMessage, HttpRequest, HttpResponse, Responder};
 use actix_web_validator::Json;
 
-use crate::api::dto::IdResponse;
 use crate::api::error::ApiError;
-use crate::util::identity::{is_signed_in, validate_identity};
+use crate::util::identity::is_signed_in;
 use crate::util::utoipa::{InternalServerError, Unauthorized, ValidationError};
 use crate::wrapper::user::dto::{Credentials, UserRegistration};
 use crate::wrapper::user::User;
@@ -48,7 +47,6 @@ path = "/api/v1/user/logout",
 tag = "User")]
 #[delete("/logout")]
 pub async fn logout(identity: Identity) -> Result<impl Responder, ApiError> {
-	validate_identity(&identity)?;
 	identity.logout();
 
 	Ok(HttpResponse::NoContent())
@@ -56,7 +54,7 @@ pub async fn logout(identity: Identity) -> Result<impl Responder, ApiError> {
 
 #[utoipa::path(post,
 responses(
-(status = 200, description = "Successfully registered.", content_type = "application/json", body = IdResponse),
+(status = 200, description = "Successfully registered.", content_type = "application/json", body = User),
 (status = 409, description = "User is signed in."),
 (status = 400, response = ValidationError),
 (status = 500, response = InternalServerError)
@@ -70,5 +68,5 @@ pub async fn register(session: Session, registration: UserRegistration) -> Resul
 	is_signed_in(&session)?;
 	let user = User::register(registration).await?;
 
-	Ok(HttpResponse::Ok().json(IdResponse::from(user)))
+	Ok(HttpResponse::Ok().json(user))
 }

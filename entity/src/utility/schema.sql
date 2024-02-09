@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS account
 	name        TEXT                             NOT NULL,
 	description TEXT,
 	iban        TEXT UNIQUE,
-	balance     INTEGER                          NOT NULL DEFAULT 0,
+	balance     BIGINT                           NOT NULL DEFAULT 0,
 	currency    INTEGER REFERENCES Currency (id) NOT NULL,
 	created_at  timestamp with time zone         NOT NULL DEFAULT current_timestamp
 );

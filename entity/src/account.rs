@@ -18,7 +18,7 @@ pub struct Model {
 	pub description: Option<String>,
 	#[sea_orm(column_type = "Text", nullable, unique)]
 	pub iban: Option<String>,
-	pub balance: i32,
+	pub balance: i64,
 	pub currency: i32,
 	pub created_at: TimeDateTimeWithTimeZone,
 }
@@ -79,7 +79,7 @@ impl ActiveModel {
 		name: &str,
 		description: &Option<String>,
 		iban: &Option<String>,
-		balance: &i32,
+		balance: &i64,
 		currency_id: &i32,
 	) -> Self {
 		Self {

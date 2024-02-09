@@ -45,7 +45,7 @@ time.workspace = true
 dotenvy = "0.15.7"
 derive_more = { version = "1.0.0-beta.6", features = ["display", "error"] }
 regex = {  version = "1.10.3", features = ["std", "perf", "unicode"] }
-async-trait = "0.1.77"
+itertools = "0.12.1"
 
 # Future Utils
 futures = "0.3.30"

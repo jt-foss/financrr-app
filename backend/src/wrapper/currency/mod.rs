@@ -4,16 +4,15 @@ use actix_web::{FromRequest, HttpRequest};
 use futures_util::future::LocalBoxFuture;
 use log::info;
 use sea_orm::ActiveValue::Set;
-use sea_orm::{ActiveModelTrait, EntityTrait, IntoActiveModel};
+use sea_orm::EntityTrait;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
 use entity::currency;
 
 use crate::api::error::ApiError;
-use crate::database::connection::get_database_connection;
-use crate::util::entity::{count, find_all, find_one_or_error};
-use crate::wrapper::currency::dto::CurrencyCreation;
+use crate::util::entity::{count, delete, find_all, find_one_or_error, insert, update};
+use crate::wrapper::currency::dto::CurrencyDTO;
 use crate::wrapper::permission::Permission;
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 use crate::wrapper::user::User;
@@ -31,8 +30,8 @@ pub struct Currency {
 }
 
 impl Currency {
-	pub async fn new(creation: CurrencyCreation, user_id: i32) -> Result<Self, ApiError> {
-		if !User::user_exists(user_id).await? {
+	pub async fn new(creation: CurrencyDTO, user_id: i32) -> Result<Self, ApiError> {
+		if !User::exists(user_id).await? {
 			return Err(ApiError::resource_not_found("User"));
 		}
 
@@ -44,13 +43,13 @@ impl Currency {
 			decimal_places: Set(creation.decimal_places),
 			user: Set(Some(user_id)),
 		};
-		let model = currency.insert(get_database_connection()).await?;
+		let model = insert(currency).await?;
 
 		Ok(Self::from(model))
 	}
 
 	pub async fn delete(self) -> Result<(), ApiError> {
-		currency::Entity::delete_by_id(self.id).exec(get_database_connection()).await?;
+		delete(currency::Entity::delete_by_id(self.id)).await?;
 
 		Ok(())
 	}
@@ -93,30 +92,19 @@ impl Currency {
 		Ok(count(currency::Entity::find_by_id(id)).await? > 0)
 	}
 
-	pub async fn update(self) -> Result<Self, ApiError> {
-		let model = self.get_db_model().await?;
-		if let Some(user) = &self.user {
-			if !user.get_id().eq(&self.id) {
-				return Err(ApiError::unauthorized());
-			}
-		} else {
-			return Err(ApiError::unauthorized());
-		}
+	pub async fn update(self, update_dto: CurrencyDTO) -> Result<Self, ApiError> {
+		let user_option = self.user.map(|user| user.get_id());
+		let active_model = currency::ActiveModel {
+			id: Set(self.id),
+			name: Set(update_dto.name),
+			symbol: Set(update_dto.symbol),
+			iso_code: Set(update_dto.iso_code),
+			decimal_places: Set(update_dto.decimal_places),
+			user: Set(user_option),
+		};
+		let model = update(active_model).await?;
 
-		self.update_db_model(model.into_active_model()).await
-	}
-
-	async fn get_db_model(&self) -> Result<currency::Model, ApiError> {
-		find_one_or_error(currency::Entity::find_by_id(self.id), "Currency").await
-	}
-
-	async fn update_db_model(self, mut model: currency::ActiveModel) -> Result<Self, ApiError> {
-		model.name = Set(self.name);
-		model.symbol = Set(self.symbol);
-		model.iso_code = Set(self.iso_code);
-		model.decimal_places = Set(self.decimal_places);
-
-		Ok(Self::from(model.update(get_database_connection()).await?))
+		Ok(Self::from(model))
 	}
 }
 
@@ -164,16 +152,7 @@ impl FromRequest for Currency {
 	fn from_request(req: &HttpRequest, payload: &mut Payload) -> Self::Future {
 		let fut = Json::<Self>::from_request(req, payload);
 		let _req = req.clone();
-		Box::pin(async move {
-			match fut.await {
-				Ok(user) => {
-					let user = user.into_inner();
-
-					Ok(user)
-				}
-				Err(e) => Err(ApiError::from(e)),
-			}
-		})
+		Box::pin(async move { Ok(fut.await?.into_inner()) })
 	}
 }
 

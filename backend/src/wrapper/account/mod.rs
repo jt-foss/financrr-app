@@ -1,27 +1,111 @@
-use sea_orm::EntityTrait;
+use actix_web::http::StatusCode;
+use futures_util::future::join_all;
+use itertools::{Either, Itertools};
+use sea_orm::{EntityTrait, Set};
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
-use validator::Validate;
+use utoipa::ToSchema;
 
-use entity::account;
+use entity::utility::time::get_now;
+use entity::{account, user_account};
 
 use crate::api::error::ApiError;
-use crate::util::entity::find_one_or_error;
-use crate::util::validation::validate_iban;
+use crate::util::entity::{delete, find_all, find_one, find_one_or_error, insert, update};
+use crate::wrapper::account::dto::AccountDTO;
 use crate::wrapper::currency::Currency;
+use crate::wrapper::permission::Permission;
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Validate)]
+pub mod dto;
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub struct Account {
 	pub id: i32,
-	#[validate(length(min = 1))]
 	pub name: String,
-	#[validate(length(min = 1))]
 	pub description: Option<String>,
-	#[validate(custom = "validate_iban")]
 	pub iban: Option<String>,
+	pub balance: i64,
 	pub currency: Phantom<Currency>,
 	pub created_at: OffsetDateTime,
+}
+
+impl Account {
+	pub async fn new(dto: AccountDTO, user_id: i32) -> Result<Self, ApiError> {
+		let active_model = account::ActiveModel {
+			id: Default::default(),
+			name: Set(dto.name),
+			description: Set(dto.description),
+			iban: Set(dto.iban),
+			balance: Set(dto.balance),
+			currency: Set(dto.currency_id),
+			created_at: Set(get_now()),
+		};
+		let model = insert(active_model).await?;
+
+		let user_account = user_account::ActiveModel {
+			user_id: Set(user_id),
+			account_id: Set(model.id),
+		};
+		insert(user_account).await?;
+
+		Ok(Self::from(model))
+	}
+
+	pub async fn delete(self) -> Result<(), ApiError> {
+		delete(account::Entity::delete_by_id(self.id)).await
+	}
+
+	pub async fn update(self, dto: AccountDTO) -> Result<Self, ApiError> {
+		let active_model = account::ActiveModel {
+			id: Set(self.id),
+			name: Set(dto.name),
+			description: Set(dto.description),
+			iban: Set(dto.iban),
+			balance: Set(dto.balance),
+			currency: Set(dto.currency_id),
+			created_at: Set(self.created_at),
+		};
+		let model = update(active_model).await?;
+
+		Ok(Self::from(model))
+	}
+
+	pub async fn find_by_id(id: i32) -> Result<Self, ApiError> {
+		Ok(Self::from(find_one_or_error(account::Entity::find_by_id(id), "Account").await?))
+	}
+
+	pub async fn find_all_by_user(user_id: i32) -> Result<Vec<Self>, ApiError> {
+		let results = join_all(
+			find_all(user_account::Entity::find_by_user_id(user_id))
+				.await?
+				.into_iter()
+				.map(|model| Self::find_by_id(model.account_id)),
+		)
+		.await;
+
+		let (accounts, errors): (Vec<_>, Vec<_>) = results.into_iter().partition_map(|result| match result {
+			Ok(account) => Either::Left(account),
+			Err(error) => Either::Right(error),
+		});
+
+		if !errors.is_empty() {
+			return Err(ApiError::from_error_vec(errors, StatusCode::INTERNAL_SERVER_ERROR));
+		}
+
+		Ok(accounts)
+	}
+}
+
+impl Permission for Account {
+	async fn has_access(&self, user_id: i32) -> Result<bool, ApiError> {
+		let user_option = find_one(user_account::Entity::find_by_id((user_id, self.id))).await?;
+
+		Ok(user_option.is_some())
+	}
+
+	async fn can_delete(&self, user_id: i32) -> Result<bool, ApiError> {
+		self.has_access(user_id).await
+	}
 }
 
 impl Identifiable for Account {
@@ -33,12 +117,6 @@ impl Identifiable for Account {
 	}
 }
 
-impl Account {
-	pub async fn find_by_id(id: i32) -> Result<Self, ApiError> {
-		Ok(Self::from(find_one_or_error(account::Entity::find_by_id(id), "Account").await?))
-	}
-}
-
 impl From<account::Model> for Account {
 	fn from(value: account::Model) -> Self {
 		Self {
@@ -46,6 +124,7 @@ impl From<account::Model> for Account {
 			name: value.name,
 			description: value.description,
 			iban: value.iban,
+			balance: value.balance,
 			currency: Phantom::new(value.currency),
 			created_at: value.created_at,
 		}
