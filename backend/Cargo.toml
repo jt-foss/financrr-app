@@ -35,7 +35,7 @@ tokio.workspace = true
 # Generating openapi spec
 utoipa = { version = "4.2.0", features = ["actix_extras", "openapi_extensions"] }
 utoipa-swagger-ui = { version = "6.0.0", features = ["actix-web", "debug-embed"] }
-utoipauto = "0.1.8"
+utoipauto = "0.1.9"
 
 # Logging
 log.workspace = true
