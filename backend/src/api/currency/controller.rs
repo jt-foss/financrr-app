@@ -3,7 +3,7 @@ use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
 use actix_web_validator::Json;
 use log::info;
 
-use crate::api::error::ApiError;
+use crate::api::error::api::ApiError;
 use crate::util::utoipa::{InternalServerError, ResourceNotFound, Unauthorized};
 use crate::wrapper::currency::dto::CurrencyDTO;
 use crate::wrapper::currency::Currency;

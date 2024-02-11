@@ -2,7 +2,7 @@ use std::future::Future;
 
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-use crate::api::error::ApiError;
+use crate::api::error::api::ApiError;
 
 pub trait Identifiable {
 	fn from_id(id: i32) -> impl Future<Output = Result<Self, ApiError>> + Send
@@ -22,6 +22,10 @@ impl<T: Identifiable + Send + 'static> Phantom<T> {
 			id,
 			inner: None,
 		}
+	}
+
+	pub fn from_option(id: Option<i32>) -> Option<Self> {
+		id.map(|id| Self::new(id))
 	}
 
 	pub async fn get_inner(&mut self) -> Result<&T, ApiError> {

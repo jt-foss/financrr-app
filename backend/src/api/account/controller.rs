@@ -1,7 +1,7 @@
 use actix_web::web::Path;
 use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
 
-use crate::api::error::ApiError;
+use crate::api::error::api::ApiError;
 use crate::util::utoipa::{InternalServerError, ResourceNotFound, Unauthorized, ValidationError};
 use crate::wrapper::account::dto::AccountDTO;
 use crate::wrapper::account::Account;

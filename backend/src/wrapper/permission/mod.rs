@@ -1,6 +1,6 @@
 use std::future::Future;
 
-use crate::api::error::ApiError;
+use crate::api::error::api::ApiError;
 
 pub trait Permission {
 	fn has_access(&self, user_id: i32) -> impl Future<Output = Result<bool, ApiError>> + Send;

@@ -10,7 +10,7 @@ use utoipa::ToSchema;
 
 use entity::currency;
 
-use crate::api::error::ApiError;
+use crate::api::error::api::ApiError;
 use crate::util::entity::{count, delete, find_all, find_one_or_error, insert, update};
 use crate::wrapper::currency::dto::CurrencyDTO;
 use crate::wrapper::permission::Permission;

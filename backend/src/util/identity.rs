@@ -1,7 +1,7 @@
 use actix_identity::Identity;
 use actix_session::Session;
 
-use crate::api::error::ApiError;
+use crate::api::error::api::ApiError;
 
 pub const IDENTITY_ID_SESSION_KEY: &str = "actix_identity.user_id";
 

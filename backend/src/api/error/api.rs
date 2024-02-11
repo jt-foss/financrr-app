@@ -11,6 +11,7 @@ use validator::ValidationError;
 
 use entity::error::EntityError;
 
+use crate::api::error::validation;
 use crate::util::validation::ValidationErrorJsonPayload;
 
 #[derive(Debug, Display, Error, Serialize, ToSchema)]
@@ -151,6 +152,12 @@ impl From<ValidationErrorJsonPayload> for ApiError {
 impl From<ValidationError> for ApiError {
 	fn from(value: ValidationError) -> Self {
 		Self::from(ValidationErrorJsonPayload::from(value))
+	}
+}
+
+impl From<validation::ValidationError> for ApiError {
+	fn from(value: validation::ValidationError) -> Self {
+		Self::from(value.get_error().to_owned())
 	}
 }
 

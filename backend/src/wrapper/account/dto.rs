@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use validator::Validate;
 
-use crate::api::error::ApiError;
+use crate::api::error::api::ApiError;
 use crate::util::validation::{validate_currency_exists, validate_iban};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Validate, ToSchema)]

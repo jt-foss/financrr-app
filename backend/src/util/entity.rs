@@ -1,6 +1,6 @@
 use sea_orm::{ActiveModelBehavior, DeleteMany, EntityTrait, IntoActiveModel, Select};
 
-use crate::api::error::ApiError;
+use crate::api::error::api::ApiError;
 use crate::database::connection::get_database_connection;
 
 pub async fn find_one<T>(select_stm: Select<T>) -> Result<Option<T::Model>, ApiError>

@@ -9,8 +9,8 @@ use utoipa::ToSchema;
 use entity::utility::time::get_now;
 use entity::{account, user_account};
 
-use crate::api::error::ApiError;
-use crate::util::entity::{delete, find_all, find_one, find_one_or_error, insert, update};
+use crate::api::error::api::ApiError;
+use crate::util::entity::{count, delete, find_all, find_one, find_one_or_error, insert, update};
 use crate::wrapper::account::dto::AccountDTO;
 use crate::wrapper::currency::Currency;
 use crate::wrapper::permission::Permission;
@@ -68,6 +68,10 @@ impl Account {
 		let model = update(active_model).await?;
 
 		Ok(Self::from(model))
+	}
+
+	pub async fn exists(id: i32) -> Result<bool, ApiError> {
+		Ok(count(account::Entity::find_by_id(id)).await? > 0)
 	}
 
 	pub async fn find_by_id(id: i32) -> Result<Self, ApiError> {

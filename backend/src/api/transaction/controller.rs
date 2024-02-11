@@ -8,7 +8,7 @@ use sea_orm::{ActiveModelTrait, EntityTrait, IntoActiveModel};
 use entity::transaction;
 use entity::utility::time::get_now;
 
-use crate::api::error::ApiError;
+use crate::api::error::api::ApiError;
 use crate::api::transaction::dto::{TransactionCreation, TransactionDTO};
 use crate::database::connection::get_database_connection;
 use crate::util::entity::find_one_or_error;

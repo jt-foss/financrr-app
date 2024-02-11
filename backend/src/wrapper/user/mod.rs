@@ -11,7 +11,7 @@ use entity::prelude::User as DbUser;
 use entity::user;
 use entity::user::Model;
 
-use crate::api::error::ApiError;
+use crate::api::error::api::ApiError;
 use crate::util::entity::{count, find_one, find_one_or_error, insert};
 use crate::util::identity::validate_identity;
 use crate::wrapper::types::phantom::{Identifiable, Phantom};

@@ -6,7 +6,7 @@ use serde::Deserialize;
 use utoipa::ToSchema;
 use validator::Validate;
 
-use crate::api::error::ApiError;
+use crate::api::error::api::ApiError;
 use crate::util::validation::{validate_password, validate_unique_username};
 
 #[derive(Deserialize, ToSchema, Validate)]
