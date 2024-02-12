@@ -28,4 +28,4 @@ rust-argon2 = "2.1.0"
 thiserror = "1.0.56"
 
 # Utils
-chrono = "0.4.33"
+chrono = "0.4.34"
