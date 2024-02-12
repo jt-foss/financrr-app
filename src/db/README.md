@@ -53,6 +53,7 @@ erDiagram
 	}
 	Transaction ||--|| Account: "one to one"
 ```
+
 ## SQL
 
 You can find the SQL script [here](https://github.com/financrr/backend/blob/main/entity/src/utility/schema.sql).

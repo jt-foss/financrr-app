@@ -11,5 +11,5 @@ Features that are specific to the backend.
 - [ ] provide docker image
 - [ ] provide good installation instructions
 - [ ] reduce external dependencies
-  - [X] we only need our databases PostgreSQL & redis
-  - [ ] integrated rate limiter -> no need for an external one
+    - [X] we only need our databases PostgreSQL & redis
+    - [ ] integrated rate limiter -> no need for an external one

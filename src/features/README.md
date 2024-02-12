@@ -1,6 +1,5 @@
 # Features
 
-
 ## General Features
 
 - [ ] Budgets
