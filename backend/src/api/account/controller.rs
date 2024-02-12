@@ -17,9 +17,10 @@ pub fn account_controller(cfg: &mut web::ServiceConfig) {
 
 #[utoipa::path(get,
 responses(
-(status = 200, description = "Successfully retrieved AccountDTO.", content_type = "application/json", body = Account),
+(status = 200, description = "Successfully retrieved Account.", content_type = "application/json", body = Account),
 (status = 401, response = Unauthorized),
-(status = 404, response = ResourceNotFound)
+(status = 404, response = ResourceNotFound),
+(status = 500, response = InternalServerError)
 ),
 path = "/api/v1/account/{account_id}",
 tag = "Account")]
@@ -35,7 +36,7 @@ pub async fn get_one(user: Phantom<User>, account_id: Path<i32>) -> Result<impl 
 
 #[utoipa::path(get,
 responses(
-(status = 200, description = "Successfully retrieved all AccountDTOs.", content_type = "application/json", body = Vec < Account >),
+(status = 200, description = "Successfully retrieved all Accounts.", content_type = "application/json", body = Vec < Account >),
 (status = 401, response = Unauthorized)
 ),
 path = "/api/v1/account",

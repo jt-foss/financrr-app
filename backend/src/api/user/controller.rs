@@ -1,16 +1,32 @@
 use actix_identity::Identity;
 use actix_session::Session;
-use actix_web::{delete, post, web, HttpMessage, HttpRequest, HttpResponse, Responder};
+use actix_web::{delete, get, post, web, HttpMessage, HttpRequest, HttpResponse, Responder};
 use actix_web_validator::Json;
 
 use crate::api::error::api::ApiError;
 use crate::util::identity::is_signed_in;
-use crate::util::utoipa::{InternalServerError, Unauthorized, ValidationError};
+use crate::util::utoipa::{InternalServerError, ResourceNotFound, Unauthorized, ValidationError};
+use crate::wrapper::types::phantom::Phantom;
 use crate::wrapper::user::dto::{Credentials, UserRegistration};
 use crate::wrapper::user::User;
 
 pub fn user_controller(cfg: &mut web::ServiceConfig) {
-    cfg.service(web::scope("/user").service(register).service(login).service(logout));
+    cfg.service(web::scope("/user").service(me).service(register).service(login).service(logout));
+}
+
+#[utoipa::path(get,
+responses(
+(status = 200, description = "Successfully retrieved your own User.", content_type = "application/json", body = User),
+(status = 401, response = Unauthorized),
+(status = 404, response = ResourceNotFound),
+(status = 500, response = InternalServerError),
+),
+path = "/api/v1/user/@me",
+tag = "User"
+)]
+#[get("/@me")]
+pub async fn me(mut user: Phantom<User>) -> Result<impl Responder, ApiError> {
+    Ok(HttpResponse::Ok().json(user.get_inner().await?))
 }
 
 #[utoipa::path(post,
