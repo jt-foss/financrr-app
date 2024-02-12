@@ -11,33 +11,33 @@ use crate::util::validation::{validate_password, validate_unique_username};
 
 #[derive(Deserialize, ToSchema, Validate)]
 pub struct UserRegistration {
-	#[validate(length(min = 1))]
-	pub username: String,
-	#[validate(email)]
-	pub email: Option<String>,
-	#[validate(custom = "validate_password")]
-	pub password: String,
+    #[validate(length(min = 1))]
+    pub username: String,
+    #[validate(email)]
+    pub email: Option<String>,
+    #[validate(custom = "validate_password")]
+    pub password: String,
 }
 
 #[derive(Deserialize, ToSchema, Validate)]
 pub struct Credentials {
-	#[validate(length(min = 1))]
-	pub username: String,
-	#[validate(length(min = 1))]
-	pub password: String,
+    #[validate(length(min = 1))]
+    pub username: String,
+    #[validate(length(min = 1))]
+    pub password: String,
 }
 
 impl FromRequest for UserRegistration {
-	type Error = ApiError;
-	type Future = LocalBoxFuture<'static, Result<Self, ApiError>>;
+    type Error = ApiError;
+    type Future = LocalBoxFuture<'static, Result<Self, ApiError>>;
 
-	fn from_request(req: &HttpRequest, payload: &mut Payload) -> Self::Future {
-		let registration = Json::<Self>::from_request(req, payload);
-		Box::pin(async move {
-			let registration = registration.await?;
-			validate_unique_username(registration.username.as_str()).await?;
+    fn from_request(req: &HttpRequest, payload: &mut Payload) -> Self::Future {
+        let registration = Json::<Self>::from_request(req, payload);
+        Box::pin(async move {
+            let registration = registration.await?;
+            validate_unique_username(registration.username.as_str()).await?;
 
-			Ok(registration.into_inner())
-		})
-	}
+            Ok(registration.into_inner())
+        })
+    }
 }

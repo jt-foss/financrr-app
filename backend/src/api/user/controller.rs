@@ -10,7 +10,7 @@ use crate::wrapper::user::dto::{Credentials, UserRegistration};
 use crate::wrapper::user::User;
 
 pub fn user_controller(cfg: &mut web::ServiceConfig) {
-	cfg.service(web::scope("/user").service(register).service(login).service(logout));
+    cfg.service(web::scope("/user").service(register).service(login).service(logout));
 }
 
 #[utoipa::path(post,
@@ -24,18 +24,18 @@ request_body = Credentials,
 tag = "User")]
 #[post("/login")]
 pub async fn login(
-	request: HttpRequest,
-	session: Session,
-	credentials: Json<Credentials>,
+    request: HttpRequest,
+    session: Session,
+    credentials: Json<Credentials>,
 ) -> Result<impl Responder, ApiError> {
-	if is_signed_in(&session).is_err() {
-		return Ok(HttpResponse::NoContent());
-	}
+    if is_signed_in(&session).is_err() {
+        return Ok(HttpResponse::NoContent());
+    }
 
-	let user = User::authenticate(credentials.into_inner()).await?;
-	Identity::login(&request.extensions(), user.id.to_string()).unwrap();
+    let user = User::authenticate(credentials.into_inner()).await?;
+    Identity::login(&request.extensions(), user.id.to_string()).unwrap();
 
-	Ok(HttpResponse::NoContent())
+    Ok(HttpResponse::NoContent())
 }
 
 #[utoipa::path(delete,
@@ -47,9 +47,9 @@ path = "/api/v1/user/logout",
 tag = "User")]
 #[delete("/logout")]
 pub async fn logout(identity: Identity) -> Result<impl Responder, ApiError> {
-	identity.logout();
+    identity.logout();
 
-	Ok(HttpResponse::NoContent())
+    Ok(HttpResponse::NoContent())
 }
 
 #[utoipa::path(post,
@@ -65,8 +65,8 @@ tag = "User"
 )]
 #[post("/register")]
 pub async fn register(session: Session, registration: UserRegistration) -> Result<impl Responder, ApiError> {
-	is_signed_in(&session)?;
-	let user = User::register(registration).await?;
+    is_signed_in(&session)?;
+    let user = User::register(registration).await?;
 
-	Ok(HttpResponse::Ok().json(user))
+    Ok(HttpResponse::Ok().json(user))
 }

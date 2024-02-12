@@ -12,14 +12,14 @@ use crate::wrapper::types::phantom::Phantom;
 use crate::wrapper::user::User;
 
 pub fn currency_controller(cfg: &mut web::ServiceConfig) {
-	cfg.service(
-		web::scope("/currency").service(get_all).service(get_one).service(create).service(delete).service(update),
-	);
+    cfg.service(
+        web::scope("/currency").service(get_all).service(get_one).service(create).service(delete).service(update),
+    );
 }
 
 #[utoipa::path(get,
 responses(
-(status = 200, description = "Successfully retrieved all Currencies.", content_type = "application/json", body = Vec<Currency>),
+(status = 200, description = "Successfully retrieved all Currencies.", content_type = "application/json", body = Vec < Currency >),
 (status = 401, response = Unauthorized),
 (status = 500, response = InternalServerError)
 ),
@@ -27,14 +27,14 @@ path = "/api/v1/currency",
 tag = "Currency")]
 #[get("")]
 pub async fn get_all(user: Option<Phantom<User>>) -> Result<impl Responder, ApiError> {
-	let mut currencies = Currency::find_all_with_no_user().await?;
-	let mut user_currencies: Vec<Currency> = vec![];
-	if let Some(user) = user {
-		user_currencies = Currency::find_all_with_user(user.get_id()).await?;
-	}
-	currencies.append(&mut user_currencies);
+    let mut currencies = Currency::find_all_with_no_user().await?;
+    let mut user_currencies: Vec<Currency> = vec![];
+    if let Some(user) = user {
+        user_currencies = Currency::find_all_with_user(user.get_id()).await?;
+    }
+    currencies.append(&mut user_currencies);
 
-	Ok(HttpResponse::Ok().json(currencies))
+    Ok(HttpResponse::Ok().json(currencies))
 }
 
 #[utoipa::path(get,
@@ -48,10 +48,10 @@ path = "/api/v1/currency/{currency_id}",
 tag = "Currency")]
 #[get("/{currency_id}")]
 pub async fn get_one(user: Option<Phantom<User>>, currency_id: Path<i32>) -> Result<impl Responder, ApiError> {
-	let currency_id = currency_id.into_inner();
-	let user_id = user.map_or(-1, |user| user.get_id());
+    let currency_id = currency_id.into_inner();
+    let user_id = user.map_or(-1, |user| user.get_id());
 
-	Ok(HttpResponse::Ok().json(Currency::find_by_id_include_user(currency_id, user_id).await?))
+    Ok(HttpResponse::Ok().json(Currency::find_by_id_include_user(currency_id, user_id).await?))
 }
 
 #[utoipa::path(post,
@@ -65,7 +65,7 @@ request_body = CurrencyDTO,
 tag = "Currency")]
 #[post("")]
 pub async fn create(user: Phantom<User>, currency: Json<CurrencyDTO>) -> Result<impl Responder, ApiError> {
-	Ok(HttpResponse::Ok().json(Currency::new(currency.into_inner(), user.get_id()).await?))
+    Ok(HttpResponse::Ok().json(Currency::new(currency.into_inner(), user.get_id()).await?))
 }
 
 #[utoipa::path(delete,
@@ -79,17 +79,17 @@ path = "/api/v1/currency/{currency_id}",
 tag = "Currency")]
 #[delete("/{currency_id}")]
 pub async fn delete(user: Phantom<User>, currency_id: Path<i32>) -> Result<impl Responder, ApiError> {
-	let currency = Currency::find_by_id(currency_id.into_inner()).await?;
-	info!("Currency: {:?}", currency);
-	if !currency.has_access(user.get_id()).await? {
-		return Err(ApiError::resource_not_found("Currency"));
-	}
-	if !currency.can_delete(user.get_id()).await? {
-		return Err(ApiError::unauthorized());
-	}
+    let currency = Currency::find_by_id(currency_id.into_inner()).await?;
+    info!("Currency: {:?}", currency);
+    if !currency.has_access(user.get_id()).await? {
+        return Err(ApiError::resource_not_found("Currency"));
+    }
+    if !currency.can_delete(user.get_id()).await? {
+        return Err(ApiError::unauthorized());
+    }
 
-	currency.delete().await?;
-	Ok(HttpResponse::Ok())
+    currency.delete().await?;
+    Ok(HttpResponse::Ok())
 }
 
 #[utoipa::path(patch,
@@ -104,14 +104,14 @@ request_body = CurrencyDTO,
 tag = "Currency")]
 #[patch("/{currency_id}")]
 pub async fn update(
-	user: Phantom<User>,
-	update: CurrencyDTO,
-	currency_id: Path<i32>,
+    user: Phantom<User>,
+    update: CurrencyDTO,
+    currency_id: Path<i32>,
 ) -> Result<impl Responder, ApiError> {
-	let currency = Currency::find_by_id(currency_id.into_inner()).await?;
-	if !currency.has_access(user.get_id()).await? {
-		return Err(ApiError::resource_not_found("Currency"));
-	}
+    let currency = Currency::find_by_id(currency_id.into_inner()).await?;
+    if !currency.has_access(user.get_id()).await? {
+        return Err(ApiError::resource_not_found("Currency"));
+    }
 
-	Ok(HttpResponse::Ok().json(currency.update(update).await?))
+    Ok(HttpResponse::Ok().json(currency.update(update).await?))
 }

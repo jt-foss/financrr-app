@@ -21,15 +21,15 @@ pub struct ResourceNotFound;
 pub struct PhantomSchema;
 
 impl<'__s> ToSchema<'__s> for PhantomSchema {
-	fn schema() -> (&'__s str, RefOr<Schema>) {
-		(
-			"Phantom",
-			schema!(
-				#[inline]
-				i32
-			)
-			.nullable(false)
-			.into(),
-		)
-	}
+    fn schema() -> (&'__s str, RefOr<Schema>) {
+        (
+            "Phantom",
+            schema!(
+                #[inline]
+                i32
+            )
+            .nullable(false)
+            .into(),
+        )
+    }
 }

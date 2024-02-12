@@ -10,26 +10,26 @@ use crate::api::error::api::ApiError;
 
 #[derive(Debug, Deserialize, Validate, ToSchema)]
 pub struct CurrencyDTO {
-	#[validate(length(min = 1, max = 255))]
-	pub name: String,
-	#[validate(length(min = 1, max = 255))]
-	pub symbol: String,
-	#[validate(length(min = 1, max = 3))]
-	pub iso_code: String,
-	#[validate(range(min = 0, max = 10))]
-	pub decimal_places: i32,
+    #[validate(length(min = 1, max = 255))]
+    pub name: String,
+    #[validate(length(min = 1, max = 255))]
+    pub symbol: String,
+    #[validate(length(min = 1, max = 3))]
+    pub iso_code: String,
+    #[validate(range(min = 0, max = 10))]
+    pub decimal_places: i32,
 }
 
 impl FromRequest for CurrencyDTO {
-	type Error = ApiError;
-	type Future = LocalBoxFuture<'static, Result<Self, ApiError>>;
+    type Error = ApiError;
+    type Future = LocalBoxFuture<'static, Result<Self, ApiError>>;
 
-	fn from_request(req: &HttpRequest, payload: &mut Payload) -> Self::Future {
-		let fut = Json::<Self>::from_request(req, payload);
-		Box::pin(async move {
-			let dto = fut.await?.into_inner();
+    fn from_request(req: &HttpRequest, payload: &mut Payload) -> Self::Future {
+        let fut = Json::<Self>::from_request(req, payload);
+        Box::pin(async move {
+            let dto = fut.await?.into_inner();
 
-			Ok(dto)
-		})
-	}
+            Ok(dto)
+        })
+    }
 }

@@ -10,9 +10,9 @@ use crate::wrapper::types::phantom::Phantom;
 use crate::wrapper::user::User;
 
 pub fn account_controller(cfg: &mut web::ServiceConfig) {
-	cfg.service(
-		web::scope("/account").service(get_one).service(get_all).service(create).service(delete).service(update),
-	);
+    cfg.service(
+        web::scope("/account").service(get_one).service(get_all).service(create).service(delete).service(update),
+    );
 }
 
 #[utoipa::path(get,
@@ -25,12 +25,12 @@ path = "/api/v1/account/{account_id}",
 tag = "Account")]
 #[get("/{account_id}")]
 pub async fn get_one(user: Phantom<User>, account_id: Path<i32>) -> Result<impl Responder, ApiError> {
-	let account = Account::find_by_id(account_id.into_inner()).await?;
-	if !account.has_access(user.get_id()).await? {
-		return Err(ApiError::resource_not_found("Account"));
-	}
+    let account = Account::find_by_id(account_id.into_inner()).await?;
+    if !account.has_access(user.get_id()).await? {
+        return Err(ApiError::resource_not_found("Account"));
+    }
 
-	Ok(HttpResponse::Ok().json(account))
+    Ok(HttpResponse::Ok().json(account))
 }
 
 #[utoipa::path(get,
@@ -42,7 +42,7 @@ path = "/api/v1/account",
 tag = "Account")]
 #[get("")]
 pub async fn get_all(user: Phantom<User>) -> Result<impl Responder, ApiError> {
-	Account::find_all_by_user(user.get_id()).await.map(|accounts| HttpResponse::Ok().json(accounts))
+    Account::find_all_by_user(user.get_id()).await.map(|accounts| HttpResponse::Ok().json(accounts))
 }
 
 #[utoipa::path(post,
@@ -58,7 +58,7 @@ request_body = AccountDTO,
 tag = "Account")]
 #[post("")]
 pub async fn create(user: Phantom<User>, account: AccountDTO) -> Result<impl Responder, ApiError> {
-	Ok(HttpResponse::Ok().json(Account::new(account, user.get_id()).await?))
+    Ok(HttpResponse::Ok().json(Account::new(account, user.get_id()).await?))
 }
 
 #[utoipa::path(delete,
@@ -72,17 +72,17 @@ path = "/api/v1/account/{account_id}",
 tag = "Account")]
 #[delete("/{account_id}")]
 pub async fn delete(user: Phantom<User>, account_id: Path<i32>) -> Result<impl Responder, ApiError> {
-	let account = Account::find_by_id(account_id.into_inner()).await?;
-	if !account.has_access(user.get_id()).await? {
-		return Err(ApiError::resource_not_found("Account"));
-	}
-	if !account.can_delete(user.get_id()).await? {
-		return Err(ApiError::unauthorized());
-	}
+    let account = Account::find_by_id(account_id.into_inner()).await?;
+    if !account.has_access(user.get_id()).await? {
+        return Err(ApiError::resource_not_found("Account"));
+    }
+    if !account.can_delete(user.get_id()).await? {
+        return Err(ApiError::unauthorized());
+    }
 
-	account.delete().await?;
+    account.delete().await?;
 
-	Ok(HttpResponse::NoContent())
+    Ok(HttpResponse::NoContent())
 }
 
 #[utoipa::path(patch,
@@ -98,16 +98,16 @@ request_body = AccountDTO,
 tag = "Account")]
 #[patch("/{account_id}")]
 pub async fn update(
-	user: Phantom<User>,
-	updated_account: AccountDTO,
-	account_id: Path<i32>,
+    user: Phantom<User>,
+    updated_account: AccountDTO,
+    account_id: Path<i32>,
 ) -> Result<impl Responder, ApiError> {
-	let account = Account::find_by_id(account_id.into_inner()).await?;
-	if !account.has_access(user.get_id()).await? {
-		return Err(ApiError::resource_not_found("Account"));
-	}
+    let account = Account::find_by_id(account_id.into_inner()).await?;
+    if !account.has_access(user.get_id()).await? {
+        return Err(ApiError::resource_not_found("Account"));
+    }
 
-	let account = account.update(updated_account).await?;
+    let account = account.update(updated_account).await?;
 
-	Ok(HttpResponse::Ok().json(account))
+    Ok(HttpResponse::Ok().json(account))
 }

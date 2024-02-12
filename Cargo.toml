@@ -1,8 +1,8 @@
 [workspace]
 members = [
-	"entity",
-	"migration",
-	"backend"
+    "entity",
+    "migration",
+    "backend"
 ]
 resolver = "2"
 
@@ -20,7 +20,6 @@ rust-version = "1.76.0"
 [workspace.lints.clippy]
 # Restriction
 absolute_paths = "warn"
-arithmetic_side_effects = "warn"
 
 # Pedantic
 wildcard-imports = "deny"
@@ -41,7 +40,7 @@ serde = { version = "1.0.196", features = ["derive"] }
 sea-orm = { version = "1.0.0-rc.1", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros", "mock"] }
 
 # Date/Time
-time = { version = "0.3.34", features = ["serde-human-readable"] }
+time = { version = "0.3.34", features = ["serde-human-readable", "local-offset"] }
 
 # Logging
 log = "0.4.20"

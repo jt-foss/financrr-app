@@ -4,8 +4,8 @@ const HASH: &str = "$argon2id$v=19$m=65536,t=3,p=1$UGFzc3dvcmRTYWx0$c5vyH53HOF7g
 
 #[test]
 fn test_password_hashing() {
-	let password = "password";
-	let salt = "PasswordSalt";
-	let hashed_password = hashing::hash_string_with_salt(password, salt).unwrap();
-	assert_eq!(HASH, hashed_password);
+    let password = "password";
+    let salt = "PasswordSalt";
+    let hashed_password = hashing::hash_string_with_salt(password, salt).unwrap();
+    assert_eq!(HASH, hashed_password);
 }

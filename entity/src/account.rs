@@ -10,86 +10,86 @@ use crate::utility::time::get_now;
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
 #[sea_orm(table_name = "account")]
 pub struct Model {
-	#[sea_orm(primary_key)]
-	pub id: i32,
-	#[sea_orm(column_type = "Text")]
-	pub name: String,
-	#[sea_orm(column_type = "Text", nullable)]
-	pub description: Option<String>,
-	#[sea_orm(column_type = "Text", nullable, unique)]
-	pub iban: Option<String>,
-	pub balance: i64,
-	pub currency: i32,
-	pub created_at: TimeDateTimeWithTimeZone,
+    #[sea_orm(primary_key)]
+    pub id: i32,
+    #[sea_orm(column_type = "Text")]
+    pub name: String,
+    #[sea_orm(column_type = "Text", nullable)]
+    pub description: Option<String>,
+    #[sea_orm(column_type = "Text", nullable, unique)]
+    pub iban: Option<String>,
+    pub balance: i64,
+    pub currency: i32,
+    pub created_at: TimeDateTimeWithTimeZone,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
-	#[sea_orm(
-		belongs_to = "super::currency::Entity",
-		from = "Column::Currency",
-		to = "super::currency::Column::Id",
-		on_update = "NoAction",
-		on_delete = "NoAction"
-	)]
-	Currency,
-	#[sea_orm(has_many = "super::user_account::Entity")]
-	UserAccount,
+    #[sea_orm(
+        belongs_to = "super::currency::Entity",
+        from = "Column::Currency",
+        to = "super::currency::Column::Id",
+        on_update = "NoAction",
+        on_delete = "NoAction"
+    )]
+    Currency,
+    #[sea_orm(has_many = "super::user_account::Entity")]
+    UserAccount,
 }
 
 impl Related<super::currency::Entity> for Entity {
-	fn to() -> RelationDef {
-		Relation::Currency.def()
-	}
+    fn to() -> RelationDef {
+        Relation::Currency.def()
+    }
 }
 
 impl Related<super::user_account::Entity> for Entity {
-	fn to() -> RelationDef {
-		Relation::UserAccount.def()
-	}
+    fn to() -> RelationDef {
+        Relation::UserAccount.def()
+    }
 }
 
 impl Related<super::user::Entity> for Entity {
-	fn to() -> RelationDef {
-		super::user_account::Relation::User.def()
-	}
-	fn via() -> Option<RelationDef> {
-		Some(super::user_account::Relation::Account.def().rev())
-	}
+    fn to() -> RelationDef {
+        super::user_account::Relation::User.def()
+    }
+    fn via() -> Option<RelationDef> {
+        Some(super::user_account::Relation::Account.def().rev())
+    }
 }
 
 impl ActiveModelBehavior for ActiveModel {}
 
 impl Entity {
-	pub fn find_all_for_user(user_id: &i32) -> Select<user_account::Entity> {
-		let user_id = user_id.to_owned();
+    pub fn find_all_for_user(user_id: &i32) -> Select<user_account::Entity> {
+        let user_id = user_id.to_owned();
 
-		user_account::Entity::find().filter(user_account::Column::UserId.eq(user_id))
-	}
+        user_account::Entity::find().filter(user_account::Column::UserId.eq(user_id))
+    }
 
-	pub fn find_by_id_and_user(id: &i32, user_id: &i32) -> Select<user_account::Entity> {
-		user_account::Entity::find()
-			.filter(user_account::Column::UserId.eq(user_id.to_owned()))
-			.filter(user_account::Column::AccountId.eq(id.to_owned()))
-	}
+    pub fn find_by_id_and_user(id: &i32, user_id: &i32) -> Select<user_account::Entity> {
+        user_account::Entity::find()
+            .filter(user_account::Column::UserId.eq(user_id.to_owned()))
+            .filter(user_account::Column::AccountId.eq(id.to_owned()))
+    }
 }
 
 impl ActiveModel {
-	pub fn new(
-		name: &str,
-		description: &Option<String>,
-		iban: &Option<String>,
-		balance: &i64,
-		currency_id: &i32,
-	) -> Self {
-		Self {
-			id: Default::default(),
-			name: Set(name.to_string()),
-			description: Set(description.to_owned()),
-			iban: Set(iban.to_owned()),
-			balance: Set(balance.to_owned()),
-			currency: Set(currency_id.to_owned()),
-			created_at: Set(get_now()),
-		}
-	}
+    pub fn new(
+        name: &str,
+        description: &Option<String>,
+        iban: &Option<String>,
+        balance: &i64,
+        currency_id: &i32,
+    ) -> Self {
+        Self {
+            id: Default::default(),
+            name: Set(name.to_string()),
+            description: Set(description.to_owned()),
+            iban: Set(iban.to_owned()),
+            balance: Set(balance.to_owned()),
+            currency: Set(currency_id.to_owned()),
+            created_at: Set(get_now()),
+        }
+    }
 }
