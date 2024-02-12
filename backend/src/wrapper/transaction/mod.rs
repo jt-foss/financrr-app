@@ -19,7 +19,7 @@ use crate::wrapper::types::phantom::{Identifiable, Phantom};
 mod account_helper;
 pub mod dto;
 
-#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize, ToSchema)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub struct Transaction {
     pub id: i32,
     pub source: Option<Phantom<Account>>,

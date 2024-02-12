@@ -14,7 +14,7 @@ use crate::wrapper::currency::Currency;
 use crate::wrapper::transaction::check_account_access;
 use crate::wrapper::types::phantom::Phantom;
 
-#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize, Validate, ToSchema)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Validate, ToSchema)]
 pub struct TransactionDTO {
     pub source: Option<Phantom<Account>>,
     pub destination: Option<Phantom<Account>>,

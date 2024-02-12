@@ -10,7 +10,7 @@ use crate::api::error::api::ApiError;
 use crate::util::validation::{validate_currency_exists, validate_iban};
 use crate::wrapper::account::Account;
 
-#[derive(Debug, Clone, Serialize, Deserialize, Validate, ToSchema)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Validate, ToSchema)]
 pub struct AccountDTO {
     #[validate(length(min = 1, max = 255))]
     pub name: String,

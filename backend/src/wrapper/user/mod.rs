@@ -19,7 +19,7 @@ use crate::wrapper::user::dto::UserRegistration;
 
 pub mod dto;
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub struct User {
     pub id: i32,
     pub username: String,

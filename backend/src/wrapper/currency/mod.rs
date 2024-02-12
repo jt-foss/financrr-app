@@ -19,7 +19,7 @@ use crate::wrapper::user::User;
 
 pub mod dto;
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub struct Currency {
     pub id: i32,
     pub name: String,
