@@ -10,12 +10,8 @@ wildcard_imports = "allow"
 ignored = ["rust-argon2"]
 
 [dependencies]
-# Actix
-actix-identity.workspace = true
-
 # ORM
 sea-orm.workspace = true
-sea-query = "0.30.7"
 
 # Serialization/Deserialization
 serde.workspace = true
@@ -27,5 +23,5 @@ rust-argon2 = "2.1.0"
 # Error handling
 thiserror = "1.0.57"
 
-# Utils
-chrono = "0.4.34"
+# Date/Time
+time.workspace = true

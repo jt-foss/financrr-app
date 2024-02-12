@@ -1,4 +1,3 @@
-pub mod constant;
 pub mod entity;
 pub mod identity;
 pub mod utoipa;

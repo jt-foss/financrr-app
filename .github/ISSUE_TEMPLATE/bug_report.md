@@ -12,6 +12,7 @@ A clear and concise description of what the bug is.
 
 **To Reproduce**
 Steps to reproduce the behavior:
+
 1. Go to '...'
 2. Click on '....'
 3. Scroll down to '....'
@@ -24,6 +25,7 @@ A clear and concise description of what you expected to happen.
 If applicable, add the relevant console logs to help explain your problem.
 
 **System information (please complete the following information)**
+
 - Host OS: [e.g. Fedora 39 Server]
 - Docker OS: (if applicable): [e.g. Alpine v3.18]
 - Version: [e.g. v1.0.0]

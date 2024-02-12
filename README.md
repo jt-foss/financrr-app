@@ -1,15 +1,19 @@
 # financrr Backend
+
 ![financrrBanner](https://github.com/financrr/backend/assets/48297101/9c959372-f276-4435-804a-dbd4e5acc0dc)
 
 The backend for financrr - The most modern finance manager you've ever seen!
 
 ---
+
 ### Requirements
 
 - [Docker](https://www.docker.com/)
 - [Rust](https://www.rust-lang.org/)  (latest stable version)
 
-**NOTE:** When deploying, it is highly recommended to use this in combination with a [reverse proxy](https://www.cloudflare.com/learning/cdn/glossary/reverse-proxy/#:~:text=A%20reverse%20proxy%20is%20a,security%2C%20performance%2C%20and%20reliability.). See: [Reverse proxy quick-start - Caddy Documentation](https://caddyserver.com/docs/quick-starts/reverse-proxy)
+**NOTE:** When deploying, it is highly recommended to use this in combination with
+a [reverse proxy](https://www.cloudflare.com/learning/cdn/glossary/reverse-proxy/#:~:text=A%20reverse%20proxy%20is%20a,security%2C%20performance%2C%20and%20reliability.).
+See: [Reverse proxy quick-start - Caddy Documentation](https://caddyserver.com/docs/quick-starts/reverse-proxy)
 
 ### Getting Started (Docker Compose)
 
@@ -20,8 +24,10 @@ The backend for financrr - The most modern finance manager you've ever seen!
 
 ## Swagger UI
 
-We have a `swagger-ui` instance running at `http://localhost:8080/swagger-ui/` (mind the trailing slash) for testing and research purposes regarding the API.<br>
-**NOTE: Keep in mind that you have to change the URL based on your preferences (`.env` config file and/or reverse proxies)**<br>
+We have a `swagger-ui` instance running at `http://localhost:8080/swagger-ui/` (mind the trailing slash) for testing and
+research purposes regarding the API.<br>
+**NOTE: Keep in mind that you have to change the URL based on your preferences (`.env` config file and/or reverse
+proxies)**<br>
 
 ## Default Login
 
@@ -52,7 +58,8 @@ There is currently no way nor any plans to use/support other databases.
 **Why is that?**<br>
 
 - Concentrating on only one database makes it way easier to develop, maintain and test existing systems
-- Having an application designed for one specific database may yield performance improvements by fine tuning both the database and application based on eachother
+- Having an application designed for one specific database may yield performance improvements by fine tuning both the
+  database and application based on eachother
 
 ### Performance Configuration
 

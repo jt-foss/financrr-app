@@ -12,7 +12,7 @@ workspace = true
 # Actix
 actix-web = { version = "4.5.1", features = ["rustls-0_22", "secure-cookies"] }
 actix-session = { version = "0.9.0", features = ["redis", "redis-rs-session"] }
-actix-identity.workspace = true
+actix-identity = "0.7.0"
 
 # Validation
 validator = { version = "0.16.1", features = ["derive"] }
@@ -28,26 +28,25 @@ redis = "0.24.0"
 # Serialization and deserialization
 serde.workspace = true
 serde_json = "1.0.113"
-
-# Async runtime
-tokio.workspace = true
+serde_with = { version = "3.6.1", features = ["json", "time_0_3"] }
 
 # Generating openapi spec
-utoipa = { version = "4.2.0", features = ["actix_extras", "openapi_extensions"] }
+utoipa = { version = "4.2.0", features = ["actix_extras", "openapi_extensions", "time", "preserve_order"] }
 utoipa-swagger-ui = { version = "6.0.0", features = ["actix-web", "debug-embed"] }
 utoipauto = "0.1.9"
 
 # Logging
 log.workspace = true
 simple_logger = "4.3.3"
-time = "0.3.34" #Needed for giving timestamps to logs
+
+# Date/Time
+time.workspace = true
 
 # Utils
 dotenvy = "0.15.7"
 derive_more = { version = "1.0.0-beta.6", features = ["display", "error"] }
-regex = {  version = "1.10.3", features = ["std", "perf", "unicode"] }
-async-trait = "0.1.77"
-chrono = "0.4.34"
+regex = { version = "1.10.3", features = ["std", "perf", "unicode"] }
+itertools = "0.12.1"
 
 # Future Utils
 futures = "0.3.30"
