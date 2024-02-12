@@ -24,18 +24,21 @@ async fn health() -> impl Responder {
     if !is_psql_reachable().await {
         return HttpResponse::ServiceUnavailable().json(HealthResponse {
             healthy: false,
+            supported_api_versions: vec![1],
             details: Some("PostgreSQL connection failed".to_string()),
         });
     }
     if !is_redis_reachable().await {
         return HttpResponse::ServiceUnavailable().json(HealthResponse {
             healthy: false,
+            supported_api_versions: vec![1],
             details: Some("Redis connection failed".to_string()),
         });
     }
 
     HttpResponse::Ok().json(HealthResponse {
         healthy: true,
+        supported_api_versions: vec![1],
         details: None,
     })
 }
