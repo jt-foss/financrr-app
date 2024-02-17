@@ -1,4 +1,4 @@
-use actix_web::{get, HttpResponse, Responder, web};
+use actix_web::{get, web, HttpResponse, Responder};
 
 use crate::api::status::dto::HealthResponse;
 use crate::config::Config;

@@ -4,16 +4,16 @@ use std::sync::OnceLock;
 use actix_identity::config::LogoutBehaviour;
 use actix_identity::IdentityMiddleware;
 use actix_session::config::CookieContentSecurity;
-use actix_session::SessionMiddleware;
 use actix_session::storage::RedisSessionStore;
-use actix_web::{
-    App, error,
-    HttpResponse,
-    HttpServer,
-    middleware, middleware::Logger, web::{self},
-};
+use actix_session::SessionMiddleware;
 use actix_web::cookie::{Key, SameSite};
 use actix_web::middleware::{Compress, NormalizePath};
+use actix_web::{
+    error, middleware,
+    middleware::Logger,
+    web::{self},
+    App, HttpResponse, HttpServer,
+};
 use actix_web_validator::{Error, JsonConfig};
 use dotenvy::dotenv;
 use log::{info, LevelFilter};
@@ -21,8 +21,8 @@ use middleware::TrailingSlash;
 use sea_orm::DatabaseConnection;
 use simple_logger::SimpleLogger;
 use time::macros::format_description;
-use utoipa::{Modify, openapi, OpenApi};
 use utoipa::openapi::Components;
+use utoipa::{openapi, Modify, OpenApi};
 use utoipa_swagger_ui::SwaggerUi;
 use utoipauto::utoipauto;
 
@@ -148,10 +148,12 @@ fn handle_validation_error(err: Error) -> actix_web::Error {
 }
 
 fn configure_api(cfg: &mut web::ServiceConfig) {
-    cfg.service(web::scope("/api")
-        .wrap(NormalizePath::new(TrailingSlash::Trim))
-        .configure(configure_api_v1)
-        .configure(status_controller));
+    cfg.service(
+        web::scope("/api")
+            .wrap(NormalizePath::new(TrailingSlash::Trim))
+            .configure(configure_api_v1)
+            .configure(status_controller),
+    );
 }
 
 fn configure_api_v1(cfg: &mut web::ServiceConfig) {
