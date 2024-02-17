@@ -1,3 +1,4 @@
+use actix_cors::Cors;
 use std::io::Result;
 use std::sync::OnceLock;
 
@@ -104,6 +105,7 @@ async fn main() -> Result<()> {
         App::new()
             .wrap(Logger::default())
             .wrap(Compress::default())
+            .wrap(Cors::permissive())
             .wrap(IdentityMiddleware::builder().logout_behaviour(LogoutBehaviour::PurgeSession).build())
             .wrap(
                 SessionMiddleware::builder(store.clone(), get_secret_key())

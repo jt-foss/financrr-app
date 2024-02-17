@@ -13,6 +13,7 @@ workspace = true
 actix-web = { version = "4.5.1", features = ["rustls-0_22", "secure-cookies"] }
 actix-session = { version = "0.9.0", features = ["redis", "redis-rs-session"] }
 actix-identity = "0.7.0"
+actix-cors = "0.7.0"
 
 # Validation
 validator = { version = "0.16.1", features = ["derive"] }
