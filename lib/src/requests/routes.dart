@@ -85,7 +85,7 @@ class CompiledRoute {
   }
 
   String _buildBaseUrl(HostInformation hostInformation, bool isVersioned) {
-    String effectiveHostUrl = hostInformation.hostUri.toString()!;
+    String effectiveHostUrl = hostInformation.hostUri!.toString();
     if (effectiveHostUrl.endsWith('/')) {
       effectiveHostUrl = effectiveHostUrl.substring(0, effectiveHostUrl.length - 1);
     }
