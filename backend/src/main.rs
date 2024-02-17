@@ -148,13 +148,17 @@ fn handle_validation_error(err: Error) -> actix_web::Error {
 }
 
 fn configure_api(cfg: &mut web::ServiceConfig) {
-    cfg.service(web::scope("/api").wrap(NormalizePath::new(TrailingSlash::Trim)).configure(configure_api_v1));
+    cfg.service(
+        web::scope("/api")
+            .wrap(NormalizePath::new(TrailingSlash::Trim))
+            .configure(configure_api_v1)
+            .configure(status_controller),
+    );
 }
 
 fn configure_api_v1(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/v1")
-            .configure(status_controller)
             .configure(user_controller)
             .configure(account_controller)
             .configure(currency_controller)

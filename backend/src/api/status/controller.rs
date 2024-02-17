@@ -17,37 +17,27 @@ responses(
 "details": "PostgreSQL connection failed"
 }
 ))),
-path = "/api/v1/status/health",
+path = "/api/status/health",
 tag = "Status")]
 #[get("/health")]
 async fn health() -> impl Responder {
     if !is_psql_reachable().await {
-        return HttpResponse::ServiceUnavailable().json(HealthResponse {
-            healthy: false,
-            supported_api_versions: vec![1],
-            details: Some("PostgreSQL connection failed".to_string()),
-        });
+        return HttpResponse::ServiceUnavailable()
+            .json(HealthResponse::new(false, Some("PostgreSQL connection failed".to_string())));
     }
     if !is_redis_reachable().await {
-        return HttpResponse::ServiceUnavailable().json(HealthResponse {
-            healthy: false,
-            supported_api_versions: vec![1],
-            details: Some("Redis connection failed".to_string()),
-        });
+        return HttpResponse::ServiceUnavailable()
+            .json(HealthResponse::new(false, Some("Redis connection failed".to_string())));
     }
 
-    HttpResponse::Ok().json(HealthResponse {
-        healthy: true,
-        supported_api_versions: vec![1],
-        details: None,
-    })
+    HttpResponse::Ok().json(HealthResponse::new(true, None))
 }
 
 #[utoipa::path(get,
 responses(
 (status = 418, description = "I'm a teapot"),
 ),
-path = "/api/v1/status/coffee",
+path = "/api/status/coffee",
 tag = "Status")]
 #[get("/coffee")]
 pub async fn coffee() -> impl Responder {
