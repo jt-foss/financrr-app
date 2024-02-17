@@ -1,6 +1,6 @@
+use actix_cors::Cors;
 use std::io::Result;
 use std::sync::OnceLock;
-use actix_cors::Cors;
 
 use actix_identity::config::LogoutBehaviour;
 use actix_identity::IdentityMiddleware;
