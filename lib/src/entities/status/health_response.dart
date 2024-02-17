@@ -1,20 +1,20 @@
 abstract class HealthResponse {
   bool get healthy;
-  List<int> get supportedApiVersions;
-  String get details;
+  int get apiVersion;
+  String? get details;
 }
 
 class HealthResponseImpl implements HealthResponse {
   @override
   final bool healthy;
   @override
-  final List<int> supportedApiVersions;
+  final int apiVersion;
   @override
-  final String details;
+  final String? details;
 
   const HealthResponseImpl({
     required this.healthy,
-    required this.supportedApiVersions,
+    required this.apiVersion,
     required this.details,
   });
 }

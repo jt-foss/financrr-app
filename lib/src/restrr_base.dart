@@ -1,22 +1,24 @@
+import 'package:restrr/src/service/api_service.dart';
+
 import '../restrr.dart';
 
 enum SessionInitType { refresh, login, register }
 
 class HostInformation {
-  final String? hostUrl;
+  final Uri? hostUri;
   final int apiVersion;
 
-  bool get hasHostUrl => hostUrl != null;
+  bool get hasHostUrl => hostUri != null;
 
-  const HostInformation({required this.hostUrl, this.apiVersion = 1});
+  const HostInformation({required this.hostUri, this.apiVersion = 1});
 
   const HostInformation.empty()
-      : hostUrl = null,
-        apiVersion = 1;
+      : hostUri = null,
+        apiVersion = -1;
 
-  HostInformation copyWith({String? hostUrl, int? apiVersion}) {
+  HostInformation copyWith({Uri? hostUri, int? apiVersion}) {
     return HostInformation(
-      hostUrl: hostUrl ?? this.hostUrl,
+      hostUri: hostUri ?? this.hostUri,
       apiVersion: apiVersion ?? this.apiVersion,
     );
   }
@@ -56,17 +58,15 @@ abstract class Restrr {
   /// Getter for the [EntityBuilder] of this [Restrr] instance.
   EntityBuilder get entityBuilder;
 
-  static Future<HostUrlCheckResult> checkHostUri(Uri hostUri) async {
-    return HostUrlCheckResult.healthy;
-  }
-
-  static Future<HostUrlCheckResult> checkHostUrl(String hostUrl) async {
-    final Uri? uri = Uri.tryParse(hostUrl);
-    if (uri == null) {
-      return HostUrlCheckResult.invalidUri;
-    }
-    hostInformation = hostInformation.copyWith(hostUrl: hostUrl);
-    return checkHostUri(uri);
+  static Future<RestResponse<HealthResponse>> checkUri(Uri uri) async {
+    hostInformation = hostInformation.copyWith(hostUri: uri, apiVersion: -1);
+    return ApiService.request(route: StatusRoutes.health.compile(), mapper: (json) => EntityBuilder.buildHealthResponse(json))
+        .then((response) {
+      if (response.hasData && response.data!.healthy) {
+        hostInformation = hostInformation.copyWith(apiVersion: response.data!.apiVersion);
+      }
+      return response;
+    });
   }
 }
 

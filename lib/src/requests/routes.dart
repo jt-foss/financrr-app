@@ -17,10 +17,16 @@ class Route {
   final RouteMethod method;
   final String path;
   final int paramCount;
+  final bool isVersioned;
 
-  Route(this.method, this.path)
+  Route(this.method, this.path, {this.isVersioned = true})
       : assert(StringUtils.count(path, '{') == StringUtils.count(path, '}')),
         paramCount = StringUtils.count(path, '{');
+
+  static Future<ErrorResponse> asErrorResponse(DioException error) async {
+    // TODO: implement
+    return ErrorResponse(RestrrError.unknown, '');
+  }
 
   CompiledRoute compile({List<String> params = const []}) {
     if (params.length != paramCount) {
@@ -75,19 +81,23 @@ class CompiledRoute {
         headers: headers,
         data: body,
         method: baseRoute.method.toString(),
-        baseUrl: _buildBaseUrl(Restrr.hostInformation)));
+        baseUrl: _buildBaseUrl(Restrr.hostInformation, baseRoute.isVersioned)));
   }
 
-  String _buildBaseUrl(HostInformation hostInformation) {
-    String effectiveHostUrl = hostInformation.hostUrl!;
+  String _buildBaseUrl(HostInformation hostInformation, bool isVersioned) {
+    String effectiveHostUrl = hostInformation.hostUri.toString()!;
     if (effectiveHostUrl.endsWith('/')) {
       effectiveHostUrl = effectiveHostUrl.substring(0, effectiveHostUrl.length - 1);
     }
-    return '$effectiveHostUrl/api/v${hostInformation.apiVersion}';
+    return isVersioned
+        ? '$effectiveHostUrl/api/v${hostInformation.apiVersion}'
+        : '$effectiveHostUrl/api';
   }
 }
 
 class StatusRoutes {
-  static final Route health = Route(RouteMethod.get, '/status/health');
-  static final Route coffee = Route(RouteMethod.get, '/status/coffee');
+  const StatusRoutes._();
+
+  static final Route health = Route(RouteMethod.get, '/status/health', isVersioned: false);
+  static final Route coffee = Route(RouteMethod.get, '/status/coffee', isVersioned: false);
 }

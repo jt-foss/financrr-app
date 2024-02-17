@@ -5,11 +5,11 @@ class EntityBuilder {
 
   const EntityBuilder({required this.api});
 
-  HealthResponse buildHealthResponse(Map<String, dynamic> json) {
+  static HealthResponse buildHealthResponse(Map<String, dynamic> json) {
     return HealthResponseImpl(
       healthy: json['healthy'],
-      supportedApiVersions: (json['supportedApiVersions'] as List).map((e) => e as int).toList(),
-      details: json['details'],
+      apiVersion: json['api_version'],
+      details: json.keys.contains('details') ? json['details'] : null,
     );
   }
 }
