@@ -1,40 +1,44 @@
-use once_cell::sync::OnceCell;
-use tokio::sync::broadcast;
+use tokio::sync::broadcast::{channel, Receiver, Sender};
 
-use crate::wrapper::transaction::Transaction;
+pub mod transaction;
 
-pub static GLOBAL_EVENT_BUS: OnceCell<GlobalEventBus> = OnceCell::new();
-
-#[derive(Clone)]
-pub enum TransactionEvent {
-    Create(Transaction),
-    Update(Transaction, Transaction),
-    Delete(Transaction),
+pub trait Event {
+    fn fire(self);
+    fn subscribe() -> Receiver<Self>
+    where
+        Self: Sized;
 }
 
-pub struct GlobalEventBus {
-    sender: broadcast::Sender<TransactionEvent>,
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum EventFilter {
+    Create,
+    Update,
+    Delete,
 }
 
-impl GlobalEventBus {
+pub struct EventBus<T: Clone> {
+    sender: Sender<T>,
+}
+
+impl<T: Clone> EventBus<T> {
     pub fn new() -> Self {
-        let (sender, _) = broadcast::channel(100);
-        Self { sender }
+        let (sender, _) = channel(100);
+        Self {
+            sender,
+        }
     }
 
-    pub fn subscribe(&self) -> broadcast::Receiver<TransactionEvent> {
+    pub fn subscribe(&self) -> Receiver<T> {
         self.sender.subscribe()
     }
 
-    pub fn fire(&self, event: TransactionEvent) {
+    pub fn fire(&self, event: T) {
         let _ = self.sender.send(event);
     }
 }
 
-pub fn subscribe() -> broadcast::Receiver<TransactionEvent> {
-    GLOBAL_EVENT_BUS.get().unwrap().subscribe()
-}
-
-pub fn fire(event: TransactionEvent) {
-    GLOBAL_EVENT_BUS.get().unwrap().fire(event);
+impl<T: Clone> Default for EventBus<T> {
+    fn default() -> Self {
+        Self::new()
+    }
 }

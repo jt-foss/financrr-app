@@ -1,7 +1,70 @@
-use std::sync::Arc;
+use log::error;
+use once_cell::sync::OnceCell;
+use tokio::spawn;
+use tokio::sync::broadcast::Receiver;
 
-pub type TransactionCallback = Arc<dyn Fn(TransactionEvent) + Send + Sync>;
+use crate::event::{Event, EventBus, EventFilter};
+use crate::wrapper::transaction::Transaction;
 
+static TRANSACTION_EVENT_BUS: OnceCell<EventBus<TransactionEvent>> = OnceCell::new();
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TransactionEvent {
+    Create(Transaction),
+    Update(Transaction, Box<Transaction>),
+    Delete(Transaction),
+}
 
+impl TransactionEvent {
+    fn get_event_bus() -> &'static EventBus<Self> {
+        TRANSACTION_EVENT_BUS.get_or_init(EventBus::new)
+    }
+
+    fn generic_subscribe<F>(filter: EventFilter, function: F)
+    where
+        F: Fn(Transaction, Option<Box<Transaction>>) + Send + 'static,
+    {
+        spawn(async move {
+            loop {
+                let event_result = Self::subscribe().recv().await;
+                match event_result {
+                    Ok(event) => match (&filter, &event) {
+                        (EventFilter::Create, Self::Create(transaction)) => function(transaction.clone(), None),
+                        (EventFilter::Update, Self::Update(old_transaction, new_transaction)) => {
+                            function(old_transaction.clone(), Some(new_transaction.clone()))
+                        }
+                        (EventFilter::Delete, Self::Delete(transaction)) => function(transaction.clone(), None),
+                        _ => {
+                            error!("Event filter and event type mismatch")
+                        }
+                    },
+                    Err(err) => error!("Error while subscribing to transaction event: {}", err),
+                }
+            }
+        });
+    }
+
+    pub fn subscribe_created(function: Box<dyn Fn(Transaction) + Send + Sync>) {
+        Self::generic_subscribe(EventFilter::Create, move |transaction, _| function(transaction));
+    }
+
+    pub fn subscribe_updated(function: Box<dyn Fn(Transaction, Box<Transaction>) + Send + Sync>) {
+        Self::generic_subscribe(EventFilter::Update, move |old_transaction, new_transaction| {
+            function(old_transaction, new_transaction.unwrap())
+        });
+    }
+
+    pub fn subscribe_deleted(function: Box<dyn Fn(Transaction) + Send + Sync>) {
+        Self::generic_subscribe(EventFilter::Delete, move |transaction, _| function(transaction));
+    }
+}
+
+impl Event for TransactionEvent {
+    fn fire(self) {
+        Self::get_event_bus().fire(self);
+    }
+
+    fn subscribe() -> Receiver<Self> {
+        Self::get_event_bus().subscribe()
+    }
 }
