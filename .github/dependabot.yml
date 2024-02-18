@@ -19,4 +19,9 @@ updates:
     directory: "/docker/rust"
     schedule:
       interval: "daily"
+      time: "06:00"#
+  - package-ecosystem: "docker"
+    directory: "/docker/monolith"
+    schedule:
+      interval: "daily"
       time: "06:00"

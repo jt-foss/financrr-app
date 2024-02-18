@@ -36,6 +36,16 @@ CREATE TABLE IF NOT EXISTS user_account
     PRIMARY KEY (user_id, account_id)
 );
 
+CREATE TABLE IF NOT EXISTS budget
+(
+    id          SERIAL PRIMARY KEY,
+    "user"      INTEGER REFERENCES "user" (id) ON UPDATE CASCADE ON DELETE CASCADE NOT NULL,
+    amount      INTEGER                        NOT NULL,
+    name        TEXT                           NOT NULL,
+    description TEXT,
+    created_at  timestamp with time zone       NOT NULL DEFAULT current_timestamp
+);
+
 CREATE TABLE IF NOT EXISTS transaction
 (
     id          SERIAL PRIMARY KEY,
@@ -44,6 +54,7 @@ CREATE TABLE IF NOT EXISTS transaction
     amount      BIGINT                           NOT NULL,
     currency    INTEGER REFERENCES Currency (id) NOT NULL,
     description TEXT,
+    budget      INTEGER REFERENCES budget (id),
     created_at  timestamp with time zone         NOT NULL DEFAULT current_timestamp,
     executed_at timestamp with time zone         NOT NULL DEFAULT current_timestamp,
     CHECK (source IS NOT NULL OR destination IS NOT NULL)

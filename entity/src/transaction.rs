@@ -15,6 +15,7 @@ pub struct Model {
     pub currency: i32,
     #[sea_orm(column_type = "Text", nullable)]
     pub description: Option<String>,
+    pub budget: Option<i32>,
     pub created_at: TimeDateTimeWithTimeZone,
     pub executed_at: TimeDateTimeWithTimeZone,
 }
@@ -38,6 +39,14 @@ pub enum Relation {
     )]
     Account1,
     #[sea_orm(
+        belongs_to = "super::budget::Entity",
+        from = "Column::Budget",
+        to = "super::budget::Column::Id",
+        on_update = "NoAction",
+        on_delete = "NoAction"
+    )]
+    Budget,
+    #[sea_orm(
         belongs_to = "super::currency::Entity",
         from = "Column::Currency",
         to = "super::currency::Column::Id",
@@ -45,6 +54,12 @@ pub enum Relation {
         on_delete = "NoAction"
     )]
     Currency,
+}
+
+impl Related<super::budget::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Budget.def()
+    }
 }
 
 impl Related<super::currency::Entity> for Entity {

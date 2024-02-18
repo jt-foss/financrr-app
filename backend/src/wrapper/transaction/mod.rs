@@ -11,6 +11,7 @@ use entity::utility::time::get_now;
 use crate::api::error::api::ApiError;
 use crate::util::entity::{delete, find_all, find_one_or_error, insert, update};
 use crate::wrapper::account::Account;
+use crate::wrapper::budget::Budget;
 use crate::wrapper::currency::Currency;
 use crate::wrapper::permission::Permission;
 use crate::wrapper::transaction::dto::TransactionDTO;
@@ -27,6 +28,7 @@ pub struct Transaction {
     pub amount: i64,
     pub currency: Phantom<Currency>,
     pub description: Option<String>,
+    pub budget: Option<Phantom<Budget>>,
     #[serde(with = "time::serde::iso8601")]
     pub created_at: OffsetDateTime,
     #[serde(with = "time::serde::iso8601")]
@@ -42,6 +44,7 @@ impl Transaction {
             amount: Set(dto.amount),
             currency: Set(dto.currency.get_id()),
             description: Set(dto.description),
+            budget: Set(dto.budget.map(|budget| budget.get_id())),
             created_at: Set(get_now()),
             executed_at: Set(dto.executed_at),
         };
@@ -62,6 +65,7 @@ impl Transaction {
             amount: Set(updated_dto.amount),
             currency: Set(updated_dto.currency.get_id()),
             description: Set(updated_dto.description),
+            budget: Set(updated_dto.budget.map(|budget| budget.get_id())),
             created_at: Set(self.created_at),
             executed_at: Set(updated_dto.executed_at),
         };
@@ -113,6 +117,7 @@ impl From<transaction::Model> for Transaction {
             amount: value.amount,
             currency: Phantom::new(value.currency),
             description: value.description,
+            budget: Phantom::from_option(value.budget),
             created_at: value.created_at,
             executed_at: value.executed_at,
         }

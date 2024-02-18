@@ -61,6 +61,7 @@ request_body = TransactionDTO,
 tag = "Transaction")]
 #[post("")]
 pub async fn create(user: Phantom<User>, transaction: TransactionDTO) -> Result<impl Responder, ApiError> {
+    // TODO add permission checks for budget
     if !transaction.check_account_access(user.get_id()).await? {
         return Err(ApiError::unauthorized());
     }

@@ -10,6 +10,7 @@ use validator::Validate;
 use crate::api::error::api::ApiError;
 use crate::api::error::validation::ValidationError;
 use crate::wrapper::account::Account;
+use crate::wrapper::budget::Budget;
 use crate::wrapper::currency::Currency;
 use crate::wrapper::transaction::check_account_access;
 use crate::wrapper::types::phantom::Phantom;
@@ -21,6 +22,7 @@ pub struct TransactionDTO {
     pub amount: i64,
     pub currency: Phantom<Currency>,
     pub description: Option<String>,
+    pub budget: Option<Phantom<Budget>>,
     #[serde(with = "time::serde::iso8601")]
     pub executed_at: OffsetDateTime,
 }
@@ -32,7 +34,7 @@ impl TransactionDTO {
 
     async fn validate(&self) -> Result<(), ApiError> {
         let mut error = ValidationError::new("Transaction validation error");
-
+        // TODO add check if budget exists
         if self.source.is_none() && self.destination.is_none() {
             error.add("account", "source or destination must be present");
         }

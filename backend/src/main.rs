@@ -43,6 +43,7 @@ use crate::util::validation::ValidationErrorJsonPayload;
 pub mod api;
 pub mod config;
 pub mod database;
+pub mod event;
 pub mod util;
 pub mod wrapper;
 
