@@ -9,6 +9,8 @@ use entity::transaction::Model;
 use entity::utility::time::get_now;
 
 use crate::api::error::api::ApiError;
+use crate::event::transaction::TransactionEvent;
+use crate::event::Event;
 use crate::util::entity::{delete, find_all, find_one_or_error, insert, update};
 use crate::wrapper::account::Account;
 use crate::wrapper::budget::Budget;
@@ -17,8 +19,8 @@ use crate::wrapper::permission::Permission;
 use crate::wrapper::transaction::dto::TransactionDTO;
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
-mod account_helper;
 pub mod dto;
+pub mod event_listener;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub struct Transaction {
@@ -51,8 +53,8 @@ impl Transaction {
         let model = insert(active_model).await?;
 
         //TODO Check if executed_at date is in future
-        let mut transaction = Self::from(model);
-        account_helper::new(&mut transaction).await?;
+        let transaction = Self::from(model);
+        TransactionEvent::fire(TransactionEvent::Create(transaction.clone()));
 
         Ok(transaction)
     }
@@ -71,14 +73,14 @@ impl Transaction {
         };
         let mut transaction = Self::from(update(active_model).await?);
 
-        account_helper::update(&mut self, &mut transaction).await?;
+        event_listener::update(&mut self, &mut transaction).await?;
 
         Ok(transaction)
     }
 
     pub async fn delete(mut self) -> Result<(), ApiError> {
         delete(transaction::Entity::delete_by_id(self.id)).await?;
-        account_helper::delete(&mut self).await?;
+        event_listener::delete(&mut self).await?;
 
         Ok(())
     }

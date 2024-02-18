@@ -1,6 +1,12 @@
 use tokio::sync::broadcast::{channel, Receiver, Sender};
 
+use transaction::TransactionEvent;
+
 pub mod transaction;
+
+pub fn init() {
+    TransactionEvent::register_listeners();
+}
 
 pub trait Event {
     fn fire(self);
