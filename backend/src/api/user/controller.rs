@@ -16,7 +16,7 @@ pub fn user_controller(cfg: &mut web::ServiceConfig) {
 
 #[utoipa::path(get,
 responses(
-(status = 200, description = "Successfully retrieved your own User.", content_type = "application/json", body = User),
+(status = 201, description = "Successfully retrieved your own User.", content_type = "application/json", body = User),
 (status = 401, response = Unauthorized),
 (status = 404, response = ResourceNotFound),
 (status = 500, response = InternalServerError),
@@ -31,7 +31,7 @@ pub async fn me(mut user: Phantom<User>) -> Result<impl Responder, ApiError> {
 
 #[utoipa::path(post,
 responses(
-(status = 204, description = "Successfully logged in", content_type = "application/json"),
+(status = 201, description = "Successfully logged in", content_type = "application/json", body = User),
 (status = 401, response = Unauthorized),
 (status = 400, response = ValidationError)
 ),
@@ -45,13 +45,14 @@ pub async fn login(
     credentials: Json<Credentials>,
 ) -> Result<impl Responder, ApiError> {
     if is_signed_in(&session).is_err() {
-        return Ok(HttpResponse::NoContent());
+        let user = User::find_by_username(credentials.username.as_str()).await?;
+        return Ok(HttpResponse::Ok().json(user));
     }
 
     let user = User::authenticate(credentials.into_inner()).await?;
     Identity::login(&request.extensions(), user.id.to_string()).unwrap();
 
-    Ok(HttpResponse::NoContent())
+    Ok(HttpResponse::Ok().json(user))
 }
 
 #[utoipa::path(delete,
