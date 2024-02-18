@@ -84,7 +84,7 @@ impl ActiveModel {
 }
 
 impl Entity {
-    pub fn find_by_username(username: String) -> Select<Self> {
-        Self::find().filter(Column::Username.eq(username))
+    pub fn find_by_username(username: &str) -> Select<Self> {
+        Self::find().filter(Column::Username.eq(username.to_string()))
     }
 }

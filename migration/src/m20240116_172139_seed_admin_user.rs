@@ -28,7 +28,7 @@ impl MigrationTrait for Migration {
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        match User::find_by_username("admin".to_string()).one(manager.get_connection()).await {
+        match User::find_by_username("admin").one(manager.get_connection()).await {
             Ok(Some(user)) => {
                 let _ = user.delete(manager.get_connection()).await;
                 Ok(())

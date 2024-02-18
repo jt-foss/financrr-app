@@ -43,12 +43,16 @@ impl User {
         Ok(Self::from(find_one_or_error(user::Entity::find_by_id(id), "User").await?))
     }
 
+    pub async fn find_by_username(username: &str) -> Result<Self, ApiError> {
+        Ok(Self::from(find_one_or_error(user::Entity::find_by_username(username), "User").await?))
+    }
+
     pub async fn exists(id: i32) -> Result<bool, ApiError> {
         Ok(count(user::Entity::find_by_id(id)).await? > 0)
     }
 
     pub async fn authenticate(credentials: dto::Credentials) -> Result<Self, ApiError> {
-        let user = find_one(DbUser::find_by_username(credentials.username)).await;
+        let user = find_one(DbUser::find_by_username(credentials.username.as_str())).await;
         match user {
             Ok(Some(user)) => {
                 if user.verify_password(credentials.password.as_bytes()).unwrap_or(false) {

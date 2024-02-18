@@ -101,7 +101,7 @@ pub fn validate_password(password: &str) -> Result<(), ValidationError> {
 }
 
 pub async fn validate_unique_username(username: &str) -> Result<(), ValidationError> {
-    match User::find_by_username(username.to_string()).one(get_database_connection()).await {
+    match User::find_by_username(username).one(get_database_connection()).await {
         Ok(Some(_)) => Err(ValidationError::new("Username is not unique")),
         Err(_) => Err(ValidationError::new("Internal server error")),
         _ => Ok(()),
