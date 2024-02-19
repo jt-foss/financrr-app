@@ -1,11 +1,12 @@
 CREATE TABLE IF NOT EXISTS "user"
 (
-    id         SERIAL PRIMARY KEY,
-    username   TEXT UNIQUE              NOT NULL,
-    email      TEXT UNIQUE,
-    password   TEXT                     NOT NULL,
-    created_at timestamp with time zone NOT NULL DEFAULT current_timestamp,
-    is_admin   BOOLEAN                  NOT NULL DEFAULT FALSE
+    id           SERIAL PRIMARY KEY,
+    username     TEXT UNIQUE              NOT NULL,
+    email        TEXT UNIQUE,
+    display_name TEXT,
+    password     TEXT                     NOT NULL,
+    created_at   timestamp with time zone NOT NULL DEFAULT current_timestamp,
+    is_admin     BOOLEAN                  NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS currency
@@ -20,13 +21,14 @@ CREATE TABLE IF NOT EXISTS currency
 
 CREATE TABLE IF NOT EXISTS account
 (
-    id          SERIAL PRIMARY KEY,
-    name        TEXT                             NOT NULL,
-    description TEXT,
-    iban        TEXT UNIQUE,
-    balance     BIGINT                           NOT NULL DEFAULT 0,
-    currency    INTEGER REFERENCES Currency (id) NOT NULL,
-    created_at  timestamp with time zone         NOT NULL DEFAULT current_timestamp
+    id               SERIAL PRIMARY KEY,
+    name             TEXT                             NOT NULL,
+    description      TEXT,
+    iban             TEXT UNIQUE,
+    balance          BIGINT                           NOT NULL DEFAULT 0,
+    original_balance BIGINT                           NOT NULL DEFAULT 0,
+    currency         INTEGER REFERENCES Currency (id) NOT NULL,
+    created_at       timestamp with time zone         NOT NULL DEFAULT current_timestamp
 );
 
 CREATE TABLE IF NOT EXISTS user_account

@@ -15,6 +15,7 @@ pub struct UserRegistration {
     pub username: String,
     #[validate(email)]
     pub email: Option<String>,
+    pub display_name: Option<String>,
     #[validate(custom = "validate_password")]
     pub password: String,
 }

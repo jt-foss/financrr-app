@@ -26,6 +26,7 @@ pub struct Account {
     pub description: Option<String>,
     pub iban: Option<String>,
     pub balance: i64,
+    pub original_balance: i64,
     pub currency: Phantom<Currency>,
     #[serde(with = "time::serde::iso8601")]
     pub created_at: OffsetDateTime,
@@ -39,6 +40,7 @@ impl Account {
             description: Set(dto.description),
             iban: Set(dto.iban),
             balance: Set(dto.balance),
+            original_balance: Set(dto.balance),
             currency: Set(dto.currency_id),
             created_at: Set(get_now()),
         };
@@ -64,6 +66,7 @@ impl Account {
             description: Set(dto.description),
             iban: Set(dto.iban),
             balance: Set(dto.balance),
+            original_balance: Set(dto.original_balance),
             currency: Set(dto.currency_id),
             created_at: Set(self.created_at),
         };
@@ -117,6 +120,7 @@ impl Account {
             description: account.description,
             iban: account.iban,
             balance: account.balance,
+            original_balance: account.original_balance,
             currency: account.currency.get_id(),
             created_at: account.created_at,
         }
@@ -162,6 +166,7 @@ impl From<account::Model> for Account {
             description: value.description,
             iban: value.iban,
             balance: value.balance,
+            original_balance: value.original_balance,
             currency: Phantom::new(value.currency),
             created_at: value.created_at,
         }

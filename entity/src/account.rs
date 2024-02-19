@@ -19,6 +19,7 @@ pub struct Model {
     #[sea_orm(column_type = "Text", nullable, unique)]
     pub iban: Option<String>,
     pub balance: i64,
+    pub original_balance: i64,
     pub currency: i32,
     pub created_at: TimeDateTimeWithTimeZone,
 }
@@ -88,6 +89,7 @@ impl ActiveModel {
             description: Set(description.to_owned()),
             iban: Set(iban.to_owned()),
             balance: Set(balance.to_owned()),
+            original_balance: Set(balance.to_owned()),
             currency: Set(currency_id.to_owned()),
             created_at: Set(get_now()),
         }
