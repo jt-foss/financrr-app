@@ -1,8 +1,15 @@
+use std::future::Future;
+use std::pin::Pin;
+
 use tokio::sync::broadcast::{channel, Receiver, Sender};
 
 use transaction::TransactionEvent;
 
+use crate::api::error::api::ApiError;
+
 pub mod transaction;
+
+pub type EventResult = Pin<Box<dyn Future<Output = Result<(), ApiError>> + Send>>;
 
 pub fn init() {
     TransactionEvent::register_listeners();

@@ -20,7 +20,6 @@ use crate::wrapper::transaction::dto::TransactionDTO;
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
 pub mod dto;
-pub mod event_listener;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub struct Transaction {
@@ -59,7 +58,7 @@ impl Transaction {
         Ok(transaction)
     }
 
-    pub async fn update(mut self, updated_dto: TransactionDTO) -> Result<Self, ApiError> {
+    pub async fn update(self, updated_dto: TransactionDTO) -> Result<Self, ApiError> {
         let active_model = transaction::ActiveModel {
             id: Set(self.id),
             source: Set(updated_dto.source.map(|source| source.get_id())),
@@ -71,16 +70,17 @@ impl Transaction {
             created_at: Set(self.created_at),
             executed_at: Set(updated_dto.executed_at),
         };
-        let mut transaction = Self::from(update(active_model).await?);
+        let transaction = Self::from(update(active_model).await?);
 
-        event_listener::update(&mut self, &mut transaction).await?;
+        TransactionEvent::fire(TransactionEvent::Update(self.clone(), Box::new(transaction.clone())));
 
         Ok(transaction)
     }
 
-    pub async fn delete(mut self) -> Result<(), ApiError> {
+    pub async fn delete(self) -> Result<(), ApiError> {
         delete(transaction::Entity::delete_by_id(self.id)).await?;
-        event_listener::delete(&mut self).await?;
+
+        TransactionEvent::fire(TransactionEvent::Delete(self.clone()));
 
         Ok(())
     }

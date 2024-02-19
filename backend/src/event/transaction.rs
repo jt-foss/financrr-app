@@ -1,20 +1,16 @@
-use std::future::Future;
-use std::pin::Pin;
-
 use log::error;
 use once_cell::sync::OnceCell;
 use tokio::spawn;
 use tokio::sync::broadcast::Receiver;
 
-use crate::event::{Event, EventBus, EventFilter};
-use crate::wrapper::transaction;
+use crate::event::{Event, EventBus, EventFilter, EventResult};
+use crate::wrapper::account;
 use crate::wrapper::transaction::Transaction;
 
 static TRANSACTION_EVENT_BUS: OnceCell<EventBus<TransactionEvent>> = OnceCell::new();
 
-pub type CreateOrDeleteFn = Box<dyn Fn(Transaction) -> Pin<Box<dyn Future<Output = ()> + Send>> + Send + Sync>;
-pub type UpdateFn =
-    Box<dyn Fn(Transaction, Box<Transaction>) -> Pin<Box<dyn Future<Output = ()> + Send>> + Send + Sync>;
+pub type CreateOrDeleteFn = Box<dyn Fn(Transaction) -> EventResult + Send + Sync>;
+pub type UpdateFn = Box<dyn Fn(Transaction, Box<Transaction>) -> EventResult + Send + Sync>;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TransactionEvent {
@@ -25,7 +21,7 @@ pub enum TransactionEvent {
 
 impl TransactionEvent {
     pub fn register_listeners() {
-        transaction::event_listener::transaction_listener();
+        account::event_listener::transaction_listener();
     }
 
     fn get_event_bus() -> &'static EventBus<Self> {
@@ -34,29 +30,37 @@ impl TransactionEvent {
 
     fn generic_subscribe<F>(filter: EventFilter, function: F)
     where
-        F: Fn(Transaction, Option<Box<Transaction>>) -> Pin<Box<dyn Future<Output = ()> + Send>> + Send + 'static,
+        F: Fn(Transaction, Option<Box<Transaction>>) -> EventResult + Send + 'static,
     {
         spawn(async move {
             loop {
                 let event_result = Self::subscribe().recv().await;
                 match event_result {
-                    Ok(event) => match (&filter, &event) {
-                        (EventFilter::Create, Self::Create(transaction)) => {
-                            let future = function(transaction.clone(), None);
-                            spawn(future);
+                    Ok(event) => {
+                        match (&filter, &event) {
+                            (EventFilter::Create, Self::Create(transaction)) => {
+                                let future = function(transaction.clone(), None);
+                                if let Err(e) = future.await {
+                                    error!("Error creating transaction: {}", e);
+                                }
+                            }
+                            (EventFilter::Update, Self::Update(old_transaction, new_transaction)) => {
+                                let future = function(old_transaction.clone(), Some(new_transaction.clone()));
+                                if let Err(e) = future.await {
+                                    error!("Error updating transaction: {}", e);
+                                }
+                            }
+                            (EventFilter::Delete, Self::Delete(transaction)) => {
+                                let future = function(transaction.clone(), None);
+                                if let Err(e) = future.await {
+                                    error!("Error deleting transaction: {}", e);
+                                }
+                            }
+                            _ => {
+                                error!("Received unexpected event with invalid event filter.\nEvent: {:?}\nEventFilter: {:?}", event, filter);
+                            }
                         }
-                        (EventFilter::Update, Self::Update(old_transaction, new_transaction)) => {
-                            let future = function(old_transaction.clone(), Some(new_transaction.clone()));
-                            spawn(future);
-                        }
-                        (EventFilter::Delete, Self::Delete(transaction)) => {
-                            let future = function(transaction.clone(), None);
-                            spawn(future);
-                        }
-                        _ => {
-                            error!("Event filter and event type mismatch")
-                        }
-                    },
+                    }
                     Err(err) => error!("Error while subscribing to transaction event: {}", err),
                 }
             }

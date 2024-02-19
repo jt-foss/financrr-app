@@ -17,6 +17,7 @@ use crate::wrapper::permission::Permission;
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
 pub mod dto;
+pub mod event_listener;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub struct Account {
