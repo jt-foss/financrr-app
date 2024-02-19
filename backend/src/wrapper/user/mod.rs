@@ -24,6 +24,7 @@ pub struct User {
     pub id: i32,
     pub username: String,
     pub email: Option<String>,
+    pub display_name: Option<String>,
     #[serde(with = "time::serde::iso8601")]
     pub created_at: OffsetDateTime,
     pub is_admin: bool,
@@ -66,7 +67,12 @@ impl User {
     }
 
     pub async fn register(registration: UserRegistration) -> Result<Self, ApiError> {
-        match user::ActiveModel::register(registration.username, registration.email, registration.password) {
+        match user::ActiveModel::register(
+            registration.username,
+            registration.email,
+            registration.display_name,
+            registration.password,
+        ) {
             Ok(user) => {
                 let user = insert(user).await?;
                 Ok(Self::from(user))
@@ -111,6 +117,7 @@ impl From<user::Model> for User {
             id: value.id,
             username: value.username,
             email: value.email,
+            display_name: value.display_name,
             created_at: value.created_at,
             is_admin: value.is_admin,
         }
