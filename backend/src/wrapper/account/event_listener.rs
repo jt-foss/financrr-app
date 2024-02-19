@@ -1,4 +1,5 @@
 use crate::api::error::api::ApiError;
+use crate::event::transaction::TransactionEvent;
 use crate::wrapper::account::dto::AccountDTO;
 use crate::wrapper::account::Account;
 use crate::wrapper::transaction::Transaction;
@@ -11,7 +12,15 @@ async fn update_account_balance(account: &Account, amount: i64) -> Result<(), Ap
     Ok(())
 }
 
-pub async fn new(transaction: &mut Transaction) -> Result<(), ApiError> {
+pub fn transaction_listener() {
+    TransactionEvent::subscribe_created(Box::new(|transaction| Box::pin(transaction_created(transaction))));
+    TransactionEvent::subscribe_updated(Box::new(|old_transaction, new_transaction| {
+        Box::pin(transaction_updated(old_transaction, new_transaction))
+    }));
+    TransactionEvent::subscribe_deleted(Box::new(|transaction| Box::pin(transaction_deleted(transaction))));
+}
+
+async fn transaction_created(mut transaction: Transaction) -> Result<(), ApiError> {
     if let Some(source) = &mut transaction.source {
         update_account_balance(source.get_inner().await?, -transaction.amount).await?;
     }
@@ -22,7 +31,10 @@ pub async fn new(transaction: &mut Transaction) -> Result<(), ApiError> {
     Ok(())
 }
 
-pub async fn update(old_transaction: &mut Transaction, new_transaction: &mut Transaction) -> Result<(), ApiError> {
+async fn transaction_updated(
+    mut old_transaction: Transaction,
+    mut new_transaction: Box<Transaction>,
+) -> Result<(), ApiError> {
     if let Some(source) = &mut old_transaction.source {
         update_account_balance(source.get_inner().await?, old_transaction.amount).await?;
     }
@@ -39,7 +51,7 @@ pub async fn update(old_transaction: &mut Transaction, new_transaction: &mut Tra
     Ok(())
 }
 
-pub async fn delete(transaction: &mut Transaction) -> Result<(), ApiError> {
+async fn transaction_deleted(mut transaction: Transaction) -> Result<(), ApiError> {
     if let Some(source) = &mut transaction.source {
         update_account_balance(source.get_inner().await?, transaction.amount).await?;
     }

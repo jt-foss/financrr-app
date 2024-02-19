@@ -2,6 +2,7 @@ use sea_orm::ActiveValue::Set;
 use sea_orm::EntityTrait;
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
+use tokio::time::Duration;
 use utoipa::ToSchema;
 
 use entity::transaction;
@@ -9,14 +10,16 @@ use entity::transaction::Model;
 use entity::utility::time::get_now;
 
 use crate::api::error::api::ApiError;
+use crate::event::transaction::TransactionEvent;
+use crate::event::Event;
 use crate::util::entity::{delete, find_all, find_one_or_error, insert, update};
 use crate::wrapper::account::Account;
+use crate::wrapper::budget::Budget;
 use crate::wrapper::currency::Currency;
 use crate::wrapper::permission::Permission;
 use crate::wrapper::transaction::dto::TransactionDTO;
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
-mod account_helper;
 pub mod dto;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
@@ -27,6 +30,7 @@ pub struct Transaction {
     pub amount: i64,
     pub currency: Phantom<Currency>,
     pub description: Option<String>,
+    pub budget: Option<Phantom<Budget>>,
     #[serde(with = "time::serde::iso8601")]
     pub created_at: OffsetDateTime,
     #[serde(with = "time::serde::iso8601")]
@@ -42,19 +46,26 @@ impl Transaction {
             amount: Set(dto.amount),
             currency: Set(dto.currency.get_id()),
             description: Set(dto.description),
+            budget: Set(dto.budget.map(|budget| budget.get_id())),
             created_at: Set(get_now()),
             executed_at: Set(dto.executed_at),
         };
         let model = insert(active_model).await?;
 
-        //TODO Check if executed_at date is in future
-        let mut transaction = Self::from(model);
-        account_helper::new(&mut transaction).await?;
+        let transaction = Self::from(model);
+        // check if execute_at is in the future
+        if transaction.executed_at > get_now() {
+            let delay = transaction.executed_at - get_now();
+            let delay = Duration::new(delay.whole_seconds() as u64, 0);
+            TransactionEvent::fire_scheduled(TransactionEvent::Create(transaction.clone()), delay);
+        } else {
+            TransactionEvent::fire(TransactionEvent::Create(transaction.clone()));
+        }
 
         Ok(transaction)
     }
 
-    pub async fn update(mut self, updated_dto: TransactionDTO) -> Result<Self, ApiError> {
+    pub async fn update(self, updated_dto: TransactionDTO) -> Result<Self, ApiError> {
         let active_model = transaction::ActiveModel {
             id: Set(self.id),
             source: Set(updated_dto.source.map(|source| source.get_id())),
@@ -62,19 +73,21 @@ impl Transaction {
             amount: Set(updated_dto.amount),
             currency: Set(updated_dto.currency.get_id()),
             description: Set(updated_dto.description),
+            budget: Set(updated_dto.budget.map(|budget| budget.get_id())),
             created_at: Set(self.created_at),
             executed_at: Set(updated_dto.executed_at),
         };
-        let mut transaction = Self::from(update(active_model).await?);
+        let transaction = Self::from(update(active_model).await?);
 
-        account_helper::update(&mut self, &mut transaction).await?;
+        TransactionEvent::fire(TransactionEvent::Update(self.clone(), Box::new(transaction.clone())));
 
         Ok(transaction)
     }
 
-    pub async fn delete(mut self) -> Result<(), ApiError> {
+    pub async fn delete(self) -> Result<(), ApiError> {
         delete(transaction::Entity::delete_by_id(self.id)).await?;
-        account_helper::delete(&mut self).await?;
+
+        TransactionEvent::fire(TransactionEvent::Delete(self.clone()));
 
         Ok(())
     }
@@ -113,6 +126,7 @@ impl From<transaction::Model> for Transaction {
             amount: value.amount,
             currency: Phantom::new(value.currency),
             description: value.description,
+            budget: Phantom::from_option(value.budget),
             created_at: value.created_at,
             executed_at: value.executed_at,
         }

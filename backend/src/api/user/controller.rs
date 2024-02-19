@@ -31,7 +31,7 @@ pub async fn me(mut user: Phantom<User>) -> Result<impl Responder, ApiError> {
 
 #[utoipa::path(post,
 responses(
-(status = 201, description = "Successfully logged in", content_type = "application/json", body = User),
+(status = 200, description = "Successfully logged in", content_type = "application/json", body = User),
 (status = 401, response = Unauthorized),
 (status = 400, response = ValidationError)
 ),

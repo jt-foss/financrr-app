@@ -20,7 +20,7 @@ services:
         condition: service_healthy
 
   db:
-    image: postgres:16-alpine3.19
+    image: postgres:16.2-alpine3.19
     init: true
     restart: unless-stopped
     environment:
@@ -40,7 +40,7 @@ services:
       retries: 3
 
   cache:
-    image: redis:7-alpine3.19
+    image: redis:7.2.4-alpine3.19
     init: true
     restart: unless-stopped
     environment:

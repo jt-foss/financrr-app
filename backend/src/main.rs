@@ -1,7 +1,7 @@
-use actix_cors::Cors;
 use std::io::Result;
 use std::sync::OnceLock;
 
+use actix_cors::Cors;
 use actix_identity::config::LogoutBehaviour;
 use actix_identity::IdentityMiddleware;
 use actix_session::config::CookieContentSecurity;
@@ -43,6 +43,7 @@ use crate::util::validation::ValidationErrorJsonPayload;
 pub mod api;
 pub mod config;
 pub mod database;
+pub mod event;
 pub mod util;
 pub mod wrapper;
 
@@ -97,6 +98,9 @@ async fn main() -> Result<()> {
 
     info!("Migrating database...");
     Migrator::up(get_database_connection(), None).await.expect("Could not migrate database!");
+
+    info!("Starting up event system...");
+    event::init();
 
     // Make instance variable of ApiDoc so all worker threads gets the same instance.
     let openapi = ApiDoc::openapi();
