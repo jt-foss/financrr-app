@@ -2,6 +2,7 @@ use log::error;
 use once_cell::sync::OnceCell;
 use tokio::spawn;
 use tokio::sync::broadcast::Receiver;
+use tokio::time::Duration;
 
 use crate::event::{Event, EventBus, EventFilter, EventResult};
 use crate::wrapper::account;
@@ -85,6 +86,10 @@ impl TransactionEvent {
 impl Event for TransactionEvent {
     fn fire(self) {
         Self::get_event_bus().fire(self);
+    }
+
+    fn fire_scheduled(self, delay: Duration) {
+        Self::get_event_bus().fire_scheduled(self, delay);
     }
 
     fn subscribe() -> Receiver<Self> {

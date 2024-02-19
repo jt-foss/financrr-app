@@ -2,6 +2,8 @@ use std::future::Future;
 use std::pin::Pin;
 
 use tokio::sync::broadcast::{channel, Receiver, Sender};
+use tokio::time::sleep;
+use tokio::time::Duration;
 
 use transaction::TransactionEvent;
 
@@ -17,6 +19,7 @@ pub fn init() {
 
 pub trait Event {
     fn fire(self);
+    fn fire_scheduled(self, delay: Duration);
     fn subscribe() -> Receiver<Self>
     where
         Self: Sized;
@@ -33,7 +36,7 @@ pub struct EventBus<T: Clone> {
     sender: Sender<T>,
 }
 
-impl<T: Clone> EventBus<T> {
+impl<T: Clone + Send + 'static> EventBus<T> {
     pub fn new() -> Self {
         let (sender, _) = channel(100);
         Self {
@@ -48,9 +51,17 @@ impl<T: Clone> EventBus<T> {
     pub fn fire(&self, event: T) {
         let _ = self.sender.send(event);
     }
+
+    pub fn fire_scheduled(&self, event: T, delay: Duration) {
+        let sender = self.sender.clone();
+        tokio::spawn(async move {
+            sleep(delay).await;
+            let _ = sender.send(event);
+        });
+    }
 }
 
-impl<T: Clone> Default for EventBus<T> {
+impl<T: Clone + Send + 'static> Default for EventBus<T> {
     fn default() -> Self {
         Self::new()
     }

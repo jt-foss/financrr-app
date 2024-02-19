@@ -2,6 +2,7 @@ use sea_orm::ActiveValue::Set;
 use sea_orm::EntityTrait;
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
+use tokio::time::Duration;
 use utoipa::ToSchema;
 
 use entity::transaction;
@@ -51,9 +52,15 @@ impl Transaction {
         };
         let model = insert(active_model).await?;
 
-        //TODO Check if executed_at date is in future
         let transaction = Self::from(model);
-        TransactionEvent::fire(TransactionEvent::Create(transaction.clone()));
+        // check if execute_at is in the future
+        if transaction.executed_at > get_now() {
+            let delay = transaction.executed_at - get_now();
+            let delay = Duration::new(delay.whole_seconds() as u64, 0);
+            TransactionEvent::fire_scheduled(TransactionEvent::Create(transaction.clone()), delay);
+        } else {
+            TransactionEvent::fire(TransactionEvent::Create(transaction.clone()));
+        }
 
         Ok(transaction)
     }
