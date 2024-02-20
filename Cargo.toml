@@ -34,7 +34,7 @@ use_self = "warn"
 
 [workspace.dependencies]
 # Serialization/Deserialization
-serde = { version = "1.0.196", features = ["derive"] }
+serde = { version = "1.0.197", features = ["derive"] }
 
 # ORM
 sea-orm = { version = "1.0.0-rc.1", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros", "mock"] }
