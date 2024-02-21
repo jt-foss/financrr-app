@@ -1,27 +1,28 @@
+import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 
 import '../../restrr.dart';
 
-enum RouteMethod {
-  get,
-  post,
-  put,
-  delete,
-  patch;
-
-  @override
-  String toString() => name.toUpperCase();
-}
-
 class Route {
-  final RouteMethod method;
+  final String method;
   final String path;
   final int paramCount;
   final bool isVersioned;
 
-  Route(this.method, this.path, {this.isVersioned = true})
+  Route._(this.method, this.path, {this.isVersioned = true})
       : assert(StringUtils.count(path, '{') == StringUtils.count(path, '}')),
         paramCount = StringUtils.count(path, '{');
+
+  Route.get(String path, {bool isVersioned = true}) : this._('GET', path, isVersioned: isVersioned);
+
+  Route.post(String path, {bool isVersioned = true}) : this._('POST', path, isVersioned: isVersioned);
+
+  Route.put(String path, {bool isVersioned = true}) : this._('PUT', path, isVersioned: isVersioned);
+
+  Route.delete(String path, {bool isVersioned = true}) : this._('DELETE', path, isVersioned: isVersioned);
+
+  Route.patch(String path, {bool isVersioned = true}) : this._('PATCH', path, isVersioned: isVersioned);
 
   static Future<ErrorResponse> asErrorResponse(DioException error) async {
     // TODO: implement
@@ -63,25 +64,23 @@ class CompiledRoute {
     return CompiledRoute(baseRoute, newRoute, parameters, queryParameters: queryParameters);
   }
 
-  Future<Response> submit({String? bearerToken, String? mfaCode, dynamic body, String contentType = 'application/json'}) {
+  Future<Response> submit({dynamic body, String contentType = 'application/json'}) {
     if (!Restrr.hostInformation.hasHostUrl) {
       throw StateError('Host URL is not set!');
     }
-    Dio dio = Dio();
+    Dio dio = Dio()..interceptors.add(CookieManager(PersistCookieJar()));
     Map<String, dynamic> headers = {};
-    if (bearerToken != null) {
-      headers['Authorization'] = 'Bearer $bearerToken';
-    }
-    if (mfaCode != null) {
-      headers['X-MFA-Code'] = mfaCode;
-    }
     headers['Content-Type'] = contentType;
-    return dio.fetch(RequestOptions(
-        path: compiledRoute,
-        headers: headers,
-        data: body,
-        method: baseRoute.method.toString(),
-        baseUrl: _buildBaseUrl(Restrr.hostInformation, baseRoute.isVersioned)));
+    return dio
+        .fetch(RequestOptions(
+            path: compiledRoute,
+            headers: headers,
+            data: body,
+            method: baseRoute.method.toString(),
+            baseUrl: _buildBaseUrl(Restrr.hostInformation, baseRoute.isVersioned)))
+        .then((value) {
+      return value;
+    });
   }
 
   String _buildBaseUrl(HostInformation hostInformation, bool isVersioned) {
@@ -89,15 +88,6 @@ class CompiledRoute {
     if (effectiveHostUrl.endsWith('/')) {
       effectiveHostUrl = effectiveHostUrl.substring(0, effectiveHostUrl.length - 1);
     }
-    return isVersioned
-        ? '$effectiveHostUrl/api/v${hostInformation.apiVersion}'
-        : '$effectiveHostUrl/api';
+    return isVersioned ? '$effectiveHostUrl/api/v${hostInformation.apiVersion}' : '$effectiveHostUrl/api';
   }
-}
-
-class StatusRoutes {
-  const StatusRoutes._();
-
-  static final Route health = Route(RouteMethod.get, '/status/health', isVersioned: false);
-  static final Route coffee = Route(RouteMethod.get, '/status/coffee', isVersioned: false);
 }

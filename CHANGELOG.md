@@ -1,8 +1,12 @@
+## 0.2.0
+- Added `RestrrBuilder#login`
+- More cleanup
+
 ## 0.1.1
 - Added Dart Action
 
 ## 0.1.0
-- Added Restrr#checkUri
+- Added `Restrr#checkUri`
 - Added tests
 - Further laid out concrete package structure
 
