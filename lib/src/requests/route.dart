@@ -1,13 +1,21 @@
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:restrr/src/utils/io_utils.dart';
 
 import '../../restrr.dart';
 
 class Route {
+  /// The HTTP method of this route.
   final String method;
+
+  /// The path of this route.
   final String path;
+
+  /// The amount of parameters this route expects.
   final int paramCount;
+
+  /// Whether this route is versioned (i.e. /api/v1/...), or not.
   final bool isVersioned;
 
   Route._(this.method, this.path, {this.isVersioned = true})
@@ -24,9 +32,15 @@ class Route {
 
   Route.patch(String path, {bool isVersioned = true}) : this._('PATCH', path, isVersioned: isVersioned);
 
-  static Future<ErrorResponse> asErrorResponse(DioException error) async {
-    // TODO: implement
-    return ErrorResponse(RestrrError.unknown, '');
+  /// Translates a [DioException] into a [RestrrError].
+  static Future<RestrrError> translateDioException(DioException error) async {
+    if (!await IOUtils.checkConnection()) {
+      return RestrrError.noInternetConnection;
+    }
+    if (error.type == DioExceptionType.connectionTimeout || error.type == DioExceptionType.receiveTimeout) {
+      return RestrrError.serverUnreachable;
+    }
+    return RestrrError.unknown;
   }
 
   CompiledRoute compile({List<String> params = const []}) {

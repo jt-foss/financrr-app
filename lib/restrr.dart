@@ -14,7 +14,7 @@ export 'src/requests/route.dart';
 export 'src/requests/route_definitions.dart';
 
 /* [ /src/requests/responses ] */
-export 'src/requests/responses/error_response.dart';
+export 'src/requests/responses/errors.dart';
 export 'src/requests/responses/rest_response.dart';
 
 /* [ /src/service ] */
@@ -22,4 +22,5 @@ export 'src/service/api_service.dart';
 export 'src/service/user_service.dart';
 
 /* [ /src/utils ] */
+export 'src/utils/io_utils.dart';
 export 'src/utils/string_utils.dart';

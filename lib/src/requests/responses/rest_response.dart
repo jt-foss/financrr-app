@@ -4,13 +4,10 @@ import '../../../restrr.dart';
 /// This can either hold data, [T], or an [ErrorResponse].
 class RestResponse<T> {
   final T? data;
-  final ErrorResponse? error;
+  final RestrrError? error;
 
   const RestResponse({this.data, this.error});
 
   bool get hasData => data != null;
-
-  static Future<RestResponse<T>> fromError<T>(Future<ErrorResponse> error) async {
-    return RestResponse(error: await error);
-  }
+  bool get hasError => error != null;
 }

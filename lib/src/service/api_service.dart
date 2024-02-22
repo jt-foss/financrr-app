@@ -19,7 +19,7 @@ abstract class ApiService {
       final Response<dynamic> response = await route.submit(body: body, contentType: contentType);
       return RestResponse(data: mapper.call(response.data));
     } on DioException catch (e) {
-      return RestResponse.fromError(Route.asErrorResponse(e));
+      return (await Route.translateDioException(e)).toRestResponse();
     }
   }
 
@@ -32,7 +32,7 @@ abstract class ApiService {
       await route.submit(body: body, contentType: contentType);
       return const RestResponse(data: true);
     } on DioException catch (e) {
-      return RestResponse.fromError(Route.asErrorResponse(e));
+      return (await Route.translateDioException(e)).toRestResponse();
     }
   }
 
@@ -54,7 +54,7 @@ abstract class ApiService {
       fullRequest?.call(response.data.toString());
       return RestResponse(data: (response.data as List<dynamic>).map((single) => mapper.call(single)).toList());
     } on DioException catch (e) {
-      return RestResponse.fromError(Route.asErrorResponse(e));
+      return (await Route.translateDioException(e)).toRestResponse();
     }
   }
 }

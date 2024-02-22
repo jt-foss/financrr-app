@@ -1,3 +1,9 @@
+## 0.2.1
+- Removed `ErrorResponse`
+- Replaced `RestResponse#error` with `RestrrError?`
+- Added `Route#translateDioException`
+- Added `IOUtils#checkConnection`
+
 ## 0.2.0
 - Added `RestrrBuilder#login`
 - More cleanup
