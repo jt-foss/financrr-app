@@ -1,7 +1,6 @@
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-import 'package:restrr/src/utils/io_utils.dart';
 
 import '../../restrr.dart';
 
@@ -32,17 +31,6 @@ class Route {
 
   Route.patch(String path, {bool isVersioned = true}) : this._('PATCH', path, isVersioned: isVersioned);
 
-  /// Translates a [DioException] into a [RestrrError].
-  static Future<RestrrError> translateDioException(DioException error) async {
-    if (!await IOUtils.checkConnection()) {
-      return RestrrError.noInternetConnection;
-    }
-    if (error.type == DioExceptionType.connectionTimeout || error.type == DioExceptionType.receiveTimeout) {
-      return RestrrError.serverUnreachable;
-    }
-    return RestrrError.unknown;
-  }
-
   CompiledRoute compile({List<String> params = const []}) {
     if (params.length != paramCount) {
       throw ArgumentError(
@@ -61,6 +49,8 @@ class Route {
 }
 
 class CompiledRoute {
+  static final PersistCookieJar cookieJar = PersistCookieJar();
+
   final Route baseRoute;
   final String compiledRoute;
   final Map<String, String> parameters;
@@ -82,7 +72,7 @@ class CompiledRoute {
     if (!Restrr.hostInformation.hasHostUrl) {
       throw StateError('Host URL is not set!');
     }
-    Dio dio = Dio()..interceptors.add(CookieManager(PersistCookieJar()));
+    Dio dio = Dio()..interceptors.add(CookieManager(cookieJar));
     Map<String, dynamic> headers = {};
     headers['Content-Type'] = contentType;
     return dio

@@ -33,9 +33,15 @@ class RestrrBuilder {
   String? sessionId;
   String? username;
   String? password;
+  String? email;
+  String? displayName;
 
   RestrrBuilder.login({required this.uri, required this.username, required this.password})
       : initType = RestrrInitType.login;
+
+  RestrrBuilder.register(
+      {required this.uri, required this.username, required this.password, this.email, this.displayName})
+      : initType = RestrrInitType.register;
 
   /// Creates a new session with the given [uri].
   Future<RestResponse<Restrr>> create() async {
@@ -49,28 +55,36 @@ class RestrrBuilder {
           : statusResponse.error?.toRestResponse() ?? RestrrError.invalidUri.toRestResponse();
     }
     Restrr.log.info('Host: $uri, API v${statusResponse.data!.apiVersion}');
-    // create the API instance
-    final RestrrImpl? api = await switch (initType) {
-      RestrrInitType.register => throw UnimplementedError(),
+    return switch (initType) {
+      RestrrInitType.register => _handleRegistration(username!, password!, email: email, displayName: displayName),
       RestrrInitType.login => _handleLogin(username!, password!),
     };
-    if (api == null) {
+  }
+
+  Future<RestResponse<RestrrImpl>> _handleLogin(String username, String password) async {
+    final RestrrImpl api = RestrrImpl._();
+    final RestResponse<User> userResponse = await UserService(api: api).login(username, password);
+    if (!userResponse.hasData) {
       Restrr.log.warning('Invalid credentials for user $username');
       return RestrrError.invalidCredentials.toRestResponse();
     }
+    api.selfUser = userResponse.data!;
     Restrr.log.info('Successfully logged in as ${api.selfUser.username}');
     return RestResponse(data: api);
   }
 
-  /// Handles the login process.
-  /// Returns a [RestrrImpl] instance if the login was successful, otherwise null.
-  Future<RestrrImpl?> _handleLogin(String username, String password) async {
+  Future<RestResponse<RestrrImpl>> _handleRegistration(String username, String password,
+      {String? email, String? displayName}) async {
     final RestrrImpl api = RestrrImpl._();
-    final RestResponse<User> userResponse = await UserService(api: api).login(username, password);
-    if (!userResponse.hasData) {
-      return null;
+    final RestResponse<User> response =
+        await UserService(api: api).register(username, password, email: email, displayName: displayName);
+    if (response.hasError) {
+      Restrr.log.warning('Failed to register user $username');
+      return response.error?.toRestResponse() ?? RestrrError.unknown.toRestResponse();
     }
-    return api..selfUser = userResponse.data!;
+    api.selfUser = response.data!;
+    Restrr.log.info('Successfully registered & logged in as ${api.selfUser.username}');
+    return RestResponse(data: api);
   }
 }
 
@@ -83,6 +97,8 @@ abstract class Restrr {
 
   /// The currently authenticated user.
   User get selfUser;
+
+  Future<bool> logout();
 
   /// Checks whether the given [uri] is valid and the API is healthy.
   static Future<RestResponse<HealthResponse>> checkUri(Uri uri) async {
@@ -107,4 +123,14 @@ class RestrrImpl implements Restrr {
 
   @override
   late final User selfUser;
+
+  @override
+  Future<bool> logout() async {
+    final RestResponse<bool> response = await UserService(api: this).logout();
+    if (response.hasData && response.data!) {
+      await CompiledRoute.cookieJar.deleteAll();
+      return true;
+    }
+    return false;
+  }
 }

@@ -1,3 +1,11 @@
+## 0.3.0
+- Added `User#displayName`
+- Added `Restrr#logout`
+- Added `Restrr#register`
+- Further refactored error handling
+  - Added `errorMap` to `ApiService#request` (and similar methods)
+- Added more tests
+
 ## 0.2.1
 - Removed `ErrorResponse`
 - Replaced `RestResponse#error` with `RestrrError?`

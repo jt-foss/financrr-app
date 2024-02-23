@@ -2,7 +2,17 @@ import 'package:restrr/restrr.dart';
 
 /// Represents a type of error that can occur during a REST request.
 enum RestrrError {
+  /* Request errors */
+  badRequest,
+
+  /* Server errors */
+
+  notFound,
+  notSignedIn,
   invalidCredentials,
+  alreadySignedIn,
+  internalServerError,
+  serviceUnavailable,
 
   /* Client errors */
 

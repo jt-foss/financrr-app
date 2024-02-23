@@ -20,6 +20,7 @@ class EntityBuilder {
       id: json['id'],
       username: json['username'],
       email: json['email'],
+      displayName: json['display_name'],
       createdAt: DateTime.parse(json['created_at']),
       isAdmin: json['is_admin'],
     );
