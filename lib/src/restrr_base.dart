@@ -1,3 +1,4 @@
+import 'package:cookie_jar/cookie_jar.dart';
 import 'package:logging/logging.dart';
 
 import '../restrr.dart';
@@ -22,7 +23,12 @@ class HostInformation {
   }
 }
 
-///
+class RestrrOptions {
+  final CookieJar? cookieJar;
+
+  const RestrrOptions({this.cookieJar});
+}
+
 enum RestrrInitType { login, register }
 
 /// A builder for creating a new [Restrr] instance.
@@ -36,6 +42,8 @@ class RestrrBuilder {
   String? email;
   String? displayName;
 
+  final RestrrOptions options = RestrrOptions();
+
   RestrrBuilder.login({required this.uri, required this.username, required this.password})
       : initType = RestrrInitType.login;
 
@@ -45,6 +53,9 @@ class RestrrBuilder {
 
   /// Creates a new session with the given [uri].
   Future<RestResponse<Restrr>> create() async {
+    if (options.cookieJar != null) {
+      CompiledRoute.cookieJar = options.cookieJar;
+    }
     Restrr.log.info('Attempting to initialize a session (${initType.name}) with $uri');
     // check if the URI is valid
     final RestResponse<HealthResponse> statusResponse = await Restrr.checkUri(uri);
@@ -127,8 +138,8 @@ class RestrrImpl implements Restrr {
   @override
   Future<bool> logout() async {
     final RestResponse<bool> response = await UserService(api: this).logout();
-    if (response.hasData && response.data!) {
-      await CompiledRoute.cookieJar.deleteAll();
+    if (response.hasData && response.data! && CompiledRoute.cookieJar != null) {
+      await CompiledRoute.cookieJar?.deleteAll();
       return true;
     }
     return false;

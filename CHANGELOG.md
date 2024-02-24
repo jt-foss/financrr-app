@@ -1,4 +1,7 @@
-## 0.3.0
+## 0.3.1 
+- Added ability to customize & disable Cookie Jar
+
+## 0.3
 - Added `User#displayName`
 - Added `Restrr#logout`
 - Added `Restrr#register`
@@ -12,14 +15,14 @@
 - Added `Route#translateDioException`
 - Added `IOUtils#checkConnection`
 
-## 0.2.0
+## 0.2
 - Added `RestrrBuilder#login`
 - More cleanup
 
 ## 0.1.1
 - Added Dart Action
 
-## 0.1.0
+## 0.1
 - Added `Restrr#checkUri`
 - Added tests
 - Further laid out concrete package structure

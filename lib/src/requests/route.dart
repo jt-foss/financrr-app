@@ -49,7 +49,7 @@ class Route {
 }
 
 class CompiledRoute {
-  static final PersistCookieJar cookieJar = PersistCookieJar();
+  static CookieJar? cookieJar;
 
   final Route baseRoute;
   final String compiledRoute;
@@ -72,7 +72,10 @@ class CompiledRoute {
     if (!Restrr.hostInformation.hasHostUrl) {
       throw StateError('Host URL is not set!');
     }
-    Dio dio = Dio()..interceptors.add(CookieManager(cookieJar));
+    Dio dio = Dio();
+    if (cookieJar != null) {
+      dio.interceptors.add(CookieManager(cookieJar!));
+    }
     Map<String, dynamic> headers = {};
     headers['Content-Type'] = contentType;
     return dio
