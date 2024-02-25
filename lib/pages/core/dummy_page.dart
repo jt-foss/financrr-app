@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../router.dart';
-
 class DummyPage extends StatefulWidget {
   final String text;
 

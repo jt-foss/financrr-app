@@ -77,11 +77,6 @@ class AppRouter {
               child: child,
             );
           });
-
-  /// Shorthand which directly consumes the [BuildContext] and [GoRouterState].
-  /// This is basically equal to [_defaultBranchPageBuilder].
-  static Page<T> Function(BuildContext, GoRouterState) _defaultPageBuilder<T>(Widget child) =>
-      (context, state) => _buildDefaultPageTransition<T>(context, state, child);
 }
 
 class PagePathBuilder {

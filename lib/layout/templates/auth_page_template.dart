@@ -53,7 +53,8 @@ class AuthPageTemplateState extends State<AuthPageTemplate> {
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 10),
-              child: SvgPicture.asset(context.appTheme.logoPath, width: 100, color: context.theme.primaryColor),
+              child: SvgPicture.asset(context.appTheme.logoPath,
+                  width: 100, colorFilter: ColorFilter.mode(context.theme.primaryColor, BlendMode.srcIn)),
             ),
             Text(
                 style: context.textTheme.titleLarge?.copyWith(color: context.theme.primaryColor),
