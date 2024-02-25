@@ -3,151 +3,181 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AppTheme {
   final int id;
-  final String Function(AppLocalizations) name;
+  final String logoPath;
+  final String Function(AppLocalizations) nameFunction;
   final Color previewColor;
   final ThemeMode themeMode;
   final ThemeData themeData;
 
   const AppTheme(
-      {required this.id, required this.name, required this.previewColor, required this.themeMode, required this.themeData});
+      {required this.id,
+      required this.logoPath,
+      required this.nameFunction,
+      required this.previewColor,
+      required this.themeMode,
+      required this.themeData});
 }
 
 class AppThemes {
+  static const String _fontFamily = 'Montserrat';
   static final List<AppTheme> themes = [light(), dark()];
-  static const TextStyle _defaultStyle = TextStyle(fontFamily: 'Montserrat', fontFamilyFallback: ['Arial']);
 
   const AppThemes._();
 
   static AppTheme light() {
-    const FinancrrTheme financrrTheme = FinancrrTheme(
-        logoPath: 'logo/logo_blue.svg',
-        primaryAccentColor: Color(0xFF2C03E6),
-        primaryHighlightColor: Color(0xFF2C03E6),
-        primaryTextColor: Color(0xFF000000),
-        secondaryTextColor: Color(0xFF1C1B1F),
-        primaryBackgroundColor: Color(0xFFFFFFFF),
-        secondaryBackgroundColor: Color(0xFFEBEBEB),
-        primaryButtonColor: Color(0xFF2C03E6),
-        primaryButtonTextColor: Color(0xFFFFFFFF));
     return AppTheme(
         id: 1,
-        name: (_) => 'Light',
+        logoPath: 'assets/logo/logo_light.svg',
+        nameFunction: (_) => 'Light',
         previewColor: Colors.white,
         themeMode: ThemeMode.light,
-        themeData: _buildThemeData(financrrTheme, Brightness.light));
+        themeData: _buildThemeData(Brightness.light, const Color(0xFF2C03E6), const Color(0xFFFFFFFF)));
   }
 
-  // TODO: implement actual dark theme colors
   static AppTheme dark() {
-    const FinancrrTheme financrrTheme = FinancrrTheme(
-        logoPath: 'logo/logo_light.svg',
-        primaryAccentColor: Color(0xFF578BFA),
-        primaryHighlightColor: Color(0xFFFFFFFF),
-        primaryTextColor: Color(0xFFFFFFFF),
-        secondaryTextColor: Color(0xFFA1B1D1),
-        primaryBackgroundColor: Color(0xFF132852),
-        secondaryBackgroundColor: Color(0xFF3A5384),
-        primaryButtonColor: Color(0xFFFFFFFF),
-        primaryButtonTextColor: Color(0xFF000000));
     return AppTheme(
         id: 2,
-        name: (_) => 'Dark',
+        logoPath: 'assets/logo/logo_light.svg',
+        nameFunction: (_) => 'Dark',
         previewColor: const Color(0xFF2B2D31),
         themeMode: ThemeMode.dark,
-        themeData: _buildThemeData(financrrTheme, Brightness.dark));
+        themeData: _buildThemeData(Brightness.dark, const Color(0xFF2B73FF), const Color(0xFF151517)));
   }
 
-  static ThemeData _buildThemeData(FinancrrTheme financrrTheme, Brightness brightness) {
-    final TextStyle defaultStyle = _defaultStyle.copyWith(color: financrrTheme.primaryTextColor);
+  static ThemeData _buildThemeData(Brightness brightness, Color primaryColor, Color backgroundColor) {
+    final ThemeData base = ThemeData(
+      chipTheme: const ChipThemeData(
+        side: BorderSide.none,
+      ),
+      sliderTheme: const SliderThemeData(
+        thumbShape: RoundSliderThumbShape(enabledThumbRadius: 7),
+        trackHeight: 2.0,
+      ),
+    );
+    final TextTheme textTheme = TextTheme(
+      displayLarge: const TextStyle(
+        fontSize: 26,
+        fontWeight: FontWeight.bold,
+        color: Color.fromARGB(255, 255, 255, 255),
+      ),
+      displayMedium: const TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.bold,
+        color: Color.fromARGB(255, 255, 255, 255),
+      ),
+      displaySmall: TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.bold,
+        color: primaryColor,
+      ),
+      titleSmall: const TextStyle(
+        fontSize: 16.0,
+        fontWeight: FontWeight.bold,
+      ),
+      titleMedium: const TextStyle(
+        fontSize: 18.0,
+        fontWeight: FontWeight.bold,
+      ),
+      titleLarge: const TextStyle(
+        fontSize: 26.0,
+        fontWeight: FontWeight.bold,
+      ),
+      bodyLarge: const TextStyle(
+        fontSize: 16.0,
+        fontWeight: FontWeight.normal,
+      ),
+      bodyMedium: const TextStyle(
+        fontSize: 14.0,
+        fontWeight: FontWeight.normal,
+      ),
+      bodySmall: const TextStyle(
+        fontSize: 12.0,
+        fontWeight: FontWeight.normal,
+      ),
+    );
     return ThemeData(
-        extensions: [financrrTheme],
-        scaffoldBackgroundColor: financrrTheme.primaryBackgroundColor,
-        brightness: brightness,
-        colorScheme: ThemeData().colorScheme.copyWith(
-            primary: financrrTheme.primaryAccentColor, secondary: financrrTheme.primaryAccentColor, brightness: brightness),
-        textTheme: ThemeData().textTheme.copyWith(
-              displayLarge: defaultStyle.copyWith(fontSize: 57, fontWeight: FontWeight.w400),
-              displayMedium: defaultStyle.copyWith(fontSize: 45, fontWeight: FontWeight.w400),
-              displaySmall: defaultStyle.copyWith(fontSize: 36, fontWeight: FontWeight.w400),
-              headlineLarge: defaultStyle.copyWith(fontSize: 32, fontWeight: FontWeight.w400),
-              headlineMedium: defaultStyle.copyWith(fontSize: 28, fontWeight: FontWeight.w400),
-              headlineSmall: defaultStyle.copyWith(fontSize: 24, fontWeight: FontWeight.w400),
-              titleLarge: defaultStyle.copyWith(fontSize: 22, fontWeight: FontWeight.w500),
-              titleMedium: defaultStyle.copyWith(fontSize: 16, fontWeight: FontWeight.w500),
-              titleSmall: defaultStyle.copyWith(fontSize: 14, fontWeight: FontWeight.w500),
-              bodyLarge: defaultStyle.copyWith(fontSize: 16, fontWeight: FontWeight.w400),
-              bodyMedium: defaultStyle.copyWith(fontSize: 14, fontWeight: FontWeight.w400),
-              bodySmall: defaultStyle.copyWith(fontSize: 12, fontWeight: FontWeight.w400),
-              labelLarge: defaultStyle.copyWith(fontSize: 14, fontWeight: FontWeight.w500),
-              labelMedium: defaultStyle.copyWith(fontSize: 12, fontWeight: FontWeight.w500),
-              labelSmall: defaultStyle.copyWith(fontSize: 11, fontWeight: FontWeight.w500),
-            ),
-        drawerTheme: ThemeData().drawerTheme.copyWith(backgroundColor: financrrTheme.primaryBackgroundColor));
-  }
-}
-
-@immutable
-class FinancrrTheme extends ThemeExtension<FinancrrTheme> {
-  /// The path for this themes' logo (variation).
-  final String? logoPath;
-
-  final Color primaryAccentColor;
-  final Color primaryHighlightColor;
-  final Color primaryTextColor;
-  final Color secondaryTextColor;
-  final Color primaryBackgroundColor;
-  final Color secondaryBackgroundColor;
-  final Color primaryButtonColor;
-  final Color primaryButtonTextColor;
-
-  const FinancrrTheme(
-      {required this.logoPath,
-      required this.primaryAccentColor,
-      required this.primaryHighlightColor,
-      required this.primaryTextColor,
-      required this.secondaryTextColor,
-      required this.primaryBackgroundColor,
-      required this.secondaryBackgroundColor,
-      required this.primaryButtonColor,
-      required this.primaryButtonTextColor});
-
-  @override
-  ThemeExtension<FinancrrTheme> copyWith(
-      {String? logoPath,
-      Color? primaryAccentColor,
-      Color? primaryHighlightColor,
-      Color? primaryTextColor,
-      Color? secondaryTextColor,
-      Color? primaryBackgroundColor,
-      Color? secondaryBackgroundColor,
-      Color? primaryButtonColor,
-      Color? primaryButtonTextColor}) {
-    return FinancrrTheme(
-        logoPath: logoPath ?? this.logoPath,
-        primaryAccentColor: primaryAccentColor ?? this.primaryAccentColor,
-        primaryHighlightColor: primaryHighlightColor ?? this.primaryHighlightColor,
-        primaryTextColor: primaryTextColor ?? this.primaryTextColor,
-        secondaryTextColor: secondaryTextColor ?? this.secondaryTextColor,
-        primaryBackgroundColor: primaryBackgroundColor ?? this.primaryBackgroundColor,
-        secondaryBackgroundColor: secondaryBackgroundColor ?? this.secondaryBackgroundColor,
-        primaryButtonColor: primaryButtonColor ?? this.primaryButtonColor,
-        primaryButtonTextColor: primaryButtonTextColor ?? this.primaryButtonTextColor);
-  }
-
-  @override
-  ThemeExtension<FinancrrTheme> lerp(covariant ThemeExtension<FinancrrTheme>? other, double t) {
-    if (other is! FinancrrTheme) {
-      return this;
-    }
-    return FinancrrTheme(
-        logoPath: logoPath,
-        primaryAccentColor: Color.lerp(primaryAccentColor, other.primaryAccentColor, t)!,
-        primaryHighlightColor: Color.lerp(primaryHighlightColor, other.primaryHighlightColor, t)!,
-        primaryTextColor: Color.lerp(primaryTextColor, other.primaryTextColor, t)!,
-        secondaryTextColor: Color.lerp(secondaryTextColor, other.secondaryTextColor, t)!,
-        primaryBackgroundColor: Color.lerp(primaryBackgroundColor, other.primaryBackgroundColor, t)!,
-        secondaryBackgroundColor: Color.lerp(secondaryBackgroundColor, other.secondaryBackgroundColor, t)!,
-        primaryButtonColor: Color.lerp(primaryButtonColor, other.primaryButtonColor, t)!,
-        primaryButtonTextColor: Color.lerp(primaryButtonTextColor, other.primaryButtonTextColor, t)!);
+      useMaterial3: true,
+      brightness: brightness,
+      primaryColor: primaryColor,
+      scaffoldBackgroundColor: backgroundColor,
+      hintColor: Colors.grey[600],
+      fontFamily: _fontFamily,
+      snackBarTheme: SnackBarThemeData(
+        contentTextStyle: const TextStyle(
+          fontFamily: _fontFamily,
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+        ),
+        backgroundColor: Colors.grey[900],
+      ),
+      appBarTheme: AppBarTheme(
+        titleTextStyle: TextStyle(
+          fontFamily: _fontFamily,
+          color: primaryColor,
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
+        ),
+        backgroundColor: const Color.fromARGB(255, 32, 33, 35),
+        foregroundColor: primaryColor,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        centerTitle: true,
+      ),
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: const Color.fromARGB(255, 35, 36, 37),
+        selectedItemColor: primaryColor,
+      ),
+      drawerTheme: DrawerThemeData(
+        backgroundColor: backgroundColor,
+        scrimColor: Colors.white.withOpacity(0.1),
+      ),
+      textTheme: textTheme,
+      cardColor: Colors.grey[900],
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          foregroundColor: Colors.white,
+          backgroundColor: primaryColor,
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: primaryColor,
+        ),
+      ),
+      chipTheme: base.chipTheme,
+      sliderTheme: base.sliderTheme,
+      popupMenuTheme: const PopupMenuThemeData(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+        ),
+        surfaceTintColor: Colors.transparent,
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        indicatorColor: primaryColor.withOpacity(0.4),
+        iconTheme: MaterialStatePropertyAll(
+          IconThemeData(color: Colors.grey[500]),
+        ),
+        backgroundColor: Colors.grey[900],
+        surfaceTintColor: Colors.transparent,
+        labelTextStyle: MaterialStatePropertyAll(
+          TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+            color: Colors.grey[300],
+          ),
+        ),
+      ),
+      dialogTheme: const DialogTheme(
+        surfaceTintColor: Colors.transparent,
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        labelStyle: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
+        border: const OutlineInputBorder(),
+      ),
+      textSelectionTheme: TextSelectionThemeData(
+        cursorColor: primaryColor,
+      ),
+    );
   }
 }

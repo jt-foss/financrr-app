@@ -1,19 +1,4 @@
-import 'package:financrr_frontend/themes.dart';
-import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
-
-class TextUtils {
-  const TextUtils._();
-
-  static Widget paddedTitle(BuildContext context, {required String title, bool bottomPadding = true, bool topPadding = true}) {
-    final FinancrrTheme theme = context.financrrTheme;
-    return Padding(
-        padding: EdgeInsets.only(bottom: bottomPadding ? 10 : 0, top: topPadding ? 20 : 0),
-        child: AppTextStyles.of(context)
-            .titleSmall
-            .text(title, color: theme.secondaryTextColor, fontWeightOverride: FontWeight.bold));
-  }
-}
 
 class AppTextStyles {
   final AppTextStyle displayLarge;
