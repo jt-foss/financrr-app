@@ -1,11 +1,11 @@
 import 'dart:async';
 
+import 'package:financrr_frontend/main.dart';
 import 'package:financrr_frontend/pages/auth/login_page.dart';
 import 'package:financrr_frontend/themes.dart';
 import 'package:flutter/material.dart';
 
 import '../layout/adaptive_scaffold.dart';
-import '../main.dart';
 import '../router.dart';
 
 class ContextNavigatorPage extends StatefulWidget {
@@ -36,7 +36,7 @@ class ContextNavigatorPageState extends State<ContextNavigatorPage> {
     // TODO: impl navigation
     await Future.delayed(const Duration(seconds: 2));
     if (!mounted) return;
-    FinancrrApp.of(context).changeAppTheme(theme: AppThemes.light());
+    FinancrrApp.of(context).changeAppTheme(theme: AppThemes.light(), system: false);
     context.goPath(LoginPage.pagePath.build());
   }
 

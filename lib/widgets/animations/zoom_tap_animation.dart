@@ -12,7 +12,7 @@ class ZoomTapAnimation extends StatefulWidget {
   final Curve beginCurve, endCurve;
 
   const ZoomTapAnimation(
-      {Key? key,
+      {super.key,
       required this.child,
       this.onTap,
       this.begin = 1.0,
@@ -23,8 +23,7 @@ class ZoomTapAnimation extends StatefulWidget {
       this.beginCurve = Curves.decelerate,
       this.endCurve = Curves.fastOutSlowIn,
       this.onLongTap,
-      this.enableLongTapRepeatEvent = false})
-      : super(key: key);
+      this.enableLongTapRepeatEvent = false});
 
   @override
   State<StatefulWidget> createState() => _ZoomTapAnimationState();

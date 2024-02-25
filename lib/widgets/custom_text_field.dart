@@ -62,14 +62,15 @@ class _CustomTextFieldState extends State<CustomTextField> {
                 hintText: _selected ? null : widget.hintText,
                 hintStyle: _textStyles.bodyMedium.style(fontWeightOverride: FontWeight.w600),
                 prefixIcon: widget.prefixIcon != null
-                    ? Icon(widget.prefixIcon, color: !_selected ? null : _financrrTheme.primaryAccentColor)
+                    ? Icon(widget.prefixIcon,
+                        color: !_selected ? _financrrTheme.primaryTextColor : _financrrTheme.primaryAccentColor)
                     : null,
                 suffixIcon: !widget.hideable
                     ? null
-                    : IconButton(
-                        icon: Icon(_hidden ? Icons.visibility : Icons.visibility_off,
-                            color: !_selected ? null : _financrrTheme.primaryAccentColor),
-                        onPressed: () => setState(() => _hidden = !_hidden),
+                    : InkWell(
+                        child: Icon(_hidden ? Icons.visibility : Icons.visibility_off,
+                            color: !_selected ? _financrrTheme.primaryTextColor : _financrrTheme.primaryAccentColor),
+                        onTap: () => setState(() => _hidden = !_hidden),
                       )),
           ),
         ),

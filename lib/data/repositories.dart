@@ -2,13 +2,17 @@ import 'package:financrr_frontend/data/theme_repository.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'host_repository.dart';
+
 class Repositories {
   const Repositories._();
 
   static late final ThemeRepository themeRepository;
+  static late final HostRepository hostRepository;
 
   static Future init(FlutterSecureStorage storage, SharedPreferences preferences) async {
     themeRepository = ThemeRepository(preferences: preferences);
+    hostRepository = HostRepository(preferences: preferences);
   }
 }
 

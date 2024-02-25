@@ -1,5 +1,6 @@
 import 'package:financrr_frontend/pages/auth/login_page.dart';
 import 'package:financrr_frontend/pages/context_navigator_page.dart';
+import 'package:financrr_frontend/util/constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -33,8 +34,8 @@ class AppRouter {
       GoRoute(
           name: 'financrr — Login',
           path: LoginPage.pagePath.path,
-          pageBuilder: (context, state) =>
-              _buildDefaultPageTransition(context, state, LoginPage(redirectTo: state.uri.queryParameters['redirectTo'])),
+          pageBuilder: (context, state) => _buildDefaultPageTransition(
+              context, state, LoginPage(key: GlobalKeys.loginPage, redirectTo: state.uri.queryParameters['redirectTo'])),
           redirect: authGuard),
     ];
   }

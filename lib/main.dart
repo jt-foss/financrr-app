@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:financrr_frontend/data/repositories.dart';
 import 'package:financrr_frontend/router.dart';
 import 'package:financrr_frontend/themes.dart';
@@ -90,5 +92,12 @@ class FinancrrAppState extends State<FinancrrApp> {
       _themeMode = system ? ThemeMode.system : theme.themeMode;
       ThemeService.setThemePreferences(_activeLightTheme, _activeDarkTheme, _themeMode);
     });
+  }
+}
+
+class CustomHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
   }
 }

@@ -22,10 +22,13 @@ class AppThemes {
     const FinancrrTheme financrrTheme = FinancrrTheme(
         logoPath: 'logo/logo_blue.svg',
         primaryAccentColor: Color(0xFF2C03E6),
+        primaryHighlightColor: Color(0xFF2C03E6),
         primaryTextColor: Color(0xFF000000),
         secondaryTextColor: Color(0xFF1C1B1F),
         primaryBackgroundColor: Color(0xFFFFFFFF),
-        secondaryBackgroundColor: Color(0xFFEBEBEB));
+        secondaryBackgroundColor: Color(0xFFEBEBEB),
+        primaryButtonColor: Color(0xFF2C03E6),
+        primaryButtonTextColor: Color(0xFFFFFFFF));
     return AppTheme(
         id: 1,
         name: (_) => 'Light',
@@ -38,14 +41,17 @@ class AppThemes {
   static AppTheme dark() {
     const FinancrrTheme financrrTheme = FinancrrTheme(
         logoPath: 'logo/logo_light.svg',
-        primaryAccentColor: Color(0xFF407BF8),
+        primaryAccentColor: Color(0xFF578BFA),
+        primaryHighlightColor: Color(0xFFFFFFFF),
         primaryTextColor: Color(0xFFFFFFFF),
-        secondaryTextColor: Color(0xFFBFBFBF),
-        primaryBackgroundColor: Color(0xFF2B2D31),
-        secondaryBackgroundColor: Color(0xFF1F2124));
+        secondaryTextColor: Color(0xFFA1B1D1),
+        primaryBackgroundColor: Color(0xFF132852),
+        secondaryBackgroundColor: Color(0xFF3A5384),
+        primaryButtonColor: Color(0xFFFFFFFF),
+        primaryButtonTextColor: Color(0xFF000000));
     return AppTheme(
         id: 2,
-        name: (_) => 'Dunkel',
+        name: (_) => 'Dark',
         previewColor: const Color(0xFF2B2D31),
         themeMode: ThemeMode.dark,
         themeData: _buildThemeData(financrrTheme, Brightness.dark));
@@ -86,34 +92,46 @@ class FinancrrTheme extends ThemeExtension<FinancrrTheme> {
   final String? logoPath;
 
   final Color primaryAccentColor;
+  final Color primaryHighlightColor;
   final Color primaryTextColor;
   final Color secondaryTextColor;
   final Color primaryBackgroundColor;
   final Color secondaryBackgroundColor;
+  final Color primaryButtonColor;
+  final Color primaryButtonTextColor;
 
   const FinancrrTheme(
       {required this.logoPath,
       required this.primaryAccentColor,
+      required this.primaryHighlightColor,
       required this.primaryTextColor,
       required this.secondaryTextColor,
       required this.primaryBackgroundColor,
-      required this.secondaryBackgroundColor});
+      required this.secondaryBackgroundColor,
+      required this.primaryButtonColor,
+      required this.primaryButtonTextColor});
 
   @override
   ThemeExtension<FinancrrTheme> copyWith(
       {String? logoPath,
       Color? primaryAccentColor,
+      Color? primaryHighlightColor,
       Color? primaryTextColor,
       Color? secondaryTextColor,
       Color? primaryBackgroundColor,
-      Color? secondaryBackgroundColor}) {
+      Color? secondaryBackgroundColor,
+      Color? primaryButtonColor,
+      Color? primaryButtonTextColor}) {
     return FinancrrTheme(
         logoPath: logoPath ?? this.logoPath,
         primaryAccentColor: primaryAccentColor ?? this.primaryAccentColor,
+        primaryHighlightColor: primaryHighlightColor ?? this.primaryHighlightColor,
         primaryTextColor: primaryTextColor ?? this.primaryTextColor,
         secondaryTextColor: secondaryTextColor ?? this.secondaryTextColor,
         primaryBackgroundColor: primaryBackgroundColor ?? this.primaryBackgroundColor,
-        secondaryBackgroundColor: secondaryBackgroundColor ?? this.secondaryBackgroundColor);
+        secondaryBackgroundColor: secondaryBackgroundColor ?? this.secondaryBackgroundColor,
+        primaryButtonColor: primaryButtonColor ?? this.primaryButtonColor,
+        primaryButtonTextColor: primaryButtonTextColor ?? this.primaryButtonTextColor);
   }
 
   @override
@@ -124,9 +142,12 @@ class FinancrrTheme extends ThemeExtension<FinancrrTheme> {
     return FinancrrTheme(
         logoPath: logoPath,
         primaryAccentColor: Color.lerp(primaryAccentColor, other.primaryAccentColor, t)!,
+        primaryHighlightColor: Color.lerp(primaryHighlightColor, other.primaryHighlightColor, t)!,
         primaryTextColor: Color.lerp(primaryTextColor, other.primaryTextColor, t)!,
         secondaryTextColor: Color.lerp(secondaryTextColor, other.secondaryTextColor, t)!,
         primaryBackgroundColor: Color.lerp(primaryBackgroundColor, other.primaryBackgroundColor, t)!,
-        secondaryBackgroundColor: Color.lerp(secondaryBackgroundColor, other.secondaryBackgroundColor, t)!);
+        secondaryBackgroundColor: Color.lerp(secondaryBackgroundColor, other.secondaryBackgroundColor, t)!,
+        primaryButtonColor: Color.lerp(primaryButtonColor, other.primaryButtonColor, t)!,
+        primaryButtonTextColor: Color.lerp(primaryButtonTextColor, other.primaryButtonTextColor, t)!);
   }
 }
