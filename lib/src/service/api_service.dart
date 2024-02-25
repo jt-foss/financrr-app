@@ -65,7 +65,7 @@ abstract class ApiService {
 
   static Future<RestResponse<T>> _handleDioException<T>(DioException ex, Map<int, RestrrError> errorMap) async {
     // check internet connection
-    if (!await IOUtils.checkConnection()) {
+    if (CompiledRoute.cookieJar != null && !await IOUtils.checkConnection()) {
       return RestrrError.noInternetConnection.toRestResponse();
     }
     // check status code

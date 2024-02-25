@@ -24,9 +24,12 @@ class HostInformation {
 }
 
 class RestrrOptions {
+  final bool isWeb;
   final CookieJar? cookieJar;
 
-  const RestrrOptions({this.cookieJar});
+  const RestrrOptions({this.isWeb = false, this.cookieJar});
+
+  bool get canUseCookieJar => cookieJar != null && !isWeb;
 }
 
 enum RestrrInitType { login, register }
@@ -42,7 +45,7 @@ class RestrrBuilder {
   String? email;
   String? displayName;
 
-  final RestrrOptions options = RestrrOptions();
+  RestrrOptions options = RestrrOptions();
 
   RestrrBuilder.login({required this.uri, required this.username, required this.password})
       : initType = RestrrInitType.login;
@@ -53,9 +56,7 @@ class RestrrBuilder {
 
   /// Creates a new session with the given [uri].
   Future<RestResponse<Restrr>> create() async {
-    if (options.cookieJar != null) {
-      CompiledRoute.cookieJar = options.cookieJar;
-    }
+    CompiledRoute.cookieJar = options.canUseCookieJar ? options.cookieJar : null;
     Restrr.log.info('Attempting to initialize a session (${initType.name}) with $uri');
     // check if the URI is valid
     final RestResponse<HealthResponse> statusResponse = await Restrr.checkUri(uri);
@@ -73,7 +74,7 @@ class RestrrBuilder {
   }
 
   Future<RestResponse<RestrrImpl>> _handleLogin(String username, String password) async {
-    final RestrrImpl api = RestrrImpl._();
+    final RestrrImpl api = RestrrImpl._(options: options);
     final RestResponse<User> userResponse = await UserService(api: api).login(username, password);
     if (!userResponse.hasData) {
       Restrr.log.warning('Invalid credentials for user $username');
@@ -86,7 +87,7 @@ class RestrrBuilder {
 
   Future<RestResponse<RestrrImpl>> _handleRegistration(String username, String password,
       {String? email, String? displayName}) async {
-    final RestrrImpl api = RestrrImpl._();
+    final RestrrImpl api = RestrrImpl._(options: options);
     final RestResponse<User> response =
         await UserService(api: api).register(username, password, email: email, displayName: displayName);
     if (response.hasError) {
@@ -105,6 +106,8 @@ abstract class Restrr {
 
   /// Getter for the [EntityBuilder] of this [Restrr] instance.
   EntityBuilder get entityBuilder;
+
+  RestrrOptions get options;
 
   /// The currently authenticated user.
   User get selfUser;
@@ -127,7 +130,10 @@ abstract class Restrr {
 }
 
 class RestrrImpl implements Restrr {
-  RestrrImpl._();
+  @override
+  final RestrrOptions options;
+
+  RestrrImpl._({required this.options});
 
   @override
   late final EntityBuilder entityBuilder = EntityBuilder(api: this);
@@ -138,7 +144,7 @@ class RestrrImpl implements Restrr {
   @override
   Future<bool> logout() async {
     final RestResponse<bool> response = await UserService(api: this).logout();
-    if (response.hasData && response.data! && CompiledRoute.cookieJar != null) {
+    if (response.hasData && response.data! && options.canUseCookieJar) {
       await CompiledRoute.cookieJar?.deleteAll();
       return true;
     }

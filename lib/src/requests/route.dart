@@ -84,10 +84,7 @@ class CompiledRoute {
             headers: headers,
             data: body,
             method: baseRoute.method.toString(),
-            baseUrl: _buildBaseUrl(Restrr.hostInformation, baseRoute.isVersioned)))
-        .then((value) {
-      return value;
-    });
+            baseUrl: _buildBaseUrl(Restrr.hostInformation, baseRoute.isVersioned)));
   }
 
   String _buildBaseUrl(HostInformation hostInformation, bool isVersioned) {
