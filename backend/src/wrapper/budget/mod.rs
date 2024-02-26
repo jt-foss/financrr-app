@@ -23,7 +23,7 @@ pub struct Budget {
     pub amount: i64,
     pub name: String,
     pub description: Option<String>,
-    #[serde(with = "time::serde::iso8601")]
+    #[serde(with = "time::serde::rfc3339")]
     pub created_at: OffsetDateTime,
 }
 

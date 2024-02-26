@@ -28,7 +28,7 @@ pub struct Account {
     pub balance: i64,
     pub original_balance: i64,
     pub currency: Phantom<Currency>,
-    #[serde(with = "time::serde::iso8601")]
+    #[serde(with = "time::serde::rfc3339")]
     pub created_at: OffsetDateTime,
 }
 

@@ -23,7 +23,7 @@ pub struct TransactionDTO {
     pub currency: Phantom<Currency>,
     pub description: Option<String>,
     pub budget: Option<Phantom<Budget>>,
-    #[serde(with = "time::serde::iso8601")]
+    #[serde(with = "time::serde::rfc3339")]
     pub executed_at: OffsetDateTime,
 }
 

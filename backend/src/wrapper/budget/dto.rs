@@ -14,7 +14,7 @@ pub struct BudgetDTO {
     pub name: String,
     #[validate(length(min = 0, max = 255))]
     pub description: Option<String>,
-    #[serde(with = "time::serde::iso8601")]
+    #[serde(with = "time::serde::rfc3339")]
     #[validate(custom = "validate_datetime_not_in_future")]
     pub created_at: OffsetDateTime,
 }

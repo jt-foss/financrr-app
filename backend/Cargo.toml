@@ -32,7 +32,6 @@ redis = "0.24.0"
 # Serialization and deserialization
 serde.workspace = true
 serde_json = "1.0.114"
-serde_with = { version = "3.6.1", features = ["json", "time_0_3"] }
 
 # Generating openapi spec
 utoipa = { version = "4.2.0", features = ["actix_extras", "openapi_extensions", "time", "preserve_order"] }
@@ -53,7 +52,6 @@ regex = { version = "1.10.3", features = ["std", "perf", "unicode"] }
 itertools = "0.12.1"
 
 # Future Utils
-futures = "0.3.30"
 futures-util = "0.3.30"
 
 # Async utils
