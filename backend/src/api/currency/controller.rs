@@ -89,7 +89,7 @@ pub async fn delete(user: Phantom<User>, currency_id: Path<i32>) -> Result<impl 
     }
 
     currency.delete().await?;
-    Ok(HttpResponse::Ok())
+    Ok(HttpResponse::NoContent())
 }
 
 #[utoipa::path(patch,

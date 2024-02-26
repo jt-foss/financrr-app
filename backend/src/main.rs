@@ -32,6 +32,7 @@ use migration::Migrator;
 use migration::MigratorTrait;
 
 use crate::api::account::controller::account_controller;
+use crate::api::budget::controller::budget_controller;
 use crate::api::currency::controller::currency_controller;
 use crate::api::status::controller::status_controller;
 use crate::api::transaction::controller::transaction_controller;
@@ -61,7 +62,8 @@ tags(
 (name = "User", description = "Endpoints for user management."),
 (name = "Account", description = "Endpoints for account management."),
 (name = "Currency", description = "Endpoints for currency management."),
-(name = "Transaction", description = "Endpoints for transaction management.")
+(name = "Transaction", description = "Endpoints for transaction management."),
+(name = "Budget", description = "Endpoints for budget management.")
 ),
 modifiers(& SecurityAddon)
 )]
@@ -168,6 +170,7 @@ fn configure_api_v1(cfg: &mut web::ServiceConfig) {
             .configure(user_controller)
             .configure(account_controller)
             .configure(currency_controller)
-            .configure(transaction_controller),
+            .configure(transaction_controller)
+            .configure(budget_controller),
     );
 }

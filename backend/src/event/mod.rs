@@ -5,16 +5,17 @@ use tokio::sync::broadcast::{channel, Receiver, Sender};
 use tokio::time::sleep;
 use tokio::time::Duration;
 
-use transaction::TransactionEvent;
-
 use crate::api::error::api::ApiError;
+use crate::wrapper::account::event_listener::account_listener;
+use crate::wrapper::budget::event_listener::budget_listener;
 
 pub mod transaction;
 
 pub type EventResult = Pin<Box<dyn Future<Output = Result<(), ApiError>> + Send>>;
 
 pub fn init() {
-    TransactionEvent::register_listeners();
+    account_listener();
+    budget_listener();
 }
 
 pub trait Event {

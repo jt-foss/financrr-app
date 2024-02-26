@@ -7,11 +7,13 @@ use regex::Regex;
 use sea_orm::EntityTrait;
 use serde::Serialize;
 use serde_json::Value;
+use time::OffsetDateTime;
 use utoipa::ToSchema;
 use validator::ValidationError;
 
 use entity::currency;
 use entity::prelude::User;
+use entity::utility::time::get_now;
 
 use crate::database::connection::get_database_connection;
 
@@ -113,6 +115,13 @@ pub fn validate_iban(iban: &str) -> Result<(), ValidationError> {
         Ok(_) => Ok(()),
         Err(_) => Err(ValidationError::new("IBAN is invalid")),
     }
+}
+
+pub fn validate_datetime_not_in_future(datetime: &OffsetDateTime) -> Result<(), ValidationError> {
+    if datetime > &get_now() {
+        return Err(ValidationError::new("Date and time cannot be in the future"));
+    }
+    Ok(())
 }
 
 pub async fn validate_currency_exists(id: i32) -> Result<(), ValidationError> {
