@@ -54,8 +54,6 @@ jobs:
       contents: read
       packages: write
     steps:
-      - name: Set env
-        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Log in to the Container registry
@@ -76,6 +74,6 @@ jobs:
           file: ./docker/rust/Dockerfile
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           labels: ${{ steps.meta.outputs.labels }}
