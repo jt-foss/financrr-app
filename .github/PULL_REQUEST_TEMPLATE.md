@@ -18,6 +18,7 @@
 - [ ] Internal code
 - [ ] Documentation
 - [ ] Added tests
+- [ ] updated `CHANGELOG.md`
 - [ ] Other: \_____ <!-- Insert other type here -->
 
 <!-- Replace "NaN" with an issue number if this is a response to an issue -->
