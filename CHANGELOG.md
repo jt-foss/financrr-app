@@ -1,3 +1,8 @@
+## 0.4
+- Added `statusCode` to `RestResponse`
+- Moved route config to `RouteOptions`
+- Removed export of `ApiService`s
+
 ## 0.3.3
 - Fixed missing options param
 

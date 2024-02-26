@@ -10,16 +10,11 @@ export 'src/entities/restrr_entity.dart';
 export 'src/entities/user.dart';
 
 /* [ /src/requests ] */
-export 'src/requests/route.dart';
 export 'src/requests/route_definitions.dart';
 
 /* [ /src/requests/responses ] */
 export 'src/requests/responses/restrr_errors.dart';
 export 'src/requests/responses/rest_response.dart';
-
-/* [ /src/service ] */
-export 'src/service/api_service.dart';
-export 'src/service/user_service.dart';
 
 /* [ /src/utils ] */
 export 'src/utils/io_utils.dart';

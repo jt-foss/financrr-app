@@ -1,38 +1,16 @@
-import 'package:cookie_jar/cookie_jar.dart';
 import 'package:logging/logging.dart';
+import 'package:restrr/src/requests/route.dart';
+import 'package:restrr/src/service/api_service.dart';
+import 'package:restrr/src/service/user_service.dart';
 
 import '../restrr.dart';
 
-class HostInformation {
-  final Uri? hostUri;
-  final int apiVersion;
-
-  bool get hasHostUrl => hostUri != null;
-
-  const HostInformation({required this.hostUri, this.apiVersion = 1});
-
-  const HostInformation.empty()
-      : hostUri = null,
-        apiVersion = -1;
-
-  HostInformation copyWith({Uri? hostUri, int? apiVersion}) {
-    return HostInformation(
-      hostUri: hostUri ?? this.hostUri,
-      apiVersion: apiVersion ?? this.apiVersion,
-    );
-  }
-}
-
 class RestrrOptions {
   final bool isWeb;
-  final CookieJar? cookieJar;
-
-  const RestrrOptions({this.isWeb = false, this.cookieJar});
-
-  bool get canUseCookieJar => cookieJar != null && !isWeb;
+  const RestrrOptions({this.isWeb = false});
 }
 
-enum RestrrInitType { login, register, refresh }
+enum RestrrInitType { login, register, savedSession }
 
 /// A builder for creating a new [Restrr] instance.
 /// The [Restrr] instance is created by calling [create].
@@ -54,12 +32,10 @@ class RestrrBuilder {
       {required this.uri, required this.username, required this.password, this.email, this.displayName})
       : initType = RestrrInitType.register;
 
-  RestrrBuilder.refresh({required this.uri})
-      : initType = RestrrInitType.refresh;
+  RestrrBuilder.savedSession({required this.uri}) : initType = RestrrInitType.savedSession;
 
   /// Creates a new session with the given [uri].
   Future<RestResponse<Restrr>> create() async {
-    CompiledRoute.cookieJar = options.canUseCookieJar ? options.cookieJar : null;
     Restrr.log.info('Attempting to initialize a session (${initType.name}) with $uri');
     // check if the URI is valid
     final RestResponse<HealthResponse> statusResponse = await Restrr.checkUri(uri);
@@ -67,63 +43,67 @@ class RestrrBuilder {
       Restrr.log.warning('Invalid financrr URI: $uri');
       return statusResponse.error == RestrrError.unknown
           ? RestrrError.invalidUri.toRestResponse()
-          : statusResponse.error?.toRestResponse() ?? RestrrError.invalidUri.toRestResponse();
+          : statusResponse.error?.toRestResponse(statusCode: statusResponse.statusCode) ??
+              RestrrError.invalidUri.toRestResponse();
     }
     Restrr.log.info('Host: $uri, API v${statusResponse.data!.apiVersion}');
+    final RestrrImpl apiImpl = RestrrImpl._(
+        options: options, routeOptions: RouteOptions(hostUri: uri, apiVersion: statusResponse.data!.apiVersion));
     return switch (initType) {
-      RestrrInitType.register => _handleRegistration(username!, password!, email: email, displayName: displayName),
-      RestrrInitType.login => _handleLogin(username!, password!),
-      RestrrInitType.refresh => _handleRefresh(),
+      RestrrInitType.register =>
+        _handleRegistration(apiImpl, username!, password!, email: email, displayName: displayName),
+      RestrrInitType.login => _handleLogin(apiImpl, username!, password!),
+      RestrrInitType.savedSession => _handleSavedSession(apiImpl),
     };
   }
 
-  Future<RestResponse<RestrrImpl>> _handleLogin(String username, String password) async {
-    final RestrrImpl api = RestrrImpl._(options: options);
-    final RestResponse<User> userResponse = await UserService(api: api).login(username, password);
-    if (!userResponse.hasData) {
+  /// Logs in with the given [username] and [password].
+  Future<RestResponse<RestrrImpl>> _handleLogin(RestrrImpl apiImpl, String username, String password) async {
+    final RestResponse<User> response = await apiImpl.userService.login(username, password);
+    if (!response.hasData) {
       Restrr.log.warning('Invalid credentials for user $username');
-      return RestrrError.invalidCredentials.toRestResponse();
+      return RestrrError.invalidCredentials.toRestResponse(statusCode: response.statusCode);
     }
-    api.selfUser = userResponse.data!;
-    Restrr.log.info('Successfully logged in as ${api.selfUser.username}');
-    return RestResponse(data: api);
+    apiImpl.selfUser = response.data!;
+    Restrr.log.info('Successfully logged in as ${apiImpl.selfUser.username}');
+    return RestResponse(data: apiImpl, statusCode: response.statusCode);
   }
 
-  Future<RestResponse<RestrrImpl>> _handleRegistration(String username, String password,
+  /// Registers a new user and logs in.
+  Future<RestResponse<RestrrImpl>> _handleRegistration(RestrrImpl apiImpl, String username, String password,
       {String? email, String? displayName}) async {
-    final RestrrImpl api = RestrrImpl._(options: options);
     final RestResponse<User> response =
-        await UserService(api: api).register(username, password, email: email, displayName: displayName);
+        await apiImpl.userService.register(username, password, email: email, displayName: displayName);
     if (response.hasError) {
       Restrr.log.warning('Failed to register user $username');
-      return response.error?.toRestResponse() ?? RestrrError.unknown.toRestResponse();
+      return response.error?.toRestResponse(statusCode: response.statusCode) ?? RestrrError.unknown.toRestResponse();
     }
-    api.selfUser = response.data!;
-    Restrr.log.info('Successfully registered & logged in as ${api.selfUser.username}');
-    return RestResponse(data: api);
+    apiImpl.selfUser = response.data!;
+    Restrr.log.info('Successfully registered & logged in as ${apiImpl.selfUser.username}');
+    return RestResponse(data: apiImpl, statusCode: response.statusCode);
   }
 
-  Future<RestResponse<RestrrImpl>> _handleRefresh() async {
-    final RestrrImpl api = RestrrImpl._(options: options);
-    final RestResponse<User> response = await UserService(api: api).getSelf();
+  /// Attempts to refresh the session with still saved credentials.
+  Future<RestResponse<RestrrImpl>> _handleSavedSession(RestrrImpl apiImpl) async {
+    final RestResponse<User> response = await apiImpl.userService.getSelf();
     if (response.hasError) {
       Restrr.log.warning('Failed to refresh session');
-      return response.error?.toRestResponse() ?? RestrrError.unknown.toRestResponse();
+      return response.error?.toRestResponse(statusCode: response.statusCode) ?? RestrrError.unknown.toRestResponse();
     }
-    api.selfUser = response.data!;
-    Restrr.log.info('Successfully refreshed session for ${api.selfUser.username}');
-    return RestResponse(data: api);
+    apiImpl.selfUser = response.data!;
+    Restrr.log.info('Successfully refreshed session for ${apiImpl.selfUser.username}');
+    return RestResponse(data: apiImpl, statusCode: response.statusCode);
   }
 }
 
 abstract class Restrr {
   static final Logger log = Logger('Restrr');
-  static HostInformation hostInformation = HostInformation.empty();
 
   /// Getter for the [EntityBuilder] of this [Restrr] instance.
   EntityBuilder get entityBuilder;
 
   RestrrOptions get options;
+  RouteOptions get routeOptions;
 
   /// The currently authenticated user.
   User get selfUser;
@@ -131,25 +111,24 @@ abstract class Restrr {
   Future<bool> logout();
 
   /// Checks whether the given [uri] is valid and the API is healthy.
-  static Future<RestResponse<HealthResponse>> checkUri(Uri uri) async {
-    hostInformation = hostInformation.copyWith(hostUri: uri, apiVersion: -1);
-    return ApiService.request(
+  static Future<RestResponse<HealthResponse>> checkUri(Uri uri, {bool isWeb = false}) async {
+    return RequestHandler.request(
         route: StatusRoutes.health.compile(),
-        mapper: (json) => EntityBuilder.buildHealthResponse(json)).then((response) {
-      if (response.hasData && response.data!.healthy) {
-        // if successful, update the API version
-        hostInformation = hostInformation.copyWith(apiVersion: response.data!.apiVersion);
-      }
-      return response;
-    });
+        mapper: (json) => EntityBuilder.buildHealthResponse(json),
+        isWeb: isWeb,
+        routeOptions: RouteOptions(hostUri: uri));
   }
 }
 
 class RestrrImpl implements Restrr {
   @override
   final RestrrOptions options;
+  @override
+  final RouteOptions routeOptions;
 
-  RestrrImpl._({required this.options});
+  late final UserService userService = UserService(api: this);
+
+  RestrrImpl._({required this.options, required this.routeOptions});
 
   @override
   late final EntityBuilder entityBuilder = EntityBuilder(api: this);
@@ -160,8 +139,8 @@ class RestrrImpl implements Restrr {
   @override
   Future<bool> logout() async {
     final RestResponse<bool> response = await UserService(api: this).logout();
-    if (response.hasData && response.data! && options.canUseCookieJar) {
-      await CompiledRoute.cookieJar?.deleteAll();
+    if (response.hasData && response.data! && !options.isWeb) {
+      await CompiledRoute.cookieJar.deleteAll();
       return true;
     }
     return false;

@@ -5,9 +5,11 @@ import '../../../restrr.dart';
 class RestResponse<T> {
   final T? data;
   final RestrrError? error;
+  final int? statusCode;
 
-  const RestResponse({this.data, this.error});
+  const RestResponse({this.data, this.error, required this.statusCode});
 
   bool get hasData => data != null;
   bool get hasError => error != null;
+  bool get hasStatusCode => statusCode != null;
 }

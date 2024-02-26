@@ -1,4 +1,4 @@
-import '../../restrr.dart';
+import 'package:restrr/src/requests/route.dart';
 
 class StatusRoutes {
   const StatusRoutes._();

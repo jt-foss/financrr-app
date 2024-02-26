@@ -25,5 +25,5 @@ enum RestrrError {
 
   const RestrrError({this.clientError = false});
 
-  RestResponse<T> toRestResponse<T>() => RestResponse(error: this);
+  RestResponse<T> toRestResponse<T>({int? statusCode}) => RestResponse(error: this, statusCode: statusCode);
 }
