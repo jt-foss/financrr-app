@@ -9,7 +9,7 @@ pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
     pub user: i32,
-    pub amount: i32,
+    pub amount: i64,
     #[sea_orm(column_type = "Text")]
     pub name: String,
     #[sea_orm(column_type = "Text", nullable)]
@@ -29,6 +29,12 @@ pub enum Relation {
         on_delete = "Cascade"
     )]
     User,
+}
+
+impl Entity {
+    pub fn find_all_by_user_id(user_id: i32) -> Select<Self> {
+        Self::find().filter(Column::User.eq(user_id))
+    }
 }
 
 impl Related<super::transaction::Entity> for Entity {

@@ -5,7 +5,6 @@ use tokio::sync::broadcast::Receiver;
 use tokio::time::Duration;
 
 use crate::event::{Event, EventBus, EventFilter, EventResult};
-use crate::wrapper::account;
 use crate::wrapper::transaction::Transaction;
 
 static TRANSACTION_EVENT_BUS: OnceCell<EventBus<TransactionEvent>> = OnceCell::new();
@@ -21,10 +20,6 @@ pub enum TransactionEvent {
 }
 
 impl TransactionEvent {
-    pub fn register_listeners() {
-        account::event_listener::transaction_listener();
-    }
-
     fn get_event_bus() -> &'static EventBus<Self> {
         TRANSACTION_EVENT_BUS.get_or_init(EventBus::new)
     }

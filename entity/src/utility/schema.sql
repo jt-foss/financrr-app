@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS budget
 (
     id          SERIAL PRIMARY KEY,
     "user"      INTEGER REFERENCES "user" (id) ON UPDATE CASCADE ON DELETE CASCADE NOT NULL,
-    amount      INTEGER                                                            NOT NULL,
+    amount      BIGINT                                                             NOT NULL,
     name        TEXT                                                               NOT NULL,
     description TEXT,
     created_at  timestamp with time zone                                           NOT NULL DEFAULT current_timestamp
