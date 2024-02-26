@@ -31,8 +31,5 @@ RUN chmod +x /home/financrr/migrator
 # Switch to non-root user
 USER financrr
 
-# Define environment variable
-ENV ADDRESS=0.0.0.0:80
-
 # Entrypoint command
 ENTRYPOINT ["/home/financrr/financrr"]
