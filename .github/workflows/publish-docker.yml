@@ -74,6 +74,6 @@ jobs:
           file: ./docker/rust/Dockerfile
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.ref }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           labels: ${{ steps.meta.outputs.labels }}
