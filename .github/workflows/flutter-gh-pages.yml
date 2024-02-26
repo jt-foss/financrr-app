@@ -21,6 +21,7 @@ jobs:
         with: 
           flutter-version: 3.19.0
       - run: flutter clean
+      - run: flutter pub upgrade
       - run: flutter build web --release --base-href /frontend/
       # Push Changes
       - run: git config user.name github-actions
