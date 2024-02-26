@@ -104,7 +104,7 @@ class RestrrBuilder {
   }
 
   Future<RestResponse<RestrrImpl>> _handleRefresh() async {
-    final RestrrImpl api = RestrrImpl._();
+    final RestrrImpl api = RestrrImpl._(options: options);
     final RestResponse<User> response = await UserService(api: api).getSelf();
     if (response.hasError) {
       Restrr.log.warning('Failed to refresh session');
