@@ -1,3 +1,6 @@
+## 0.4.1
+- Added missing `isWeb`
+
 ## 0.4
 - Added `statusCode` to `RestResponse`
 - Moved route config to `RouteOptions`
