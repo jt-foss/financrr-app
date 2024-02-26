@@ -21,11 +21,8 @@ jobs:
       contents: read
       packages: write
     steps:
-      - name: Set short git commit SHA
-        id: vars
-        run: |
-          calculatedSha=$(git rev-parse --short ${{ github.sha }})
-          echo "COMMIT_SHORT_SHA=$calculatedSha" >> $GITHUB_ENV
+      - id: commit
+        uses: prompt/actions-commit-hash@v3
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Log in to the Container registry
@@ -46,7 +43,7 @@ jobs:
           file: ./docker/rust/Dockerfile
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:nightly-${{ env.COMMIT_SHORT_SHA  }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:nightly-${{ steps.commit.outputs.short  }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:nightly
           labels: ${{ steps.meta.outputs.labels }}
 
