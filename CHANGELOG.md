@@ -1,4 +1,5 @@
 ## 0.3.2
+- Added `RestrrBuilder#refresh`
 - Fixed `RestrrOptions` and added `isWeb` attribute
 - Removed network check when no CookieJar is set (web)
 

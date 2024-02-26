@@ -32,7 +32,7 @@ class RestrrOptions {
   bool get canUseCookieJar => cookieJar != null && !isWeb;
 }
 
-enum RestrrInitType { login, register }
+enum RestrrInitType { login, register, refresh }
 
 /// A builder for creating a new [Restrr] instance.
 /// The [Restrr] instance is created by calling [create].
@@ -54,6 +54,9 @@ class RestrrBuilder {
       {required this.uri, required this.username, required this.password, this.email, this.displayName})
       : initType = RestrrInitType.register;
 
+  RestrrBuilder.refresh({required this.uri})
+      : initType = RestrrInitType.refresh;
+
   /// Creates a new session with the given [uri].
   Future<RestResponse<Restrr>> create() async {
     CompiledRoute.cookieJar = options.canUseCookieJar ? options.cookieJar : null;
@@ -70,6 +73,7 @@ class RestrrBuilder {
     return switch (initType) {
       RestrrInitType.register => _handleRegistration(username!, password!, email: email, displayName: displayName),
       RestrrInitType.login => _handleLogin(username!, password!),
+      RestrrInitType.refresh => _handleRefresh(),
     };
   }
 
@@ -96,6 +100,18 @@ class RestrrBuilder {
     }
     api.selfUser = response.data!;
     Restrr.log.info('Successfully registered & logged in as ${api.selfUser.username}');
+    return RestResponse(data: api);
+  }
+
+  Future<RestResponse<RestrrImpl>> _handleRefresh() async {
+    final RestrrImpl api = RestrrImpl._();
+    final RestResponse<User> response = await UserService(api: api).getSelf();
+    if (response.hasError) {
+      Restrr.log.warning('Failed to refresh session');
+      return response.error?.toRestResponse() ?? RestrrError.unknown.toRestResponse();
+    }
+    api.selfUser = response.data!;
+    Restrr.log.info('Successfully refreshed session for ${api.selfUser.username}');
     return RestResponse(data: api);
   }
 }
