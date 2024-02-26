@@ -6,13 +6,14 @@ services:
       dockerfile: docker/rust/Dockerfile
     init: true
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
       TZ: ${TIMEZONE}
     volumes:
       - ./:/usr/src/financrr
-      - .env:/home/financrr/.env
     ports:
-      - "127.0.0.1:3000:80"
+      - "127.0.0.1:3000:8080"
     depends_on:
       db:
         condition: service_healthy

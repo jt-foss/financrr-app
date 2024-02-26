@@ -107,6 +107,8 @@ async fn main() -> Result<()> {
     // Make instance variable of ApiDoc so all worker threads gets the same instance.
     let openapi = ApiDoc::openapi();
 
+    info!("Starting server... Listening on: {}", Config::get_config().address);
+
     HttpServer::new(move || {
         App::new()
             .wrap(Logger::default())
