@@ -12,7 +12,9 @@ import '../../layout/adaptive_scaffold.dart';
 import '../../router.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  final Uri hostUri;
+
+  const LoginPage({super.key, required this.hostUri});
 
   @override
   State<StatefulWidget> createState() => LoginPageState();
@@ -36,54 +38,55 @@ class LoginPageState extends State<LoginPage> {
 
   Widget _buildVerticalLayout(Size size) {
     return AuthPageTemplate(
+        showBackButton: true,
         child: Column(
-      children: [
-        Form(
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  child: TextFormField(
-                    controller: _usernameController,
-                    decoration: const InputDecoration(labelText: 'Username'),
-                    autofillHints: const [AutofillHints.username],
-                    validator: (value) => value!.isEmpty ? 'Username may not be empty' : null,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 5),
+              child: Text(widget.hostUri.host),
+            ),
+            Form(
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      child: TextFormField(
+                        controller: _usernameController,
+                        decoration: const InputDecoration(labelText: 'Username'),
+                        autofillHints: const [AutofillHints.username],
+                        validator: (value) => value!.isEmpty ? 'Username may not be empty' : null,
+                      ),
+                    ),
+                    TextFormField(
+                      controller: _passwordController,
+                      decoration: InputDecoration(
+                          labelText: _locale.genericPassword,
+                          suffixIcon: Padding(
+                            padding: const EdgeInsets.only(right: 10),
+                            child: IconButton(
+                                icon: Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
+                                onPressed: () => setState(() => _obscureText = !_obscureText)),
+                          )),
+                      obscureText: _obscureText,
+                      autofillHints: const [AutofillHints.password, AutofillHints.newPassword],
+                      validator: (value) => value!.isEmpty ? 'Password may not be empty' : null,
+                    ),
+                  ],
+                )),
+            Padding(
+                padding: const EdgeInsets.only(top: 20),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: _handleLogin,
+                    child: Text(_locale.signInButton),
                   ),
-                ),
-                TextFormField(
-                  controller: _passwordController,
-                  decoration: InputDecoration(
-                      labelText: _locale.genericPassword,
-                      suffixIcon: IconButton(
-                          icon: Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
-                          onPressed: () => setState(() => _obscureText = !_obscureText))),
-                  obscureText: _obscureText,
-                  autofillHints: const [AutofillHints.password, AutofillHints.newPassword],
-                  validator: (value) => value!.isEmpty ? 'Password may not be empty' : null,
-                ),
-              ],
-            )),
-        Padding(
-            padding: const EdgeInsets.only(top: 20),
-            child: SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: _handleLogin,
-                child: Text(_locale.signInButton),
-              ),
-            )),
-        Padding(
-          padding: const EdgeInsets.only(top: 10, bottom: 20),
-          child: TextButton.icon(
-              onPressed: () => Navigator.pop(context),
-              icon: const Icon(Icons.arrow_back_rounded, size: 18),
-              label: const Text('Change Server Info')),
-        )
-      ],
-    ));
+                )),
+          ],
+        ));
   }
 
   Future<void> _handleLogin() async {
@@ -94,13 +97,13 @@ class LoginPageState extends State<LoginPage> {
       return;
     }
     final RestResponse<Restrr> response =
-        await (RestrrBuilder.login(uri: Restrr.hostInformation.hostUri!, username: username, password: password)
+        await (RestrrBuilder.login(uri: widget.hostUri, username: username, password: password)
               ..options = const RestrrOptions(isWeb: kIsWeb))
             .create();
     if (!mounted) return;
     if (response.hasData) {
       context.authNotifier.setApi(response.data!);
-      context.goPath(DashboardPage.pagePath.build());
+      context.pushPath(DashboardPage.pagePath.build());
     } else {
       context.showSnackBar(response.error!.name);
     }

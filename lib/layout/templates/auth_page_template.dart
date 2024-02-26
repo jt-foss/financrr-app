@@ -10,9 +10,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../adaptive_scaffold.dart';
 
 class AuthPageTemplate extends StatefulWidget {
+  final bool showBackButton;
   final Widget child;
 
-  const AuthPageTemplate({super.key, required this.child});
+  const AuthPageTemplate({super.key, required this.child, this.showBackButton = false});
 
   @override
   State<StatefulWidget> createState() => AuthPageTemplateState();
@@ -41,8 +42,13 @@ class AuthPageTemplateState extends State<AuthPageTemplate> {
             Padding(
               padding: const EdgeInsets.only(top: 20),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: widget.showBackButton ? MainAxisAlignment.spaceBetween : MainAxisAlignment.end,
                 children: [
+                  if (widget.showBackButton)
+                    IconButton(
+                        tooltip: 'Change Server Configuration',
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: Icon(Icons.arrow_back, color: Colors.grey[400])),
                   IconButton(
                       tooltip: 'Toggle theme',
                       onPressed: () => FinancrrApp.of(context)

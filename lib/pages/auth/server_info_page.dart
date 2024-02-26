@@ -5,6 +5,7 @@ import 'package:financrr_frontend/layout/templates/auth_page_template.dart';
 import 'package:financrr_frontend/pages/auth/login_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/input_utils.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:restrr/restrr.dart';
 
@@ -27,6 +28,18 @@ class ServerInfoPageState extends State<ServerInfoPage> {
 
   bool _isLoading = false;
   bool _isValid = false;
+  Uri? _hostUri;
+  int? _apiVersion;
+
+  @override
+  void initState() {
+    super.initState();
+    final String hostUrl = HostService.get().hostUrl;
+    if (hostUrl.isNotEmpty && InputValidators.url(context, hostUrl) == null) {
+      _urlController.text = hostUrl;
+      _handleUrlCheck();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,13 +65,16 @@ class ServerInfoPageState extends State<ServerInfoPage> {
                     decoration: const InputDecoration(labelText: 'Server URL'),
                     autofillHints: const [AutofillHints.username],
                     validator: (value) => InputValidators.url(context, value),
-                    onChanged: (_) => setState(() => _isValid = false),
+                    onChanged: (_) => setState(() {
+                      _isValid = false;
+                      _apiVersion = null;
+                    }),
                   ),
                 ),
-                if (_isValid && Restrr.hostInformation.apiVersion != -1)
+                if (_isValid && _apiVersion != null)
                   Padding(
                     padding: const EdgeInsets.only(top: 5),
-                    child: Text('Status: Healthy, v${Restrr.hostInformation.apiVersion}',
+                    child: Text('Status: Healthy, v$_apiVersion',
                         style: context.textTheme.labelMedium?.copyWith(color: context.theme.primaryColor)),
                   )
               ],
@@ -70,7 +86,7 @@ class ServerInfoPageState extends State<ServerInfoPage> {
                 : TextButton.icon(
                     onPressed: () {
                       if (_isValid) {
-                        Navigator.push(context, MaterialPageRoute(builder: (ctx) => const LoginPage()));
+                        Navigator.push(context, MaterialPageRoute(builder: (ctx) => LoginPage(hostUri: _hostUri!)));
                       } else {
                         _handleUrlCheck();
                       }
@@ -92,11 +108,15 @@ class ServerInfoPageState extends State<ServerInfoPage> {
       _isLoading = true;
       _isValid = false;
     });
-    final RestResponse<HealthResponse> response = await Restrr.checkUri(Uri.parse(url));
+    final RestResponse<HealthResponse> response = await Restrr.checkUri(Uri.parse(url), isWeb: kIsWeb);
     setState(() => _isLoading = false);
     if (!mounted) return;
     if (response.hasData) {
-      setState(() => _isValid = true);
+      setState(() {
+        _isValid = true;
+        _apiVersion = response.data!.apiVersion;
+      });
+      _hostUri = Uri.parse(url);
       HostService.setHostPreferences(url);
     } else {
       context.showSnackBar('Invalid URL');

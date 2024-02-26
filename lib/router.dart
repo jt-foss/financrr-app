@@ -21,24 +21,34 @@ class AppRouter {
       ..._noShellRoutes(),
       GoRoute(path: '/', redirect: (_, __) => '/@me/dashboard'),
       GoRoute(path: '/@me', redirect: (_, __) => '/@me/dashboard'),
-      StatefulShellRoute
-          .indexedStack(builder: (context, state, shell) => ScaffoldNavBarShell(navigationShell: shell), branches: [
-        StatefulShellBranch(navigatorKey: shellNavigatorKey, routes: [
-          GoRoute(
-              path: DashboardPage.pagePath.path,
-              pageBuilder: _defaultBranchPageBuilder(const DashboardPage()),
-              redirect: coreAuthGuard),
-        ]),
-        StatefulShellBranch(routes: [
-          GoRoute(path: '/@me/a', pageBuilder: _defaultBranchPageBuilder(const DummyPage(text: 'A')), redirect: coreAuthGuard),
-        ]),
-        StatefulShellBranch(routes: [
-          GoRoute(path: '/@me/b', pageBuilder: _defaultBranchPageBuilder(const DummyPage(text: 'B')), redirect: coreAuthGuard),
-        ]),
-        StatefulShellBranch(routes: [
-          GoRoute(path: '/@me/c', pageBuilder: _defaultBranchPageBuilder(const DummyPage(text: 'C')), redirect: coreAuthGuard),
-        ]),
-      ]),
+      StatefulShellRoute.indexedStack(
+          builder: (context, state, shell) => ScaffoldNavBarShell(navigationShell: shell),
+          branches: [
+            StatefulShellBranch(navigatorKey: shellNavigatorKey, routes: [
+              GoRoute(
+                  path: DashboardPage.pagePath.path,
+                  pageBuilder: _defaultBranchPageBuilder(const DashboardPage()),
+                  redirect: coreAuthGuard),
+            ]),
+            StatefulShellBranch(routes: [
+              GoRoute(
+                  path: '/@me/a',
+                  pageBuilder: _defaultBranchPageBuilder(const DummyPage(text: 'A')),
+                  redirect: coreAuthGuard),
+            ]),
+            StatefulShellBranch(routes: [
+              GoRoute(
+                  path: '/@me/b',
+                  pageBuilder: _defaultBranchPageBuilder(const DummyPage(text: 'B')),
+                  redirect: coreAuthGuard),
+            ]),
+            StatefulShellBranch(routes: [
+              GoRoute(
+                  path: '/@me/c',
+                  pageBuilder: _defaultBranchPageBuilder(const DummyPage(text: 'C')),
+                  redirect: coreAuthGuard),
+            ]),
+          ]),
     ],
   );
 

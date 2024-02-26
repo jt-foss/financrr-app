@@ -6,7 +6,8 @@ class ScaffoldNavBarShell extends StatefulWidget {
 
   const ScaffoldNavBarShell({super.key, required this.navigationShell});
 
-  static ScaffoldNavBarShellState? maybeOf(BuildContext context) => context.findAncestorStateOfType<ScaffoldNavBarShellState>();
+  static ScaffoldNavBarShellState? maybeOf(BuildContext context) =>
+      context.findAncestorStateOfType<ScaffoldNavBarShellState>();
 
   @override
   State<StatefulWidget> createState() => ScaffoldNavBarShellState();

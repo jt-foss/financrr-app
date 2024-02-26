@@ -41,7 +41,9 @@ class AppThemes {
         nameFunction: (_) => 'Dark',
         previewColor: const Color(0xFF2B2D31),
         themeMode: ThemeMode.dark,
-        themeData: _buildThemeData(Brightness.dark, const Color(0xFF2B73FF), const Color(0xFF151517)));
+        themeData: _buildThemeData(Brightness.dark,
+            const Color(0xFF4B87FF),
+            const Color(0xFF151517)));
   }
 
   static ThemeData _buildThemeData(Brightness brightness, Color primaryColor, Color backgroundColor) {
@@ -173,6 +175,10 @@ class AppThemes {
       ),
       inputDecorationTheme: InputDecorationTheme(
         labelStyle: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
+        floatingLabelStyle: textTheme.bodyMedium?.copyWith(color: primaryColor, fontWeight: FontWeight.w600),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: primaryColor),
+        ),
         border: const OutlineInputBorder(),
       ),
       textSelectionTheme: TextSelectionThemeData(
