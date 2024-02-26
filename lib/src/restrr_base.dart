@@ -38,7 +38,7 @@ class RestrrBuilder {
   Future<RestResponse<Restrr>> create() async {
     Restrr.log.info('Attempting to initialize a session (${initType.name}) with $uri');
     // check if the URI is valid
-    final RestResponse<HealthResponse> statusResponse = await Restrr.checkUri(uri);
+    final RestResponse<HealthResponse> statusResponse = await Restrr.checkUri(uri, isWeb: options.isWeb);
     if (statusResponse.hasError) {
       Restrr.log.warning('Invalid financrr URI: $uri');
       return statusResponse.error == RestrrError.unknown

@@ -1,5 +1,8 @@
+## 0.4.2
+- Fixed missing `isWeb` in `RestrrBuilder#create`
+
 ## 0.4.1
-- Added missing `isWeb`
+- Added missing `isWeb` in `RequestHandler` methods
 
 ## 0.4
 - Added `statusCode` to `RestResponse`
