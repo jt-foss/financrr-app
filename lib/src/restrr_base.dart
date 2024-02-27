@@ -1,9 +1,12 @@
 import 'package:logging/logging.dart';
+import 'package:restrr/src/cache/batch_cache_view.dart';
 import 'package:restrr/src/requests/route.dart';
 import 'package:restrr/src/service/api_service.dart';
+import 'package:restrr/src/service/currency_service.dart';
 import 'package:restrr/src/service/user_service.dart';
 
 import '../restrr.dart';
+import 'cache/cache_view.dart';
 
 class RestrrOptions {
   final bool isWeb;
@@ -59,7 +62,7 @@ class RestrrBuilder {
 
   /// Logs in with the given [username] and [password].
   Future<RestResponse<RestrrImpl>> _handleLogin(RestrrImpl apiImpl, String username, String password) async {
-    final RestResponse<User> response = await apiImpl.userService.login(username, password);
+    final RestResponse<User> response = await apiImpl._userService.login(username, password);
     if (!response.hasData) {
       Restrr.log.warning('Invalid credentials for user $username');
       return RestrrError.invalidCredentials.toRestResponse(statusCode: response.statusCode);
@@ -73,7 +76,7 @@ class RestrrBuilder {
   Future<RestResponse<RestrrImpl>> _handleRegistration(RestrrImpl apiImpl, String username, String password,
       {String? email, String? displayName}) async {
     final RestResponse<User> response =
-        await apiImpl.userService.register(username, password, email: email, displayName: displayName);
+        await apiImpl._userService.register(username, password, email: email, displayName: displayName);
     if (response.hasError) {
       Restrr.log.warning('Failed to register user $username');
       return response.error?.toRestResponse(statusCode: response.statusCode) ?? RestrrError.unknown.toRestResponse();
@@ -85,7 +88,7 @@ class RestrrBuilder {
 
   /// Attempts to refresh the session with still saved credentials.
   Future<RestResponse<RestrrImpl>> _handleSavedSession(RestrrImpl apiImpl) async {
-    final RestResponse<User> response = await apiImpl.userService.getSelf();
+    final RestResponse<User> response = await apiImpl._userService.getSelf();
     if (response.hasError) {
       Restrr.log.warning('Failed to refresh session');
       return response.error?.toRestResponse(statusCode: response.statusCode) ?? RestrrError.unknown.toRestResponse();
@@ -108,8 +111,6 @@ abstract class Restrr {
   /// The currently authenticated user.
   User get selfUser;
 
-  Future<bool> logout();
-
   /// Checks whether the given [uri] is valid and the API is healthy.
   static Future<RestResponse<HealthResponse>> checkUri(Uri uri, {bool isWeb = false}) async {
     return RequestHandler.request(
@@ -118,6 +119,23 @@ abstract class Restrr {
         isWeb: isWeb,
         routeOptions: RouteOptions(hostUri: uri));
   }
+
+  /// Retrieves the currently authenticated user.
+  Future<User?> retrieveSelf({bool forceRetrieve = false});
+
+  /// Logs out the current user.
+  Future<bool> logout();
+
+  Future<List<Currency>?> retrieveAllCurrencies({bool forceRetrieve = false});
+
+  Future<Currency?> createCurrency(
+      {required String name, required String symbol, required String isoCode, required int decimalPlaces});
+
+  Future<Currency?> retrieveCurrencyById(ID id, {bool forceRetrieve = false});
+
+  Future<bool> deleteCurrencyById(ID id);
+
+  Future<Currency?> updateCurrencyById(ID id, {String? name, String? symbol, String? isoCode, int? decimalPlaces});
 }
 
 class RestrrImpl implements Restrr {
@@ -126,7 +144,17 @@ class RestrrImpl implements Restrr {
   @override
   final RouteOptions routeOptions;
 
-  late final UserService userService = UserService(api: this);
+  /* Services */
+
+  late final UserService _userService = UserService(api: this);
+  late final CurrencyService _currencyService = CurrencyService(api: this);
+
+  /* Caches */
+
+  late final RestrrEntityCacheView<User> userCache = RestrrEntityCacheView();
+  late final RestrrEntityCacheView<Currency> currencyCache = RestrrEntityCacheView();
+
+  late final RestrrEntityBatchCacheView<Currency> _currencyBatchCache = RestrrEntityBatchCacheView();
 
   RestrrImpl._({required this.options, required this.routeOptions});
 
@@ -137,12 +165,88 @@ class RestrrImpl implements Restrr {
   late final User selfUser;
 
   @override
+  Future<User?> retrieveSelf({bool forceRetrieve = false}) async {
+    return _getOrRetrieveSingle(
+        key: selfUser.id,
+        cacheView: userCache,
+        retrieveFunction: (api) => api._userService.getSelf(),
+        forceRetrieve: forceRetrieve);
+  }
+
+  @override
   Future<bool> logout() async {
-    final RestResponse<bool> response = await UserService(api: this).logout();
+    final RestResponse<bool> response = await _userService.logout();
     if (response.hasData && response.data! && !options.isWeb) {
       await CompiledRoute.cookieJar.deleteAll();
       return true;
     }
     return false;
+  }
+
+  @override
+  Future<List<Currency>?> retrieveAllCurrencies({bool forceRetrieve = false}) async {
+    return _getOrRetrieveMulti(
+        batchCache: _currencyBatchCache,
+        retrieveFunction: (api) => api._currencyService.retrieveAllCurrencies(),
+    );
+  }
+
+  @override
+  Future<Currency?> createCurrency(
+      {required String name, required String symbol, required String isoCode, required int decimalPlaces}) async {
+    final RestResponse<Currency> response = await _currencyService.createCurrency(
+        name: name, symbol: symbol, isoCode: isoCode, decimalPlaces: decimalPlaces);
+    return response.data;
+  }
+
+  @override
+  Future<Currency?> retrieveCurrencyById(ID id, {bool forceRetrieve = false}) async {
+    return _getOrRetrieveSingle(
+        key: id,
+        cacheView: currencyCache,
+        retrieveFunction: (api) => api._currencyService.retrieveCurrencyById(id),
+        forceRetrieve: forceRetrieve);
+  }
+
+  @override
+  Future<bool> deleteCurrencyById(ID id) async {
+    final RestResponse<bool> response = await _currencyService.deleteCurrencyById(id);
+    return response.hasData && response.data!;
+  }
+
+  @override
+  Future<Currency?> updateCurrencyById(ID id,
+      {String? name, String? symbol, String? isoCode, int? decimalPlaces}) async {
+    final RestResponse<Currency> response = await _currencyService.updateCurrencyById(id,
+        name: name, symbol: symbol, isoCode: isoCode, decimalPlaces: decimalPlaces);
+    return response.data;
+  }
+
+  Future<T?> _getOrRetrieveSingle<T extends RestrrEntity>(
+      {required ID key,
+      required RestrrEntityCacheView<T> cacheView,
+      required Future<RestResponse<T>> Function(RestrrImpl) retrieveFunction,
+      bool forceRetrieve = false}) async {
+    if (!forceRetrieve && cacheView.contains(key)) {
+      return cacheView.get(key)!;
+    }
+    final RestResponse<T> response = await retrieveFunction.call(this);
+    return response.hasData ? response.data : null;
+  }
+
+  Future<List<T>?> _getOrRetrieveMulti<T extends RestrrEntity>(
+      {required RestrrEntityBatchCacheView<T> batchCache,
+      required Future<RestResponse<List<T>>> Function(RestrrImpl) retrieveFunction,
+      bool forceRetrieve = false}) async {
+    if (!forceRetrieve && batchCache.hasSnapshot) {
+      return batchCache.get()!;
+    }
+    final RestResponse<List<T>> response = await retrieveFunction.call(this);
+    if (response.hasData) {
+      final List<T> remote = response.data!;
+      batchCache.update(remote);
+      return remote;
+    }
+    return null;
   }
 }

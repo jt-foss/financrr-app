@@ -37,18 +37,18 @@ class Route {
 
   Route.patch(String path, {bool isVersioned = true}) : this._('PATCH', path, isVersioned: isVersioned);
 
-  CompiledRoute compile({List<String> params = const []}) {
+  CompiledRoute compile({List<dynamic> params = const []}) {
     if (params.length != paramCount) {
       throw ArgumentError(
           'Error compiling route [$method $path}]: Incorrect amount of parameters! Expected: $paramCount, Provided: ${params.length}');
     }
     final Map<String, String> values = {};
     String compiledRoute = path;
-    for (String param in params) {
+    for (dynamic param in params) {
       int paramStart = compiledRoute.indexOf('{');
       int paramEnd = compiledRoute.indexOf('}');
-      values[compiledRoute.substring(paramStart + 1, paramEnd)] = param;
-      compiledRoute = compiledRoute.replaceRange(paramStart, paramEnd + 1, param);
+      values[compiledRoute.substring(paramStart + 1, paramEnd)] = param.toString();
+      compiledRoute = compiledRoute.replaceRange(paramStart, paramEnd + 1, param.toString());
     }
     return CompiledRoute(this, compiledRoute, values);
   }

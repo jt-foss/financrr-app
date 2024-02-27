@@ -15,3 +15,13 @@ class UserRoutes {
   static final Route logout = Route.delete('/user/logout');
   static final Route register = Route.post('/user/register');
 }
+
+class CurrencyRoutes {
+  const CurrencyRoutes._();
+
+  static final Route retrieveAll = Route.get('/currency');
+  static final Route create = Route.post('/currency/{currencyId}');
+  static final Route retrieveById = Route.get('/currency/{currencyId}');
+  static final Route deleteById = Route.delete('/currency/{currencyId}');
+  static final Route updateById = Route.patch('/currency/{currencyId}');
+}

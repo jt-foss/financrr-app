@@ -1,7 +1,6 @@
 import '../../restrr.dart';
 
 abstract class User extends RestrrEntity {
-  int get id;
   String get username;
   String? get email;
   String? get displayName;
@@ -15,8 +14,6 @@ abstract class User extends RestrrEntity {
 
 class UserImpl extends RestrrEntityImpl implements User {
   @override
-  final int id;
-  @override
   final String username;
   @override
   final String? email;
@@ -29,7 +26,7 @@ class UserImpl extends RestrrEntityImpl implements User {
 
   const UserImpl({
     required super.api,
-    required this.id,
+    required super.id,
     required this.username,
     required this.email,
     required this.displayName,

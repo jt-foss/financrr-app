@@ -1,3 +1,13 @@
+## 0.5
+- Added `Currency`
+- Added `Restrr#retrieveAllCurrencies`
+- Added `Restrr#createCurrency`
+- Added `Restrr#retrieveCurrencyById`
+- Added `Restrr#deleteCurrencyById`
+- Added `Restrr#updateCurrencyById`
+- Added `Restrr#retrieveSelf`
+- Implemented (Batch)CacheViews (some retrieve methods now have a `forceRetrieve` parameter)
+
 ## 0.4.2
 - Fixed missing `isWeb` in `RestrrBuilder#create`
 

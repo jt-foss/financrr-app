@@ -24,6 +24,17 @@ const String userJson = '''
 }
 ''';
 
+const String currencyJson = '''
+{
+  "id": 1,
+  "name": "US Dollar",
+  "symbol": "\$",
+  "iso_code": "USD",
+  "decimal_places": 2,
+  "user": 1
+}
+''';
+
 void main() {
   late Restrr api;
 
@@ -40,13 +51,23 @@ void main() {
       expect(healthResponse.details, null);
     });
 
-    test('.buildUser', () {
+    test('.buildUser', () async {
       final User user = api.entityBuilder.buildUser(jsonDecode(userJson));
       expect(user.id, 1);
       expect(user.username, 'admin');
       expect(user.email, null);
       expect(user.createdAt, DateTime.parse('+002024-02-17T20:48:43.391176000Z'));
       expect(user.isAdmin, true);
+    });
+
+    test('.buildCurrency', () {
+      final Currency currency = api.entityBuilder.buildCurrency(jsonDecode(currencyJson));
+      expect(currency.id, 1);
+      expect(currency.name, 'US Dollar');
+      expect(currency.symbol, '\$');
+      expect(currency.isoCode, 'USD');
+      expect(currency.decimalPlaces, 2);
+      expect(currency.user, 1);
     });
   });
 }
