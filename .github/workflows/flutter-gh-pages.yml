@@ -16,15 +16,23 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: 'Set Flutter 3.19.0'
+
+      - name: Setup Flutter
         uses: subosito/flutter-action@v2
-        with: 
-          flutter-version: 3.19.0
-      - run: flutter clean
-      - run: flutter pub upgrade
-      - run: flutter build web --release --base-href /frontend/
-      - uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: .
+          flutter-version: '3.19.0'
+
+      - name: Flutter Clean and Upgrade Packages
+        run: |
+          flutter clean
+          flutter pub upgrade
+
+      - name: Build Web
+        run: flutter build web --release --base-href /frontend/
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: gh-pages
-          clean-exclude: pr-preview
+          folder: build/web
