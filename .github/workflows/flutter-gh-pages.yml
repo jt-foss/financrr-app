@@ -23,9 +23,8 @@ jobs:
       - run: flutter clean
       - run: flutter pub upgrade
       - run: flutter build web --release --base-href /frontend/
-      # Push Changes
-      - run: git config user.name github-actions
-      - run: git config user.email github-actions@github.com
-      - run: git --work-tree build/web add --all
-      - run: git commit -m "Automatic deployment by github-actions"
-      - run: git push origin HEAD:gh-pages --force
+      - uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: .
+          branch: gh-pages
+          clean-exclude: pr-preview
