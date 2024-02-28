@@ -121,6 +121,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.1"
+  easy_localization:
+    dependency: "direct main"
+    description:
+      name: easy_localization
+      sha256: "9c86754b22aaa3e74e471635b25b33729f958dd6fb83df0ad6612948a7b231af"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.4"
+  easy_logger:
+    dependency: transitive
+    description:
+      name: easy_logger
+      sha256: c764a6e024846f33405a2342caf91c62e357c24b02c04dbc712ef232bf30ffb7
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.2"
   fake_async:
     dependency: transitive
     description:
@@ -167,7 +183,7 @@ packages:
     source: hosted
     version: "3.0.1"
   flutter_localizations:
-    dependency: "direct main"
+    dependency: transitive
     description: flutter
     source: sdk
     version: "0.0.0"
@@ -410,10 +426,10 @@ packages:
     description:
       path: "."
       ref: development
-      resolved-ref: "21bc770d99a16b1065b4ec658b8565f8dc384c97"
+      resolved-ref: "090d671b3084c5564a717b104624941bc57ce25a"
       url: "https://github.com/financrr/restrr.git"
     source: git
-    version: "0.4.2"
+    version: "0.5.0"
   shared_preferences:
     dependency: "direct main"
     description:

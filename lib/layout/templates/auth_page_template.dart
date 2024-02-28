@@ -1,10 +1,10 @@
 import 'dart:math';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:financrr_frontend/main.dart';
 import 'package:financrr_frontend/themes.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../adaptive_scaffold.dart';
@@ -20,8 +20,6 @@ class AuthPageTemplate extends StatefulWidget {
 }
 
 class AuthPageTemplateState extends State<AuthPageTemplate> {
-  late final AppLocalizations _locale = context.locale;
-
   final int _random = Random().nextInt(4) + 1;
 
   @override
@@ -62,15 +60,8 @@ class AuthPageTemplateState extends State<AuthPageTemplate> {
               child: SvgPicture.asset(context.appTheme.logoPath,
                   width: 100, colorFilter: ColorFilter.mode(context.theme.primaryColor, BlendMode.srcIn)),
             ),
-            Text(
-                style: context.textTheme.titleLarge?.copyWith(color: context.theme.primaryColor),
-                switch (_random) {
-                  1 => _locale.signInMessage1,
-                  2 => _locale.signInMessage2,
-                  3 => _locale.signInMessage3,
-                  4 => _locale.signInMessage4,
-                  _ => _locale.signInMessage5,
-                }),
+            Text('sign_in_message', style: context.textTheme.titleLarge?.copyWith(color: context.theme.primaryColor))
+                .tr(args: [_random.toString()]),
             widget.child
           ]),
         )));

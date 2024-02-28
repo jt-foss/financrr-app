@@ -1,15 +1,14 @@
 import 'dart:io';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:financrr_frontend/data/host_repository.dart';
 import 'package:financrr_frontend/data/repositories.dart';
 import 'package:financrr_frontend/router.dart';
 import 'package:financrr_frontend/themes.dart';
-import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/input_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:restrr/restrr.dart';
@@ -19,14 +18,21 @@ import 'package:url_strategy/url_strategy.dart';
 import 'data/theme_repository.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  setPathUrlStrategy();
   SharedPreferences.setPrefix('financrr.');
+  WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
+  setPathUrlStrategy();
   final SharedPreferences preferences = await SharedPreferences.getInstance();
   const FlutterSecureStorage storage = FlutterSecureStorage();
   await Repositories.init(storage, preferences);
   final EffectiveThemePreferences themePreferences = await ThemeService.getOrInsertEffective();
-  runApp(FinancrrApp(themePreferences: themePreferences));
+  runApp(
+    EasyLocalization(
+        supportedLocales: const [Locale('en', 'US'), Locale('de', 'DE')],
+        path: 'assets/l10n',
+        fallbackLocale: const Locale('en', 'US'),
+        child: FinancrrApp(themePreferences: themePreferences))
+  );
 }
 
 class FinancrrApp extends StatefulWidget {
@@ -78,11 +84,12 @@ class FinancrrAppState extends State<FinancrrApp> {
     return ChangeNotifierProvider(
       create: (_) => AuthenticationNotifier(),
       child: MaterialApp.router(
-          onGenerateTitle: (ctx) => ctx.locale.brandName,
+          onGenerateTitle: (ctx) => 'brand_name'.tr(),
           routerConfig: AppRouter.goRouter,
           debugShowCheckedModeBanner: false,
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
+          localizationsDelegates: context.localizationDelegates,
+          supportedLocales: context.supportedLocales,
+          locale: context.locale,
           theme: _activeLightTheme.themeData,
           darkTheme: _activeDarkTheme.themeData,
           themeMode: _themeMode),

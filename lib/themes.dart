@@ -1,10 +1,10 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AppTheme {
   final int id;
   final String logoPath;
-  final String Function(AppLocalizations) nameFunction;
+  final String name;
   final Color previewColor;
   final ThemeMode themeMode;
   final ThemeData themeData;
@@ -12,7 +12,7 @@ class AppTheme {
   const AppTheme(
       {required this.id,
       required this.logoPath,
-      required this.nameFunction,
+      required this.name,
       required this.previewColor,
       required this.themeMode,
       required this.themeData});
@@ -28,7 +28,7 @@ class AppThemes {
     return AppTheme(
         id: 1,
         logoPath: 'assets/logo/logo_light.svg',
-        nameFunction: (_) => 'Light',
+        name: 'theme.light'.tr(),
         previewColor: Colors.white,
         themeMode: ThemeMode.light,
         themeData: _buildThemeData(Brightness.light, const Color(0xFF2C03E6), const Color(0xFFFFFFFF)));
@@ -38,7 +38,7 @@ class AppThemes {
     return AppTheme(
         id: 2,
         logoPath: 'assets/logo/logo_light.svg',
-        nameFunction: (_) => 'Dark',
+        name: 'theme.dark'.tr(),
         previewColor: const Color(0xFF2B2D31),
         themeMode: ThemeMode.dark,
         themeData: _buildThemeData(Brightness.dark,
