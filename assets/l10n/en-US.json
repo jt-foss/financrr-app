@@ -8,5 +8,13 @@
     "common_username_required": "Please provide a username",
     "settings_currency_subtitle": "Manage (custom) currencies",
     "common_password_required": "Please provide a password",
-    "settings_currency_title": "Currency"
+    "settings_currency_title": "Currency",
+    "settings_logout_title": "Logout",
+    "settings_theme_title": "Theme",
+    "settings_language_title": "Language",
+    "settings_logout_subtitle": "Log out of your account",
+    "settings_account_subtitle": "Display Name, E-Mail, Password",
+    "settings_theme_subtitle": "Toggle between light and dark mode",
+    "settings_language_subtitle": "Change the app's language",
+    "common_login": "Log In"
 }
