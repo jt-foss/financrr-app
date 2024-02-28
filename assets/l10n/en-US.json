@@ -1,10 +1,12 @@
 {
     "common_username": "Username",
-    "common_username_not_empty": "Username may not be empty",
-    "common_password_not_empty": "Password may not be empty",
     "theme_dark": "Dark",
     "theme_light": "Light",
     "theme_midnight": "Midnight",
     "brand_name": "financrr",
-    "common_password": "Password"
+    "common_password": "Password",
+    "common_username_required": "Please provide a username",
+    "settings_currency_subtitle": "Manage (custom) currencies",
+    "common_password_required": "Please provide a password",
+    "settings_currency_title": "Currency"
 }

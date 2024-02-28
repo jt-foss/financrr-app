@@ -1,7 +1,5 @@
 {
     "common_username": "Nutzername",
-    "common_username_not_empty": "Der Nutzername sollte nicht leer sein",
-    "common_password_not_empty": "Das Passwort sollte nicht leer sein",
     "theme_dark": "Dunkel",
     "theme_light": "Hell",
     "theme_midnight": "Mitternacht",
