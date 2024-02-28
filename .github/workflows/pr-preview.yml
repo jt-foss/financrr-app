@@ -7,6 +7,10 @@ on:
       - reopened
       - synchronize
       - closed
+    paths:
+      - './lib'
+      - '**.dart'
+
 jobs:
   deploy-preview:
     runs-on: ubuntu-latest
