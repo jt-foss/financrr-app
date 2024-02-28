@@ -28,7 +28,7 @@ class AppThemes {
     return AppTheme(
         id: 1,
         logoPath: 'assets/logo/logo_light.svg',
-        name: 'theme.light'.tr(),
+        name: 'theme_light'.tr(),
         previewColor: Colors.white,
         themeMode: ThemeMode.light,
         themeData: _buildThemeData(Brightness.light, const Color(0xFF2C03E6), const Color(0xFFFFFFFF)));
@@ -38,7 +38,7 @@ class AppThemes {
     return AppTheme(
         id: 2,
         logoPath: 'assets/logo/logo_light.svg',
-        name: 'theme.dark'.tr(),
+        name: 'theme_dark'.tr(),
         previewColor: const Color(0xFF2B2D31),
         themeMode: ThemeMode.dark,
         themeData: _buildThemeData(Brightness.dark,

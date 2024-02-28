@@ -60,8 +60,8 @@ class AuthPageTemplateState extends State<AuthPageTemplate> {
               child: SvgPicture.asset(context.appTheme.logoPath,
                   width: 100, colorFilter: ColorFilter.mode(context.theme.primaryColor, BlendMode.srcIn)),
             ),
-            Text('sign_in_message', style: context.textTheme.titleLarge?.copyWith(color: context.theme.primaryColor))
-                .tr(args: [_random.toString()]),
+            Text('sign_in_message_$_random', style: context.textTheme.titleLarge?.copyWith(color: context.theme.primaryColor))
+                .tr(),
             widget.child
           ]),
         )));
