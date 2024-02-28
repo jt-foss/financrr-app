@@ -13,6 +13,7 @@ class UserService extends ApiService {
         },
         mapper: (json) => api.entityBuilder.buildUser(json),
         errorMap: {
+          404: RestrrError.invalidCredentials,
           401: RestrrError.invalidCredentials,
         });
   }

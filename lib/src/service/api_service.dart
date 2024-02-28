@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
+import 'package:logging/logging.dart';
 import 'package:restrr/restrr.dart';
 
 import '../requests/route.dart';
@@ -119,13 +122,14 @@ abstract class ApiService {
       dynamic body,
       String contentType = 'application/json'}) async {
     return RequestHandler.request(
-        route: route,
-        routeOptions: api.routeOptions,
-        isWeb: api.options.isWeb,
-        mapper: mapper,
-        errorMap: errorMap,
-        body: body,
-        contentType: contentType);
+            route: route,
+            routeOptions: api.routeOptions,
+            isWeb: api.options.isWeb,
+            mapper: mapper,
+            errorMap: errorMap,
+            body: body,
+            contentType: contentType)
+        .then((response) => _fireEvent(route, response));
   }
 
   Future<RestResponse<bool>> noResponseRequest<T>(
@@ -134,12 +138,13 @@ abstract class ApiService {
       Map<int, RestrrError> errorMap = const {},
       String contentType = 'application/json'}) async {
     return RequestHandler.noResponseRequest(
-        route: route,
-        routeOptions: api.routeOptions,
-        isWeb: api.options.isWeb,
-        body: body,
-        errorMap: errorMap,
-        contentType: contentType);
+            route: route,
+            routeOptions: api.routeOptions,
+            isWeb: api.options.isWeb,
+            body: body,
+            errorMap: errorMap,
+            contentType: contentType)
+        .then((response) => _fireEvent(route, response));
   }
 
   Future<RestResponse<List<T>>> multiRequest<T>(
@@ -150,13 +155,26 @@ abstract class ApiService {
       dynamic body,
       String contentType = 'application/json'}) async {
     return RequestHandler.multiRequest(
-        route: route,
-        routeOptions: api.routeOptions,
-        isWeb: api.options.isWeb,
-        mapper: mapper,
-        errorMap: errorMap,
-        fullRequest: fullRequest,
-        body: body,
-        contentType: contentType);
+            route: route,
+            routeOptions: api.routeOptions,
+            isWeb: api.options.isWeb,
+            mapper: mapper,
+            errorMap: errorMap,
+            fullRequest: fullRequest,
+            body: body,
+            contentType: contentType)
+        .then((response) => _fireEvent(route, response));
+  }
+
+  Future<RestResponse<T>> _fireEvent<T>(CompiledRoute route, RestResponse<T> response) async {
+    if (!api.options.disableLogging) {
+      Restrr.log.log(
+          response.statusCode != null && response.statusCode! >= 400 ? Level.WARNING : Level.INFO,
+          '[${DateTime.now().toIso8601String()}] ${route.baseRoute.method} '
+          '${api.routeOptions.hostUri}${route.baseRoute.isVersioned ? '/api/v${api.routeOptions.apiVersion}' : ''}'
+          '${route.compiledRoute} => ${response.statusCode} (${response.hasData ? 'OK' : response.error?.name})');
+    }
+    api.eventHandler.fire(RequestEvent(api: api, route: route.compiledRoute, statusCode: response.statusCode));
+    return response;
   }
 }

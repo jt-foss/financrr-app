@@ -1,3 +1,9 @@
+## 0.6
+- Added `RestrrBuilder#on` & `Restrr#on`
+- Added `ReadyEvent` & `RequestEvent`
+- Added `RestrrOptions#disableLogging`
+- Further improved Logging
+
 ## 0.5
 - Added `Currency`
 - Added `Restrr#retrieveAllCurrencies`
