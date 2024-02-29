@@ -35,7 +35,7 @@ jobs:
           flutter pub upgrade
 
       - name: Build Web
-        run: flutter build web --release --base-href /frontend/pr-preview/pr-${{ github.event.number }}/
+        run: flutter build web --release --base-href /pr-preview/pr-${{ github.event.number }}/
         if: github.event.action != 'closed'
 
       - uses: rossjrw/pr-preview-action@v1
