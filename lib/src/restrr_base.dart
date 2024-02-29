@@ -41,8 +41,8 @@ class RestrrBuilder {
 
   RestrrBuilder.savedSession({required this.uri}) : initType = RestrrInitType.savedSession;
 
-  RestrrBuilder on<T extends RestrrEvent>(void Function(T) func) {
-    _eventMap[T.runtimeType] = func;
+  RestrrBuilder on<T extends RestrrEvent>(Type type, void Function(T) func) {
+    _eventMap[type] = func;
     return this;
   }
 
@@ -115,7 +115,7 @@ abstract class Restrr {
         routeOptions: RouteOptions(hostUri: uri));
   }
 
-  void on<T extends RestrrEvent>(void Function(T) func);
+  void on<T extends RestrrEvent>(Type type, void Function(T) func);
 
   /// Retrieves the currently authenticated user.
   Future<User?> retrieveSelf({bool forceRetrieve = false});
@@ -166,7 +166,7 @@ class RestrrImpl implements Restrr {
   late final User selfUser;
 
   @override
-  void on<T extends RestrrEvent>(void Function(T) func) => eventHandler.on(func);
+  void on<T extends RestrrEvent>(Type type, void Function(T) func) => eventHandler.on(type, func);
 
   @override
   Future<User?> retrieveSelf({bool forceRetrieve = false}) async {

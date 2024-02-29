@@ -1,3 +1,6 @@
+## 0.6.2
+- Fixed `Restrr#on` (and similar methods)
+
 ## 0.6.1
 - Fixed `RestrrEventHandler#fire`
 

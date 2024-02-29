@@ -1,6 +1,6 @@
 name: restrr
 description: Dart package which allows to communicate with the financrr REST API.
-version: 0.6.1
+version: 0.6.2
 repository: https://github.com/financrr/restrr
 
 environment:

@@ -5,11 +5,13 @@ class RestrrEventHandler {
 
   const RestrrEventHandler(this.eventMap);
 
-  void on<T extends RestrrEvent>(Function(T) callback) {
-    eventMap[T.runtimeType] = callback;
+  void on<T extends RestrrEvent>(Type type, Function(T) callback) {
+    eventMap[type] = callback;
   }
 
   void fire<T extends RestrrEvent>(T event) {
+    print(eventMap);
+    print(event.runtimeType);
     eventMap[event.runtimeType]?.call(event);
   }
 }
