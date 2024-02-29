@@ -10,6 +10,6 @@ class RestrrEventHandler {
   }
 
   void fire<T extends RestrrEvent>(T event) {
-    eventMap[T.runtimeType]?.call(event);
+    eventMap[event.runtimeType]?.call(event);
   }
 }

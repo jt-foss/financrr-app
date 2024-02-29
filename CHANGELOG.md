@@ -1,3 +1,6 @@
+## 0.6.1
+- Fixed `RestrrEventHandler#fire`
+
 ## 0.6
 - Added `RestrrBuilder#on` & `Restrr#on`
 - Added `ReadyEvent` & `RequestEvent`
