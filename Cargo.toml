@@ -43,7 +43,7 @@ sea-orm = { version = "1.0.0-rc.1", features = ["sqlx-postgres", "runtime-tokio-
 time = { version = "0.3.34", features = ["serde-human-readable", "local-offset"] }
 
 # Logging
-log = "0.4.20"
+log = "0.4.21"
 
 # Config for 'cargo dist'
 [workspace.metadata.dist]
