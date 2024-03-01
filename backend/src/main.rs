@@ -128,7 +128,7 @@ async fn main() -> Result<()> {
         App::new()
             .wrap(Logger::default())
             .wrap(Compress::default())
-            .wrap(Cors::permissive())
+            .wrap(build_cors())
             .wrap(IdentityMiddleware::builder().logout_behaviour(LogoutBehaviour::PurgeSession).build())
             .wrap(
                 SessionMiddleware::builder(store.clone(), get_secret_key())
@@ -162,6 +162,29 @@ fn handle_validation_error(err: Error) -> actix_web::Error {
         },
     };
     error::InternalError::from_response(err, HttpResponse::BadRequest().json(json_error)).into()
+}
+
+fn build_cors() -> Cors {
+    let cors_config = &Config::get_config().cors;
+    let mut cors = Cors::default()
+        .allowed_methods(vec!["GET", "POST", "PATCH", "DELETE"])
+        .allowed_headers(vec!["Authorization", "Content-Type", "Accept"])
+        .max_age(3600);
+
+    if cors_config.allow_any_origin {
+        cors = cors.allow_any_origin();
+    } else {
+        cors = cors.allowed_origin_fn(move |origin, _req_head| {
+            cors_config.allowed_origins.iter().any(|allowed_origin| {
+                if allowed_origin == "*" {
+                    return true;
+                }
+                origin == allowed_origin
+            })
+        });
+    }
+
+    cors
 }
 
 fn configure_api(cfg: &mut web::ServiceConfig) {

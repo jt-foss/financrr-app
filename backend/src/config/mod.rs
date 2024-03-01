@@ -13,6 +13,7 @@ pub struct Config {
     pub session_secret: String,
     pub database: DatabaseConfig,
     pub cache: RedisConfig,
+    pub cors: CorsConfig,
 }
 
 #[derive(Debug)]
@@ -35,6 +36,12 @@ pub struct RedisConfig {
     pub port: u16,
 }
 
+#[derive(Debug)]
+pub struct CorsConfig {
+    pub allowed_origins: Vec<String>,
+    pub allow_any_origin: bool,
+}
+
 impl Config {
     pub fn get_database_url(&self) -> String {
         format!(
@@ -49,6 +56,7 @@ impl Config {
             session_secret: get_env_or_error("SESSION_SECRET"),
             database: DatabaseConfig::build_config(),
             cache: RedisConfig::build_config(),
+            cors: CorsConfig::build_config(),
         }
     }
 
@@ -94,6 +102,18 @@ impl RedisConfig {
 
     pub fn get_url(&self) -> String {
         format!("redis://{}:{}", self.host, self.port)
+    }
+}
+
+impl CorsConfig {
+    pub fn build_config() -> Self {
+        let allowed_origins =
+            get_env_or_default("CORS_ALLOWED_ORIGINS", "").split(',').map(|s| s.to_string()).collect();
+
+        Self {
+            allowed_origins,
+            allow_any_origin: get_env_or_default("CORS_ALLOW_ANY_ORIGIN", "false").parse::<bool>().unwrap_or(false),
+        }
     }
 }
 
