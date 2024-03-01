@@ -6,24 +6,24 @@ use actix_cors::Cors;
 use actix_identity::config::LogoutBehaviour;
 use actix_identity::IdentityMiddleware;
 use actix_limitation::{Limiter, RateLimiter};
-use actix_session::{SessionExt, SessionMiddleware};
 use actix_session::config::CookieContentSecurity;
 use actix_session::storage::RedisSessionStore;
-use actix_web::{
-    App,
-    error,
-    HttpResponse,
-    HttpServer, middleware::Logger, web::{self},
-};
+use actix_session::{SessionExt, SessionMiddleware};
 use actix_web::cookie::{Key, SameSite};
 use actix_web::middleware::{Compress, DefaultHeaders, NormalizePath, TrailingSlash};
 use actix_web::web::Data;
+use actix_web::{
+    error,
+    middleware::Logger,
+    web::{self},
+    App, HttpResponse, HttpServer,
+};
 use actix_web_validator::{Error, JsonConfig};
 use dotenvy::dotenv;
 use sea_orm::DatabaseConnection;
 use tracing::info;
-use utoipa::{Modify, openapi, OpenApi};
 use utoipa::openapi::Components;
+use utoipa::{openapi, Modify, OpenApi};
 use utoipa_swagger_ui::SwaggerUi;
 use utoipauto::utoipauto;
 
@@ -37,7 +37,7 @@ use crate::api::currency::controller::currency_controller;
 use crate::api::status::controller::status_controller;
 use crate::api::transaction::controller::transaction_controller;
 use crate::api::user::controller::user_controller;
-use crate::config::{Config, logger};
+use crate::config::{logger, Config};
 use crate::database::connection::{establish_database_connection, get_database_connection};
 use crate::util::identity::IDENTITY_ID_SESSION_KEY;
 use crate::util::validation::ValidationErrorJsonPayload;
