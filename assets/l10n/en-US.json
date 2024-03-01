@@ -16,5 +16,10 @@
     "settings_account_subtitle": "Display Name, E-Mail, Password",
     "settings_theme_subtitle": "Toggle between light and dark mode",
     "settings_language_subtitle": "Change the app's language",
-    "common_login": "Log In"
+    "common_login": "Log In",
+    "sign_in_message_1": "Good to see you!",
+    "sign_in_message_2": "Welcome back!",
+    "sign_in_message_3": "Nice to see you!",
+    "sign_in_message_4": "Oh, look who's there!",
+    "sign_in_message_5": "I think I've seen this one before"
 }
