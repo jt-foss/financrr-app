@@ -1,6 +1,6 @@
+use actix_web::{FromRequest, HttpRequest};
 use actix_web::dev::Payload;
 use actix_web::web::Json;
-use actix_web::{FromRequest, HttpRequest};
 use futures_util::future::LocalBoxFuture;
 use sea_orm::ActiveValue::Set;
 use sea_orm::EntityTrait;
