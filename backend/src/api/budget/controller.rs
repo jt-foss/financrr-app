@@ -1,8 +1,9 @@
 use actix_web::web::Path;
-use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
+use actix_web::{delete, get, patch, post, web, HttpResponse};
 use actix_web_validator::Json;
 
 use crate::api::error::api::ApiError;
+use crate::api::ApiResponse;
 use crate::util::utoipa::{InternalServerError, ResourceNotFound, Unauthorized, ValidationError};
 use crate::wrapper::budget::dto::BudgetDTO;
 use crate::wrapper::budget::Budget;
@@ -27,7 +28,7 @@ path = "/api/v1/budget/{budget_id}",
 tag = "Budget"
 )]
 #[get("/{budget_id}")]
-pub async fn get_one(user: Phantom<User>, budget_id: Path<i32>) -> Result<impl Responder, ApiError> {
+pub async fn get_one(user: Phantom<User>, budget_id: Path<i32>) -> ApiResponse {
     let budget = Budget::from_id(budget_id.into_inner()).await?;
     if !budget.has_access(user.get_id()).await? {
         return Err(ApiError::resource_not_found("Budget"));
@@ -46,7 +47,7 @@ path = "/api/v1/budget",
 tag = "Budget"
 )]
 #[get("")]
-pub async fn get_all(user: Phantom<User>) -> Result<impl Responder, ApiError> {
+pub async fn get_all(user: Phantom<User>) -> ApiResponse {
     let budgets = Budget::find_all(user.get_id()).await?;
 
     Ok(HttpResponse::Ok().json(budgets))
@@ -63,7 +64,7 @@ path = "/api/v1/budget",
 tag = "Budget"
 )]
 #[post("")]
-pub async fn create(user: Phantom<User>, budget: Json<BudgetDTO>) -> Result<impl Responder, ApiError> {
+pub async fn create(user: Phantom<User>, budget: Json<BudgetDTO>) -> ApiResponse {
     let budget = Budget::new(user.get_id(), budget.into_inner()).await?;
 
     Ok(HttpResponse::Ok().json(budget))
@@ -80,14 +81,14 @@ path = "/api/v1/budget/{budget_id}",
 tag = "Budget"
 )]
 #[delete("/{budget_id}")]
-pub async fn delete(user: Phantom<User>, budget_id: Path<i32>) -> Result<impl Responder, ApiError> {
+pub async fn delete(user: Phantom<User>, budget_id: Path<i32>) -> ApiResponse {
     let budget = Budget::from_id(budget_id.into_inner()).await?;
     if !budget.can_delete(user.get_id()).await? {
         return Err(ApiError::resource_not_found("Budget"));
     }
     budget.delete().await?;
 
-    Ok(HttpResponse::NoContent())
+    Ok(HttpResponse::NoContent().finish())
 }
 
 #[utoipa::path(patch,
@@ -102,11 +103,7 @@ path = "/api/v1/budget/{budget_id}",
 tag = "Budget"
 )]
 #[patch("/{budget_id}")]
-pub async fn update(
-    user: Phantom<User>,
-    budget_id: Path<i32>,
-    budget_dto: Json<BudgetDTO>,
-) -> Result<impl Responder, ApiError> {
+pub async fn update(user: Phantom<User>, budget_id: Path<i32>, budget_dto: Json<BudgetDTO>) -> ApiResponse {
     let budget = Budget::from_id(budget_id.into_inner()).await?;
     if !budget.has_access(user.get_id()).await? {
         return Err(ApiError::resource_not_found("Budget"));

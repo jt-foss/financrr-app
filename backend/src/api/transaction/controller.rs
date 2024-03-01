@@ -1,7 +1,8 @@
 use actix_web::web::Path;
-use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
+use actix_web::{delete, get, patch, post, web, HttpResponse};
 
 use crate::api::error::api::ApiError;
+use crate::api::ApiResponse;
 use crate::util::utoipa::{InternalServerError, Unauthorized};
 use crate::wrapper::permission::Permission;
 use crate::wrapper::transaction::dto::TransactionDTO;
@@ -24,7 +25,7 @@ responses(
 path = "/api/v1/transaction/{transaction_id}",
 tag = "Transaction")]
 #[get("/{transaction_id}")]
-pub async fn get_one(user: Phantom<User>, transaction_id: Path<i32>) -> Result<impl Responder, ApiError> {
+pub async fn get_one(user: Phantom<User>, transaction_id: Path<i32>) -> ApiResponse {
     let transaction_id = transaction_id.into_inner();
     let transaction = Transaction::find_by_id(transaction_id).await?;
 
@@ -44,7 +45,7 @@ responses(
 path = "/api/v1/transaction",
 tag = "Transaction")]
 #[get("")]
-pub async fn get_all(user: Phantom<User>) -> Result<impl Responder, ApiError> {
+pub async fn get_all(user: Phantom<User>) -> ApiResponse {
     let transactions = Transaction::find_all_by_user(user.get_id()).await?;
 
     Ok(HttpResponse::Ok().json(transactions))
@@ -60,7 +61,7 @@ path = "/api/v1/transaction",
 request_body = TransactionDTO,
 tag = "Transaction")]
 #[post("")]
-pub async fn create(user: Phantom<User>, transaction: TransactionDTO) -> Result<impl Responder, ApiError> {
+pub async fn create(user: Phantom<User>, transaction: TransactionDTO) -> ApiResponse {
     // TODO add permission checks for budget
     if !transaction.check_account_access(user.get_id()).await? {
         return Err(ApiError::unauthorized());
@@ -78,7 +79,7 @@ responses(
 path = "/api/v1/transaction/{transaction_id}",
 tag = "Transaction")]
 #[delete("/{transaction_id}")]
-pub async fn delete(user: Phantom<User>, transaction_id: Path<i32>) -> Result<impl Responder, ApiError> {
+pub async fn delete(user: Phantom<User>, transaction_id: Path<i32>) -> ApiResponse {
     let transaction_id = transaction_id.into_inner();
     let transaction = Transaction::find_by_id(transaction_id).await?;
 
@@ -91,7 +92,7 @@ pub async fn delete(user: Phantom<User>, transaction_id: Path<i32>) -> Result<im
 
     transaction.delete().await?;
 
-    Ok(HttpResponse::NoContent())
+    Ok(HttpResponse::NoContent().finish())
 }
 
 #[utoipa::path(patch,
@@ -104,11 +105,7 @@ path = "/api/v1/transaction/{transaction_id}",
 request_body = TransactionDTO,
 tag = "Transaction")]
 #[patch("/{transaction_id}")]
-pub async fn update(
-    user: Phantom<User>,
-    transaction_dto: TransactionDTO,
-    transaction_id: Path<i32>,
-) -> Result<impl Responder, ApiError> {
+pub async fn update(user: Phantom<User>, transaction_dto: TransactionDTO, transaction_id: Path<i32>) -> ApiResponse {
     let transaction = Transaction::find_by_id(transaction_id.into_inner()).await?;
     if !transaction.has_access(user.get_id()).await? {
         return Err(ApiError::resource_not_found("Transaction"));

@@ -1,5 +1,6 @@
-use fmt::Subscriber;
 use std::io::stdout;
+
+use fmt::Subscriber;
 use time::{format_description, UtcOffset};
 use tracing::{subscriber, Level};
 use tracing_appender::non_blocking::{NonBlockingBuilder, WorkerGuard};
