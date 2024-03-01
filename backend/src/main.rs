@@ -27,16 +27,16 @@ use utoipa::{openapi, Modify, OpenApi};
 use utoipa_swagger_ui::SwaggerUi;
 use utoipauto::utoipauto;
 
+use crate::api::routes::account::controller::account_controller;
+use crate::api::routes::budget::controller::budget_controller;
+use crate::api::routes::currency::controller::currency_controller;
+use crate::api::routes::transaction::controller::transaction_controller;
+use crate::api::routes::user::controller::user_controller;
 use entity::utility::loading::load_schema;
 use migration::Migrator;
 use migration::MigratorTrait;
 
-use crate::api::account::controller::account_controller;
-use crate::api::budget::controller::budget_controller;
-use crate::api::currency::controller::currency_controller;
 use crate::api::status::controller::status_controller;
-use crate::api::transaction::controller::transaction_controller;
-use crate::api::user::controller::user_controller;
 use crate::config::{logger, Config};
 use crate::database::connection::{establish_database_connection, get_database_connection};
 use crate::util::identity::IDENTITY_ID_SESSION_KEY;
