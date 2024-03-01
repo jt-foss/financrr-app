@@ -38,7 +38,7 @@ pub async fn get_one(user: Phantom<User>, budget_id: Path<i32>) -> Result<impl R
 
 #[utoipa::path(get,
 responses(
-(status = 200, description = "Successfully retrieved the Budgets.", content_type = "application/json", body = Vec<Budget>),
+(status = 200, description = "Successfully retrieved the Budgets.", content_type = "application/json", body = Vec < Budget >),
 (status = 401, response = Unauthorized),
 (status = 500, response = InternalServerError)
 ),

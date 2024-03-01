@@ -1,7 +1,7 @@
 use actix_web::web::Path;
 use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
 use actix_web_validator::Json;
-use log::info;
+use tracing::info;
 
 use crate::api::error::api::ApiError;
 use crate::util::utoipa::{InternalServerError, ResourceNotFound, Unauthorized};

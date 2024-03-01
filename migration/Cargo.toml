@@ -23,7 +23,7 @@ entity = { path = "../entity" }
 # Sea-orm
 sea-orm.workspace = true
 sea-orm-migration = "1.0.0-rc.1"
-log.workspace = true
+tracing.workspace = true
 
 # Date/Time
 time.workspace = true

@@ -1,9 +1,9 @@
 use std::default::Default;
 
-use log::info;
 use sea_orm::ActiveModelTrait;
 use sea_orm::ActiveValue::Set;
 use sea_orm_migration::prelude::*;
+use tracing::info;
 
 use entity::currency;
 use entity::currency::ActiveModel as Currency;

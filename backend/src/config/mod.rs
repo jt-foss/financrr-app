@@ -1,9 +1,11 @@
 use std::env;
 use std::str::FromStr;
 
-use log::LevelFilter;
+use tracing::log::LevelFilter;
 
 use crate::CONFIG;
+
+pub mod logger;
 
 #[derive(Debug)]
 pub struct Config {

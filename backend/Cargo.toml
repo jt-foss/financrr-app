@@ -46,8 +46,9 @@ utoipa-swagger-ui = { version = "6.0.0", features = ["actix-web", "debug-embed"]
 utoipauto = "0.1.9"
 
 # Logging
-log.workspace = true
-simple_logger = "4.3.3"
+tracing.workspace = true
+tracing-subscriber = {version = "0.3.18", features = ["time", "fmt"]  }
+tracing-appender = "0.2.3"
 
 # Date/Time
 time.workspace = true

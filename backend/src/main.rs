@@ -8,20 +8,17 @@ use actix_session::config::CookieContentSecurity;
 use actix_session::storage::RedisSessionStore;
 use actix_session::SessionMiddleware;
 use actix_web::cookie::{Key, SameSite};
-use actix_web::middleware::{Compress, NormalizePath};
+use actix_web::middleware::{Compress, NormalizePath, TrailingSlash};
 use actix_web::{
-    error, middleware,
+    error,
     middleware::Logger,
     web::{self},
     App, HttpResponse, HttpServer,
 };
 use actix_web_validator::{Error, JsonConfig};
 use dotenvy::dotenv;
-use log::{info, LevelFilter};
-use middleware::TrailingSlash;
 use sea_orm::DatabaseConnection;
-use simple_logger::SimpleLogger;
-use time::macros::format_description;
+use tracing::info;
 use utoipa::openapi::Components;
 use utoipa::{openapi, Modify, OpenApi};
 use utoipa_swagger_ui::SwaggerUi;
@@ -37,7 +34,7 @@ use crate::api::currency::controller::currency_controller;
 use crate::api::status::controller::status_controller;
 use crate::api::transaction::controller::transaction_controller;
 use crate::api::user::controller::user_controller;
-use crate::config::Config;
+use crate::config::{logger, Config};
 use crate::database::connection::{establish_database_connection, get_database_connection};
 use crate::util::validation::ValidationErrorJsonPayload;
 
@@ -86,7 +83,7 @@ impl Modify for SecurityAddon {
 #[actix_web::main]
 async fn main() -> Result<()> {
     dotenv().ok();
-    configure_logger();
+    let _guard = logger::configure(); // We need to keep the guard alive to keep the logger running.
 
     info!("Starting up...");
     CONFIG.set(Config::load()).expect("Could not load config!");
@@ -131,15 +128,6 @@ async fn main() -> Result<()> {
     .bind(&Config::get_config().address)?
     .run()
     .await
-}
-
-fn configure_logger() {
-    SimpleLogger::new()
-        .env()
-        .with_level(LevelFilter::Info)
-        .with_timestamp_format(format_description!("[year]-[month]-[day] [hour]:[minute]:[second]"))
-        .init()
-        .unwrap();
 }
 
 fn get_secret_key() -> Key {

@@ -3,9 +3,9 @@ use actix_web::http::header::ContentType;
 use actix_web::http::StatusCode;
 use actix_web::HttpResponse;
 use derive_more::{Display, Error};
-use log::error;
 use sea_orm::DbErr;
 use serde::{Serialize, Serializer};
+use tracing::error;
 use utoipa::ToSchema;
 use validator::ValidationError;
 
