@@ -1,26 +1,29 @@
 use std::io::Result;
 use std::sync::OnceLock;
+use std::time::Duration;
 
 use actix_cors::Cors;
 use actix_identity::config::LogoutBehaviour;
 use actix_identity::IdentityMiddleware;
+use actix_limitation::{Limiter, RateLimiter};
+use actix_session::{SessionExt, SessionMiddleware};
 use actix_session::config::CookieContentSecurity;
 use actix_session::storage::RedisSessionStore;
-use actix_session::SessionMiddleware;
+use actix_web::{
+    App,
+    error,
+    HttpResponse,
+    HttpServer, middleware::Logger, web::{self},
+};
 use actix_web::cookie::{Key, SameSite};
 use actix_web::middleware::{Compress, DefaultHeaders, NormalizePath, TrailingSlash};
-use actix_web::{
-    error,
-    middleware::Logger,
-    web::{self},
-    App, HttpResponse, HttpServer,
-};
+use actix_web::web::Data;
 use actix_web_validator::{Error, JsonConfig};
 use dotenvy::dotenv;
 use sea_orm::DatabaseConnection;
 use tracing::info;
+use utoipa::{Modify, openapi, OpenApi};
 use utoipa::openapi::Components;
-use utoipa::{openapi, Modify, OpenApi};
 use utoipa_swagger_ui::SwaggerUi;
 use utoipauto::utoipauto;
 
@@ -34,8 +37,9 @@ use crate::api::currency::controller::currency_controller;
 use crate::api::status::controller::status_controller;
 use crate::api::transaction::controller::transaction_controller;
 use crate::api::user::controller::user_controller;
-use crate::config::{logger, Config};
+use crate::config::{Config, logger};
 use crate::database::connection::{establish_database_connection, get_database_connection};
+use crate::util::identity::IDENTITY_ID_SESSION_KEY;
 use crate::util::validation::ValidationErrorJsonPayload;
 
 pub mod api;
@@ -104,6 +108,20 @@ async fn main() -> Result<()> {
     // Make instance variable of ApiDoc so all worker threads gets the same instance.
     let openapi = ApiDoc::openapi();
 
+    info!("Initializing rate limiter...");
+    let limiter = Data::new(
+        Limiter::builder(Config::get_config().cache.get_url())
+            .key_by(|req| {
+                req.get_session()
+                    .get(IDENTITY_ID_SESSION_KEY)
+                    .unwrap_or_else(|_| req.cookie("rate-api-id").map(|c| c.to_string()))
+            })
+            .limit(5000)
+            .period(Duration::from_secs(3600)) // 60 minutes
+            .build()
+            .unwrap(),
+    );
+
     info!("Starting server... Listening on: {}", Config::get_config().address);
 
     HttpServer::new(move || {
@@ -122,6 +140,7 @@ async fn main() -> Result<()> {
                     .build(),
             )
             .app_data(JsonConfig::default().error_handler(|err, _| handle_validation_error(err)))
+            .app_data(limiter.clone())
             .configure(configure_api)
             .service(SwaggerUi::new("/swagger-ui/{_:.*}").url("/api-docs/openapi.json", openapi.clone()))
     })
@@ -151,6 +170,7 @@ fn configure_api(cfg: &mut web::ServiceConfig) {
 
     cfg.service(
         web::scope("/api")
+            .wrap(RateLimiter::default())
             .wrap(default_headers)
             .wrap(NormalizePath::new(TrailingSlash::Trim))
             .configure(configure_api_v1)

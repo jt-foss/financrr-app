@@ -81,13 +81,29 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1478456bca71c7b04411da1afb0c506e16dec6863815207693b791247511027f"
 dependencies = [
  "actix-service",
- "actix-session",
+ "actix-session 0.9.0",
  "actix-utils",
  "actix-web",
  "derive_more 0.99.17",
  "futures-core",
  "serde",
  "tracing",
+]
+
+[[package]]
+name = "actix-limitation"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3bf9d4ce7fd50ab56efde47127bd5a2e5e27ae1dc3edbcb85be16672f477ff0a"
+dependencies = [
+ "actix-session 0.8.0",
+ "actix-utils",
+ "actix-web",
+ "chrono",
+ "derive_more 0.99.17",
+ "log",
+ "redis 0.23.3",
+ "time",
 ]
 
 [[package]]
@@ -153,6 +169,23 @@ dependencies = [
 
 [[package]]
 name = "actix-session"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2e6a28f813a6671e1847d005cad0be36ae4d016287690f765c303379837c13d6"
+dependencies = [
+ "actix-service",
+ "actix-utils",
+ "actix-web",
+ "anyhow",
+ "async-trait",
+ "derive_more 0.99.17",
+ "serde",
+ "serde_json",
+ "tracing",
+]
+
+[[package]]
+name = "actix-session"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b671404ec72194d8af58c2bdaf51e3c477a0595056bd5010148405870dda8df2"
@@ -163,7 +196,7 @@ dependencies = [
  "anyhow",
  "derive_more 0.99.17",
  "rand",
- "redis",
+ "redis 0.24.0",
  "serde",
  "serde_json",
  "tracing",
@@ -696,7 +729,8 @@ version = "0.1.0"
 dependencies = [
  "actix-cors",
  "actix-identity",
- "actix-session",
+ "actix-limitation",
+ "actix-session 0.9.0",
  "actix-web",
  "actix-web-validator",
  "derive_more 1.0.0-beta.6",
@@ -707,7 +741,7 @@ dependencies = [
  "itertools",
  "migration",
  "once_cell",
- "redis",
+ "redis 0.24.0",
  "regex",
  "sea-orm",
  "serde",
@@ -953,8 +987,10 @@ checksum = "5bc015644b92d5890fab7489e49d21f879d5c990186827d42ec511919404f38b"
 dependencies = [
  "android-tzdata",
  "iana-time-zone",
+ "js-sys",
  "num-traits",
  "serde",
+ "wasm-bindgen",
  "windows-targets 0.52.4",
 ]
 
@@ -2541,6 +2577,25 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ec0be4795e2f6a28069bec0b5ff3e2ac9bafc99e6a9a7dc3547996c5c816922c"
 dependencies = [
  "getrandom",
+]
+
+[[package]]
+name = "redis"
+version = "0.23.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4f49cdc0bb3f412bf8e7d1bd90fe1d9eb10bc5c399ba90973c14662a27b3f8ba"
+dependencies = [
+ "async-trait",
+ "bytes",
+ "combine",
+ "futures-util",
+ "itoa",
+ "percent-encoding",
+ "pin-project-lite",
+ "ryu",
+ "tokio",
+ "tokio-util",
+ "url",
 ]
 
 [[package]]
