@@ -8,7 +8,7 @@ use actix_session::config::CookieContentSecurity;
 use actix_session::storage::RedisSessionStore;
 use actix_session::SessionMiddleware;
 use actix_web::cookie::{Key, SameSite};
-use actix_web::middleware::{Compress, NormalizePath, TrailingSlash};
+use actix_web::middleware::{Compress, DefaultHeaders, NormalizePath, TrailingSlash};
 use actix_web::{
     error,
     middleware::Logger,
@@ -146,8 +146,12 @@ fn handle_validation_error(err: Error) -> actix_web::Error {
 }
 
 fn configure_api(cfg: &mut web::ServiceConfig) {
+    let default_headers =
+        DefaultHeaders::new().add(("Content-Type", "application/json")).add(("Accept", "application/json"));
+
     cfg.service(
         web::scope("/api")
+            .wrap(default_headers)
             .wrap(NormalizePath::new(TrailingSlash::Trim))
             .configure(configure_api_v1)
             .configure(status_controller),
