@@ -134,10 +134,7 @@ async fn main() -> Result<()> {
                     // allow the cookie only from the current domain
                     .cookie_same_site(SameSite::Strict)
                     .cookie_content_security(CookieContentSecurity::Signed)
-                    .session_lifecycle(
-                        PersistentSession::default()
-                            .session_ttl(time::Duration::days(7))
-                    )
+                    .session_lifecycle(PersistentSession::default().session_ttl(time::Duration::days(7)))
                     .build(),
             )
             .app_data(JsonConfig::default().error_handler(|err, _| handle_validation_error(err)))
