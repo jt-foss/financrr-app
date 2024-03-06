@@ -1,8 +1,7 @@
 use actix_web::web::Path;
-use actix_web::{delete, get, patch, post, web, HttpResponse};
+use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
 
 use crate::api::error::api::ApiError;
-use crate::api::ApiResponse;
 use crate::util::utoipa::{InternalServerError, ResourceNotFound, Unauthorized, ValidationError};
 use crate::wrapper::account::dto::AccountDTO;
 use crate::wrapper::account::Account;
@@ -26,7 +25,7 @@ responses(
 path = "/api/v1/account/{account_id}",
 tag = "Account")]
 #[get("/{account_id}")]
-pub async fn get_one(user: Phantom<User>, account_id: Path<i32>) -> ApiResponse {
+pub async fn get_one(user: Phantom<User>, account_id: Path<i32>) -> Result<impl Responder, ApiError> {
     let account = Account::find_by_id(account_id.into_inner()).await?;
     if !account.has_access(user.get_id()).await? {
         return Err(ApiError::resource_not_found("Account"));
@@ -43,7 +42,7 @@ responses(
 path = "/api/v1/account",
 tag = "Account")]
 #[get("")]
-pub async fn get_all(user: Phantom<User>) -> ApiResponse {
+pub async fn get_all(user: Phantom<User>) -> Result<impl Responder, ApiError> {
     Account::find_all_by_user(user.get_id()).await.map(|accounts| HttpResponse::Ok().json(accounts))
 }
 
@@ -59,7 +58,7 @@ path = "/api/v1/account",
 request_body = AccountDTO,
 tag = "Account")]
 #[post("")]
-pub async fn create(user: Phantom<User>, account: AccountDTO) -> ApiResponse {
+pub async fn create(user: Phantom<User>, account: AccountDTO) -> Result<impl Responder, ApiError> {
     Ok(HttpResponse::Ok().json(Account::new(account, user.get_id()).await?))
 }
 
@@ -73,7 +72,7 @@ responses(
 path = "/api/v1/account/{account_id}",
 tag = "Account")]
 #[delete("/{account_id}")]
-pub async fn delete(user: Phantom<User>, account_id: Path<i32>) -> ApiResponse {
+pub async fn delete(user: Phantom<User>, account_id: Path<i32>) -> Result<impl Responder, ApiError> {
     let account = Account::find_by_id(account_id.into_inner()).await?;
     if !account.has_access(user.get_id()).await? {
         return Err(ApiError::resource_not_found("Account"));
@@ -84,7 +83,7 @@ pub async fn delete(user: Phantom<User>, account_id: Path<i32>) -> ApiResponse {
 
     account.delete().await?;
 
-    Ok(HttpResponse::NoContent().finish())
+    Ok(HttpResponse::NoContent())
 }
 
 #[utoipa::path(patch,
@@ -99,7 +98,11 @@ path = "/api/v1/account/{account_id}",
 request_body = AccountDTO,
 tag = "Account")]
 #[patch("/{account_id}")]
-pub async fn update(user: Phantom<User>, updated_account: AccountDTO, account_id: Path<i32>) -> ApiResponse {
+pub async fn update(
+    user: Phantom<User>,
+    updated_account: AccountDTO,
+    account_id: Path<i32>,
+) -> Result<impl Responder, ApiError> {
     let account = Account::find_by_id(account_id.into_inner()).await?;
     if !account.has_access(user.get_id()).await? {
         return Err(ApiError::resource_not_found("Account"));

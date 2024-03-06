@@ -1,10 +1,7 @@
-use actix_web::HttpResponse;
-
-use crate::api::error::api::ApiError;
-
 pub mod error;
 pub mod pagination;
 pub mod routes;
 pub mod status;
 
-pub type ApiResponse = Result<HttpResponse, ApiError>;
+// Use this once impl Trait is stable (https://github.com/rust-lang/rust/issues/63063)
+//pub type ApiResponse = Result<impl Responder, ApiError>;

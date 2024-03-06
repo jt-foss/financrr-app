@@ -1,10 +1,9 @@
 use actix_web::web::Path;
-use actix_web::{delete, get, patch, post, web, HttpResponse};
+use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
 use actix_web_validator::Json;
 use tracing::info;
 
 use crate::api::error::api::ApiError;
-use crate::api::ApiResponse;
 use crate::util::utoipa::{InternalServerError, ResourceNotFound, Unauthorized};
 use crate::wrapper::currency::dto::CurrencyDTO;
 use crate::wrapper::currency::Currency;
@@ -27,7 +26,7 @@ responses(
 path = "/api/v1/currency",
 tag = "Currency")]
 #[get("")]
-pub async fn get_all(user: Option<Phantom<User>>) -> ApiResponse {
+pub async fn get_all(user: Option<Phantom<User>>) -> Result<impl Responder, ApiError> {
     let mut currencies = Currency::find_all_with_no_user().await?;
     let mut user_currencies: Vec<Currency> = vec![];
     if let Some(user) = user {
@@ -48,7 +47,7 @@ responses(
 path = "/api/v1/currency/{currency_id}",
 tag = "Currency")]
 #[get("/{currency_id}")]
-pub async fn get_one(user: Option<Phantom<User>>, currency_id: Path<i32>) -> ApiResponse {
+pub async fn get_one(user: Option<Phantom<User>>, currency_id: Path<i32>) -> Result<impl Responder, ApiError> {
     let currency_id = currency_id.into_inner();
     let user_id = user.map_or(-1, |user| user.get_id());
 
@@ -65,7 +64,7 @@ path = "/api/v1/currency",
 request_body = CurrencyDTO,
 tag = "Currency")]
 #[post("")]
-pub async fn create(user: Phantom<User>, currency: Json<CurrencyDTO>) -> ApiResponse {
+pub async fn create(user: Phantom<User>, currency: Json<CurrencyDTO>) -> Result<impl Responder, ApiError> {
     Ok(HttpResponse::Ok().json(Currency::new(currency.into_inner(), user.get_id()).await?))
 }
 
@@ -79,7 +78,7 @@ responses(
 path = "/api/v1/currency/{currency_id}",
 tag = "Currency")]
 #[delete("/{currency_id}")]
-pub async fn delete(user: Phantom<User>, currency_id: Path<i32>) -> ApiResponse {
+pub async fn delete(user: Phantom<User>, currency_id: Path<i32>) -> Result<impl Responder, ApiError> {
     let currency = Currency::find_by_id(currency_id.into_inner()).await?;
     info!("Currency: {:?}", currency);
     if !currency.has_access(user.get_id()).await? {
@@ -90,7 +89,7 @@ pub async fn delete(user: Phantom<User>, currency_id: Path<i32>) -> ApiResponse 
     }
 
     currency.delete().await?;
-    Ok(HttpResponse::NoContent().finish())
+    Ok(HttpResponse::NoContent())
 }
 
 #[utoipa::path(patch,
@@ -104,7 +103,11 @@ path = "/api/v1/currency/{currency_id}",
 request_body = CurrencyDTO,
 tag = "Currency")]
 #[patch("/{currency_id}")]
-pub async fn update(user: Phantom<User>, update: CurrencyDTO, currency_id: Path<i32>) -> ApiResponse {
+pub async fn update(
+    user: Phantom<User>,
+    update: CurrencyDTO,
+    currency_id: Path<i32>,
+) -> Result<impl Responder, ApiError> {
     let currency = Currency::find_by_id(currency_id.into_inner()).await?;
     if !currency.has_access(user.get_id()).await? {
         return Err(ApiError::resource_not_found("Currency"));
