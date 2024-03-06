@@ -7,7 +7,7 @@ use sea_orm::DbErr;
 use serde::{Serialize, Serializer};
 use tracing::error;
 use utoipa::ToSchema;
-use validator::ValidationError;
+use validator::{ValidationError, ValidationErrors};
 
 use entity::error::EntityError;
 
@@ -152,6 +152,12 @@ impl From<ValidationErrorJsonPayload> for ApiError {
 impl From<ValidationError> for ApiError {
     fn from(value: ValidationError) -> Self {
         Self::from(ValidationErrorJsonPayload::from(value))
+    }
+}
+
+impl From<ValidationErrors> for ApiError {
+    fn from(value: ValidationErrors) -> Self {
+        Self::from(ValidationErrorJsonPayload::from(&value))
     }
 }
 

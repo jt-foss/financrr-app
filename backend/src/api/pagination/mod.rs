@@ -6,16 +6,18 @@ use actix_web::{FromRequest, HttpRequest};
 use futures_util::future::LocalBoxFuture;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
+use validator::Validate;
 
 use crate::api::error::api::ApiError;
 use crate::wrapper::currency::Currency;
 
 pub const DEFAULT_PAGE: i32 = 1;
 pub const DEFAULT_LIMIT: i32 = 50;
+pub const MAX_LIMIT: i32 = 500;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, ToSchema)]
 #[aliases(PaginatedCurrency = Pagination<Currency>)]
-pub struct Pagination<T> {
+pub struct Pagination<T: Serialize + ToSchema<'static>> {
     #[serde(rename = "_metadata")]
     pub metadata: Metadata,
     pub data: T,
@@ -69,9 +71,11 @@ impl Links {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Validate, Deserialize)]
 pub struct PageSizeParam {
+    #[validate(range(min = 1))]
     pub page: i32,
+    #[validate(range(min = 1, max = 255))]
     pub limit: i32,
 }
 
@@ -92,10 +96,14 @@ impl FromRequest for PageSizeParam {
         let page_size_params: Result<Query<Self>, QueryPayloadError> = Query::from_query(req.query_string());
 
         let page_size_params = match page_size_params {
-            Ok(page_size_params) => Ok(page_size_params.into_inner()),
-            Err(_) => Ok(Self::default()),
+            Ok(page_size_params) => page_size_params.into_inner(),
+            Err(_) => Self::default(),
         };
 
-        Box::pin(async move { page_size_params })
+        Box::pin(async move {
+            page_size_params.validate().map_err(ApiError::from)?;
+
+            Ok(page_size_params)
+        })
     }
 }
