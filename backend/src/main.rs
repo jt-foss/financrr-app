@@ -6,7 +6,7 @@ use actix_cors::Cors;
 use actix_identity::config::LogoutBehaviour;
 use actix_identity::IdentityMiddleware;
 use actix_limitation::{Limiter, RateLimiter};
-use actix_session::config::CookieContentSecurity;
+use actix_session::config::{CookieContentSecurity, PersistentSession};
 use actix_session::storage::RedisSessionStore;
 use actix_session::{SessionExt, SessionMiddleware};
 use actix_web::cookie::{Key, SameSite};
@@ -134,6 +134,10 @@ async fn main() -> Result<()> {
                     // allow the cookie only from the current domain
                     .cookie_same_site(SameSite::Strict)
                     .cookie_content_security(CookieContentSecurity::Signed)
+                    .session_lifecycle(
+                        PersistentSession::default()
+                            .session_ttl(time::Duration::days(7))
+                    )
                     .build(),
             )
             .app_data(JsonConfig::default().error_handler(|err, _| handle_validation_error(err)))
