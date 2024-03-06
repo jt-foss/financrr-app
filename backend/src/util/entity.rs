@@ -1,4 +1,4 @@
-use sea_orm::{ActiveModelBehavior, DeleteMany, EntityTrait, IntoActiveModel, Select};
+use sea_orm::{ActiveModelBehavior, DeleteMany, EntityTrait, IntoActiveModel, PaginatorTrait, Select};
 
 use crate::api::error::api::ApiError;
 use crate::database::connection::get_database_connection;
@@ -23,9 +23,11 @@ pub async fn find_all<T: EntityTrait>(select_stm: Select<T>) -> Result<Vec<T::Mo
     select_stm.all(get_database_connection()).await.map_err(ApiError::from)
 }
 
-pub async fn count<T: EntityTrait>(select_stm: Select<T>) -> Result<u64, ApiError> {
-    // TODO we need to fix this to use count() instead of find_all()
-    find_all(select_stm).await.map(|models| models.len() as u64)
+pub async fn count<T: EntityTrait>(select_stm: Select<T>) -> Result<u64, ApiError>
+where
+    <T as EntityTrait>::Model: Sync,
+{
+    PaginatorTrait::count(select_stm, get_database_connection()).await.map_err(ApiError::from)
 }
 
 pub async fn insert<T>(active_model: T) -> Result<<T::Entity as EntityTrait>::Model, ApiError>

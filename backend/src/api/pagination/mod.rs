@@ -6,15 +6,13 @@ use actix_web::{FromRequest, HttpRequest};
 use futures_util::future::LocalBoxFuture;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
-use utoipauto::utoipa_ignore;
-use crate::wrapper::currency::Currency;
 
 use crate::api::error::api::ApiError;
+use crate::wrapper::currency::Currency;
 
 pub const DEFAULT_PAGE: i32 = 1;
 pub const DEFAULT_LIMIT: i32 = 50;
 
-#[utoipa_ignore]
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, ToSchema)]
 #[aliases(PaginatedCurrency = Pagination<Currency>)]
 pub struct Pagination<T> {
