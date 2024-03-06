@@ -11,26 +11,26 @@ use validator::Validate;
 use crate::api::error::api::ApiError;
 use crate::wrapper::currency::Currency;
 
-pub const DEFAULT_PAGE: i32 = 1;
-pub const DEFAULT_LIMIT: i32 = 50;
-pub const MAX_LIMIT: i32 = 500;
+pub const DEFAULT_PAGE: u64 = 1;
+pub const DEFAULT_LIMIT: u64 = 50;
+pub const MAX_LIMIT: u64 = 500;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, ToSchema)]
 #[aliases(PaginatedCurrency = Pagination<Currency>)]
 pub struct Pagination<T: Serialize + ToSchema<'static>> {
     #[serde(rename = "_metadata")]
     pub metadata: Metadata,
-    pub data: T,
+    pub data: Vec<T>,
 }
 
 impl<T: Serialize + ToSchema<'static>> Pagination<T> {
-    pub fn new(page: i32, limit: i32, total: i32, data: T, uri: Uri) -> Self {
+    pub fn new(data: Vec<T>, page_size_param: &PageSizeParam, total: u64, uri: Uri) -> Self {
         Self {
             metadata: Metadata {
-                page,
-                limit,
+                page: page_size_param.page,
+                limit: page_size_param.limit,
                 total,
-                links: Links::new(uri, page, limit, total),
+                links: Links::new(uri, page_size_param, total),
             },
             data,
         }
@@ -39,9 +39,9 @@ impl<T: Serialize + ToSchema<'static>> Pagination<T> {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, ToSchema)]
 pub struct Metadata {
-    pub page: i32,
-    pub limit: i32,
-    pub total: i32,
+    pub page: u64,
+    pub limit: u64,
+    pub total: u64,
     pub links: Links,
 }
 
@@ -52,13 +52,16 @@ pub struct Links {
 }
 
 impl Links {
-    pub fn new(uri: Uri, page: i32, limit: i32, total: i32) -> Self {
+    pub fn new(uri: Uri, page_size_param: &PageSizeParam, total: u64) -> Self {
+        let page = page_size_param.page;
+        let limit = page_size_param.limit;
+
         let prev = if page > 1 {
             Some(format!("{}?page={}&limit={}", uri.path(), page - 1, limit))
         } else {
             None
         };
-        let next = if page < total {
+        let next = if total >= limit {
             Some(format!("{}?page={}&limit={}", uri.path(), page + 1, limit))
         } else {
             None
@@ -74,9 +77,9 @@ impl Links {
 #[derive(Debug, Clone, PartialEq, Eq, Validate, Deserialize)]
 pub struct PageSizeParam {
     #[validate(range(min = 1))]
-    pub page: i32,
+    pub page: u64,
     #[validate(range(min = 1, max = 255))]
-    pub limit: i32,
+    pub limit: u64,
 }
 
 impl Default for PageSizeParam {

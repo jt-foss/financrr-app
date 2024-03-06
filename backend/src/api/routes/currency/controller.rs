@@ -1,9 +1,11 @@
+use actix_web::http::Uri;
 use actix_web::web::Path;
 use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
 use actix_web_validator::Json;
 use tracing::info;
 
 use crate::api::error::api::ApiError;
+use crate::api::pagination::{PageSizeParam, Pagination};
 use crate::util::utoipa::{InternalServerError, ResourceNotFound, Unauthorized};
 use crate::wrapper::currency::dto::CurrencyDTO;
 use crate::wrapper::currency::Currency;
@@ -26,15 +28,20 @@ responses(
 path = "/api/v1/currency",
 tag = "Currency")]
 #[get("")]
-pub async fn get_all(user: Option<Phantom<User>>) -> Result<impl Responder, ApiError> {
-    let mut currencies = Currency::find_all_with_no_user().await?;
-    let mut user_currencies: Vec<Currency> = vec![];
+pub async fn get_all(
+    user: Option<Phantom<User>>,
+    page_size: PageSizeParam,
+    uri: Uri,
+) -> Result<impl Responder, ApiError> {
+    let mut currencies = Currency::find_all_with_no_user_paginated(&page_size).await?;
     if let Some(user) = user {
-        user_currencies = Currency::find_all_with_user(user.get_id()).await?;
+        let user_currencies = Currency::find_all_with_user_paginated(user.get_id(), &page_size).await?;
+        currencies.extend(user_currencies);
     }
-    currencies.append(&mut user_currencies);
+    currencies.truncate(page_size.limit as usize);
+    let size = currencies.len() as u64;
 
-    Ok(HttpResponse::Ok().json(currencies))
+    Ok(HttpResponse::Ok().json(Pagination::new(currencies, &page_size, size, uri)))
 }
 
 #[utoipa::path(get,

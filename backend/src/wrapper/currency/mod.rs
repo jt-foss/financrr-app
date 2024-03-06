@@ -11,7 +11,8 @@ use utoipa::ToSchema;
 use entity::currency;
 
 use crate::api::error::api::ApiError;
-use crate::util::entity::{count, delete, find_all, find_one_or_error, insert, update};
+use crate::api::pagination::PageSizeParam;
+use crate::util::entity::{count, delete, find_all, find_all_paginated, find_one_or_error, insert, update};
 use crate::wrapper::currency::dto::CurrencyDTO;
 use crate::wrapper::permission::Permission;
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
@@ -76,8 +77,24 @@ impl Currency {
         Ok(find_all(currency::Entity::find_all_with_no_user()).await?.into_iter().map(Self::from).collect())
     }
 
+    pub async fn find_all_with_no_user_paginated(page_size: &PageSizeParam) -> Result<Vec<Self>, ApiError> {
+        Ok(find_all_paginated(currency::Entity::find_all_with_no_user(), page_size)
+            .await?
+            .into_iter()
+            .map(Self::from)
+            .collect())
+    }
+
     pub async fn find_all_with_user(user_id: i32) -> Result<Vec<Self>, ApiError> {
         Ok(find_all(currency::Entity::find_all_with_user(user_id)).await?.into_iter().map(Self::from).collect())
+    }
+
+    pub async fn find_all_with_user_paginated(user_id: i32, page_size: &PageSizeParam) -> Result<Vec<Self>, ApiError> {
+        Ok(find_all_paginated(currency::Entity::find_all_with_user(user_id), page_size)
+            .await?
+            .into_iter()
+            .map(Self::from)
+            .collect())
     }
 
     pub async fn find_all(user_id: i32) -> Result<Vec<Self>, ApiError> {

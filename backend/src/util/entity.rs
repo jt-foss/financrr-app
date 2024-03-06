@@ -1,6 +1,7 @@
 use sea_orm::{ActiveModelBehavior, DeleteMany, EntityTrait, IntoActiveModel, PaginatorTrait, Select};
 
 use crate::api::error::api::ApiError;
+use crate::api::pagination::PageSizeParam;
 use crate::database::connection::get_database_connection;
 
 pub async fn find_one<T>(select_stm: Select<T>) -> Result<Option<T::Model>, ApiError>
@@ -21,6 +22,19 @@ pub async fn find_one_or_error<T: EntityTrait>(
 
 pub async fn find_all<T: EntityTrait>(select_stm: Select<T>) -> Result<Vec<T::Model>, ApiError> {
     select_stm.all(get_database_connection()).await.map_err(ApiError::from)
+}
+
+pub async fn find_all_paginated<T: EntityTrait>(
+    select_stm: Select<T>,
+    page_size: &PageSizeParam,
+) -> Result<Vec<T::Model>, ApiError>
+where
+    <T as EntityTrait>::Model: Sync,
+{
+    PaginatorTrait::paginate(select_stm, get_database_connection(), page_size.limit)
+        .fetch_page(page_size.page - 1)
+        .await
+        .map_err(ApiError::from)
 }
 
 pub async fn count<T: EntityTrait>(select_stm: Select<T>) -> Result<u64, ApiError>
