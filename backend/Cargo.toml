@@ -44,8 +44,7 @@ serde_json = "1.0.114"
 # Generating openapi spec
 utoipa = { version = "4.2.0", features = ["actix_extras", "openapi_extensions", "time", "preserve_order", "preserve_path_order"] }
 utoipa-swagger-ui = { version = "6.0.0", features = ["actix-web", "debug-embed"] }
-# TODO replace with official version once the generic pr is merged
-utoipauto = { git = "https://github.com/DenuxPlays/utoipauto.git", features = ["generic_full_path"] }
+utoipauto = { version = "0.1.10", features = ["generic_full_path"] }
 
 # Logging
 tracing.workspace = true

@@ -960,9 +960,9 @@ dependencies = [
 
 [[package]]
 name = "cc"
-version = "1.0.89"
+version = "1.0.90"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a0ba8f7aaa012f30d5b2861462f6708eccd49c3c39863fe083a308035f63d723"
+checksum = "8cd6604a82acf3039f1144f54b8eb34e91ffba622051189e71b781822d5ee1f5"
 dependencies = [
  "jobserver",
  "libc",
@@ -4009,16 +4009,18 @@ dependencies = [
 
 [[package]]
 name = "utoipauto"
-version = "0.1.9"
-source = "git+https://github.com/DenuxPlays/utoipauto.git#280bc7119df00c904bfd0ac1f4affbd2ac11e68e"
+version = "0.1.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0c8b0206d46c52c964fbbecbf0f4015941000ce1122a3cc6103a64496bc9997e"
 dependencies = [
  "utoipauto-macro",
 ]
 
 [[package]]
 name = "utoipauto-core"
-version = "0.1.9"
-source = "git+https://github.com/DenuxPlays/utoipauto.git#280bc7119df00c904bfd0ac1f4affbd2ac11e68e"
+version = "0.1.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f188b14783527b8694a62ac420f945049a8ad02ae403c59cd6d6d46ce70e7d00"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -4027,8 +4029,9 @@ dependencies = [
 
 [[package]]
 name = "utoipauto-macro"
-version = "0.1.9"
-source = "git+https://github.com/DenuxPlays/utoipauto.git#280bc7119df00c904bfd0ac1f4affbd2ac11e68e"
+version = "0.1.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8441b6e9e8e22128550e718d08b9da55182e85920e3d307894300cb9fcd4791b"
 dependencies = [
  "proc-macro2",
  "quote",
