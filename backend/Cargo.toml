@@ -43,7 +43,7 @@ serde_json = "1.0.114"
 # Generating openapi spec
 utoipa = { version = "4.2.0", features = ["actix_extras", "openapi_extensions", "time", "preserve_order"] }
 utoipa-swagger-ui = { version = "6.0.0", features = ["actix-web", "debug-embed"] }
-utoipauto = "0.1.9"
+utoipauto = "0.1.10"
 
 # Logging
 log.workspace = true
