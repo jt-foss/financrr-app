@@ -1,22 +1,30 @@
+use actix_web::{FromRequest, HttpRequest};
 use actix_web::dev::Payload;
 use actix_web::error::QueryPayloadError;
 use actix_web::http::Uri;
 use actix_web::web::Query;
-use actix_web::{FromRequest, HttpRequest};
 use futures_util::future::LocalBoxFuture;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use validator::Validate;
 
 use crate::api::error::api::ApiError;
+use crate::wrapper::account::Account;
+use crate::wrapper::budget::Budget;
 use crate::wrapper::currency::Currency;
+use crate::wrapper::transaction::Transaction;
 
 pub const DEFAULT_PAGE: u64 = 1;
 pub const DEFAULT_LIMIT: u64 = 50;
 pub const MAX_LIMIT: u64 = 500;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, ToSchema)]
-#[aliases(PaginatedCurrency = Pagination<Currency>)]
+#[aliases(
+PaginatedAccount = Pagination<Account>,
+PaginatedBudget = Pagination<Budget>,
+PaginatedCurrency = Pagination<Currency>,
+PaginatedTransaction = Pagination<Transaction>
+)]
 pub struct Pagination<T: Serialize + ToSchema<'static>> {
     #[serde(rename = "_metadata")]
     pub metadata: Metadata,
