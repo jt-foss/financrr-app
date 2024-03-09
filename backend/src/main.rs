@@ -18,7 +18,7 @@ use actix_web::{
     web::{self},
     App, HttpResponse, HttpServer,
 };
-use actix_web_validator::{Error, JsonConfig};
+use actix_web_validator::{Error, JsonConfig, PathConfig, QueryConfig};
 use dotenvy::dotenv;
 use sea_orm::DatabaseConnection;
 use tracing::info;
@@ -138,6 +138,8 @@ async fn main() -> Result<()> {
                     .build(),
             )
             .app_data(JsonConfig::default().error_handler(|err, _| handle_validation_error(err)))
+            .app_data(QueryConfig::default().error_handler(|err, _| handle_validation_error(err)))
+            .app_data(PathConfig::default().error_handler(|err, _| handle_validation_error(err)))
             .app_data(limiter.clone())
             .configure(configure_api)
             .service(SwaggerUi::new("/swagger-ui/{_:.*}").url("/api-docs/openapi.json", openapi.clone()))

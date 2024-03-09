@@ -88,7 +88,7 @@ impl Links {
 pub struct PageSizeParam {
     #[validate(range(min = 1))]
     pub page: u64,
-    #[validate(range(min = 1, max = 255))]
+    #[validate(range(min = 1, max = "MAX_LIMIT"))]
     pub limit: u64,
 }
 
