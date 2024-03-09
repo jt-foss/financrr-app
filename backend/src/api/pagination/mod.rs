@@ -5,7 +5,9 @@ use actix_web::web::Query;
 use actix_web::{FromRequest, HttpRequest};
 use futures_util::future::LocalBoxFuture;
 use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
+use utoipa::openapi::path::{Parameter, ParameterBuilder, ParameterIn};
+use utoipa::openapi::{KnownFormat, ObjectBuilder, Required, SchemaFormat, SchemaType};
+use utoipa::{IntoParams, ToSchema};
 use validator::Validate;
 
 use crate::api::error::api::ApiError;
@@ -116,5 +118,34 @@ impl FromRequest for PageSizeParam {
 
             Ok(page_size_params)
         })
+    }
+}
+
+impl IntoParams for PageSizeParam {
+    fn into_params(parameter_in_provider: impl Fn() -> Option<ParameterIn>) -> Vec<Parameter> {
+        vec![
+            ParameterBuilder::new()
+                .name("page")
+                .required(Required::False)
+                .parameter_in(parameter_in_provider().unwrap_or_default())
+                .description(Some("The page number."))
+                .schema(Some(
+                    ObjectBuilder::new()
+                        .schema_type(SchemaType::Integer)
+                        .format(Some(SchemaFormat::KnownFormat(KnownFormat::Int64))),
+                ))
+                .build(),
+            ParameterBuilder::new()
+                .name("limit")
+                .required(Required::False)
+                .parameter_in(parameter_in_provider().unwrap_or_default())
+                .description(Some("The number of items per page."))
+                .schema(Some(
+                    ObjectBuilder::new()
+                        .schema_type(SchemaType::Integer)
+                        .format(Some(SchemaFormat::KnownFormat(KnownFormat::Int64))),
+                ))
+                .build(),
+        ]
     }
 }

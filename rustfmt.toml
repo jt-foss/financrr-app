@@ -4,3 +4,4 @@ newline_style = "Unix"
 use_small_heuristics = "Off"
 hard_tabs = false
 tab_spaces = 4
+#group_imports = "StdExternalCrate" # currently a nightly feature

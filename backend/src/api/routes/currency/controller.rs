@@ -25,6 +25,7 @@ responses(
 (status = 401, response = Unauthorized),
 (status = 500, response = InternalServerError)
 ),
+params(PageSizeParam),
 path = "/api/v1/currency",
 tag = "Currency")]
 #[get("")]
