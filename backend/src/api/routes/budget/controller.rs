@@ -20,6 +20,24 @@ pub fn budget_controller(cfg: &mut web::ServiceConfig) {
 
 #[utoipa::path(get,
 responses(
+(status = 200, description = "Successfully retrieved the Budgets.", content_type = "application/json", body = PaginatedBudget),
+(status = 401, response = Unauthorized),
+(status = 500, response = InternalServerError)
+),
+params(PageSizeParam),
+path = "/api/v1/budget/?page={page}&size={size}",
+tag = "Budget"
+)]
+#[get("")]
+pub async fn get_all(user: Phantom<User>, page_size: PageSizeParam, uri: Uri) -> Result<impl Responder, ApiError> {
+    let total = Budget::count_all_by_user(user.get_id()).await?;
+    let budgets = Budget::find_all_by_user_paginated(user.get_id(), &page_size).await?;
+
+    Ok(HttpResponse::Ok().json(Pagination::new(budgets, &page_size, total, uri)))
+}
+
+#[utoipa::path(get,
+responses(
 (status = 200, description = "Successfully retrieved the Budget.", content_type = "application/json", body = Budget),
 (status = 401, response = Unauthorized),
 (status = 404, response = ResourceNotFound),
@@ -36,24 +54,6 @@ pub async fn get_one(user: Phantom<User>, budget_id: Path<i32>) -> Result<impl R
     }
 
     Ok(HttpResponse::Ok().json(budget))
-}
-
-#[utoipa::path(get,
-responses(
-(status = 200, description = "Successfully retrieved the Budgets.", content_type = "application/json", body = PaginatedBudget),
-(status = 401, response = Unauthorized),
-(status = 500, response = InternalServerError)
-),
-params(PageSizeParam),
-path = "/api/v1/budget/?page={page}&size={size}",
-tag = "Budget"
-)]
-#[get("")]
-pub async fn get_all(user: Phantom<User>, page_size: PageSizeParam, uri: Uri) -> Result<impl Responder, ApiError> {
-    let total = Budget::count_all_by_user(user.get_id()).await?;
-    let budgets = Budget::find_all_by_user_paginated(user.get_id(), &page_size).await?;
-
-    Ok(HttpResponse::Ok().json(Pagination::new(budgets, &page_size, total, uri)))
 }
 
 #[utoipa::path(post,

@@ -19,6 +19,23 @@ pub fn transaction_controller(cfg: &mut web::ServiceConfig) {
 
 #[utoipa::path(get,
 responses(
+(status = 200, description = "Successfully retrieved all Transactions.", content_type = "application/json", body = PaginatedTransaction),
+(status = 401, response = Unauthorized),
+(status = 500, response = InternalServerError)
+),
+params(PageSizeParam),
+path = "/api/v1/transaction/?page={page}&size={size}",
+tag = "Transaction")]
+#[get("")]
+pub async fn get_all(user: Phantom<User>, page_size: PageSizeParam, uri: Uri) -> Result<impl Responder, ApiError> {
+    let total = Transaction::count_all_by_user(user.get_id()).await?;
+    let transactions = Transaction::find_all_by_user_paginated(user.get_id(), &page_size).await?;
+
+    Ok(HttpResponse::Ok().json(Pagination::new(transactions, &page_size, total, uri)))
+}
+
+#[utoipa::path(get,
+responses(
 (status = 200, description = "Successfully retrieved Transaction.", content_type = "application/json", body = Transaction),
 (status = 401, response = Unauthorized),
 (status = 500, response = InternalServerError)
@@ -35,23 +52,6 @@ pub async fn get_one(user: Phantom<User>, transaction_id: Path<i32>) -> Result<i
     }
 
     Ok(HttpResponse::Ok().json(transaction))
-}
-
-#[utoipa::path(get,
-responses(
-(status = 200, description = "Successfully retrieved all Transactions.", content_type = "application/json", body = PaginatedTransaction),
-(status = 401, response = Unauthorized),
-(status = 500, response = InternalServerError)
-),
-params(PageSizeParam),
-path = "/api/v1/transaction/?page={page}&size={size}",
-tag = "Transaction")]
-#[get("")]
-pub async fn get_all(user: Phantom<User>, page_size: PageSizeParam, uri: Uri) -> Result<impl Responder, ApiError> {
-    let total = Transaction::count_all_by_user(user.get_id()).await?;
-    let transactions = Transaction::find_all_by_user_paginated(user.get_id(), &page_size).await?;
-
-    Ok(HttpResponse::Ok().json(Pagination::new(transactions, &page_size, total, uri)))
 }
 
 #[utoipa::path(post,
