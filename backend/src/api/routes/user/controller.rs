@@ -1,9 +1,9 @@
-use crate::api::error::api::ApiError;
 use actix_identity::Identity;
 use actix_session::Session;
 use actix_web::{delete, get, post, web, HttpMessage, HttpRequest, HttpResponse, Responder};
 use actix_web_validator::Json;
 
+use crate::api::error::api::ApiError;
 use crate::util::identity::is_signed_in;
 use crate::util::utoipa::{InternalServerError, ResourceNotFound, Unauthorized, ValidationError};
 use crate::wrapper::types::phantom::Phantom;

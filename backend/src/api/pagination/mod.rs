@@ -22,10 +22,10 @@ pub const MAX_LIMIT: u64 = 500;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, ToSchema)]
 #[aliases(
-PaginatedAccount = Pagination<Account>,
-PaginatedBudget = Pagination<Budget>,
-PaginatedCurrency = Pagination<Currency>,
-PaginatedTransaction = Pagination<Transaction>
+PaginatedAccount = Pagination < Account >,
+PaginatedBudget = Pagination < Budget >,
+PaginatedCurrency = Pagination < Currency >,
+PaginatedTransaction = Pagination < Transaction >
 )]
 pub struct Pagination<T: Serialize + ToSchema<'static>> {
     #[serde(rename = "_metadata")]
