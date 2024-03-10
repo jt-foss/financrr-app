@@ -34,10 +34,6 @@ pub struct Pagination<T: Serialize + ToSchema<'static>> {
 }
 
 impl<T: Serialize + ToSchema<'static>> Pagination<T> {
-    /*
-    TODO update to the following:
-        pub fn new((data: Vec<T>, page_size_param: &PageSizeParam, total: u64), uri: Uri) -> Self {
-     */
     pub fn new(data: Vec<T>, page_size_param: &PageSizeParam, total: u64, uri: Uri) -> Self {
         Self {
             metadata: Metadata {
