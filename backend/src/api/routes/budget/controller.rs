@@ -1,8 +1,10 @@
+use actix_web::http::Uri;
 use actix_web::web::Path;
 use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
 use actix_web_validator::Json;
 
 use crate::api::error::api::ApiError;
+use crate::api::pagination::{PageSizeParam, Pagination};
 use crate::util::utoipa::{InternalServerError, ResourceNotFound, Unauthorized, ValidationError};
 use crate::wrapper::budget::dto::BudgetDTO;
 use crate::wrapper::budget::Budget;
@@ -38,18 +40,20 @@ pub async fn get_one(user: Phantom<User>, budget_id: Path<i32>) -> Result<impl R
 
 #[utoipa::path(get,
 responses(
-(status = 200, description = "Successfully retrieved the Budgets.", content_type = "application/json", body = Vec < Budget >),
+(status = 200, description = "Successfully retrieved the Budgets.", content_type = "application/json", body = PaginatedBudget),
 (status = 401, response = Unauthorized),
 (status = 500, response = InternalServerError)
 ),
-path = "/api/v1/budget",
+params(PageSizeParam),
+path = "/api/v1/budget/?page={page}&size={size}",
 tag = "Budget"
 )]
 #[get("")]
-pub async fn get_all(user: Phantom<User>) -> Result<impl Responder, ApiError> {
-    let budgets = Budget::find_all(user.get_id()).await?;
+pub async fn get_all(user: Phantom<User>, page_size: PageSizeParam, uri: Uri) -> Result<impl Responder, ApiError> {
+    let total = Budget::count_all_by_user(user.get_id()).await?;
+    let budgets = Budget::find_all_by_user_paginated(user.get_id(), &page_size).await?;
 
-    Ok(HttpResponse::Ok().json(budgets))
+    Ok(HttpResponse::Ok().json(Pagination::new(budgets, &page_size, total, uri)))
 }
 
 #[utoipa::path(post,

@@ -7,7 +7,8 @@ use utoipa::ToSchema;
 use entity::budget;
 
 use crate::api::error::api::ApiError;
-use crate::util::entity::{delete, find_all, find_one_or_error, insert, update};
+use crate::api::pagination::PageSizeParam;
+use crate::util::entity::{count, delete, find_all, find_all_paginated, find_one_or_error, insert, update};
 use crate::wrapper::budget::dto::BudgetDTO;
 use crate::wrapper::permission::Permission;
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
@@ -28,8 +29,23 @@ pub struct Budget {
 }
 
 impl Budget {
-    pub async fn find_all(user_id: i32) -> Result<Vec<Self>, ApiError> {
+    pub async fn find_all_by_user(user_id: i32) -> Result<Vec<Self>, ApiError> {
         Ok(find_all(budget::Entity::find_all_by_user_id(user_id)).await?.into_iter().map(Self::from).collect())
+    }
+
+    pub async fn find_all_by_user_paginated(
+        user_id: i32,
+        page_size_param: &PageSizeParam,
+    ) -> Result<Vec<Self>, ApiError> {
+        Ok(find_all_paginated(budget::Entity::find_all_by_user_id(user_id), page_size_param)
+            .await?
+            .into_iter()
+            .map(Self::from)
+            .collect())
+    }
+
+    pub async fn count_all_by_user(user_id: i32) -> Result<u64, ApiError> {
+        count(budget::Entity::find_all_by_user_id(user_id)).await
     }
 
     pub async fn new(user_id: i32, dto: BudgetDTO) -> Result<Self, ApiError> {
