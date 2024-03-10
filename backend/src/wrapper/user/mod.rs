@@ -1,4 +1,4 @@
-use actix_identity::Identity;
+use actix_session::Session;
 use actix_web::dev::Payload;
 use actix_web::{FromRequest, HttpRequest};
 use futures_util::future::LocalBoxFuture;
@@ -6,6 +6,7 @@ use sea_orm::EntityTrait;
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 use utoipa::ToSchema;
+use dto::Credentials;
 
 use entity::prelude::User as DbUser;
 use entity::user;
@@ -13,7 +14,6 @@ use entity::user::Model;
 
 use crate::api::error::api::ApiError;
 use crate::util::entity::{count, find_one, find_one_or_error, insert};
-use crate::util::identity::validate_identity;
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 use crate::wrapper::user::dto::UserRegistration;
 
@@ -52,7 +52,7 @@ impl User {
         Ok(count(user::Entity::find_by_id(id)).await? > 0)
     }
 
-    pub async fn authenticate(credentials: dto::Credentials) -> Result<Self, ApiError> {
+    pub async fn authenticate(credentials: Credentials) -> Result<Self, ApiError> {
         let user = find_one(DbUser::find_by_username(credentials.username.as_str())).await;
         match user {
             Ok(Some(user)) => {
@@ -89,7 +89,6 @@ impl FromRequest for User {
     fn from_request(req: &HttpRequest, _payload: &mut Payload) -> Self::Future {
         let req = req.clone();
         Box::pin(async move {
-            let user_id = validate_identity(Identity::extract(&req).into_inner()?)?;
 
             Self::find_by_id(user_id).await
         })

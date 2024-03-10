@@ -3,8 +3,6 @@ use std::sync::OnceLock;
 use std::time::Duration;
 
 use actix_cors::Cors;
-use actix_identity::config::LogoutBehaviour;
-use actix_identity::IdentityMiddleware;
 use actix_limitation::{Limiter, RateLimiter};
 use actix_session::config::{CookieContentSecurity, PersistentSession};
 use actix_session::storage::RedisSessionStore;
@@ -34,6 +32,7 @@ use migration::MigratorTrait;
 use crate::api::routes::account::controller::account_controller;
 use crate::api::routes::budget::controller::budget_controller;
 use crate::api::routes::currency::controller::currency_controller;
+use crate::api::routes::session::controller::session_controller;
 use crate::api::routes::transaction::controller::transaction_controller;
 use crate::api::routes::user::controller::user_controller;
 use crate::api::status::controller::status_controller;
@@ -109,9 +108,9 @@ async fn main() -> Result<()> {
     let limiter = Data::new(
         Limiter::builder(Config::get_config().cache.get_url())
             .key_by(|req| {
-                req.get_session()
-                    .get(IDENTITY_ID_SESSION_KEY)
-                    .unwrap_or_else(|_| req.cookie("rate-api-id").map(|c| c.to_string()))
+                Some(req.peer_addr()
+                    .map(|addr| addr.ip().to_string())
+                    .unwrap_or_else(|| "unknown".to_string()))
             })
             .limit(5000)
             .period(Duration::from_secs(3600)) // 60 minutes
@@ -126,15 +125,14 @@ async fn main() -> Result<()> {
             .wrap(Logger::default())
             .wrap(Compress::default())
             .wrap(build_cors())
-            .wrap(IdentityMiddleware::builder().logout_behaviour(LogoutBehaviour::PurgeSession).build())
             .wrap(
                 SessionMiddleware::builder(store.clone(), get_secret_key())
                     // allow the cookie to be accessed from javascript
-                    .cookie_http_only(false)
+                    .cookie_http_only(true)
                     // allow the cookie only from the current domain
                     .cookie_same_site(SameSite::Strict)
                     .cookie_content_security(CookieContentSecurity::Signed)
-                    .session_lifecycle(PersistentSession::default().session_ttl(time::Duration::days(7)))
+                    .session_lifecycle(PersistentSession::default().session_ttl(time::Duration::days(1)))
                     .build(),
             )
             .app_data(JsonConfig::default().error_handler(|err, _| handle_validation_error(err)))
@@ -208,6 +206,7 @@ fn configure_api_v1(cfg: &mut web::ServiceConfig) {
             .configure(account_controller)
             .configure(currency_controller)
             .configure(transaction_controller)
-            .configure(budget_controller),
+            .configure(budget_controller)
+            .configure(session_controller),
     );
 }
