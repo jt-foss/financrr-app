@@ -19,6 +19,22 @@ pub fn account_controller(cfg: &mut web::ServiceConfig) {
 
 #[utoipa::path(get,
 responses(
+(status = 200, description = "Successfully retrieved all Accounts.", content_type = "application/json", body = PaginatedAccount),
+(status = 401, response = Unauthorized)
+),
+params(PageSizeParam),
+path = "/api/v1/account/?page={page}&size={size}",
+tag = "Account")]
+#[get("")]
+pub async fn get_all(user: Phantom<User>, page_size: PageSizeParam, uri: Uri) -> Result<impl Responder, ApiError> {
+    let total = Account::count_all_by_user(user.get_id()).await?;
+    let result = Account::find_all_by_user(user.get_id()).await?;
+
+    Ok(HttpResponse::Ok().json(PaginatedAccount::new(result, &page_size, total, uri)))
+}
+
+#[utoipa::path(get,
+responses(
 (status = 200, description = "Successfully retrieved Account.", content_type = "application/json", body = Account),
 (status = 401, response = Unauthorized),
 (status = 404, response = ResourceNotFound),
@@ -34,22 +50,6 @@ pub async fn get_one(user: Phantom<User>, account_id: Path<i32>) -> Result<impl 
     }
 
     Ok(HttpResponse::Ok().json(account))
-}
-
-#[utoipa::path(get,
-responses(
-(status = 200, description = "Successfully retrieved all Accounts.", content_type = "application/json", body = PaginatedAccount),
-(status = 401, response = Unauthorized)
-),
-params(PageSizeParam),
-path = "/api/v1/account/?page={page}&size={size}",
-tag = "Account")]
-#[get("")]
-pub async fn get_all(user: Phantom<User>, page_size: PageSizeParam, uri: Uri) -> Result<impl Responder, ApiError> {
-    let total = Account::count_all_by_user(user.get_id()).await?;
-    let result = Account::find_all_by_user(user.get_id()).await?;
-
-    Ok(HttpResponse::Ok().json(PaginatedAccount::new(result, &page_size, total, uri)))
 }
 
 #[utoipa::path(post,
