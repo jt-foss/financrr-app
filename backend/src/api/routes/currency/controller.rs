@@ -21,7 +21,7 @@ pub fn currency_controller(cfg: &mut web::ServiceConfig) {
 
 #[utoipa::path(get,
 responses(
-(status = 200, description = "Successfully retrieved all Currencies.", content_type = "application/json", body = Vec < Currency >),
+(status = 200, description = "Successfully retrieved all Currencies.", content_type = "application/json", body = PaginatedCurrency),
 (status = 401, response = Unauthorized),
 (status = 500, response = InternalServerError)
 ),

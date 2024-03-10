@@ -112,6 +112,10 @@ impl Account {
         Ok(accounts)
     }
 
+    pub async fn count_all_by_user(user_id: i32) -> Result<u64, ApiError> {
+        count(user_account::Entity::find_by_user_id(user_id)).await
+    }
+
     fn to_model(&self) -> account::Model {
         let account = self.clone();
         account::Model {
