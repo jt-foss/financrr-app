@@ -26,7 +26,7 @@ responses(
 (status = 500, response = InternalServerError)
 ),
 params(PageSizeParam),
-path = "/api/v1/currency",
+path = "/api/v1/currency/?page={page}&limit={limit}",
 tag = "Currency")]
 #[get("")]
 pub async fn get_all(
@@ -34,13 +34,18 @@ pub async fn get_all(
     page_size: PageSizeParam,
     uri: Uri,
 ) -> Result<impl Responder, ApiError> {
+    let mut user_currency_count = 0;
     let mut currencies = Currency::find_all_with_no_user_paginated(&page_size).await?;
     if let Some(user) = user {
         let user_currencies = Currency::find_all_with_user_paginated(user.get_id(), &page_size).await?;
         currencies.extend(user_currencies);
+
+        user_currency_count = Currency::count_all_with_user(user.get_id()).await?;
     }
     currencies.truncate(page_size.limit as usize);
-    let size = currencies.len() as u64;
+
+    let currency_count = Currency::count_all_with_no_user().await?;
+    let size = currency_count + user_currency_count;
 
     Ok(HttpResponse::Ok().json(Pagination::new(currencies, &page_size, size, uri)))
 }

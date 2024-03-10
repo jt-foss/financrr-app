@@ -128,7 +128,7 @@ impl IntoParams for PageSizeParam {
                 .name("page")
                 .required(Required::False)
                 .parameter_in(parameter_in_provider().unwrap_or_default())
-                .description(Some("The page number."))
+                .description(Some(format!("The page number. Default: {}", DEFAULT_PAGE)))
                 .schema(Some(
                     ObjectBuilder::new()
                         .schema_type(SchemaType::Integer)
@@ -139,7 +139,7 @@ impl IntoParams for PageSizeParam {
                 .name("limit")
                 .required(Required::False)
                 .parameter_in(parameter_in_provider().unwrap_or_default())
-                .description(Some("The number of items per page."))
+                .description(Some(format!("The number of items per page. Default: {}", DEFAULT_LIMIT)))
                 .schema(Some(
                     ObjectBuilder::new()
                         .schema_type(SchemaType::Integer)

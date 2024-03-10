@@ -85,6 +85,10 @@ impl Currency {
             .collect())
     }
 
+    pub async fn count_all_with_no_user() -> Result<u64, ApiError> {
+        count(currency::Entity::find_all_with_no_user()).await
+    }
+
     pub async fn find_all_with_user(user_id: i32) -> Result<Vec<Self>, ApiError> {
         Ok(find_all(currency::Entity::find_all_with_user(user_id)).await?.into_iter().map(Self::from).collect())
     }
@@ -95,6 +99,10 @@ impl Currency {
             .into_iter()
             .map(Self::from)
             .collect())
+    }
+
+    pub async fn count_all_with_user(user_id: i32) -> Result<u64, ApiError> {
+        count(currency::Entity::find_all_with_user(user_id)).await
     }
 
     pub async fn find_all(user_id: i32) -> Result<Vec<Self>, ApiError> {
