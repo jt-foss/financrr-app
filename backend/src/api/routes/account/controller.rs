@@ -1,7 +1,9 @@
+use actix_web::http::Uri;
 use actix_web::web::Path;
 use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
 
 use crate::api::error::api::ApiError;
+use crate::api::pagination::{PageSizeParam, PaginatedAccount};
 use crate::util::utoipa::{InternalServerError, ResourceNotFound, Unauthorized, ValidationError};
 use crate::wrapper::account::dto::AccountDTO;
 use crate::wrapper::account::Account;
@@ -36,14 +38,18 @@ pub async fn get_one(user: Phantom<User>, account_id: Path<i32>) -> Result<impl 
 
 #[utoipa::path(get,
 responses(
-(status = 200, description = "Successfully retrieved all Accounts.", content_type = "application/json", body = Vec < Account >),
+(status = 200, description = "Successfully retrieved all Accounts.", content_type = "application/json", body = PaginatedAccount),
 (status = 401, response = Unauthorized)
 ),
-path = "/api/v1/account",
+params(PageSizeParam),
+path = "/api/v1/account/?page={page}&size={size}",
 tag = "Account")]
 #[get("")]
-pub async fn get_all(user: Phantom<User>) -> Result<impl Responder, ApiError> {
-    Account::find_all_by_user(user.get_id()).await.map(|accounts| HttpResponse::Ok().json(accounts))
+pub async fn get_all(user: Phantom<User>, page_size: PageSizeParam, uri: Uri) -> Result<impl Responder, ApiError> {
+    let total = Account::count_all_by_user(user.get_id()).await?;
+    let result = Account::find_all_by_user(user.get_id()).await?;
+
+    Ok(HttpResponse::Ok().json(PaginatedAccount::new(result, &page_size, total, uri)))
 }
 
 #[utoipa::path(post,

@@ -10,7 +10,8 @@ use entity::utility::time::get_now;
 use entity::{account, user_account};
 
 use crate::api::error::api::ApiError;
-use crate::util::entity::{count, delete, find_all, find_one, find_one_or_error, insert, update};
+use crate::api::pagination::PageSizeParam;
+use crate::util::entity::{count, delete, find_all, find_all_paginated, find_one, find_one_or_error, insert, update};
 use crate::wrapper::account::dto::AccountDTO;
 use crate::wrapper::currency::Currency;
 use crate::wrapper::permission::Permission;
@@ -100,6 +101,22 @@ impl Account {
         )
         .await;
 
+        Self::handle_result_vec(results)
+    }
+
+    pub async fn find_all_by_user_paginated(user_id: i32, page_size: &PageSizeParam) -> Result<Vec<Self>, ApiError> {
+        let results = join_all(
+            find_all_paginated(user_account::Entity::find_by_user_id(user_id), page_size)
+                .await?
+                .into_iter()
+                .map(|model| Self::find_by_id(model.account_id)),
+        )
+        .await;
+
+        Self::handle_result_vec(results)
+    }
+
+    fn handle_result_vec(results: Vec<Result<Self, ApiError>>) -> Result<Vec<Self>, ApiError> {
         let (accounts, errors): (Vec<_>, Vec<_>) = results.into_iter().partition_map(|result| match result {
             Ok(account) => Either::Left(account),
             Err(error) => Either::Right(error),
