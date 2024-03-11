@@ -1,4 +1,4 @@
-use actix_web::{get, HttpResponse, post, Responder, web};
+use actix_web::{get, post, web, HttpResponse, Responder};
 
 use crate::api::error::api::ApiError;
 use crate::util::utoipa::{InternalServerError, ResourceNotFound, Unauthorized, ValidationError};

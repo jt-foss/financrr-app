@@ -1,4 +1,3 @@
-pub mod entity;
-pub mod identity;
+pub mod auth;
 pub mod utoipa;
 pub mod validation;

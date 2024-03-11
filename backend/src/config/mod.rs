@@ -10,7 +10,7 @@ pub mod logger;
 #[derive(Debug)]
 pub struct Config {
     pub address: String,
-    pub session_secret: String,
+    pub session_lifetime_hours: u64,
     pub database: DatabaseConfig,
     pub cache: RedisConfig,
     pub cors: CorsConfig,
@@ -53,7 +53,9 @@ impl Config {
     pub fn load() -> Self {
         Self {
             address: get_env_or_error("ADDRESS"),
-            session_secret: get_env_or_error("SESSION_SECRET"),
+            session_lifetime_hours: get_env_or_default("SESSION_LIFETIME_HOURS", "168")
+                .parse::<u64>()
+                .expect("Could not parse SESSION_LIFETIME_HOURS to u64!"),
             database: DatabaseConfig::build_config(),
             cache: RedisConfig::build_config(),
             cors: CorsConfig::build_config(),
@@ -118,7 +120,7 @@ impl CorsConfig {
 }
 
 pub fn get_env_or_error(key: &str) -> String {
-    env::var(key).unwrap_or_else(|_| panic!("{} env variable must be set!", key))
+    env::var(key).unwrap_or_else(|_| panic!("'{}' env variable must be set!", key))
 }
 
 pub fn get_env_or_default(key: &str, default: &str) -> String {

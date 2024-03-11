@@ -1,3 +1,11 @@
+CREATE TABLE IF NOT EXISTS session
+(
+    id         SERIAL PRIMARY KEY,
+    token      TEXT                                                               NOT NULL,
+    "user"     INTEGER REFERENCES "user" (id) ON UPDATE CASCADE ON DELETE CASCADE NOT NULL,
+    created_at timestamp with time zone                                           NOT NULL DEFAULT current_timestamp
+);
+
 CREATE TABLE IF NOT EXISTS "user"
 (
     id           SERIAL PRIMARY KEY,

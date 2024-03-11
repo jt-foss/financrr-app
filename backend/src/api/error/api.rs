@@ -3,6 +3,7 @@ use actix_web::http::header::ContentType;
 use actix_web::http::StatusCode;
 use actix_web::HttpResponse;
 use derive_more::{Display, Error};
+use redis::RedisError;
 use sea_orm::DbErr;
 use serde::{Serialize, Serializer};
 use tracing::error;
@@ -102,6 +103,14 @@ impl ApiError {
             reference: SerializableStruct::new(&errors).ok(),
         }
     }
+
+    pub fn no_token_provided() -> Self {
+        Self {
+            status_code: StatusCode::UNAUTHORIZED,
+            details: "No token provided.".to_string(),
+            reference: None,
+        }
+    }
 }
 
 impl ResponseError for ApiError {
@@ -130,6 +139,16 @@ impl From<EntityError> for ApiError {
 
 impl From<DbErr> for ApiError {
     fn from(value: DbErr) -> Self {
+        Self {
+            status_code: StatusCode::INTERNAL_SERVER_ERROR,
+            details: value.to_string(),
+            reference: None,
+        }
+    }
+}
+
+impl From<RedisError> for ApiError {
+    fn from(value: RedisError) -> Self {
         Self {
             status_code: StatusCode::INTERNAL_SERVER_ERROR,
             details: value.to_string(),

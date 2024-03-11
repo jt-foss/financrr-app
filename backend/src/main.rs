@@ -4,10 +4,6 @@ use std::time::Duration;
 
 use actix_cors::Cors;
 use actix_limitation::{Limiter, RateLimiter};
-use actix_session::config::{CookieContentSecurity, PersistentSession};
-use actix_session::storage::RedisSessionStore;
-use actix_session::{SessionExt, SessionMiddleware};
-use actix_web::cookie::{Key, SameSite};
 use actix_web::middleware::{Compress, DefaultHeaders, NormalizePath, TrailingSlash};
 use actix_web::web::Data;
 use actix_web::{
@@ -18,10 +14,12 @@ use actix_web::{
 };
 use actix_web_validator::{Error, JsonConfig, PathConfig, QueryConfig};
 use dotenvy::dotenv;
+use redis::Client;
 use sea_orm::DatabaseConnection;
 use tracing::info;
-use utoipa::openapi::Components;
-use utoipa::{openapi, Modify, OpenApi};
+use utoipa::openapi::security::{ApiKey, ApiKeyValue, SecurityScheme};
+use utoipa::openapi::OpenApi as OpenApiStruct;
+use utoipa::{Modify, OpenApi};
 use utoipa_swagger_ui::SwaggerUi;
 use utoipauto::utoipauto;
 
@@ -37,8 +35,7 @@ use crate::api::routes::transaction::controller::transaction_controller;
 use crate::api::routes::user::controller::user_controller;
 use crate::api::status::controller::status_controller;
 use crate::config::{logger, Config};
-use crate::database::connection::{establish_database_connection, get_database_connection};
-use crate::util::identity::IDENTITY_ID_SESSION_KEY;
+use crate::database::connection::{create_redis_client, establish_database_connection, get_database_connection};
 use crate::util::validation::ValidationErrorJsonPayload;
 
 pub mod api;
@@ -49,6 +46,7 @@ pub mod util;
 pub mod wrapper;
 
 pub static DB: OnceLock<DatabaseConnection> = OnceLock::new();
+pub static REDIS: OnceLock<Client> = OnceLock::new();
 pub static CONFIG: OnceLock<Config> = OnceLock::new();
 
 #[utoipauto(paths = "./backend/src")]
@@ -56,27 +54,24 @@ pub static CONFIG: OnceLock<Config> = OnceLock::new();
 #[openapi(
 tags(
 (name = "Status", description = "Endpoints that contain information about the health status of the server."),
+(name = "Session", description = "Endpoints for session management."),
 (name = "User", description = "Endpoints for user management."),
 (name = "Account", description = "Endpoints for account management."),
 (name = "Currency", description = "Endpoints for currency management."),
 (name = "Transaction", description = "Endpoints for transaction management."),
 (name = "Budget", description = "Endpoints for budget management.")
 ),
-modifiers(& SecurityAddon)
+modifiers(&SecurityAddon)
 )]
 pub struct ApiDoc;
 
 pub struct SecurityAddon;
 
 impl Modify for SecurityAddon {
-    fn modify(&self, openapi: &mut openapi::OpenApi) {
-        match openapi.components {
-            Some(_) => {}
-            None => {
-                openapi.components = Some(Components::default());
-            }
-        }
-        openapi.components.as_mut().unwrap();
+    fn modify(&self, openapi: &mut OpenApiStruct) {
+        let components = openapi.components.as_mut().unwrap(); // we can unwrap safely since there already is components registered.
+        components
+            .add_security_scheme("api_key", SecurityScheme::ApiKey(ApiKey::Header(ApiKeyValue::new("user_api_key"))))
     }
 }
 
@@ -87,13 +82,14 @@ async fn main() -> Result<()> {
 
     info!("Starting up...");
     CONFIG.set(Config::load()).expect("Could not load config!");
+
+    info!("\t[*] Establishing database connection...");
     DB.set(establish_database_connection().await).expect("Could not set database!");
+    info!("\t[*] Establishing redis connection...");
+    REDIS.set(create_redis_client().await).expect("Could not set redis!");
 
     info!("Loading schema...");
     load_schema(get_database_connection()).await;
-
-    info!("Loading redis...");
-    let store = RedisSessionStore::new(Config::get_config().cache.get_url()).await.expect("Could not load redis!");
 
     info!("Migrating database...");
     Migrator::up(get_database_connection(), None).await.expect("Could not migrate database!");
@@ -108,9 +104,7 @@ async fn main() -> Result<()> {
     let limiter = Data::new(
         Limiter::builder(Config::get_config().cache.get_url())
             .key_by(|req| {
-                Some(req.peer_addr()
-                    .map(|addr| addr.ip().to_string())
-                    .unwrap_or_else(|| "unknown".to_string()))
+                Some(req.peer_addr().map(|addr| addr.ip().to_string()).unwrap_or_else(|| "unknown".to_string()))
             })
             .limit(5000)
             .period(Duration::from_secs(3600)) // 60 minutes
@@ -125,16 +119,6 @@ async fn main() -> Result<()> {
             .wrap(Logger::default())
             .wrap(Compress::default())
             .wrap(build_cors())
-            .wrap(
-                SessionMiddleware::builder(store.clone(), get_secret_key())
-                    // allow the cookie to be accessed from javascript
-                    .cookie_http_only(true)
-                    // allow the cookie only from the current domain
-                    .cookie_same_site(SameSite::Strict)
-                    .cookie_content_security(CookieContentSecurity::Signed)
-                    .session_lifecycle(PersistentSession::default().session_ttl(time::Duration::days(1)))
-                    .build(),
-            )
             .app_data(JsonConfig::default().error_handler(|err, _| handle_validation_error(err)))
             .app_data(QueryConfig::default().error_handler(|err, _| handle_validation_error(err)))
             .app_data(PathConfig::default().error_handler(|err, _| handle_validation_error(err)))
@@ -145,10 +129,6 @@ async fn main() -> Result<()> {
     .bind(&Config::get_config().address)?
     .run()
     .await
-}
-
-fn get_secret_key() -> Key {
-    Key::from(Config::get_config().session_secret.as_bytes())
 }
 
 fn handle_validation_error(err: Error) -> actix_web::Error {

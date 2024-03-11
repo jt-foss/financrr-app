@@ -11,9 +11,9 @@ use entity::utility::time::get_now;
 
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
+use crate::database::entity::{count, delete, find_all, find_all_paginated, find_one_or_error, insert, update};
 use crate::event::transaction::TransactionEvent;
 use crate::event::Event;
-use crate::util::entity::{count, delete, find_all, find_all_paginated, find_one_or_error, insert, update};
 use crate::wrapper::account::Account;
 use crate::wrapper::budget::Budget;
 use crate::wrapper::currency::Currency;

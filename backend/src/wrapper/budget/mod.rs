@@ -8,7 +8,7 @@ use entity::budget;
 
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
-use crate::util::entity::{count, delete, find_all, find_all_paginated, find_one_or_error, insert, update};
+use crate::database::entity::{count, delete, find_all, find_all_paginated, find_one_or_error, insert, update};
 use crate::wrapper::budget::dto::BudgetDTO;
 use crate::wrapper::permission::Permission;
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
