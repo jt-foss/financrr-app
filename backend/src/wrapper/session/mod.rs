@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use time::Duration as TimeDuration;
 use time::OffsetDateTime;
 use tokio::spawn;
-use tokio::time::{sleep, Duration};
+use tokio::time::{Duration, sleep};
 use tracing::{error, info};
 use utoipa::ToSchema;
 use uuid::Uuid;
@@ -54,7 +54,7 @@ impl Session {
 
     async fn insert_into_redis(&self) -> Result<(), ApiError> {
         set_ex(self.token.to_owned(), self.user.id.to_string(), self.expired_at.unix_timestamp() as u64).await?;
-        zadd("sessions".to_owned(), self.expired_at.unix_timestamp() as f64, self.token.to_owned()).await?;
+        zadd("sessions".to_owned(), self.token.to_owned(), self.expired_at.unix_timestamp() as f64).await?;
 
         Ok(())
     }
@@ -104,7 +104,7 @@ impl Session {
     }
 
     pub async fn count_all() -> Result<u64, ApiError> {
-        count(session::Entity::find()).await
+        count(session::Entity::count()).await
     }
 
     pub async fn init() -> Result<(), ApiError> {

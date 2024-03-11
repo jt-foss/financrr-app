@@ -12,9 +12,9 @@ pub async fn set_ex(key: String, value: String, expiration_timestamp: u64) -> Re
     Ok(conn.set_ex(key, value, expiration_timestamp).await?)
 }
 
-pub async fn zadd(key: String, score: f64, member: String) -> Result<String, ApiError> {
+pub async fn zadd(key: String, member: String, score: f64) -> Result<i32, ApiError> {
     let mut conn = get_redis_connection().await?;
-    Ok(conn.zadd(key, score, member).await?)
+    Ok(conn.zadd(key, member, score).await?)
 }
 
 pub async fn zrangebyscore(key: String, min: String, max: String) -> Result<Vec<String>, ApiError> {
