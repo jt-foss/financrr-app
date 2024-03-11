@@ -92,6 +92,12 @@ pub struct PageSizeParam {
     pub limit: u64,
 }
 
+impl PageSizeParam {
+    pub fn new(page: u64, limit: u64) -> Self {
+        Self { page, limit }
+    }
+}
+
 impl Default for PageSizeParam {
     fn default() -> Self {
         Self {

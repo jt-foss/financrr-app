@@ -37,6 +37,7 @@ use crate::api::status::controller::status_controller;
 use crate::config::{logger, Config};
 use crate::database::connection::{create_redis_client, establish_database_connection, get_database_connection};
 use crate::util::validation::ValidationErrorJsonPayload;
+use crate::wrapper::session::Session;
 
 pub mod api;
 pub mod config;
@@ -93,6 +94,9 @@ async fn main() -> Result<()> {
 
     info!("Migrating database...");
     Migrator::up(get_database_connection(), None).await.expect("Could not migrate database!");
+
+    info!("Loading sessions...");
+    Session::init().await.expect("Could not load sessions!");
 
     info!("Starting up event system...");
     event::init();

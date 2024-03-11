@@ -9,3 +9,4 @@ pub mod transaction;
 pub mod user;
 pub mod user_account;
 pub mod utility;
+pub mod session;
