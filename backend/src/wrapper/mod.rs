@@ -6,3 +6,4 @@ pub mod session;
 pub mod transaction;
 pub mod types;
 pub mod user;
+pub mod util;

@@ -51,11 +51,12 @@ impl ApiError {
     pub fn invalid_session() -> Self {
         Self {
             status_code: StatusCode::UNAUTHORIZED,
-            details: "Invalid session provided.".to_string(),
+            details: "Session expired or invalid!".to_string(),
             reference: None,
         }
     }
 
+    #[deprecated]
     pub fn invalid_identity() -> Self {
         Self {
             status_code: StatusCode::UNAUTHORIZED,

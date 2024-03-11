@@ -36,3 +36,10 @@ pub async fn del(key: String) -> Result<String, ApiError> {
     let mut conn = get_redis_connection().await?;
     Ok(conn.del(key).await?)
 }
+
+pub async fn clear_redis() -> Result<(), ApiError> {
+    let mut conn = get_redis_connection().await?;
+    redis::cmd("FLUSHALL").query_async(&mut conn).await.map_err(ApiError::from)?;
+
+    Ok(())
+}

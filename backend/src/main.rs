@@ -36,6 +36,7 @@ use crate::api::routes::user::controller::user_controller;
 use crate::api::status::controller::status_controller;
 use crate::config::{logger, Config};
 use crate::database::connection::{create_redis_client, establish_database_connection, get_database_connection};
+use crate::database::redis::clear_redis;
 use crate::util::validation::ValidationErrorJsonPayload;
 use crate::wrapper::session::Session;
 
@@ -89,22 +90,25 @@ async fn main() -> Result<()> {
     info!("\t[*] Establishing redis connection...");
     REDIS.set(create_redis_client().await).expect("Could not set redis!");
 
-    info!("Loading schema...");
+    info!("\t[*] Cleaning redis...");
+    clear_redis().await.expect("Could not clear redis!");
+
+    info!("\t[*] Loading schema...");
     load_schema(get_database_connection()).await;
 
-    info!("Migrating database...");
+    info!("\t[*] Migrating database...");
     Migrator::up(get_database_connection(), None).await.expect("Could not migrate database!");
 
-    info!("Loading sessions...");
+    info!("\t[*] Loading sessions...");
     Session::init().await.expect("Could not load sessions!");
 
-    info!("Starting up event system...");
+    info!("\t[*] Starting up event system...");
     event::init();
 
     // Make instance variable of ApiDoc so all worker threads gets the same instance.
     let openapi = ApiDoc::openapi();
 
-    info!("Initializing rate limiter...");
+    info!("\t[*] Initializing rate limiter...");
     let limiter = Data::new(
         Limiter::builder(Config::get_config().cache.get_url())
             .key_by(|req| {

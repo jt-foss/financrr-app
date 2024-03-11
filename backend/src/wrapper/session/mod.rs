@@ -1,14 +1,12 @@
 use std::ops::Add;
 
-use actix_web::http::StatusCode;
 use futures_util::future::join_all;
-use itertools::{Either, Itertools};
 use sea_orm::{EntityTrait, Set};
 use serde::{Deserialize, Serialize};
 use time::Duration as TimeDuration;
 use time::OffsetDateTime;
 use tokio::spawn;
-use tokio::time::Duration;
+use tokio::time::{sleep, Duration};
 use tracing::{error, info};
 use utoipa::ToSchema;
 use uuid::Uuid;
@@ -20,8 +18,9 @@ use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
 use crate::config::Config;
 use crate::database::entity::{count, delete, find_all_paginated, insert};
-use crate::database::redis::{del, set_ex, zadd};
+use crate::database::redis::{del, get, set_ex, zadd};
 use crate::wrapper::user::User;
+use crate::wrapper::util::handle_async_result_vec;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub struct Session {
@@ -60,49 +59,48 @@ impl Session {
         Ok(())
     }
 
+    pub async fn get_user_id(token: String) -> Result<i32, ApiError> {
+        let user_id = Self::get_user_id_from_redis(token.to_owned()).await?;
+        if user_id.is_none() {
+            return Err(ApiError::invalid_session());
+        }
+
+        Ok(user_id.unwrap())
+    }
+
+    async fn get_user_id_from_redis(token: String) -> Result<Option<i32>, ApiError> {
+        let user_id = get(token.to_owned()).await?;
+
+        match user_id.parse::<i32>() {
+            Err(_) => Err(ApiError::invalid_session()),
+            Ok(id) => Ok(Some(id)),
+        }
+    }
+
     pub async fn delete(self) -> Result<(), ApiError> {
-        match del(self.token.to_owned()).await {
-            Err(e) => error!("Could not delete session {}: {}", self.token, e),
-            _ => {}
+        if let Err(e) = del(self.token.to_owned()).await {
+            error!("Could not delete session {}: {}", self.token, e);
         }
         delete(session::Entity::delete_by_id(self.id)).await?;
 
         Ok(())
     }
 
-    pub async fn delete_by_token(session_token: String) -> Result<(), ApiError> {
-        match del(session_token.clone()).await {
-            Err(e) => error!("Could not delete session {}: {}", session_token, e),
-            _ => {}
+    pub async fn delete_by_token(session_token: &String) -> Result<(), ApiError> {
+        if let Err(e) = del(session_token.clone()).await {
+            error!("Could not delete session {}: {}", session_token, e);
         }
-        delete(session::Entity::delete_by_token(session_token)).await?;
+        delete(session::Entity::delete_by_token(session_token.clone())).await?;
 
         Ok(())
     }
 
     pub async fn find_all_paginated(page_size: &PageSizeParam) -> Result<Vec<Self>, ApiError> {
-        let results = join_all(
-            find_all_paginated(session::Entity::find(), page_size)
-                .await?
-                .into_iter()
-                .map(|model| Self::from_model(model)),
-        )
-        .await;
+        let results =
+            join_all(find_all_paginated(session::Entity::find(), page_size).await?.into_iter().map(Self::from_model))
+                .await;
 
-        Self::handle_result_vec(results)
-    }
-
-    fn handle_result_vec(results: Vec<Result<Session, ApiError>>) -> Result<Vec<Self>, ApiError> {
-        let (sessions, errors): (Vec<_>, Vec<_>) = results.into_iter().partition_map(|result| match result {
-            Ok(session) => Either::Left(session),
-            Err(error) => Either::Right(error),
-        });
-
-        if !errors.is_empty() {
-            return Err(ApiError::from_error_vec(errors, StatusCode::INTERNAL_SERVER_ERROR));
-        }
-
-        Ok(sessions)
+        handle_async_result_vec(results)
     }
 
     pub async fn count_all() -> Result<u64, ApiError> {
@@ -122,6 +120,7 @@ impl Session {
             let sessions = Self::find_all_paginated(&page_size).await?;
             for session in sessions {
                 session.insert_into_redis().await?;
+                session.schedule_deletion().await?;
             }
         }
 
@@ -143,11 +142,10 @@ impl Session {
 
     fn schedule_deletion_task(session_key: String, delay: u64) {
         spawn(async move {
-            tokio::time::sleep(Duration::from_secs(delay)).await;
-            match Self::delete_by_token(session_key).await {
-                Err(e) => error!("Could not delete session {}: {}", session_key, e),
-                _ => (),
-            };
+            sleep(Duration::from_secs(delay)).await;
+            if let Err(e) = Self::delete_by_token(&session_key).await {
+                error!("Could not delete session {}: {}", session_key, e);
+            }
         });
     }
 
@@ -163,9 +161,5 @@ impl Session {
 
     fn generate_session_key() -> String {
         Uuid::new_v4().to_string()
-    }
-
-    fn calculate_end_datetime() -> OffsetDateTime {
-        get_now().add(TimeDuration::hours(Config::get_config().session_lifetime_hours as i64))
     }
 }

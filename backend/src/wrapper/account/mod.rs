@@ -1,6 +1,4 @@
-use actix_web::http::StatusCode;
 use futures_util::future::join_all;
-use itertools::{Either, Itertools};
 use sea_orm::{EntityTrait, IntoActiveModel, Set};
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
@@ -18,6 +16,7 @@ use crate::wrapper::account::dto::AccountDTO;
 use crate::wrapper::currency::Currency;
 use crate::wrapper::permission::Permission;
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
+use crate::wrapper::util::handle_async_result_vec;
 
 pub mod dto;
 pub mod event_listener;
@@ -103,7 +102,7 @@ impl Account {
         )
         .await;
 
-        Self::handle_result_vec(results)
+        handle_async_result_vec(results)
     }
 
     pub async fn find_all_by_user_paginated(user_id: i32, page_size: &PageSizeParam) -> Result<Vec<Self>, ApiError> {
@@ -115,20 +114,7 @@ impl Account {
         )
         .await;
 
-        Self::handle_result_vec(results)
-    }
-
-    fn handle_result_vec(results: Vec<Result<Self, ApiError>>) -> Result<Vec<Self>, ApiError> {
-        let (accounts, errors): (Vec<_>, Vec<_>) = results.into_iter().partition_map(|result| match result {
-            Ok(account) => Either::Left(account),
-            Err(error) => Either::Right(error),
-        });
-
-        if !errors.is_empty() {
-            return Err(ApiError::from_error_vec(errors, StatusCode::INTERNAL_SERVER_ERROR));
-        }
-
-        Ok(accounts)
+        handle_async_result_vec(results)
     }
 
     pub async fn count_all_by_user(user_id: i32) -> Result<u64, ApiError> {
