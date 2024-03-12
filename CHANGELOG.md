@@ -8,6 +8,8 @@
 - added cors configuration
 - Added pagination to `get_all` endpoints
 - moved to token-based session authentication
+- new session limit (defaults to 25)
+- new session endpoints and session management
 
 # Version 0.1.0 (26.02.2024)
 
