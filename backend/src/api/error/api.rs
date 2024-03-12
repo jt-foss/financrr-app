@@ -56,11 +56,10 @@ impl ApiError {
         }
     }
 
-    #[deprecated]
-    pub fn invalid_identity() -> Self {
+    pub fn session_limit_reached() -> Self {
         Self {
-            status_code: StatusCode::UNAUTHORIZED,
-            details: "Invalid identity provided.".to_string(),
+            status_code: StatusCode::CONFLICT,
+            details: "Session limit reached!".to_string(),
             reference: None,
         }
     }

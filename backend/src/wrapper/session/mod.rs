@@ -35,6 +35,10 @@ impl Session {
     pub async fn new(user: User) -> Result<Self, ApiError> {
         let session_token = Self::generate_session_key();
 
+        if Self::reached_session_limit(user.id).await? {
+            return Err(ApiError::session_limit_reached());
+        }
+
         // insert into database
         let session = session::ActiveModel {
             id: Default::default(),
@@ -105,6 +109,16 @@ impl Session {
 
     pub async fn count_all() -> Result<u64, ApiError> {
         count(session::Entity::count()).await
+    }
+
+    pub async fn count_all_by_user(user_id: i32) -> Result<u64, ApiError> {
+        count(session::Entity::count_by_user(user_id)).await
+    }
+
+    pub async fn reached_session_limit(user_id: i32) -> Result<bool, ApiError> {
+        let sessions = Self::count_all_by_user(user_id).await?;
+
+        Ok(sessions >= Config::get_config().session_limit)
     }
 
     pub async fn init() -> Result<(), ApiError> {

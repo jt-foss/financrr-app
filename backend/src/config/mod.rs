@@ -11,6 +11,7 @@ pub mod logger;
 pub struct Config {
     pub address: String,
     pub session_lifetime_hours: u64,
+    pub session_limit: u64,
     pub database: DatabaseConfig,
     pub cache: RedisConfig,
     pub cors: CorsConfig,
@@ -56,6 +57,9 @@ impl Config {
             session_lifetime_hours: get_env_or_default("SESSION_LIFETIME_HOURS", "168")
                 .parse::<u64>()
                 .expect("Could not parse SESSION_LIFETIME_HOURS to u64!"),
+            session_limit: get_env_or_default("SESSION_LIMIT", "25")
+                .parse::<u64>()
+                .expect("Could not parse SESSION_LIMIT to u64!"),
             database: DatabaseConfig::build_config(),
             cache: RedisConfig::build_config(),
             cors: CorsConfig::build_config(),
