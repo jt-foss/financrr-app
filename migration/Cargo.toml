@@ -1,0 +1,29 @@
+[package]
+name = "migration"
+version.workspace = true
+authors.workspace = true
+description.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+readme.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+# Async runtime
+async-std = { version = "1.12.0", features = ["attributes", "tokio1"] }
+
+# Entity
+entity = { path = "../entity" }
+
+# Sea-orm
+sea-orm.workspace = true
+sea-orm-migration = "1.0.0-rc.1"
+tracing.workspace = true
+
+# Date/Time
+time.workspace = true

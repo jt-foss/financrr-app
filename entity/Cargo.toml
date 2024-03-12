@@ -1,0 +1,34 @@
+[package]
+name = "entity"
+version.workspace = true
+authors.workspace = true
+description.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+readme.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[lints.clippy]
+wildcard_imports = "allow"
+
+[package.metadata.cargo-machete]
+ignored = ["rust-argon2"]
+
+[dependencies]
+# ORM
+sea-orm.workspace = true
+
+# Serialization/Deserialization
+serde.workspace = true
+
+# Encryption
+rand = "0.8.5"
+rust-argon2 = "2.1.0"
+
+# Error handling
+thiserror = "1.0.58"
+
+# Date/Time
+time.workspace = true
