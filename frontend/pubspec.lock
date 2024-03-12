@@ -426,10 +426,10 @@ packages:
     description:
       path: "."
       ref: development
-      resolved-ref: "090d671b3084c5564a717b104624941bc57ce25a"
+      resolved-ref: aed99f5879bbd6bec388a7b0906880558d07d845
       url: "https://github.com/financrr/restrr.git"
     source: git
-    version: "0.5.0"
+    version: "0.6.2"
   shared_preferences:
     dependency: "direct main"
     description:
