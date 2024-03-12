@@ -3,17 +3,16 @@ name: (Backend) Create and publish Docker image
 on:
   push:
     branches: [ 'main' ]
+    paths:
+      - 'backend/**'
   create:
     tags: [ '*' ]
+    paths:
+      - 'backend/**'
 
 concurrency:
   group: "docker-build-backend"
   cancel-in-progress: false
-
-# Set default working directory
-defaults:
-  run:
-    working-directory: ./backend  # Change the working directory to /backend
 
 env:
   REGISTRY: ghcr.io
@@ -25,6 +24,10 @@ jobs:
     permissions:
       contents: read
       packages: write
+    # Set default working directory
+    defaults:
+      run:
+        working-directory: ./backend  # Change the working directory to /backend
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -55,6 +58,10 @@ jobs:
     permissions:
       contents: read
       packages: write
+    # Set default working directory
+    defaults:
+      run:
+        working-directory: ./backend  # Change the working directory to /backend
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
