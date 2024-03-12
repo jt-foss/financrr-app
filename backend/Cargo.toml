@@ -17,7 +17,7 @@ workspace = true
 
 [dependencies]
 # Actix
-actix-web = { version = "4.5.1", features = ["rustls-0_22", "secure-cookies"] }
+actix-web = { version = "4.5.1", features = ["rustls-0_22"] }
 actix-cors = "0.7.0"
 actix-limitation = "0.5.1"
 
@@ -58,7 +58,6 @@ dotenvy = "0.15.7"
 derive_more = { version = "1.0.0-beta.6", features = ["display", "error"] }
 regex = { version = "1.10.3", features = ["std", "perf", "unicode"] }
 itertools = "0.12.1"
-rand = "0.8.5"
 
 # Future Utils
 futures-util = "0.3.30"
