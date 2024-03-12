@@ -32,13 +32,14 @@ pub mod dto;
 pub struct Session {
     pub id: i32,
     pub token: String,
+    pub name: Option<String>,
     #[serde(with = "time::serde::rfc3339")]
     pub expired_at: OffsetDateTime,
     pub user: User,
 }
 
 impl Session {
-    pub async fn new(user: User) -> Result<Self, ApiError> {
+    pub async fn new(user: User, session_name: Option<String>) -> Result<Self, ApiError> {
         let session_token = Self::generate_session_key();
 
         if Self::reached_session_limit(user.id).await? {
@@ -49,6 +50,7 @@ impl Session {
         let session = session::ActiveModel {
             id: Default::default(),
             token: Set(session_token.clone()),
+            name: Set(session_name),
             user: Set(user.id),
             created_at: Set(get_now()),
         };
@@ -76,6 +78,7 @@ impl Session {
         let active_model = session::ActiveModel {
             id: Set(self.id),
             token: Set(self.token.to_owned()),
+            name: Set(self.name.clone()),
             user: Set(self.user.id),
             created_at: Set(get_now()),
         };
@@ -234,6 +237,7 @@ impl Session {
         let user = User::find_by_id(model.user).await?;
         Ok(Self {
             id: model.id,
+            name: model.name,
             token: model.token,
             user,
             expired_at: model.created_at.add(TimeDuration::hours(Config::get_config().session_lifetime_hours as i64)),

@@ -11,6 +11,8 @@ pub struct Model {
     pub id: i32,
     #[sea_orm(column_type = "Text", unique)]
     pub token: String,
+    #[sea_orm(column_type = "Text", nullable)]
+    pub name: Option<String>,
     pub user: i32,
     pub created_at: TimeDateTimeWithTimeZone,
 }

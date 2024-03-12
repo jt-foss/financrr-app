@@ -26,6 +26,8 @@ pub struct Credentials {
     pub username: String,
     #[validate(length(min = 1))]
     pub password: String,
+    #[validate(length(min = 1))]
+    pub session_name: Option<String>,
 }
 
 impl FromRequest for UserRegistration {

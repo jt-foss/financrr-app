@@ -179,8 +179,10 @@ tag = "Session"
 )]
 #[post("")]
 pub async fn create(credentials: Json<Credentials>) -> Result<impl Responder, ApiError> {
-    let user = User::authenticate(credentials.into_inner()).await?;
-    let session = Session::new(user).await?;
+    let credentials = credentials.into_inner();
+    let session_name = credentials.session_name.clone();
+    let user = User::authenticate(credentials).await?;
+    let session = Session::new(user, session_name).await?;
 
     Ok(HttpResponse::Ok().json(session))
 }
