@@ -1,9 +1,18 @@
-name: Clippy
+name: (Backend) Clippy
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'backend/**'
   pull_request:
     branches: [ "main" ]
+    paths:
+      - 'backend/**'
+
+# Set default working directory
+defaults:
+  run:
+    working-directory: ./backend  # Change the working directory to /backend
 
 # Make sure CI fails on all warnings, including Clippy lints
 env:

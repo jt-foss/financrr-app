@@ -1,4 +1,4 @@
-name: Security audit
+name: (Rust) Security audit
 on:
   push:
     paths:
@@ -8,6 +8,11 @@ on:
     paths:
       - '**/Cargo.toml'
       - '**/Cargo.lock'
+
+# Set default working directory
+defaults:
+  run:
+    working-directory: ./backend  # Change the working directory to /backend
 
 jobs:
   security_audit:

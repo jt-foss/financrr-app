@@ -2,12 +2,12 @@
 
 ## Supported Versions
 
-We only support the latest version.<br>
+We currently only support the latest version.<br>
 Please make sure to update to the latest version before submitting a security issue.
 
 ## Reporting a Vulnerability
 
-**Email us:** Send an email to dev@denux.dev with the subject line "Security Vulnerability Report."
+**Email us:** Send an email to `security@financrr.app` with the subject line "Security Vulnerability Report."
 
 **Include Details:** Clearly describe the security issue in the body of the email. Provide sufficient information for us
 to understand the problem without compromising sensitive details.
@@ -23,4 +23,4 @@ further clarification or updates.
 
 ## How to contact us
 
-You can send us an E-Mail at `dev@denux.dev` to report a security issue.
+You can send us an E-Mail at `security@financrr.app` to report a security issue.

@@ -1,9 +1,16 @@
-name: Deploy Flutter Web
+name: (Frontend) Deploy Flutter Web
 
 on:
   workflow_dispatch:
   push:
-    branches: [ development ]
+    branches: [ main ]
+    paths:
+      - 'frontend/**'
+
+# Set default working directory
+defaults:
+  run:
+    working-directory: ./frontend  # Change the working directory to /frontend
 
 jobs:
   build:

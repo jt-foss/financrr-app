@@ -1,4 +1,4 @@
-name: Create and publish a Docker image
+name: (Backend) Create and publish Docker image
 
 on:
   push:
@@ -7,8 +7,13 @@ on:
     tags: [ '*' ]
 
 concurrency:
-  group: "docker-build"
+  group: "docker-build-backend"
   cancel-in-progress: false
+
+# Set default working directory
+defaults:
+  run:
+    working-directory: ./backend  # Change the working directory to /backend
 
 env:
   REGISTRY: ghcr.io

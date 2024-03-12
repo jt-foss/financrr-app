@@ -1,4 +1,4 @@
-name: Deploy PR previews
+name: (Frontend) Deploy PR previews
 concurrency: preview-${{ github.ref }}
 on:
   pull_request:
@@ -8,19 +8,24 @@ on:
       - synchronize
       - closed
     paths:
-      - './lib'
+      - 'frontend/lib'
       - '**.dart'
+
+# Set default working directory
+defaults:
+  run:
+    working-directory: ./frontend  # Change the working directory to /frontend
 
 jobs:
   deploy-preview:
     runs-on: ubuntu-latest
-    
+
     permissions:
       contents: write
       pull-requests: write
       pages: write
       id-token: write
-    
+
     steps:
       - uses: actions/checkout@v4
 

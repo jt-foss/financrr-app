@@ -6,7 +6,7 @@
 version: 2
 updates:
   - package-ecosystem: "cargo" # See documentation for possible values
-    directory: "/" # Location of package manifests
+    directory: "/backend/" # Location of package manifests
     schedule:
       interval: "daily"
       time: "06:00"
@@ -15,8 +15,13 @@ updates:
     schedule:
       interval: "daily"
       time: "06:00"
+  - package-ecosystem: "pub"
+    directory: "/frontend/"
+    schedule:
+      interval: "daily"
+      time: "06:00"
   - package-ecosystem: "docker"
-    directory: "/docker/rust"
+    directory: "/backend/docker/rust"
     schedule:
       interval: "daily"
       time: "06:00"

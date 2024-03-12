@@ -41,7 +41,11 @@ on:
   push:
     tags:
       - '**[0-9]+.[0-9]+.[0-9]+*'
-  pull_request:
+
+# Set default working directory
+defaults:
+  run:
+    working-directory: ./backend  # Change the working directory to /backend
 
 jobs:
   # Run 'cargo dist plan' (or host) to determine what tasks we need to do

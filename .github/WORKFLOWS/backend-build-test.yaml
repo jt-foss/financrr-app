@@ -1,10 +1,19 @@
-name: Rust
+name: (Backend Rust) Build and Test
 
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'backend/**'
   pull_request:
     branches: [ "main" ]
+    paths:
+      - 'backend/**'
+
+# Set default working directory
+defaults:
+  run:
+    working-directory: ./backend  # Change the working directory to /backend
 
 env:
   CARGO_TERM_COLOR: always

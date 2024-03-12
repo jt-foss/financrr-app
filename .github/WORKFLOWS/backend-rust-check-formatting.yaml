@@ -1,10 +1,19 @@
-name: Format
+name: (Backend Rust) Check formatting
 permissions: write-all
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'backend/**'
   pull_request:
     branches: [ "main" ]
+    paths:
+      - 'backend/**'
+
+# Set default working directory
+defaults:
+  run:
+    working-directory: ./backend  # Change the working directory to /backend
 
 jobs:
   format:
