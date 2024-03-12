@@ -1,0 +1,38 @@
+name: Deploy Flutter Web
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ development ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.19.0'
+
+      - name: Flutter Clean and Upgrade Packages
+        run: |
+          flutter clean
+          flutter pub upgrade
+
+      - name: Build Web
+        run: flutter build web --release
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: gh-pages
+          folder: build/web
