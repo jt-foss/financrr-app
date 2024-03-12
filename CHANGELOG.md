@@ -1,5 +1,9 @@
 # Unreleased
 
+Nothing yet!
+
+# Version 0.2.0 (12.03.2024)
+
 - dependency updates
 - improved logging
 - Added logging file with log rotation.

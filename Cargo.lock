@@ -675,7 +675,7 @@ checksum = "d468802bab17cbc0cc575e9b053f41e72aa36bfa6b7f55e3529ffa43161b97fa"
 
 [[package]]
 name = "backend"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "actix-cors",
  "actix-limitation",
@@ -1267,7 +1267,7 @@ dependencies = [
 
 [[package]]
 name = "entity"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "rand",
  "rust-argon2",
@@ -2004,7 +2004,7 @@ checksum = "523dc4f511e55ab87b694dc30d0f820d60906ef06413f93d4d7a1385599cc149"
 
 [[package]]
 name = "migration"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "async-std",
  "entity",
