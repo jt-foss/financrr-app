@@ -32,4 +32,4 @@ jobs:
           toolchain: nightly-${{ env.date }}
           flags: --all
           args: --config-path=./rustfmt.toml
-          working-directory: .
+          working-directory: ./backend

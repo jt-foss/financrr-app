@@ -45,8 +45,8 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: ./docker/rust/Dockerfile
+          context: ./backend
+          file: ./backend/docker/rust/Dockerfile
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:nightly
@@ -79,8 +79,8 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: ./docker/rust/Dockerfile
+          context: ./backend
+          file: ./backend/docker/rust/Dockerfile
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.ref }}
