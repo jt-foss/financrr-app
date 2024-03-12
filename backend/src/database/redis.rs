@@ -17,12 +17,12 @@ pub async fn zadd(key: String, member: String, score: f64) -> Result<i32, ApiErr
     Ok(conn.zadd(key, member, score).await?)
 }
 
-pub async fn zrangebyscore(key: String, min: String, max: String) -> Result<Vec<String>, ApiError> {
+pub async fn zrangebyscore(key: String, min: String, max: String) -> Result<Vec<i32>, ApiError> {
     let mut conn = get_redis_connection().await?;
     Ok(conn.zrangebyscore(key, min, max).await?)
 }
 
-pub async fn zscore(key: String, member: String) -> Result<String, ApiError> {
+pub async fn zscore(key: String, member: String) -> Result<i32, ApiError> {
     let mut conn = get_redis_connection().await?;
     Ok(conn.zscore(key, member).await?)
 }

@@ -36,6 +36,14 @@ impl Related<super::user::Entity> for Entity {
 impl ActiveModelBehavior for ActiveModel {}
 
 impl Entity {
+    pub fn find_by_token(token: String) -> Select<Self> {
+        Self::find().filter(Column::Token.eq(token))
+    }
+
+    pub fn find_by_user(user_id: i32) -> Select<Self> {
+        Self::find().filter(Column::User.eq(user_id))
+    }
+
     pub fn count() -> Select<Self> {
         Self::find().column(Column::Id)
     }

@@ -1,6 +1,8 @@
 use std::ops::Add;
 
-use futures_util::future::join_all;
+use actix_web::dev::Payload;
+use actix_web::{FromRequest, HttpRequest};
+use futures_util::future::{join_all, LocalBoxFuture};
 use sea_orm::{EntityTrait, Set};
 use serde::{Deserialize, Serialize};
 use time::Duration as TimeDuration;
@@ -17,10 +19,14 @@ use entity::utility::time::get_now;
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
 use crate::config::Config;
-use crate::database::entity::{count, delete, find_all_paginated, insert};
+use crate::database::entity::{count, delete, find_all_paginated, find_one_or_error, insert, update};
 use crate::database::redis::{del, get, set_ex, zadd};
+use crate::util::auth::extract_bearer_token;
+use crate::wrapper::permission::Permission;
 use crate::wrapper::user::User;
 use crate::wrapper::util::handle_async_result_vec;
+
+pub mod dto;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub struct Session {
@@ -63,6 +69,21 @@ impl Session {
         Ok(())
     }
 
+    pub async fn renew(mut self) -> Result<Self, ApiError> {
+        self.expired_at = get_now().add(TimeDuration::hours(Config::get_config().session_lifetime_hours as i64));
+        self.insert_into_redis().await?;
+
+        let active_model = session::ActiveModel {
+            id: Set(self.id),
+            token: Set(self.token.to_owned()),
+            user: Set(self.user.id),
+            created_at: Set(get_now()),
+        };
+        let model = update(active_model).await?;
+
+        Self::from_model(model).await
+    }
+
     pub async fn get_user_id(token: String) -> Result<i32, ApiError> {
         let user_id = Self::get_user_id_from_redis(token.to_owned()).await?;
         if user_id.is_none() {
@@ -99,12 +120,58 @@ impl Session {
         Ok(())
     }
 
+    pub async fn delete_all_with_user(user_id: i32) -> Result<(), ApiError> {
+        let sessions = Self::find_all_by_user(user_id).await?;
+
+        for session in sessions {
+            session.delete().await?;
+        }
+
+        Ok(())
+    }
+
     pub async fn find_all_paginated(page_size: &PageSizeParam) -> Result<Vec<Self>, ApiError> {
         let results =
             join_all(find_all_paginated(session::Entity::find(), page_size).await?.into_iter().map(Self::from_model))
                 .await;
 
         handle_async_result_vec(results)
+    }
+
+    pub async fn find_all_by_user_paginated(user_id: i32, page_size: &PageSizeParam) -> Result<Vec<Self>, ApiError> {
+        let results = join_all(
+            find_all_paginated(session::Entity::find_by_user(user_id), page_size)
+                .await?
+                .into_iter()
+                .map(Self::from_model),
+        )
+        .await;
+
+        handle_async_result_vec(results)
+    }
+
+    pub async fn find_all_by_user(user_id: i32) -> Result<Vec<Self>, ApiError> {
+        let results = join_all(
+            find_all_paginated(session::Entity::find_by_user(user_id), &PageSizeParam::default())
+                .await?
+                .into_iter()
+                .map(Self::from_model),
+        )
+        .await;
+
+        handle_async_result_vec(results)
+    }
+
+    pub async fn find_by_id(id: i32) -> Result<Self, ApiError> {
+        let model = find_one_or_error(session::Entity::find_by_id(id), "Session").await?;
+
+        Self::from_model(model).await
+    }
+
+    pub async fn find_by_token(token: String) -> Result<Self, ApiError> {
+        let model = find_one_or_error(session::Entity::find_by_token(token), "Session").await?;
+
+        Self::from_model(model).await
     }
 
     pub async fn count_all() -> Result<u64, ApiError> {
@@ -175,5 +242,33 @@ impl Session {
 
     fn generate_session_key() -> String {
         Uuid::new_v4().to_string()
+    }
+}
+
+impl Permission for Session {
+    async fn has_access(&self, user_id: i32) -> Result<bool, ApiError> {
+        if self.user.id == user_id {
+            return Ok(true);
+        }
+
+        Ok(false)
+    }
+
+    async fn can_delete(&self, user_id: i32) -> Result<bool, ApiError> {
+        self.has_access(user_id).await
+    }
+}
+
+impl FromRequest for Session {
+    type Error = ApiError;
+    type Future = LocalBoxFuture<'static, Result<Self, ApiError>>;
+
+    fn from_request(req: &HttpRequest, _payload: &mut Payload) -> Self::Future {
+        let req = req.clone();
+        Box::pin(async move {
+            let token = extract_bearer_token(&req)?;
+
+            Self::find_by_token(token).await
+        })
     }
 }

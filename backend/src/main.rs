@@ -58,7 +58,7 @@ tags(
 (name = "Status", description = "Endpoints that contain information about the health status of the server."),
 (name = "Session", description = "Endpoints for session management."),
 (name = "User", description = "Endpoints for user management."),
-(name = "Account", description = "Endpoints for account management."),
+(name = "Account", description = "Endpoints for finance-account management."),
 (name = "Currency", description = "Endpoints for currency management."),
 (name = "Transaction", description = "Endpoints for transaction management."),
 (name = "Budget", description = "Endpoints for budget management.")
