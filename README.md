@@ -9,6 +9,10 @@
 financrr is an open-source financing manager app designed to help you gain better control and understanding of your finances. 
 With its intuitive interface and powerful features, Financrr empowers users to track expenses, set budgets, and achieve their financial goals.
 
+## ⚠️ Please note
+> financrr is currently under major development, and there is no official release yet. None of the listed features below are available for use at the moment.
+> However, we are working diligently towards a 1.0 release!
+
 ## ✨ (Planned) Features
 
 - [ ] **Expense Tracking**: Easily track your expenses and categorize them for better organization.
