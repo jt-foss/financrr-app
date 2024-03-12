@@ -9,6 +9,15 @@ CREATE TABLE IF NOT EXISTS "user"
     is_admin     BOOLEAN                  NOT NULL DEFAULT FALSE
 );
 
+CREATE TABLE IF NOT EXISTS session
+(
+    id         SERIAL PRIMARY KEY,
+    token      TEXT UNIQUE                                                        NOT NULL,
+    name       TEXT,
+    "user"     INTEGER REFERENCES "user" (id) ON UPDATE CASCADE ON DELETE CASCADE NOT NULL,
+    created_at timestamp with time zone                                           NOT NULL DEFAULT current_timestamp
+);
+
 CREATE TABLE IF NOT EXISTS currency
 (
     id             SERIAL PRIMARY KEY,

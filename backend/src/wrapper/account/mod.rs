@@ -1,6 +1,4 @@
-use actix_web::http::StatusCode;
 use futures_util::future::join_all;
-use itertools::{Either, Itertools};
 use sea_orm::{EntityTrait, IntoActiveModel, Set};
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
@@ -10,11 +8,15 @@ use entity::utility::time::get_now;
 use entity::{account, user_account};
 
 use crate::api::error::api::ApiError;
-use crate::util::entity::{count, delete, find_all, find_one, find_one_or_error, insert, update};
+use crate::api::pagination::PageSizeParam;
+use crate::database::entity::{
+    count, delete, find_all, find_all_paginated, find_one, find_one_or_error, insert, update,
+};
 use crate::wrapper::account::dto::AccountDTO;
 use crate::wrapper::currency::Currency;
 use crate::wrapper::permission::Permission;
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
+use crate::wrapper::util::handle_async_result_vec;
 
 pub mod dto;
 pub mod event_listener;
@@ -100,16 +102,23 @@ impl Account {
         )
         .await;
 
-        let (accounts, errors): (Vec<_>, Vec<_>) = results.into_iter().partition_map(|result| match result {
-            Ok(account) => Either::Left(account),
-            Err(error) => Either::Right(error),
-        });
+        handle_async_result_vec(results)
+    }
 
-        if !errors.is_empty() {
-            return Err(ApiError::from_error_vec(errors, StatusCode::INTERNAL_SERVER_ERROR));
-        }
+    pub async fn find_all_by_user_paginated(user_id: i32, page_size: &PageSizeParam) -> Result<Vec<Self>, ApiError> {
+        let results = join_all(
+            find_all_paginated(user_account::Entity::find_by_user_id(user_id), page_size)
+                .await?
+                .into_iter()
+                .map(|model| Self::find_by_id(model.account_id)),
+        )
+        .await;
 
-        Ok(accounts)
+        handle_async_result_vec(results)
+    }
+
+    pub async fn count_all_by_user(user_id: i32) -> Result<u64, ApiError> {
+        count(user_account::Entity::find_by_user_id(user_id)).await
     }
 
     fn to_model(&self) -> account::Model {

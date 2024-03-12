@@ -1,8 +1,8 @@
 use actix_web::{get, web, HttpResponse, Responder};
 
 use crate::api::status::dto::HealthResponse;
-use crate::config::Config;
-use crate::database::connection::get_database_connection;
+use crate::database::connection::{get_database_connection, get_redis_connection};
+use crate::database::redis::cmd;
 
 pub fn status_controller(cfg: &mut web::ServiceConfig) {
     cfg.service(web::scope("/status").service(health).service(coffee));
@@ -41,7 +41,7 @@ path = "/api/status/coffee",
 tag = "Status")]
 #[get("/coffee")]
 pub async fn coffee() -> impl Responder {
-    HttpResponse::ImATeapot().finish()
+    HttpResponse::ImATeapot()
 }
 
 async fn is_psql_reachable() -> bool {
@@ -50,15 +50,9 @@ async fn is_psql_reachable() -> bool {
 }
 
 async fn is_redis_reachable() -> bool {
-    let client = match redis::Client::open(Config::get_config().cache.get_url()) {
-        Ok(client) => client,
-        Err(_) => return false,
+    if get_redis_connection().await.is_err() {
+        return false;
     };
 
-    let mut con = match client.get_async_connection().await {
-        Ok(con) => con,
-        Err(_) => return false,
-    };
-
-    redis::cmd("PING").query_async::<_, ()>(&mut con).await.is_ok()
+    cmd(redis::cmd("PING")).await.is_ok()
 }

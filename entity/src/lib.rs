@@ -5,6 +5,7 @@ pub mod budget;
 pub mod currency;
 pub mod error;
 pub mod prelude;
+pub mod session;
 pub mod transaction;
 pub mod user;
 pub mod user_account;

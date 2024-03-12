@@ -1,8 +1,8 @@
-use log::error;
 use once_cell::sync::OnceCell;
 use tokio::spawn;
 use tokio::sync::broadcast::Receiver;
 use tokio::time::Duration;
+use tracing::error;
 
 use crate::event::{Event, EventBus, EventFilter, EventResult};
 use crate::wrapper::transaction::Transaction;

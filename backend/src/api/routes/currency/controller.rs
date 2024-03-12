@@ -1,9 +1,11 @@
+use actix_web::http::Uri;
 use actix_web::web::Path;
 use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
 use actix_web_validator::Json;
-use log::info;
+use tracing::info;
 
 use crate::api::error::api::ApiError;
+use crate::api::pagination::{PageSizeParam, Pagination};
 use crate::util::utoipa::{InternalServerError, ResourceNotFound, Unauthorized};
 use crate::wrapper::currency::dto::CurrencyDTO;
 use crate::wrapper::currency::Currency;
@@ -19,22 +21,36 @@ pub fn currency_controller(cfg: &mut web::ServiceConfig) {
 
 #[utoipa::path(get,
 responses(
-(status = 200, description = "Successfully retrieved all Currencies.", content_type = "application/json", body = Vec < Currency >),
+(status = 200, description = "Successfully retrieved all Currencies.", content_type = "application/json", body = PaginatedCurrency),
 (status = 401, response = Unauthorized),
 (status = 500, response = InternalServerError)
 ),
-path = "/api/v1/currency",
+security(
+("bearer_token" = [])
+),
+params(PageSizeParam),
+path = "/api/v1/currency/?page={page}&limit={limit}",
 tag = "Currency")]
 #[get("")]
-pub async fn get_all(user: Option<Phantom<User>>) -> Result<impl Responder, ApiError> {
-    let mut currencies = Currency::find_all_with_no_user().await?;
-    let mut user_currencies: Vec<Currency> = vec![];
+pub async fn get_all(
+    user: Option<Phantom<User>>,
+    page_size: PageSizeParam,
+    uri: Uri,
+) -> Result<impl Responder, ApiError> {
+    let mut user_currency_count = 0;
+    let mut currencies = Currency::find_all_with_no_user_paginated(&page_size).await?;
     if let Some(user) = user {
-        user_currencies = Currency::find_all_with_user(user.get_id()).await?;
-    }
-    currencies.append(&mut user_currencies);
+        let user_currencies = Currency::find_all_with_user_paginated(user.get_id(), &page_size).await?;
+        currencies.extend(user_currencies);
 
-    Ok(HttpResponse::Ok().json(currencies))
+        user_currency_count = Currency::count_all_with_user(user.get_id()).await?;
+    }
+    currencies.truncate(page_size.limit as usize);
+
+    let currency_count = Currency::count_all_with_no_user().await?;
+    let size = currency_count + user_currency_count;
+
+    Ok(HttpResponse::Ok().json(Pagination::new(currencies, &page_size, size, uri)))
 }
 
 #[utoipa::path(get,
@@ -43,6 +59,9 @@ responses(
 (status = 401, response = Unauthorized),
 (status = 404, response = ResourceNotFound),
 (status = 500, response = InternalServerError)
+),
+security(
+("bearer_token" = [])
 ),
 path = "/api/v1/currency/{currency_id}",
 tag = "Currency")]
@@ -60,6 +79,9 @@ responses(
 (status = 401, response = Unauthorized),
 (status = 500, response = InternalServerError)
 ),
+security(
+("bearer_token" = [])
+),
 path = "/api/v1/currency",
 request_body = CurrencyDTO,
 tag = "Currency")]
@@ -74,6 +96,9 @@ responses(
 (status = 401, response = Unauthorized),
 (status = 404, response = ResourceNotFound),
 (status = 500, response = InternalServerError)
+),
+security(
+("bearer_token" = [])
 ),
 path = "/api/v1/currency/{currency_id}",
 tag = "Currency")]
@@ -98,6 +123,9 @@ responses(
 (status = 401, response = Unauthorized),
 (status = 404, response = ResourceNotFound),
 (status = 500, response = InternalServerError)
+),
+security(
+("bearer_token" = [])
 ),
 path = "/api/v1/currency/{currency_id}",
 request_body = CurrencyDTO,

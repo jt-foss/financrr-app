@@ -12,6 +12,7 @@ services:
       TZ: ${TIMEZONE}
     volumes:
       - ./:/usr/src/financrr
+      - ./logs:/home/financrr/logs
     ports:
       - "127.0.0.1:3000:8080"
     depends_on:

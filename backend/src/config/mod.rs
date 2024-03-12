@@ -1,16 +1,20 @@
 use std::env;
 use std::str::FromStr;
 
-use log::LevelFilter;
+use tracing::log::LevelFilter;
 
 use crate::CONFIG;
+
+pub mod logger;
 
 #[derive(Debug)]
 pub struct Config {
     pub address: String,
-    pub session_secret: String,
+    pub session_lifetime_hours: u64,
+    pub session_limit: u64,
     pub database: DatabaseConfig,
     pub cache: RedisConfig,
+    pub cors: CorsConfig,
 }
 
 #[derive(Debug)]
@@ -33,6 +37,12 @@ pub struct RedisConfig {
     pub port: u16,
 }
 
+#[derive(Debug)]
+pub struct CorsConfig {
+    pub allowed_origins: Vec<String>,
+    pub allow_any_origin: bool,
+}
+
 impl Config {
     pub fn get_database_url(&self) -> String {
         format!(
@@ -44,9 +54,15 @@ impl Config {
     pub fn load() -> Self {
         Self {
             address: get_env_or_error("ADDRESS"),
-            session_secret: get_env_or_error("SESSION_SECRET"),
+            session_lifetime_hours: get_env_or_default("SESSION_LIFETIME_HOURS", "168")
+                .parse::<u64>()
+                .expect("Could not parse SESSION_LIFETIME_HOURS to u64!"),
+            session_limit: get_env_or_default("SESSION_LIMIT", "25")
+                .parse::<u64>()
+                .expect("Could not parse SESSION_LIMIT to u64!"),
             database: DatabaseConfig::build_config(),
             cache: RedisConfig::build_config(),
+            cors: CorsConfig::build_config(),
         }
     }
 
@@ -95,8 +111,20 @@ impl RedisConfig {
     }
 }
 
+impl CorsConfig {
+    pub fn build_config() -> Self {
+        let allowed_origins =
+            get_env_or_default("CORS_ALLOWED_ORIGINS", "").split(',').map(|s| s.to_string()).collect();
+
+        Self {
+            allowed_origins,
+            allow_any_origin: get_env_or_default("CORS_ALLOW_ANY_ORIGIN", "false").parse::<bool>().unwrap_or(false),
+        }
+    }
+}
+
 pub fn get_env_or_error(key: &str) -> String {
-    env::var(key).unwrap_or_else(|_| panic!("{} env variable must be set!", key))
+    env::var(key).unwrap_or_else(|_| panic!("'{}' env variable must be set!", key))
 }
 
 pub fn get_env_or_default(key: &str, default: &str) -> String {

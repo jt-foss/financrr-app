@@ -1,7 +1,9 @@
+use actix_web::http::Uri;
 use actix_web::web::Path;
 use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
 
 use crate::api::error::api::ApiError;
+use crate::api::pagination::{PageSizeParam, PaginatedAccount};
 use crate::util::utoipa::{InternalServerError, ResourceNotFound, Unauthorized, ValidationError};
 use crate::wrapper::account::dto::AccountDTO;
 use crate::wrapper::account::Account;
@@ -17,10 +19,32 @@ pub fn account_controller(cfg: &mut web::ServiceConfig) {
 
 #[utoipa::path(get,
 responses(
+(status = 200, description = "Successfully retrieved all Accounts.", content_type = "application/json", body = PaginatedAccount),
+(status = 401, response = Unauthorized)
+),
+params(PageSizeParam),
+security(
+("bearer_token" = [])
+),
+path = "/api/v1/account/?page={page}&size={size}",
+tag = "Account")]
+#[get("")]
+pub async fn get_all(user: Phantom<User>, page_size: PageSizeParam, uri: Uri) -> Result<impl Responder, ApiError> {
+    let total = Account::count_all_by_user(user.get_id()).await?;
+    let result = Account::find_all_by_user(user.get_id()).await?;
+
+    Ok(HttpResponse::Ok().json(PaginatedAccount::new(result, &page_size, total, uri)))
+}
+
+#[utoipa::path(get,
+responses(
 (status = 200, description = "Successfully retrieved Account.", content_type = "application/json", body = Account),
 (status = 401, response = Unauthorized),
 (status = 404, response = ResourceNotFound),
 (status = 500, response = InternalServerError)
+),
+security(
+("bearer_token" = [])
 ),
 path = "/api/v1/account/{account_id}",
 tag = "Account")]
@@ -34,18 +58,6 @@ pub async fn get_one(user: Phantom<User>, account_id: Path<i32>) -> Result<impl 
     Ok(HttpResponse::Ok().json(account))
 }
 
-#[utoipa::path(get,
-responses(
-(status = 200, description = "Successfully retrieved all Accounts.", content_type = "application/json", body = Vec < Account >),
-(status = 401, response = Unauthorized)
-),
-path = "/api/v1/account",
-tag = "Account")]
-#[get("")]
-pub async fn get_all(user: Phantom<User>) -> Result<impl Responder, ApiError> {
-    Account::find_all_by_user(user.get_id()).await.map(|accounts| HttpResponse::Ok().json(accounts))
-}
-
 #[utoipa::path(post,
 responses(
 (status = 200, description = "Successfully created AccountDTO.", content_type = "application/json", body = Account),
@@ -53,6 +65,9 @@ responses(
 (status = 400, response = ValidationError),
 (status = 404, response = ResourceNotFound),
 (status = 500, response = InternalServerError)
+),
+security(
+("bearer_token" = [])
 ),
 path = "/api/v1/account",
 request_body = AccountDTO,
@@ -68,6 +83,9 @@ responses(
 (status = 401, response = Unauthorized),
 (status = 404, response = ResourceNotFound),
 (status = 500, response = InternalServerError)
+),
+security(
+("bearer_token" = [])
 ),
 path = "/api/v1/account/{account_id}",
 tag = "Account")]
@@ -93,6 +111,9 @@ responses(
 (status = 400, response = ValidationError),
 (status = 404, response = ResourceNotFound),
 (status = 500, response = InternalServerError)
+),
+security(
+("bearer_token" = [])
 ),
 path = "/api/v1/account/{account_id}",
 request_body = AccountDTO,

@@ -10,9 +10,10 @@ use entity::transaction::Model;
 use entity::utility::time::get_now;
 
 use crate::api::error::api::ApiError;
+use crate::api::pagination::PageSizeParam;
+use crate::database::entity::{count, delete, find_all, find_all_paginated, find_one_or_error, insert, update};
 use crate::event::transaction::TransactionEvent;
 use crate::event::Event;
-use crate::util::entity::{delete, find_all, find_one_or_error, insert, update};
 use crate::wrapper::account::Account;
 use crate::wrapper::budget::Budget;
 use crate::wrapper::currency::Currency;
@@ -98,6 +99,18 @@ impl Transaction {
 
     pub async fn find_all_by_user(user_id: i32) -> Result<Vec<Self>, ApiError> {
         Ok(find_all(transaction::Entity::find_all_by_user(user_id)).await?.into_iter().map(Self::from).collect())
+    }
+
+    pub async fn find_all_by_user_paginated(user_id: i32, page_size: &PageSizeParam) -> Result<Vec<Self>, ApiError> {
+        Ok(find_all_paginated(transaction::Entity::find_all_by_user(user_id), page_size)
+            .await?
+            .into_iter()
+            .map(Self::from)
+            .collect())
+    }
+
+    pub async fn count_all_by_user(user_id: i32) -> Result<u64, ApiError> {
+        count(transaction::Entity::find_all_by_user(user_id)).await
     }
 }
 

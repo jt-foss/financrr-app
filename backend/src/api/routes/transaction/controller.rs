@@ -1,7 +1,9 @@
+use actix_web::http::Uri;
 use actix_web::web::Path;
 use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
 
 use crate::api::error::api::ApiError;
+use crate::api::pagination::{PageSizeParam, Pagination};
 use crate::util::utoipa::{InternalServerError, Unauthorized};
 use crate::wrapper::permission::Permission;
 use crate::wrapper::transaction::dto::TransactionDTO;
@@ -17,9 +19,32 @@ pub fn transaction_controller(cfg: &mut web::ServiceConfig) {
 
 #[utoipa::path(get,
 responses(
+(status = 200, description = "Successfully retrieved all Transactions.", content_type = "application/json", body = PaginatedTransaction),
+(status = 401, response = Unauthorized),
+(status = 500, response = InternalServerError)
+),
+params(PageSizeParam),
+security(
+("bearer_token" = [])
+),
+path = "/api/v1/transaction/?page={page}&size={size}",
+tag = "Transaction")]
+#[get("")]
+pub async fn get_all(user: Phantom<User>, page_size: PageSizeParam, uri: Uri) -> Result<impl Responder, ApiError> {
+    let total = Transaction::count_all_by_user(user.get_id()).await?;
+    let transactions = Transaction::find_all_by_user_paginated(user.get_id(), &page_size).await?;
+
+    Ok(HttpResponse::Ok().json(Pagination::new(transactions, &page_size, total, uri)))
+}
+
+#[utoipa::path(get,
+responses(
 (status = 200, description = "Successfully retrieved Transaction.", content_type = "application/json", body = Transaction),
 (status = 401, response = Unauthorized),
 (status = 500, response = InternalServerError)
+),
+security(
+("bearer_token" = [])
 ),
 path = "/api/v1/transaction/{transaction_id}",
 tag = "Transaction")]
@@ -35,26 +60,14 @@ pub async fn get_one(user: Phantom<User>, transaction_id: Path<i32>) -> Result<i
     Ok(HttpResponse::Ok().json(transaction))
 }
 
-#[utoipa::path(get,
-responses(
-(status = 200, description = "Successfully retrieved all Transactions.", content_type = "application/json", body = Vec < Transaction >),
-(status = 401, response = Unauthorized),
-(status = 500, response = InternalServerError)
-),
-path = "/api/v1/transaction",
-tag = "Transaction")]
-#[get("")]
-pub async fn get_all(user: Phantom<User>) -> Result<impl Responder, ApiError> {
-    let transactions = Transaction::find_all_by_user(user.get_id()).await?;
-
-    Ok(HttpResponse::Ok().json(transactions))
-}
-
 #[utoipa::path(post,
 responses(
 (status = 200, description = "Successfully created Transaction.", content_type = "application/json", body = Transaction),
 (status = 401, response = Unauthorized),
 (status = 500, response = InternalServerError)
+),
+security(
+("bearer_token" = [])
 ),
 path = "/api/v1/transaction",
 request_body = TransactionDTO,
@@ -74,6 +87,9 @@ responses(
 (status = 200, description = "Successfully deleted Transaction."),
 (status = 401, response = Unauthorized),
 (status = 500, response = InternalServerError)
+),
+security(
+("bearer_token" = [])
 ),
 path = "/api/v1/transaction/{transaction_id}",
 tag = "Transaction")]
@@ -99,6 +115,9 @@ responses(
 (status = 200, description = "Successfully updated Transaction.", content_type = "application/json", body = Transaction),
 (status = 401, response = Unauthorized),
 (status = 500, response = InternalServerError)
+),
+security(
+("bearer_token" = [])
 ),
 path = "/api/v1/transaction/{transaction_id}",
 request_body = TransactionDTO,
