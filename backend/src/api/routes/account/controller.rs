@@ -23,6 +23,9 @@ responses(
 (status = 401, response = Unauthorized)
 ),
 params(PageSizeParam),
+security(
+("bearer_token" = [])
+),
 path = "/api/v1/account/?page={page}&size={size}",
 tag = "Account")]
 #[get("")]
@@ -39,6 +42,9 @@ responses(
 (status = 401, response = Unauthorized),
 (status = 404, response = ResourceNotFound),
 (status = 500, response = InternalServerError)
+),
+security(
+("bearer_token" = [])
 ),
 path = "/api/v1/account/{account_id}",
 tag = "Account")]
@@ -60,6 +66,9 @@ responses(
 (status = 404, response = ResourceNotFound),
 (status = 500, response = InternalServerError)
 ),
+security(
+("bearer_token" = [])
+),
 path = "/api/v1/account",
 request_body = AccountDTO,
 tag = "Account")]
@@ -74,6 +83,9 @@ responses(
 (status = 401, response = Unauthorized),
 (status = 404, response = ResourceNotFound),
 (status = 500, response = InternalServerError)
+),
+security(
+("bearer_token" = [])
 ),
 path = "/api/v1/account/{account_id}",
 tag = "Account")]
@@ -99,6 +111,9 @@ responses(
 (status = 400, response = ValidationError),
 (status = 404, response = ResourceNotFound),
 (status = 500, response = InternalServerError)
+),
+security(
+("bearer_token" = [])
 ),
 path = "/api/v1/account/{account_id}",
 request_body = AccountDTO,

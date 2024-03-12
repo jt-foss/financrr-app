@@ -17,7 +17,7 @@ use dotenvy::dotenv;
 use redis::Client;
 use sea_orm::DatabaseConnection;
 use tracing::info;
-use utoipa::openapi::security::{ApiKey, ApiKeyValue, SecurityScheme};
+use utoipa::openapi::security::{Http, HttpAuthScheme, SecurityScheme};
 use utoipa::openapi::OpenApi as OpenApiStruct;
 use utoipa::{Modify, OpenApi};
 use utoipa_swagger_ui::SwaggerUi;
@@ -63,17 +63,16 @@ tags(
 (name = "Transaction", description = "Endpoints for transaction management."),
 (name = "Budget", description = "Endpoints for budget management.")
 ),
-modifiers(&SecurityAddon)
+modifiers(&BearerTokenAddon)
 )]
 pub struct ApiDoc;
 
-pub struct SecurityAddon;
+pub struct BearerTokenAddon;
 
-impl Modify for SecurityAddon {
+impl Modify for BearerTokenAddon {
     fn modify(&self, openapi: &mut OpenApiStruct) {
-        let components = openapi.components.as_mut().unwrap(); // we can unwrap safely since there already is components registered.
-        components
-            .add_security_scheme("api_key", SecurityScheme::ApiKey(ApiKey::Header(ApiKeyValue::new("user_api_key"))))
+        let components = openapi.components.as_mut().unwrap(); // we can unwrap safely since there already are components registered.
+        components.add_security_scheme("bearer_token", SecurityScheme::Http(Http::new(HttpAuthScheme::Bearer)))
     }
 }
 

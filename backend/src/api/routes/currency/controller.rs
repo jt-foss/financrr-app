@@ -25,6 +25,9 @@ responses(
 (status = 401, response = Unauthorized),
 (status = 500, response = InternalServerError)
 ),
+security(
+("bearer_token" = [])
+),
 params(PageSizeParam),
 path = "/api/v1/currency/?page={page}&limit={limit}",
 tag = "Currency")]
@@ -57,6 +60,9 @@ responses(
 (status = 404, response = ResourceNotFound),
 (status = 500, response = InternalServerError)
 ),
+security(
+("bearer_token" = [])
+),
 path = "/api/v1/currency/{currency_id}",
 tag = "Currency")]
 #[get("/{currency_id}")]
@@ -73,6 +79,9 @@ responses(
 (status = 401, response = Unauthorized),
 (status = 500, response = InternalServerError)
 ),
+security(
+("bearer_token" = [])
+),
 path = "/api/v1/currency",
 request_body = CurrencyDTO,
 tag = "Currency")]
@@ -87,6 +96,9 @@ responses(
 (status = 401, response = Unauthorized),
 (status = 404, response = ResourceNotFound),
 (status = 500, response = InternalServerError)
+),
+security(
+("bearer_token" = [])
 ),
 path = "/api/v1/currency/{currency_id}",
 tag = "Currency")]
@@ -111,6 +123,9 @@ responses(
 (status = 401, response = Unauthorized),
 (status = 404, response = ResourceNotFound),
 (status = 500, response = InternalServerError)
+),
+security(
+("bearer_token" = [])
 ),
 path = "/api/v1/currency/{currency_id}",
 request_body = CurrencyDTO,

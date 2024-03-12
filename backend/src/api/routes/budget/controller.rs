@@ -25,6 +25,9 @@ responses(
 (status = 500, response = InternalServerError)
 ),
 params(PageSizeParam),
+security(
+("bearer_token" = [])
+),
 path = "/api/v1/budget/?page={page}&size={size}",
 tag = "Budget"
 )]
@@ -42,6 +45,9 @@ responses(
 (status = 401, response = Unauthorized),
 (status = 404, response = ResourceNotFound),
 (status = 500, response = InternalServerError)
+),
+security(
+("bearer_token" = [])
 ),
 path = "/api/v1/budget/{budget_id}",
 tag = "Budget"
@@ -63,6 +69,9 @@ responses(
 (status = 401, response = Unauthorized),
 (status = 500, response = InternalServerError)
 ),
+security(
+("bearer_token" = [])
+),
 path = "/api/v1/budget",
 tag = "Budget"
 )]
@@ -79,6 +88,9 @@ responses(
 (status = 401, response = Unauthorized),
 (status = 404, response = ResourceNotFound),
 (status = 500, response = InternalServerError)
+),
+security(
+("bearer_token" = [])
 ),
 path = "/api/v1/budget/{budget_id}",
 tag = "Budget"
@@ -101,6 +113,9 @@ responses(
 (status = 401, response = Unauthorized),
 (status = 404, response = ResourceNotFound),
 (status = 500, response = InternalServerError)
+),
+security(
+("bearer_token" = [])
 ),
 path = "/api/v1/budget/{budget_id}",
 tag = "Budget"

@@ -24,6 +24,9 @@ responses(
 (status = 500, response = InternalServerError)
 ),
 params(PageSizeParam),
+security(
+("bearer_token" = [])
+),
 path = "/api/v1/transaction/?page={page}&size={size}",
 tag = "Transaction")]
 #[get("")]
@@ -39,6 +42,9 @@ responses(
 (status = 200, description = "Successfully retrieved Transaction.", content_type = "application/json", body = Transaction),
 (status = 401, response = Unauthorized),
 (status = 500, response = InternalServerError)
+),
+security(
+("bearer_token" = [])
 ),
 path = "/api/v1/transaction/{transaction_id}",
 tag = "Transaction")]
@@ -60,6 +66,9 @@ responses(
 (status = 401, response = Unauthorized),
 (status = 500, response = InternalServerError)
 ),
+security(
+("bearer_token" = [])
+),
 path = "/api/v1/transaction",
 request_body = TransactionDTO,
 tag = "Transaction")]
@@ -78,6 +87,9 @@ responses(
 (status = 200, description = "Successfully deleted Transaction."),
 (status = 401, response = Unauthorized),
 (status = 500, response = InternalServerError)
+),
+security(
+("bearer_token" = [])
 ),
 path = "/api/v1/transaction/{transaction_id}",
 tag = "Transaction")]
@@ -103,6 +115,9 @@ responses(
 (status = 200, description = "Successfully updated Transaction.", content_type = "application/json", body = Transaction),
 (status = 401, response = Unauthorized),
 (status = 500, response = InternalServerError)
+),
+security(
+("bearer_token" = [])
 ),
 path = "/api/v1/transaction/{transaction_id}",
 request_body = TransactionDTO,

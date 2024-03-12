@@ -17,6 +17,9 @@ responses(
 (status = 404, response = ResourceNotFound),
 (status = 500, response = InternalServerError),
 ),
+security(
+("bearer_token" = [])
+),
 path = "/api/v1/user/@me",
 tag = "User"
 )]
