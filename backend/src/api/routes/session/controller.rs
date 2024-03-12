@@ -30,6 +30,7 @@ pub fn session_controller(cfg: &mut web::ServiceConfig) {
 #[utoipa::path(get,
 responses(
 (status = 200, description = "Successfully retrieved the current Session.", content_type = "application/json", body = Session),
+(status = 401, response = Unauthorized),
 (status = 404, response = ResourceNotFound),
 (status = 500, response = InternalServerError)
 ),
@@ -70,6 +71,7 @@ pub async fn get_one(user: Phantom<User>, session_id: Path<i32>) -> Result<impl 
 #[utoipa::path(get,
 responses(
 (status = 200, description = "Successfully retrieved all Sessions.", content_type = "application/json", body = PaginatedSession),
+(status = 401, response = Unauthorized),
 (status = 500, response = InternalServerError)
 ),
 params(PageSizeParam),
@@ -91,6 +93,7 @@ pub async fn get_all(user: Phantom<User>, page_size: PageSizeParam, uri: Uri) ->
 #[utoipa::path(patch,
 responses(
 (status = 200, description = "Successfully renewed the current Session.", content_type = "application/json", body = Session),
+(status = 401, response = Unauthorized),
 (status = 500, response = InternalServerError)
 ),
 security(
@@ -109,6 +112,7 @@ pub async fn renew(session: Session) -> Result<impl Responder, ApiError> {
 #[utoipa::path(delete,
 responses(
 (status = 204, description = "Successfully deleted the current Session."),
+(status = 401, response = Unauthorized),
 (status = 500, response = InternalServerError)
 ),
 security(
@@ -156,6 +160,7 @@ pub async fn delete(user: Phantom<User>, session_id: Path<i32>) -> Result<impl R
 #[utoipa::path(delete,
 responses(
 (status = 204, description = "Successfully deleted all Sessions."),
+(status = 401, response = Unauthorized),
 (status = 500, response = InternalServerError)
 ),
 security(
@@ -174,6 +179,7 @@ pub async fn delete_all(user: Phantom<User>) -> Result<impl Responder, ApiError>
 #[utoipa::path(post,
 responses(
 (status = 200, description = "Successfully created a new Session.", content_type = "application/json", body = Session),
+(status = 401, response = Unauthorized),
 (status = 500, response = InternalServerError)
 ),
 path = "/api/v1/session",
