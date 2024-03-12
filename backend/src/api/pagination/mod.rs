@@ -14,6 +14,7 @@ use crate::api::error::api::ApiError;
 use crate::wrapper::account::Account;
 use crate::wrapper::budget::Budget;
 use crate::wrapper::currency::Currency;
+use crate::wrapper::session::Session;
 use crate::wrapper::transaction::Transaction;
 
 pub const DEFAULT_PAGE: u64 = 1;
@@ -25,7 +26,8 @@ pub const MAX_LIMIT: u64 = 500;
 PaginatedAccount = Pagination < Account >,
 PaginatedBudget = Pagination < Budget >,
 PaginatedCurrency = Pagination < Currency >,
-PaginatedTransaction = Pagination < Transaction >
+PaginatedTransaction = Pagination < Transaction >,
+PaginatedSession = Pagination < Session >
 )]
 pub struct Pagination<T: Serialize + ToSchema<'static>> {
     #[serde(rename = "_metadata")]

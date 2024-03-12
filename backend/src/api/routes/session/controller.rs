@@ -1,9 +1,10 @@
+use actix_web::http::Uri;
 use actix_web::web::Path;
 use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
 use actix_web_validator::Json;
 
 use crate::api::error::api::ApiError;
-use crate::api::pagination::PageSizeParam;
+use crate::api::pagination::{PageSizeParam, Pagination};
 use crate::util::utoipa::{InternalServerError, ResourceNotFound, Unauthorized};
 use crate::wrapper::permission::Permission;
 use crate::wrapper::session::dto::PublicSession;
@@ -68,7 +69,7 @@ pub async fn get_one(user: Phantom<User>, session_id: Path<i32>) -> Result<impl 
 
 #[utoipa::path(get,
 responses(
-(status = 200, description = "Successfully retrieved all Sessions.", content_type = "application/json", body = Vec<PublicSession>),
+(status = 200, description = "Successfully retrieved all Sessions.", content_type = "application/json", body = PaginatedSession),
 (status = 500, response = InternalServerError)
 ),
 params(PageSizeParam),
@@ -79,11 +80,12 @@ path = "/api/v1/session",
 tag = "Session"
 )]
 #[get("")]
-pub async fn get_all(user: Phantom<User>, page_size: PageSizeParam) -> Result<impl Responder, ApiError> {
+pub async fn get_all(user: Phantom<User>, page_size: PageSizeParam, uri: Uri) -> Result<impl Responder, ApiError> {
     let sessions = Session::find_all_by_user_paginated(user.get_id(), &page_size).await?;
     let public_sessions: Vec<PublicSession> = sessions.into_iter().map(PublicSession::from).collect();
+    let total = Session::count_all_by_user(user.get_id()).await?;
 
-    Ok(HttpResponse::Ok().json(public_sessions))
+    Ok(HttpResponse::Ok().json(Pagination::new(public_sessions, &page_size, total, uri)))
 }
 
 #[utoipa::path(patch,
