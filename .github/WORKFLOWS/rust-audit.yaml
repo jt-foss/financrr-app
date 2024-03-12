@@ -1,0 +1,25 @@
+name: (Rust) Security audit
+on:
+  push:
+    paths:
+      - '**/Cargo.toml'
+      - '**/Cargo.lock'
+  pull_request:
+    paths:
+      - '**/Cargo.toml'
+      - '**/Cargo.lock'
+
+# Set default working directory
+defaults:
+  run:
+    working-directory: ./backend  # Change the working directory to /backend
+
+jobs:
+  security_audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: rustsec/audit-check@v1.4.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ignore: "RUSTSEC-2023-0071" # Marvin attack (RSA) crate. Being worked on.

@@ -1,0 +1,26 @@
+name: (Backend) Docker Compose Build
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'backend/**'
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - 'backend/**'
+
+# Set default working directory
+defaults:
+  run:
+    working-directory: ./backend  # Change the working directory to /backend
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare for build
+        run: bash bin/install.bash
+      - name: Build the Docker compose images
+        run: bash bin/build.bash
