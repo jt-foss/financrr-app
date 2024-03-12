@@ -1,8 +1,19 @@
-# Unreleased
+# Changelog
 
-Nothing yet!
+All notable changes to this project will be documented in this file.
 
-# Version 0.2.0 (12.03.2024)
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+## [0.2.1] 12-03-2024
+
+### Changed
+
+- improved `Changelog.md`
+
+## [0.2.0] 12-03-2024
 
 - dependency updates
 - improved logging
@@ -16,6 +27,6 @@ Nothing yet!
 - new session endpoints and session management
 - session can now be named
 
-# Version 0.1.0 (26.02.2024)
+## [0.1.0] 26-02-2024
 
 - Initial release.
