@@ -1,1 +1,1 @@
-# resources
+# financrr-app
