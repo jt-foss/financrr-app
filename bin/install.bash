@@ -11,4 +11,7 @@ set +e
 cp -n .env.dist .env
 set -e
 
+echo "Creating logs directory..."
+mkdir -p logs
+
 cd "${WORK_DIR}"
