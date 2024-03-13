@@ -64,3 +64,4 @@ jobs:
         with:
           branch: gh-pages
           folder: ./docs/book
+          target-folder: /docs
