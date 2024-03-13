@@ -6,11 +6,11 @@ use actix_web_validator::Json;
 use crate::api::documentation::response::{InternalServerError, ResourceNotFound, Unauthorized, ValidationError};
 use crate::api::error::api::ApiError;
 use crate::api::pagination::{PageSizeParam, Pagination};
-use crate::wrapper::budget::dto::BudgetDTO;
-use crate::wrapper::budget::Budget;
+use crate::wrapper::entity::budget::dto::BudgetDTO;
+use crate::wrapper::entity::budget::Budget;
+use crate::wrapper::entity::user::User;
 use crate::wrapper::permission::Permission;
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
-use crate::wrapper::user::User;
 
 pub fn budget_controller(cfg: &mut web::ServiceConfig) {
     cfg.service(

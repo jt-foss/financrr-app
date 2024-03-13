@@ -6,8 +6,8 @@ use tokio::time::sleep;
 use tokio::time::Duration;
 
 use crate::api::error::api::ApiError;
-use crate::wrapper::account::event_listener::account_listener;
-use crate::wrapper::budget::event_listener::budget_listener;
+use crate::wrapper::entity::account::event_listener::account_listener;
+use crate::wrapper::entity::budget::event_listener::budget_listener;
 
 pub mod transaction;
 

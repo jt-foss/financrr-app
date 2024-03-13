@@ -11,11 +11,11 @@ use utoipa::{IntoParams, ToSchema};
 use validator::Validate;
 
 use crate::api::error::api::ApiError;
-use crate::wrapper::account::Account;
-use crate::wrapper::budget::Budget;
-use crate::wrapper::currency::Currency;
-use crate::wrapper::session::Session;
-use crate::wrapper::transaction::Transaction;
+use crate::wrapper::entity::account::Account;
+use crate::wrapper::entity::budget::Budget;
+use crate::wrapper::entity::currency::Currency;
+use crate::wrapper::entity::session::Session;
+use crate::wrapper::entity::transaction::Transaction;
 
 pub const DEFAULT_PAGE: u64 = 1;
 pub const DEFAULT_LIMIT: u64 = 50;

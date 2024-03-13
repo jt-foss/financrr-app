@@ -14,9 +14,9 @@ use entity::user::Model;
 use crate::api::error::api::ApiError;
 use crate::database::entity::{count, find_one, find_one_or_error, insert};
 use crate::util::auth::extract_bearer_token;
-use crate::wrapper::session::Session;
+use crate::wrapper::entity::session::Session;
+use crate::wrapper::entity::user::dto::UserRegistration;
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
-use crate::wrapper::user::dto::UserRegistration;
 
 pub mod dto;
 

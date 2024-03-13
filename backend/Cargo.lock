@@ -681,6 +681,7 @@ dependencies = [
  "actix-limitation",
  "actix-web",
  "actix-web-validator",
+ "bitflags 2.4.2",
  "derive_more 1.0.0-beta.6",
  "dotenvy",
  "entity",

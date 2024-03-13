@@ -1,8 +1,8 @@
 use crate::api::error::api::ApiError;
 use crate::event::transaction::TransactionEvent;
-use crate::wrapper::account::dto::AccountDTO;
-use crate::wrapper::account::Account;
-use crate::wrapper::transaction::Transaction;
+use crate::wrapper::entity::account::dto::AccountDTO;
+use crate::wrapper::entity::account::Account;
+use crate::wrapper::entity::transaction::Transaction;
 
 async fn update_account_balance(account: &Account, amount: i64) -> Result<(), ApiError> {
     let mut dto = AccountDTO::from(account);

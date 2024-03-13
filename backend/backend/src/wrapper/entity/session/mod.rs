@@ -22,8 +22,8 @@ use crate::config::Config;
 use crate::database::entity::{count, delete, find_all_paginated, find_one_or_error, insert, update};
 use crate::database::redis::{del, get, set_ex, zadd};
 use crate::util::auth::extract_bearer_token;
+use crate::wrapper::entity::user::User;
 use crate::wrapper::permission::Permission;
-use crate::wrapper::user::User;
 use crate::wrapper::util::handle_async_result_vec;
 
 pub mod dto;

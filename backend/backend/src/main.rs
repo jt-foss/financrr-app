@@ -38,7 +38,7 @@ use crate::config::{logger, Config};
 use crate::database::connection::{create_redis_client, establish_database_connection, get_database_connection};
 use crate::database::redis::clear_redis;
 use crate::util::validation::ValidationErrorJsonPayload;
-use crate::wrapper::session::Session;
+use crate::wrapper::entity::session::Session;
 
 pub mod api;
 pub mod config;

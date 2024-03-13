@@ -12,8 +12,8 @@ use crate::api::pagination::PageSizeParam;
 use crate::database::entity::{
     count, delete, find_all, find_all_paginated, find_one, find_one_or_error, insert, update,
 };
-use crate::wrapper::account::dto::AccountDTO;
-use crate::wrapper::currency::Currency;
+use crate::wrapper::entity::account::dto::AccountDTO;
+use crate::wrapper::entity::currency::Currency;
 use crate::wrapper::permission::Permission;
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 use crate::wrapper::util::handle_async_result_vec;

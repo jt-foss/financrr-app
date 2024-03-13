@@ -1,8 +1,8 @@
 use crate::api::error::api::ApiError;
 use crate::event::transaction::TransactionEvent;
-use crate::wrapper::budget::dto::BudgetDTO;
-use crate::wrapper::budget::Budget;
-use crate::wrapper::transaction::Transaction;
+use crate::wrapper::entity::budget::dto::BudgetDTO;
+use crate::wrapper::entity::budget::Budget;
+use crate::wrapper::entity::transaction::Transaction;
 
 async fn update_budget_amount(budget: &Budget, amount: i64) -> Result<(), ApiError> {
     let mut dto = BudgetDTO::from(budget);

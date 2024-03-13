@@ -5,11 +5,11 @@ use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
 use crate::api::documentation::response::{InternalServerError, ResourceNotFound, Unauthorized, ValidationError};
 use crate::api::error::api::ApiError;
 use crate::api::pagination::{PageSizeParam, PaginatedAccount};
-use crate::wrapper::account::dto::AccountDTO;
-use crate::wrapper::account::Account;
+use crate::wrapper::entity::account::dto::AccountDTO;
+use crate::wrapper::entity::account::Account;
+use crate::wrapper::entity::user::User;
 use crate::wrapper::permission::Permission;
 use crate::wrapper::types::phantom::Phantom;
-use crate::wrapper::user::User;
 
 pub fn account_controller(cfg: &mut web::ServiceConfig) {
     cfg.service(

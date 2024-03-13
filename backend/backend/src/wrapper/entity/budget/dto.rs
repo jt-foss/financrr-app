@@ -4,7 +4,7 @@ use utoipa::ToSchema;
 use validator::Validate;
 
 use crate::util::validation::validate_datetime_not_in_future;
-use crate::wrapper::budget::Budget;
+use crate::wrapper::entity::budget::Budget;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Validate, ToSchema)]
 pub struct BudgetDTO {

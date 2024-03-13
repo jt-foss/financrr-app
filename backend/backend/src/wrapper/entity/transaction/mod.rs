@@ -14,11 +14,11 @@ use crate::api::pagination::PageSizeParam;
 use crate::database::entity::{count, delete, find_all, find_all_paginated, find_one_or_error, insert, update};
 use crate::event::transaction::TransactionEvent;
 use crate::event::Event;
-use crate::wrapper::account::Account;
-use crate::wrapper::budget::Budget;
-use crate::wrapper::currency::Currency;
+use crate::wrapper::entity::account::Account;
+use crate::wrapper::entity::budget::Budget;
+use crate::wrapper::entity::currency::Currency;
+use crate::wrapper::entity::transaction::dto::TransactionDTO;
 use crate::wrapper::permission::Permission;
-use crate::wrapper::transaction::dto::TransactionDTO;
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
 pub mod dto;

@@ -5,11 +5,11 @@ use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
 use crate::api::documentation::response::{InternalServerError, Unauthorized, ValidationError};
 use crate::api::error::api::ApiError;
 use crate::api::pagination::{PageSizeParam, Pagination};
+use crate::wrapper::entity::transaction::dto::TransactionDTO;
+use crate::wrapper::entity::transaction::Transaction;
+use crate::wrapper::entity::user::User;
 use crate::wrapper::permission::Permission;
-use crate::wrapper::transaction::dto::TransactionDTO;
-use crate::wrapper::transaction::Transaction;
 use crate::wrapper::types::phantom::Phantom;
-use crate::wrapper::user::User;
 
 pub fn transaction_controller(cfg: &mut web::ServiceConfig) {
     cfg.service(

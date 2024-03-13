@@ -7,11 +7,11 @@ use tracing::info;
 use crate::api::documentation::response::{InternalServerError, ResourceNotFound, Unauthorized, ValidationError};
 use crate::api::error::api::ApiError;
 use crate::api::pagination::{PageSizeParam, Pagination};
-use crate::wrapper::currency::dto::CurrencyDTO;
-use crate::wrapper::currency::Currency;
+use crate::wrapper::entity::currency::dto::CurrencyDTO;
+use crate::wrapper::entity::currency::Currency;
+use crate::wrapper::entity::user::User;
 use crate::wrapper::permission::Permission;
 use crate::wrapper::types::phantom::Phantom;
-use crate::wrapper::user::User;
 
 pub fn currency_controller(cfg: &mut web::ServiceConfig) {
     cfg.service(

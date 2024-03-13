@@ -7,12 +7,12 @@ use crate::api::documentation::response::ValidationError;
 use crate::api::documentation::response::{InternalServerError, ResourceNotFound, Unauthorized};
 use crate::api::error::api::ApiError;
 use crate::api::pagination::{PageSizeParam, Pagination};
+use crate::wrapper::entity::session::dto::PublicSession;
+use crate::wrapper::entity::session::Session;
+use crate::wrapper::entity::user::dto::Credentials;
+use crate::wrapper::entity::user::User;
 use crate::wrapper::permission::Permission;
-use crate::wrapper::session::dto::PublicSession;
-use crate::wrapper::session::Session;
 use crate::wrapper::types::phantom::Phantom;
-use crate::wrapper::user::dto::Credentials;
-use crate::wrapper::user::User;
 
 pub fn session_controller(cfg: &mut web::ServiceConfig) {
     cfg.service(

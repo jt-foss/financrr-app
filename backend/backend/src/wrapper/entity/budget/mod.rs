@@ -9,10 +9,10 @@ use entity::budget;
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
 use crate::database::entity::{count, delete, find_all, find_all_paginated, find_one_or_error, insert, update};
-use crate::wrapper::budget::dto::BudgetDTO;
+use crate::wrapper::entity::budget::dto::BudgetDTO;
+use crate::wrapper::entity::user::User;
 use crate::wrapper::permission::Permission;
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
-use crate::wrapper::user::User;
 
 pub mod dto;
 pub mod event_listener;

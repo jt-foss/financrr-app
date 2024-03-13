@@ -13,10 +13,10 @@ use entity::currency;
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
 use crate::database::entity::{count, delete, find_all, find_all_paginated, find_one_or_error, insert, update};
-use crate::wrapper::currency::dto::CurrencyDTO;
+use crate::wrapper::entity::currency::dto::CurrencyDTO;
+use crate::wrapper::entity::user::User;
 use crate::wrapper::permission::Permission;
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
-use crate::wrapper::user::User;
 
 pub mod dto;
 

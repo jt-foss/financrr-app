@@ -9,10 +9,10 @@ use validator::Validate;
 
 use crate::api::error::api::ApiError;
 use crate::api::error::validation::ValidationError;
-use crate::wrapper::account::Account;
-use crate::wrapper::budget::Budget;
-use crate::wrapper::currency::Currency;
-use crate::wrapper::transaction::check_account_access;
+use crate::wrapper::entity::account::Account;
+use crate::wrapper::entity::budget::Budget;
+use crate::wrapper::entity::currency::Currency;
+use crate::wrapper::entity::transaction::check_account_access;
 use crate::wrapper::types::phantom::Phantom;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Validate, ToSchema)]
