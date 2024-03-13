@@ -2,9 +2,9 @@ use actix_web::http::Uri;
 use actix_web::web::Path;
 use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
 
+use crate::api::documentation::response::{InternalServerError, Unauthorized, ValidationError};
 use crate::api::error::api::ApiError;
 use crate::api::pagination::{PageSizeParam, Pagination};
-use crate::util::utoipa::{InternalServerError, Unauthorized};
 use crate::wrapper::permission::Permission;
 use crate::wrapper::transaction::dto::TransactionDTO;
 use crate::wrapper::transaction::Transaction;
@@ -20,6 +20,7 @@ pub fn transaction_controller(cfg: &mut web::ServiceConfig) {
 #[utoipa::path(get,
 responses(
 (status = 200, description = "Successfully retrieved all Transactions.", content_type = "application/json", body = PaginatedTransaction),
+(status = 400, response = ValidationError),
 (status = 401, response = Unauthorized),
 (status = 500, response = InternalServerError)
 ),
@@ -62,7 +63,7 @@ pub async fn get_one(user: Phantom<User>, transaction_id: Path<i32>) -> Result<i
 
 #[utoipa::path(post,
 responses(
-(status = 200, description = "Successfully created Transaction.", content_type = "application/json", body = Transaction),
+(status = 201, description = "Successfully created Transaction.", content_type = "application/json", body = Transaction),
 (status = 401, response = Unauthorized),
 (status = 500, response = InternalServerError)
 ),
@@ -79,12 +80,12 @@ pub async fn create(user: Phantom<User>, transaction: TransactionDTO) -> Result<
         return Err(ApiError::unauthorized());
     }
 
-    Ok(HttpResponse::Ok().json(Transaction::new(transaction).await?))
+    Ok(HttpResponse::Created().json(Transaction::new(transaction).await?))
 }
 
 #[utoipa::path(delete,
 responses(
-(status = 200, description = "Successfully deleted Transaction."),
+(status = 204, description = "Successfully deleted Transaction."),
 (status = 401, response = Unauthorized),
 (status = 500, response = InternalServerError)
 ),
