@@ -35,7 +35,7 @@ jobs:
           flutter pub upgrade
 
       - name: Build Web
-        run: flutter build web --release --base-href /frontend-stage/
+        run: flutter build web --release --base-href /financrr-app/frontend-stage/
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
