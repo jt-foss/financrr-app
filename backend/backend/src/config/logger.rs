@@ -2,7 +2,7 @@ use std::io::stdout;
 
 use fmt::Subscriber;
 use time::{format_description, UtcOffset};
-use tracing::{Level, subscriber};
+use tracing::{subscriber, Level};
 use tracing_appender::non_blocking::{NonBlockingBuilder, WorkerGuard};
 use tracing_appender::rolling::{RollingFileAppender, Rotation};
 use tracing_log::LogTracer;
