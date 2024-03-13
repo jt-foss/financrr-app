@@ -80,7 +80,7 @@ params(PageSizeParam),
 security(
 ("bearer_token" = [])
 ),
-path = "/api/v1/session",
+path = "/api/v1/session/?page={page}&size={size}",
 tag = "Session"
 )]
 #[get("")]
