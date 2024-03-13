@@ -698,6 +698,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-appender",
+ "tracing-log",
  "tracing-subscriber",
  "utoipa",
  "utoipa-swagger-ui",

@@ -47,6 +47,7 @@ utoipauto = { version = "0.1.10", features = ["generic_full_path"] }
 
 # Logging
 tracing.workspace = true
+tracing-log = "0.2.0"
 tracing-subscriber = { version = "0.3.18", features = ["time", "fmt"] }
 tracing-appender = "0.2.3"
 

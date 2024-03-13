@@ -2,14 +2,17 @@ use std::io::stdout;
 
 use fmt::Subscriber;
 use time::{format_description, UtcOffset};
-use tracing::{subscriber, Level};
+use tracing::{Level, subscriber};
 use tracing_appender::non_blocking::{NonBlockingBuilder, WorkerGuard};
 use tracing_appender::rolling::{RollingFileAppender, Rotation};
+use tracing_log::LogTracer;
 use tracing_subscriber::fmt;
 use tracing_subscriber::fmt::time::OffsetTime;
 use tracing_subscriber::fmt::writer::MakeWriterExt;
 
 pub fn configure() -> WorkerGuard {
+    LogTracer::init().expect("Failed to set  tracing-log adapter!");
+
     // Time format: 2021-01-01 00:00:00
     let timer = format_description::parse("[year]-[month padding:zero]-[day padding:zero] [hour]:[minute]:[second]")
         .expect("Failed to parse format description");
