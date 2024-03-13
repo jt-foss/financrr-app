@@ -33,3 +33,4 @@ jobs:
         uses: zgosalvez/github-actions-analyze-dart@v3
         with:
           line-length: 128
+          working-directory: ./frontend

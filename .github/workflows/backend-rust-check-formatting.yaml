@@ -31,5 +31,5 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           toolchain: nightly-${{ env.date }}
           flags: --all
-          args: --config-path=./rustfmt.toml
+          args: --config-path=./backend/rustfmt.toml
           working-directory: ./backend
