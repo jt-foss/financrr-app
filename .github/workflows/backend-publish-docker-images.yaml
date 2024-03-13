@@ -16,7 +16,7 @@ concurrency:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: backend
+  IMAGE_NAME: financrr/backend
 
 jobs:
   build-and-push-image:
