@@ -20,7 +20,7 @@ pub fn session_controller(cfg: &mut web::ServiceConfig) {
             .service(get_current)
             .service(get_one)
             .service(get_all)
-            .service(renew)
+            .service(refresh)
             .service(delete_current)
             .service(delete)
             .service(delete_all)
@@ -101,11 +101,11 @@ responses(
 security(
 ("bearer_token" = [])
 ),
-path = "/api/v1/session/renew",
+path = "/api/v1/session/refresh",
 tag = "Session"
 )]
-#[patch("/renew")]
-pub async fn renew(session: Session) -> Result<impl Responder, ApiError> {
+#[patch("/refresh")]
+pub async fn refresh(session: Session) -> Result<impl Responder, ApiError> {
     let new_session = session.renew().await?;
 
     Ok(HttpResponse::Ok().json(new_session))
