@@ -1,4 +1,4 @@
-name: (Rust) Security audit
+name: (Backend) Rust checks (security, clippy, rustfmt)
 on:
   push:
     paths:
