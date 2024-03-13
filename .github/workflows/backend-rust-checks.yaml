@@ -1,12 +1,9 @@
-name: (Backend Rust) Check formatting
-permissions: write-all
+name: (Rust) Security audit
 on:
   push:
-    branches: [ "main" ]
     paths:
       - 'backend/**'
   pull_request:
-    branches: [ "main" ]
     paths:
       - 'backend/**'
 
@@ -16,12 +13,20 @@ defaults:
     working-directory: ./backend  # Change the working directory to /backend
 
 jobs:
-  format:
-    name: rustfmt
+  security_audit:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - run: echo "date=$(date -d '1 month ago' +'%Y-%m-%d')" >> $GITHUB_ENV
+      # cargo audit
+      - name: Install cargo-audit
+        run: cargo install --force cargo-audit
+      - name: Run cargo-audit
+        run: cargo audit --ignore RUSTSEC-2023-0071 # Marvin attack (RSA) crate. Being worked on.
+      # clippy
+      - name: Run Clippy
+        run: cargo clippy --all-targets --all-features
+      # rustfmt
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: nightly-${{ env.date }}
