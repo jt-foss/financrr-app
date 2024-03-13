@@ -4,9 +4,9 @@ use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
 use actix_web_validator::Json;
 use tracing::info;
 
+use crate::api::documentation::response::{InternalServerError, ResourceNotFound, Unauthorized, ValidationError};
 use crate::api::error::api::ApiError;
 use crate::api::pagination::{PageSizeParam, Pagination};
-use crate::util::utoipa::{InternalServerError, ResourceNotFound, Unauthorized};
 use crate::wrapper::currency::dto::CurrencyDTO;
 use crate::wrapper::currency::Currency;
 use crate::wrapper::permission::Permission;
@@ -22,6 +22,7 @@ pub fn currency_controller(cfg: &mut web::ServiceConfig) {
 #[utoipa::path(get,
 responses(
 (status = 200, description = "Successfully retrieved all Currencies.", content_type = "application/json", body = PaginatedCurrency),
+(status = 400, response = ValidationError),
 (status = 401, response = Unauthorized),
 (status = 500, response = InternalServerError)
 ),
@@ -75,7 +76,7 @@ pub async fn get_one(user: Option<Phantom<User>>, currency_id: Path<i32>) -> Res
 
 #[utoipa::path(post,
 responses(
-(status = 200, description = "Successfully created the Currency.", content_type = "application/json", body = Currency),
+(status = 201, description = "Successfully created the Currency.", content_type = "application/json", body = Currency),
 (status = 401, response = Unauthorized),
 (status = 500, response = InternalServerError)
 ),
@@ -87,7 +88,7 @@ request_body = CurrencyDTO,
 tag = "Currency")]
 #[post("")]
 pub async fn create(user: Phantom<User>, currency: Json<CurrencyDTO>) -> Result<impl Responder, ApiError> {
-    Ok(HttpResponse::Ok().json(Currency::new(currency.into_inner(), user.get_id()).await?))
+    Ok(HttpResponse::Created().json(Currency::new(currency.into_inner(), user.get_id()).await?))
 }
 
 #[utoipa::path(delete,

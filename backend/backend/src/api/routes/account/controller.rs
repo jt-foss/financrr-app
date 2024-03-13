@@ -2,9 +2,9 @@ use actix_web::http::Uri;
 use actix_web::web::Path;
 use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
 
+use crate::api::documentation::response::{InternalServerError, ResourceNotFound, Unauthorized, ValidationError};
 use crate::api::error::api::ApiError;
 use crate::api::pagination::{PageSizeParam, PaginatedAccount};
-use crate::util::utoipa::{InternalServerError, ResourceNotFound, Unauthorized, ValidationError};
 use crate::wrapper::account::dto::AccountDTO;
 use crate::wrapper::account::Account;
 use crate::wrapper::permission::Permission;
@@ -20,7 +20,8 @@ pub fn account_controller(cfg: &mut web::ServiceConfig) {
 #[utoipa::path(get,
 responses(
 (status = 200, description = "Successfully retrieved all Accounts.", content_type = "application/json", body = PaginatedAccount),
-(status = 401, response = Unauthorized)
+(status = 400, response = ValidationError),
+(status = 401, response = Unauthorized),
 ),
 params(PageSizeParam),
 security(
@@ -60,7 +61,7 @@ pub async fn get_one(user: Phantom<User>, account_id: Path<i32>) -> Result<impl 
 
 #[utoipa::path(post,
 responses(
-(status = 200, description = "Successfully created AccountDTO.", content_type = "application/json", body = Account),
+(status = 201, description = "Successfully created AccountDTO.", content_type = "application/json", body = Account),
 (status = 401, response = Unauthorized),
 (status = 400, response = ValidationError),
 (status = 404, response = ResourceNotFound),
@@ -74,7 +75,7 @@ request_body = AccountDTO,
 tag = "Account")]
 #[post("")]
 pub async fn create(user: Phantom<User>, account: AccountDTO) -> Result<impl Responder, ApiError> {
-    Ok(HttpResponse::Ok().json(Account::new(account, user.get_id()).await?))
+    Ok(HttpResponse::Created().json(Account::new(account, user.get_id()).await?))
 }
 
 #[utoipa::path(delete,

@@ -63,7 +63,7 @@ tags(
 (name = "Transaction", description = "Endpoints for transaction management."),
 (name = "Budget", description = "Endpoints for budget management.")
 ),
-modifiers(&BearerTokenAddon)
+modifiers(& BearerTokenAddon)
 )]
 pub struct ApiDoc;
 
