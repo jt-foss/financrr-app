@@ -9,7 +9,7 @@ use crate::api::pagination::{PageSizeParam, Pagination};
 use crate::wrapper::entity::budget::dto::BudgetDTO;
 use crate::wrapper::entity::budget::Budget;
 use crate::wrapper::entity::user::User;
-use crate::wrapper::permission::Permission;
+use crate::wrapper::permission::{HasPermissionOrError, Permissions};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
 pub fn budget_controller(cfg: &mut web::ServiceConfig) {
@@ -56,9 +56,7 @@ tag = "Budget"
 #[get("/{budget_id}")]
 pub async fn get_one(user: Phantom<User>, budget_id: Path<i32>) -> Result<impl Responder, ApiError> {
     let budget = Budget::from_id(budget_id.into_inner()).await?;
-    if !budget.has_access(user.get_id()).await? {
-        return Err(ApiError::resource_not_found("Budget"));
-    }
+    budget.has_permission_or_error(user.get_id(), Permissions::READ).await?;
 
     Ok(HttpResponse::Ok().json(budget))
 }
@@ -99,9 +97,8 @@ tag = "Budget"
 #[delete("/{budget_id}")]
 pub async fn delete(user: Phantom<User>, budget_id: Path<i32>) -> Result<impl Responder, ApiError> {
     let budget = Budget::from_id(budget_id.into_inner()).await?;
-    if !budget.can_delete(user.get_id()).await? {
-        return Err(ApiError::resource_not_found("Budget"));
-    }
+    budget.has_permission_or_error(user.get_id(), Permissions::READ_DELETE).await?;
+
     budget.delete().await?;
 
     Ok(HttpResponse::NoContent())
@@ -128,9 +125,8 @@ pub async fn update(
     budget_dto: Json<BudgetDTO>,
 ) -> Result<impl Responder, ApiError> {
     let budget = Budget::from_id(budget_id.into_inner()).await?;
-    if !budget.has_access(user.get_id()).await? {
-        return Err(ApiError::resource_not_found("Budget"));
-    }
+    budget.has_permission_or_error(user.get_id(), Permissions::READ_WRITE).await?;
+
     let budget = budget.update(budget_dto.into_inner()).await?;
 
     Ok(HttpResponse::Ok().json(budget))

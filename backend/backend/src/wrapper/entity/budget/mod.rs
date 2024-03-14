@@ -1,5 +1,5 @@
 use sea_orm::ActiveValue::Set;
-use sea_orm::EntityTrait;
+use sea_orm::{EntityName, EntityTrait};
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 use utoipa::ToSchema;
@@ -11,7 +11,8 @@ use crate::api::pagination::PageSizeParam;
 use crate::database::entity::{count, delete, find_all, find_all_paginated, find_one_or_error, insert, update};
 use crate::wrapper::entity::budget::dto::BudgetDTO;
 use crate::wrapper::entity::user::User;
-use crate::wrapper::permission::Permission;
+use crate::wrapper::entity::WrapperEntity;
+use crate::wrapper::permission::{HasPermissionOrError, Permission};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
 pub mod dto;
@@ -85,15 +86,19 @@ impl Identifiable for Budget {
     }
 }
 
-impl Permission for Budget {
-    async fn has_access(&self, user_id: i32) -> Result<bool, ApiError> {
-        Ok(self.user.get_id() == user_id)
+impl WrapperEntity for Budget {
+    fn get_id(&self) -> i32 {
+        self.id
     }
 
-    async fn can_delete(&self, user_id: i32) -> Result<bool, ApiError> {
-        self.has_access(user_id).await
+    fn table_name(&self) -> String {
+        budget::Entity.table_name().to_string()
     }
 }
+
+impl Permission for Budget {}
+
+impl HasPermissionOrError for Budget {}
 
 impl From<budget::Model> for Budget {
     fn from(model: budget::Model) -> Self {

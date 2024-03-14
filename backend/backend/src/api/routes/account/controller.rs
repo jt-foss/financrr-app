@@ -8,7 +8,7 @@ use crate::api::pagination::{PageSizeParam, PaginatedAccount};
 use crate::wrapper::entity::account::dto::AccountDTO;
 use crate::wrapper::entity::account::Account;
 use crate::wrapper::entity::user::User;
-use crate::wrapper::permission::Permission;
+use crate::wrapper::permission::{HasPermissionOrError, Permissions};
 use crate::wrapper::types::phantom::Phantom;
 
 pub fn account_controller(cfg: &mut web::ServiceConfig) {
@@ -52,9 +52,7 @@ tag = "Account")]
 #[get("/{account_id}")]
 pub async fn get_one(user: Phantom<User>, account_id: Path<i32>) -> Result<impl Responder, ApiError> {
     let account = Account::find_by_id(account_id.into_inner()).await?;
-    if !account.has_access(user.get_id()).await? {
-        return Err(ApiError::resource_not_found("Account"));
-    }
+    account.has_permission_or_error(user.get_id(), Permissions::READ).await?;
 
     Ok(HttpResponse::Ok().json(account))
 }
@@ -93,12 +91,7 @@ tag = "Account")]
 #[delete("/{account_id}")]
 pub async fn delete(user: Phantom<User>, account_id: Path<i32>) -> Result<impl Responder, ApiError> {
     let account = Account::find_by_id(account_id.into_inner()).await?;
-    if !account.has_access(user.get_id()).await? {
-        return Err(ApiError::resource_not_found("Account"));
-    }
-    if !account.can_delete(user.get_id()).await? {
-        return Err(ApiError::unauthorized());
-    }
+    account.has_permission_or_error(user.get_id(), Permissions::READ_DELETE).await?;
 
     account.delete().await?;
 
@@ -126,9 +119,7 @@ pub async fn update(
     account_id: Path<i32>,
 ) -> Result<impl Responder, ApiError> {
     let account = Account::find_by_id(account_id.into_inner()).await?;
-    if !account.has_access(user.get_id()).await? {
-        return Err(ApiError::resource_not_found("Account"));
-    }
+    account.has_permission_or_error(user.get_id(), Permissions::READ_WRITE).await?;
 
     let account = account.update(updated_account).await?;
 

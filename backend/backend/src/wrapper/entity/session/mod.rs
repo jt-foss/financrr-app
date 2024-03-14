@@ -3,7 +3,7 @@ use std::ops::Add;
 use actix_web::dev::Payload;
 use actix_web::{FromRequest, HttpRequest};
 use futures_util::future::{join_all, LocalBoxFuture};
-use sea_orm::{EntityTrait, Set};
+use sea_orm::{EntityName, EntityTrait, Set};
 use serde::{Deserialize, Serialize};
 use time::Duration as TimeDuration;
 use time::OffsetDateTime;
@@ -23,7 +23,8 @@ use crate::database::entity::{count, delete, find_all_paginated, find_one_or_err
 use crate::database::redis::{del, get, set_ex, zadd};
 use crate::util::auth::extract_bearer_token;
 use crate::wrapper::entity::user::User;
-use crate::wrapper::permission::Permission;
+use crate::wrapper::entity::WrapperEntity;
+use crate::wrapper::permission::{HasPermissionOrError, Permission};
 use crate::wrapper::util::handle_async_result_vec;
 
 pub mod dto;
@@ -249,19 +250,19 @@ impl Session {
     }
 }
 
-impl Permission for Session {
-    async fn has_access(&self, user_id: i32) -> Result<bool, ApiError> {
-        if self.user.id == user_id {
-            return Ok(true);
-        }
-
-        Ok(false)
+impl WrapperEntity for Session {
+    fn get_id(&self) -> i32 {
+        self.id
     }
 
-    async fn can_delete(&self, user_id: i32) -> Result<bool, ApiError> {
-        self.has_access(user_id).await
+    fn table_name(&self) -> String {
+        session::Entity.table_name().to_string()
     }
 }
+
+impl Permission for Session {}
+
+impl HasPermissionOrError for Session {}
 
 impl FromRequest for Session {
     type Error = ApiError;

@@ -1,5 +1,5 @@
 use futures_util::future::join_all;
-use sea_orm::{EntityTrait, IntoActiveModel, Set};
+use sea_orm::{EntityName, EntityTrait, IntoActiveModel, Set};
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 use utoipa::ToSchema;
@@ -9,12 +9,11 @@ use entity::utility::time::get_now;
 
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
-use crate::database::entity::{
-    count, delete, find_all, find_all_paginated, find_one, find_one_or_error, insert, update,
-};
+use crate::database::entity::{count, delete, find_all, find_all_paginated, find_one_or_error, insert, update};
 use crate::wrapper::entity::account::dto::AccountDTO;
 use crate::wrapper::entity::currency::Currency;
-use crate::wrapper::permission::Permission;
+use crate::wrapper::entity::WrapperEntity;
+use crate::wrapper::permission::{HasPermissionOrError, Permission, Permissions};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 use crate::wrapper::util::handle_async_result_vec;
 
@@ -48,13 +47,10 @@ impl Account {
         };
         let model = insert(active_model).await?;
 
-        let user_account = user_account::ActiveModel {
-            user_id: Set(user_id),
-            account_id: Set(model.id),
-        };
-        insert(user_account).await?;
+        let account = Self::from(model);
+        account.add_permission(user_id, Permissions::all()).await?;
 
-        Ok(Self::from(model))
+        Ok(account)
     }
 
     pub async fn delete(self) -> Result<(), ApiError> {
@@ -95,10 +91,10 @@ impl Account {
 
     pub async fn find_all_by_user(user_id: i32) -> Result<Vec<Self>, ApiError> {
         let results = join_all(
-            find_all(user_account::Entity::find_by_user_id(user_id))
+            find_all(account::Entity::find_all_for_user(&user_id))
                 .await?
                 .into_iter()
-                .map(|model| Self::find_by_id(model.account_id)),
+                .map(|model| Self::find_by_id(model.entity_id)),
         )
         .await;
 
@@ -107,10 +103,10 @@ impl Account {
 
     pub async fn find_all_by_user_paginated(user_id: i32, page_size: &PageSizeParam) -> Result<Vec<Self>, ApiError> {
         let results = join_all(
-            find_all_paginated(user_account::Entity::find_by_user_id(user_id), page_size)
+            find_all_paginated(account::Entity::find_all_for_user(&user_id), page_size)
                 .await?
                 .into_iter()
-                .map(|model| Self::find_by_id(model.account_id)),
+                .map(|model| Self::find_by_id(model.entity_id)),
         )
         .await;
 
@@ -118,7 +114,7 @@ impl Account {
     }
 
     pub async fn count_all_by_user(user_id: i32) -> Result<u64, ApiError> {
-        count(user_account::Entity::find_by_user_id(user_id)).await
+        count(account::Entity::find_all_for_user(&user_id)).await
     }
 
     fn to_model(&self) -> account::Model {
@@ -136,27 +132,33 @@ impl Account {
     }
 }
 
-impl Permission for Account {
-    async fn has_access(&self, user_id: i32) -> Result<bool, ApiError> {
-        Phantom::<Self>::has_access(&Phantom::new(self.id), user_id).await
+impl WrapperEntity for Account {
+    fn get_id(&self) -> i32 {
+        self.id
     }
 
-    async fn can_delete(&self, user_id: i32) -> Result<bool, ApiError> {
-        self.has_access(user_id).await
+    fn table_name(&self) -> String {
+        account::Entity.table_name().to_string()
+    }
+}
+
+impl Permission for Account {}
+
+impl HasPermissionOrError for Account {}
+
+impl WrapperEntity for Phantom<Account> {
+    fn get_id(&self) -> i32 {
+        self.get_id()
+    }
+
+    fn table_name(&self) -> String {
+        account::Entity.table_name().to_string()
     }
 }
 
-impl Permission for Phantom<Account> {
-    async fn has_access(&self, user_id: i32) -> Result<bool, ApiError> {
-        let user_option = find_one(user_account::Entity::find_by_id((user_id, self.get_id()))).await?;
+impl Permission for Phantom<Account> {}
 
-        Ok(user_option.is_some())
-    }
-
-    async fn can_delete(&self, user_id: i32) -> Result<bool, ApiError> {
-        self.has_access(user_id).await
-    }
-}
+impl HasPermissionOrError for Phantom<Account> {}
 
 impl Identifiable for Account {
     async fn from_id(id: i32) -> Result<Self, ApiError>
