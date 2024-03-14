@@ -48,7 +48,7 @@ class AdaptiveScaffoldState extends State<AdaptiveScaffold> {
 
   Widget _buildLayout(BuildContext context, BoxConstraints constraints) {
     Widget Function(BuildContext, BoxConstraints, Size) layout = widget.verticalBuilder;
-    if (!context.isMobile && false) {
+    if (!context.isMobile) {
       layout = widget.horizontalFullBuilder ??
           (context, constraints, size) {
             return Center(
