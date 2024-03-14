@@ -72,33 +72,33 @@ class ScaffoldNavBarShellState extends State<ScaffoldNavBarShell> {
         child: isMobile
             ? widget.navigationShell
             : Row(
-          children: [
-            StatefulBuilder(builder: (context, setState) {
-              return MouseRegion(
-                onEnter: (event) => setState(() => _isHovered = true),
-                onExit: (event) => setState(() => _isHovered = false),
-                child: NavigationRail(
-                    destinations: _navRailDestinations,
-                    extended: context.isWidescreen || _isHovered,
-                    onDestinationSelected: (index) => goToBranch(index),
-                    selectedIndex: widget.navigationShell.currentIndex),
-              );
-            }),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: widget.navigationShell,
+                children: [
+                  StatefulBuilder(builder: (context, setState) {
+                    return MouseRegion(
+                      onEnter: (event) => setState(() => _isHovered = true),
+                      onExit: (event) => setState(() => _isHovered = false),
+                      child: NavigationRail(
+                          destinations: _navRailDestinations,
+                          extended: context.isWidescreen || _isHovered,
+                          onDestinationSelected: (index) => goToBranch(index),
+                          selectedIndex: widget.navigationShell.currentIndex),
+                    );
+                  }),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: widget.navigationShell,
+                    ),
+                  )
+                ],
               ),
-            )
-          ],
-        ),
       ),
       appBar: AppBar(),
       bottomNavigationBar: isMobile
           ? NavigationBar(
-          onDestinationSelected: (index) => goToBranch(index),
-          selectedIndex: widget.navigationShell.currentIndex,
-          destinations: _navBarDestinations)
+              onDestinationSelected: (index) => goToBranch(index),
+              selectedIndex: widget.navigationShell.currentIndex,
+              destinations: _navBarDestinations)
           : null,
     );
   }

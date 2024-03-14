@@ -92,18 +92,18 @@ class _SettingsPageState extends State<SettingsPage> {
         width: size.width / 1.1,
         child: Scaffold(
             body: ListView.separated(
-              itemCount: _cards.length,
-              itemBuilder: (_, index) {
-                if (index == 0) {
-                  return Padding(padding: const EdgeInsets.only(top: 10), child: _cards[index]);
-                }
-                return _cards[index];
-              },
-              separatorBuilder: (_, index) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 5),
-                child: index == 0 ? const Divider() : null,
-              ),
-            )),
+          itemCount: _cards.length,
+          itemBuilder: (_, index) {
+            if (index == 0) {
+              return Padding(padding: const EdgeInsets.only(top: 10), child: _cards[index]);
+            }
+            return _cards[index];
+          },
+          separatorBuilder: (_, index) => Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5),
+            child: index == 0 ? const Divider() : null,
+          ),
+        )),
       ),
     );
   }

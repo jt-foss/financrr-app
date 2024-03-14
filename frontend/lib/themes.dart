@@ -40,12 +40,12 @@ class AppTheme {
 
   const AppTheme(
       {required this.id,
-        required this.logoPath,
-        this.translationKey,
-        this.fallbackName,
-        required this.previewColor,
-        required this.themeMode,
-        required this.themeData});
+      required this.logoPath,
+      this.translationKey,
+      this.fallbackName,
+      required this.previewColor,
+      required this.themeMode,
+      required this.themeData});
 
   String get effectiveName => translationKey?.tr() ?? fallbackName ?? id;
 
@@ -87,15 +87,15 @@ class AppTheme {
     final TextTheme textTheme = _buildTextTheme(primaryColor);
     final AppBarTheme? appBarTheme = _tryAppBarThemeFromJson(fullJson, json['app_bar_theme_data']);
     final NavigationBarThemeData? navigationBarTheme =
-    _tryNavigationBarThemeDataFromJson(fullJson, json['navigation_bar_theme_data']);
+        _tryNavigationBarThemeDataFromJson(fullJson, json['navigation_bar_theme_data']);
     final NavigationRailThemeData? navigationRailTheme =
-    _tryNavigationRailThemeDataFromJson(fullJson, json['navigation_rail_theme_data']);
+        _tryNavigationRailThemeDataFromJson(fullJson, json['navigation_rail_theme_data']);
     final ElevatedButtonThemeData? elevatedButtonTheme =
-    _tryElevatedButtonThemeDataFromJson(fullJson, json['elevated_button_theme_data']);
+        _tryElevatedButtonThemeDataFromJson(fullJson, json['elevated_button_theme_data']);
     final TextButtonThemeData? textButtonTheme =
-    _tryTextButtonThemeDataFromJson(fullJson, json['text_button_theme_data']);
+        _tryTextButtonThemeDataFromJson(fullJson, json['text_button_theme_data']);
     final TextSelectionThemeData? textSelectionTheme =
-    _tryTextSelectionThemeDataFromJson(fullJson, json['text_selection_theme_data']);
+        _tryTextSelectionThemeDataFromJson(fullJson, json['text_selection_theme_data']);
     final SwitchThemeData? switchTheme = _trySwitchThemeDataFromJson(fullJson, json['switch_theme_data']);
     final SnackBarThemeData? snackBarTheme = _trySnackBarThemeDataFromJson(fullJson, json['snack_bar_theme_data']);
     final DrawerThemeData? drawerTheme = _tryDrawerThemeData(fullJson, json['drawer_theme_data']);

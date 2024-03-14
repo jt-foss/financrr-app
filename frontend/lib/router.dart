@@ -92,7 +92,7 @@ class AppRouter {
   }
 
   static Page<T> Function(BuildContext, GoRouterState) _defaultBranchPageBuilder<T>(Widget child) =>
-          (context, state) => CustomTransitionPage(
+      (context, state) => CustomTransitionPage(
           child: child,
           transitionsBuilder: (context, animation, _, child) {
             return FadeTransition(

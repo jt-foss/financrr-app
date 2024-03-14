@@ -39,6 +39,13 @@ class _CurrencySettingsPageState extends State<CurrencySettingsPage> {
     return Scaffold(
         appBar: AppBar(
           title: const Text('Manage Currencies'),
+          actions: [
+            IconButton(
+              tooltip: 'Add custom currency',
+              icon: const Icon(Icons.add),
+              onPressed: () => Navigator.of(context).pushNamed('/@me/settings/currency/add'),
+            ),
+          ],
         ),
         body: Center(
           child: SizedBox(
@@ -48,20 +55,47 @@ class _CurrencySettingsPageState extends State<CurrencySettingsPage> {
                 stream: _currenciesController.stream,
                 onError: (context, snap) => const Text('Error'),
                 onLoading: (context, snap) => const CircularProgressIndicator(),
-                onSuccess: (context, snap) => Column(
-                  children: snap.data!
-                      .map((currency) => Card.outlined(
-                    child: ListTile(
-                      leading: Text(currency.symbol),
-                      title: Text(currency.name),
-                      subtitle: Text(currency.isoCode),
-                    ),
-                  ))
-                      .toList(),
-                ),
+                onSuccess: (context, snap) {
+                  final List<Currency> currencies = snap.data as List<Currency>;
+                  final Currency preferredCurrency =
+                      currencies.firstWhere((c) => c.isoCode == 'EUR', orElse: () => currencies.first);
+                  final List<Currency> customCurrencies =
+                      currencies.where((c) => c.isCustom && c != preferredCurrency).toList();
+                  final List<Currency> defaultCurrencies =
+                      currencies.where((c) => !c.isCustom && c != preferredCurrency).toList();
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: Column(children: [
+                      _buildCurrencyCard(preferredCurrency, isPreferred: true),
+                      Card.outlined(
+                        child: ListTile(
+                          title: Text('${customCurrencies.length} custom currencies'),
+                          trailing: TextButton(
+                            onPressed: () => Navigator.of(context).pushNamed('/@me/settings/currency/add'),
+                            child: const Text('Add'),
+                          ),
+                        ),
+                      ),
+                      for (final currency in customCurrencies) _buildCurrencyCard(currency),
+                      const Divider(),
+                      for (final currency in defaultCurrencies) _buildCurrencyCard(currency),
+                    ]),
+                  );
+                },
               ),
             ),
           ),
         ));
+  }
+
+  Widget _buildCurrencyCard(Currency currency, {bool isPreferred = false}) {
+    return Card.outlined(
+      child: ListTile(
+        leading: Text(currency.symbol),
+        title: Text(currency.name),
+        subtitle: Text(currency.isoCode),
+        trailing: isPreferred ? const Text('Preferred') : null,
+      ),
+    );
   }
 }
