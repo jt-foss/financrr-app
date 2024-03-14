@@ -54,7 +54,7 @@ class LoginPageState extends State<LoginPage> {
                         controller: _usernameController,
                         decoration: InputDecoration(labelText: 'common_username'.tr()),
                         autofillHints: const [AutofillHints.username],
-                        validator: (value) => value!.isEmpty ? 'common_username_not_empty' : null,
+                        validator: (value) => value!.isEmpty ? 'common_username_required'.tr() : null,
                       ),
                     ),
                     TextFormField(
@@ -69,7 +69,7 @@ class LoginPageState extends State<LoginPage> {
                           )),
                       obscureText: _obscureText,
                       autofillHints: const [AutofillHints.password, AutofillHints.newPassword],
-                      validator: (value) => value!.isEmpty ? 'common_password_not_empty' : null,
+                      validator: (value) => value!.isEmpty ? 'common_password_required'.tr() : null,
                     ),
                   ],
                 )),
@@ -80,7 +80,7 @@ class LoginPageState extends State<LoginPage> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: _handleLogin,
-                    child: const Text('common.sign_in').tr(),
+                    child: const Text('common_login').tr(),
                   ),
                 )),
           ],
@@ -90,19 +90,20 @@ class LoginPageState extends State<LoginPage> {
   Future<void> _handleLogin() async {
     final String username = _usernameController.text;
     if (username.isEmpty) {
-      context.showSnackBar('common_username_not_empty');
+      context.showSnackBar('common_username_required'.tr());
       return;
     }
     final String password = _passwordController.text;
     if (username.isEmpty) {
-      context.showSnackBar('common_password_not_empty');
+      context.showSnackBar('common_password_required'.tr());
       return;
     }
 
     final RestResponse<Restrr> response =
-        await (RestrrBuilder.login(uri: widget.hostUri, username: username, password: password)
-              ..options = const RestrrOptions(isWeb: kIsWeb))
-            .create();
+    await (RestrrBuilder.login(uri: widget.hostUri, username: username, password: password)
+      ..options = const RestrrOptions(isWeb: kIsWeb))
+        .on<ReadyEvent>(ReadyEvent, (event) => event.api.retrieveAllCurrencies())
+        .create();
     if (!mounted) return;
     if (response.hasData) {
       context.authNotifier.setApi(response.data!);

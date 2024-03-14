@@ -101,6 +101,12 @@ abstract class Repository<T> {
           'Encountered invalid Object when saving ${data.runtimeType}! Got: ${value.runtimeType}, Expected either String, int, bool or double')
     };
   }
+
+  Future<void> clear() async {
+    for (String key in keys) {
+      await preferences.remove('${prefix}_$key');
+    }
+  }
 }
 
 class RepositoryItem<T> {

@@ -1,6 +1,9 @@
 import 'package:financrr_frontend/layout/scaffold_navbar_shell.dart';
 import 'package:financrr_frontend/pages/auth/login_page.dart';
 import 'package:financrr_frontend/pages/auth/server_info_page.dart';
+import 'package:financrr_frontend/pages/core/settings/currency_settings_page.dart';
+import 'package:financrr_frontend/pages/core/settings/theme_settings_page.dart';
+import 'package:financrr_frontend/pages/core/settings_page.dart';
 import 'package:financrr_frontend/pages/core/dashboard_page.dart';
 import 'package:financrr_frontend/pages/core/dummy_page.dart';
 import 'package:financrr_frontend/util/constants.dart';
@@ -16,6 +19,7 @@ class AppRouter {
   static final GlobalKey<NavigatorState> shellNavigatorKey = GlobalKey(debugLabel: 'shell');
 
   static final goRouter = GoRouter(
+    initialLocation: '/',
     navigatorKey: rootNavigatorKey,
     routes: [
       ..._noShellRoutes(),
@@ -32,21 +36,22 @@ class AppRouter {
             ]),
             StatefulShellBranch(routes: [
               GoRoute(
-                  path: '/@me/a',
+                  path: '/@me/accounts',
                   pageBuilder: _defaultBranchPageBuilder(const DummyPage(text: 'A')),
                   redirect: coreAuthGuard),
             ]),
             StatefulShellBranch(routes: [
               GoRoute(
-                  path: '/@me/b',
+                  path: '/@me/statistics',
                   pageBuilder: _defaultBranchPageBuilder(const DummyPage(text: 'B')),
                   redirect: coreAuthGuard),
             ]),
             StatefulShellBranch(routes: [
               GoRoute(
-                  path: '/@me/c',
-                  pageBuilder: _defaultBranchPageBuilder(const DummyPage(text: 'C')),
-                  redirect: coreAuthGuard),
+                path: SettingsPage.pagePath.path,
+                pageBuilder: _defaultBranchPageBuilder(const SettingsPage()),
+                redirect: coreAuthGuard,
+              ),
             ]),
           ]),
     ],
@@ -60,6 +65,14 @@ class AppRouter {
           pageBuilder: (context, state) =>
               _buildDefaultPageTransition(context, state, ServerInfoPage(key: GlobalKeys.loginPage)),
           redirect: authGuard),
+      GoRoute(
+          path: ThemeSettingsPage.pagePath.path,
+          pageBuilder: _defaultBranchPageBuilder(const ThemeSettingsPage()),
+          redirect: coreAuthGuard),
+      GoRoute(
+          path: CurrencySettingsPage.pagePath.path,
+          pageBuilder: _defaultBranchPageBuilder(const CurrencySettingsPage()),
+          redirect: coreAuthGuard)
     ];
   }
 
@@ -79,7 +92,7 @@ class AppRouter {
   }
 
   static Page<T> Function(BuildContext, GoRouterState) _defaultBranchPageBuilder<T>(Widget child) =>
-      (context, state) => CustomTransitionPage(
+          (context, state) => CustomTransitionPage(
           child: child,
           transitionsBuilder: (context, animation, _, child) {
             return FadeTransition(

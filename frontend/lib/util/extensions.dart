@@ -3,6 +3,11 @@ import 'package:financrr_frontend/themes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+extension LayoutExtension on BuildContext {
+  bool get isMobile => MediaQuery.of(this).size.width < 550;
+  bool get isWidescreen => MediaQuery.of(this).size.width >= 1100;
+}
+
 extension ThemeExtension on BuildContext {
   AppTheme get appTheme => FinancrrApp.of(this).getAppTheme();
 
