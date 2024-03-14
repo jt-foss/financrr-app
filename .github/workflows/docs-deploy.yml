@@ -35,8 +35,15 @@ jobs:
   # Build job
   build:
     runs-on: ubuntu-latest
+
     env:
       MDBOOK_VERSION: 0.4.36
+
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+
     steps:
       - uses: actions/checkout@v4
       - name: Install mdBook
@@ -55,6 +62,6 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: gh-pages
-          folder: docs
+          folder: ./docs/book
+          target-folder: /docs

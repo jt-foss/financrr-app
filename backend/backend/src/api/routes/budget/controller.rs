@@ -3,9 +3,9 @@ use actix_web::web::Path;
 use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
 use actix_web_validator::Json;
 
+use crate::api::documentation::response::{InternalServerError, ResourceNotFound, Unauthorized, ValidationError};
 use crate::api::error::api::ApiError;
 use crate::api::pagination::{PageSizeParam, Pagination};
-use crate::util::utoipa::{InternalServerError, ResourceNotFound, Unauthorized, ValidationError};
 use crate::wrapper::budget::dto::BudgetDTO;
 use crate::wrapper::budget::Budget;
 use crate::wrapper::permission::Permission;
@@ -21,6 +21,7 @@ pub fn budget_controller(cfg: &mut web::ServiceConfig) {
 #[utoipa::path(get,
 responses(
 (status = 200, description = "Successfully retrieved the Budgets.", content_type = "application/json", body = PaginatedBudget),
+(status = 400, response = ValidationError),
 (status = 401, response = Unauthorized),
 (status = 500, response = InternalServerError)
 ),
@@ -64,7 +65,7 @@ pub async fn get_one(user: Phantom<User>, budget_id: Path<i32>) -> Result<impl R
 
 #[utoipa::path(post,
 responses(
-(status = 200, description = "Successfully created the Budget.", content_type = "application/json", body = Budget),
+(status = 201, description = "Successfully created the Budget.", content_type = "application/json", body = Budget),
 (status = 400, response = ValidationError),
 (status = 401, response = Unauthorized),
 (status = 500, response = InternalServerError)
@@ -79,7 +80,7 @@ tag = "Budget"
 pub async fn create(user: Phantom<User>, budget: Json<BudgetDTO>) -> Result<impl Responder, ApiError> {
     let budget = Budget::new(user.get_id(), budget.into_inner()).await?;
 
-    Ok(HttpResponse::Ok().json(budget))
+    Ok(HttpResponse::Created().json(budget))
 }
 
 #[utoipa::path(delete,

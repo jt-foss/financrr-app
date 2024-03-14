@@ -35,11 +35,11 @@ jobs:
           flutter pub upgrade
 
       - name: Build Web
-        run: flutter build web --release
+        run: flutter build web --release --base-href /financrr-app/frontend-stage/
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: gh-pages
-          folder: build/web
+          folder: frontend/build/web
+          target-folder: /frontend-stage
