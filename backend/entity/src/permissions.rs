@@ -4,24 +4,19 @@ use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
-#[sea_orm(table_name = "user_account")]
+#[sea_orm(table_name = "permissions")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub user_id: i32,
+    #[sea_orm(primary_key, auto_increment = false, column_type = "Text")]
+    pub entity_type: String,
     #[sea_orm(primary_key, auto_increment = false)]
-    pub account_id: i32,
+    pub entity_id: i32,
+    pub permissions: i32,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
-    #[sea_orm(
-        belongs_to = "super::account::Entity",
-        from = "Column::AccountId",
-        to = "super::account::Column::Id",
-        on_update = "Cascade",
-        on_delete = "Cascade"
-    )]
-    Account,
     #[sea_orm(
         belongs_to = "super::user::Entity",
         from = "Column::UserId",
@@ -30,12 +25,6 @@ pub enum Relation {
         on_delete = "Cascade"
     )]
     User,
-}
-
-impl Related<super::account::Entity> for Entity {
-    fn to() -> RelationDef {
-        Relation::Account.def()
-    }
 }
 
 impl Related<super::user::Entity> for Entity {
@@ -47,11 +36,10 @@ impl Related<super::user::Entity> for Entity {
 impl ActiveModelBehavior for ActiveModel {}
 
 impl Entity {
-    pub fn find_by_user_id(user_id: i32) -> Select<Self> {
-        Self::find().filter(Column::UserId.eq(user_id))
-    }
-
-    pub fn find_by_account_id(account_id: i32) -> Select<Self> {
-        Self::find().filter(Column::AccountId.eq(account_id))
+    pub fn find_permission(user_id: i32, entity_type: &str, entity_id: i32) -> Select<Self> {
+        Entity::find()
+            .filter(Column::UserId.eq(user_id))
+            .filter(Column::EntityType.eq(entity_type))
+            .filter(Column::EntityId.eq(entity_id))
     }
 }

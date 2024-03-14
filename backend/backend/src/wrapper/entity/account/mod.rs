@@ -4,8 +4,8 @@ use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 use utoipa::ToSchema;
 
+use entity::account;
 use entity::utility::time::get_now;
-use entity::{account, user_account};
 
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;

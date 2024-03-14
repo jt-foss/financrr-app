@@ -4,7 +4,6 @@ use sea_orm::entity::prelude::*;
 use sea_orm::ActiveValue::Set;
 use serde::{Deserialize, Serialize};
 
-use crate::user_account;
 use crate::utility::time::get_now;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
@@ -34,28 +33,11 @@ pub enum Relation {
         on_delete = "NoAction"
     )]
     Currency,
-    #[sea_orm(has_many = "super::user_account::Entity")]
-    UserAccount,
 }
 
 impl Related<super::currency::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::Currency.def()
-    }
-}
-
-impl Related<super::user_account::Entity> for Entity {
-    fn to() -> RelationDef {
-        Relation::UserAccount.def()
-    }
-}
-
-impl Related<super::user::Entity> for Entity {
-    fn to() -> RelationDef {
-        super::user_account::Relation::User.def()
-    }
-    fn via() -> Option<RelationDef> {
-        Some(super::user_account::Relation::Account.def().rev())
     }
 }
 

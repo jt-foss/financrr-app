@@ -88,10 +88,26 @@ impl ApiError {
         }
     }
 
+    pub fn requested_resource_not_found() -> Self {
+        Self {
+            status_code: StatusCode::NOT_FOUND,
+            details: "Requested resource not found.".to_string(),
+            reference: None,
+        }
+    }
+
     pub fn unauthorized() -> Self {
         Self {
             status_code: StatusCode::UNAUTHORIZED,
             details: "Unauthorized.".to_string(),
+            reference: None,
+        }
+    }
+
+    pub fn missing_permissions() -> Self {
+        Self {
+            status_code: StatusCode::FORBIDDEN,
+            details: "Missing permissions.".to_string(),
             reference: None,
         }
     }
