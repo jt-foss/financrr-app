@@ -1,6 +1,7 @@
 import 'package:financrr_frontend/layout/scaffold_navbar_shell.dart';
 import 'package:financrr_frontend/pages/auth/login_page.dart';
 import 'package:financrr_frontend/pages/auth/server_info_page.dart';
+import 'package:financrr_frontend/pages/context_navigator.dart';
 import 'package:financrr_frontend/pages/core/settings/currency_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings/theme_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings_page.dart';
@@ -23,7 +24,6 @@ class AppRouter {
     navigatorKey: rootNavigatorKey,
     routes: [
       ..._noShellRoutes(),
-      GoRoute(path: '/', redirect: (_, __) => '/@me/dashboard'),
       GoRoute(path: '/@me', redirect: (_, __) => '/@me/dashboard'),
       StatefulShellRoute.indexedStack(
           builder: (context, state, shell) => ScaffoldNavBarShell(navigationShell: shell),
@@ -60,7 +60,11 @@ class AppRouter {
   static List<GoRoute> _noShellRoutes() {
     return [
       GoRoute(
-          name: 'financrr — Login',
+        path: ContextNavigatorPage.pagePath.path,
+        pageBuilder: (context, state) =>
+            _buildDefaultPageTransition(context, state, const ContextNavigatorPage()),
+      ),
+      GoRoute(
           path: ServerInfoPage.pagePath.path,
           pageBuilder: (context, state) =>
               _buildDefaultPageTransition(context, state, ServerInfoPage(key: GlobalKeys.loginPage)),
@@ -84,7 +88,7 @@ class AppRouter {
   /// Checks whether the current user is authenticated. If not, this will redirect to the [LoginPage], including
   /// the `redirectTo` queryParam for the page the user was initially going to visit
   static String? coreAuthGuard(BuildContext context, GoRouterState state) {
-    return context.authNotifier.isAuthenticated ? null : ServerInfoPage.pagePath.build().fullPath;
+    return context.authNotifier.isAuthenticated ? null : ContextNavigatorPage.pagePath.build().fullPath;
   }
 
   static Page<T> _buildDefaultPageTransition<T>(BuildContext context, GoRouterState state, Widget child) {
@@ -158,7 +162,7 @@ extension BuildContextExtension on BuildContext {
   /// Provides the [AuthenticationNotifier] using [BuildContext.read].
   AuthenticationNotifier get authNotifier => read<AuthenticationNotifier>();
 
-  /// Provides a nullable instance of [DURA], being only null if the user __is not__ logged in.
+  /// Provides a nullable instance of [Restrr], being only null if the user **is not** logged in.
   Restrr? get api => authNotifier.api;
 
   void goPath(PagePath path, {Object? extra}) {

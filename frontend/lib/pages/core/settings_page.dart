@@ -1,4 +1,4 @@
-import 'package:financrr_frontend/pages/auth/server_info_page.dart';
+import 'package:financrr_frontend/data/session_repository.dart';
 import 'package:financrr_frontend/pages/core/settings/currency_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings/theme_settings_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
@@ -65,12 +65,7 @@ class _SettingsPageState extends State<SettingsPage> {
     ),
     Card.outlined(
       child: ListTile(
-        onTap: () async {
-          await _api.logout();
-          if (!mounted) return;
-          context.authNotifier.setApi(null);
-          context.goPath(ServerInfoPage.pagePath.build());
-        },
+        onTap: () => SessionService.logout(context, _api),
         leading: const Icon(Icons.logout),
         title: const Text('Logout'),
         subtitle: const Text('Log out of your account'),

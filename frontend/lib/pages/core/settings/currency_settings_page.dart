@@ -17,14 +17,14 @@ class CurrencySettingsPage extends StatefulWidget {
 }
 
 class _CurrencySettingsPageState extends State<CurrencySettingsPage> {
-  final StreamController<List<Currency>> _currenciesController = StreamController<List<Currency>>.broadcast();
+  final StreamController<Paginated<Currency>> _currenciesController = StreamController<Paginated<Currency>>.broadcast();
 
   late final Restrr _api = context.api!;
 
   @override
   void initState() {
     super.initState();
-    _api.retrieveAllCurrencies().then((currencies) => _currenciesController.sink.add(currencies ?? []));
+    _api.retrieveAllCurrencies().then((currencies) => _currenciesController.sink.add(currencies));
   }
 
   @override
@@ -56,30 +56,18 @@ class _CurrencySettingsPageState extends State<CurrencySettingsPage> {
                 onError: (context, snap) => const Text('Error'),
                 onLoading: (context, snap) => const CircularProgressIndicator(),
                 onSuccess: (context, snap) {
-                  final List<Currency> currencies = snap.data as List<Currency>;
-                  final Currency preferredCurrency =
-                      currencies.firstWhere((c) => c.isoCode == 'EUR', orElse: () => currencies.first);
-                  final List<Currency> customCurrencies =
-                      currencies.where((c) => c.isCustom && c != preferredCurrency).toList();
-                  final List<Currency> defaultCurrencies =
-                      currencies.where((c) => !c.isCustom && c != preferredCurrency).toList();
+                  final Paginated<Currency> currencyPage = snap.data as Paginated<Currency>;
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 10),
-                    child: Column(children: [
-                      _buildCurrencyCard(preferredCurrency, isPreferred: true),
-                      Card.outlined(
-                        child: ListTile(
-                          title: Text('${customCurrencies.length} custom currencies'),
-                          trailing: TextButton(
-                            onPressed: () => Navigator.of(context).pushNamed('/@me/settings/currency/add'),
-                            child: const Text('Add'),
-                          ),
-                        ),
-                      ),
-                      for (final currency in customCurrencies) _buildCurrencyCard(currency),
-                      const Divider(),
-                      for (final currency in defaultCurrencies) _buildCurrencyCard(currency),
-                    ]),
+                    child: PaginatedDataTable(
+                      header: const Text('Currencies'),
+                      columns: const [
+                        DataColumn(label: Text('Symbol')),
+                        DataColumn(label: Text('Name')),
+                        DataColumn(label: Text('ISO Code')),
+                      ],
+                      source: _CurrencyDataSource(currencyPage),
+                    )
                   );
                 },
               ),
@@ -96,6 +84,36 @@ class _CurrencySettingsPageState extends State<CurrencySettingsPage> {
         subtitle: Text(currency.isoCode),
         trailing: isPreferred ? const Text('Preferred') : null,
       ),
+    );
+  }
+}
+
+class _CurrencyDataSource extends DataTableSource {
+  final Paginated<Currency> currencies;
+
+  _CurrencyDataSource(this.currencies);
+
+  @override
+  int get rowCount => currencies.limit;
+
+  @override
+  bool get isRowCountApproximate => false;
+
+  @override
+  int get selectedRowCount => 0;
+
+  @override
+  DataRow? getRow(int index) {
+    if (index >= currencies.length) {
+      return null;
+    }
+    final Currency currency = currencies.items[index];
+    return DataRow(
+      cells: [
+        DataCell(Text(currency.symbol)),
+        DataCell(Text(currency.name)),
+        DataCell(Text(currency.isoCode)),
+      ],
     );
   }
 }

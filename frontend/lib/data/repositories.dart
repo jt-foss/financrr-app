@@ -1,3 +1,4 @@
+import 'package:financrr_frontend/data/session_repository.dart';
 import 'package:financrr_frontend/data/theme_repository.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,10 +8,13 @@ import 'host_repository.dart';
 class Repositories {
   const Repositories._();
 
+  static late final SessionRepository sessionRepository;
+
   static late final ThemeRepository themeRepository;
   static late final HostRepository hostRepository;
 
   static Future init(FlutterSecureStorage storage, SharedPreferences preferences) async {
+    sessionRepository = SessionRepository(storage: storage);
     themeRepository = ThemeRepository(preferences: preferences);
     hostRepository = HostRepository(preferences: preferences);
   }
@@ -23,7 +27,7 @@ abstract class SecureStringRepository {
 
   String get key;
 
-  Future<bool> contains() {
+  Future<bool> exists() {
     try {
       return storage.containsKey(key: key);
     } catch (_) {
