@@ -3,9 +3,10 @@ use actix_web::web::Path;
 use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
 use actix_web_validator::Json;
 
+use crate::api::documentation::response::ValidationError;
+use crate::api::documentation::response::{InternalServerError, ResourceNotFound, Unauthorized};
 use crate::api::error::api::ApiError;
 use crate::api::pagination::{PageSizeParam, Pagination};
-use crate::util::utoipa::{InternalServerError, ResourceNotFound, Unauthorized};
 use crate::wrapper::permission::Permission;
 use crate::wrapper::session::dto::PublicSession;
 use crate::wrapper::session::Session;
@@ -19,7 +20,7 @@ pub fn session_controller(cfg: &mut web::ServiceConfig) {
             .service(get_current)
             .service(get_one)
             .service(get_all)
-            .service(renew)
+            .service(refresh)
             .service(delete_current)
             .service(delete)
             .service(delete_all)
@@ -71,6 +72,7 @@ pub async fn get_one(user: Phantom<User>, session_id: Path<i32>) -> Result<impl 
 #[utoipa::path(get,
 responses(
 (status = 200, description = "Successfully retrieved all Sessions.", content_type = "application/json", body = PaginatedSession),
+(status = 400, response = ValidationError),
 (status = 401, response = Unauthorized),
 (status = 500, response = InternalServerError)
 ),
@@ -78,7 +80,7 @@ params(PageSizeParam),
 security(
 ("bearer_token" = [])
 ),
-path = "/api/v1/session",
+path = "/api/v1/session/?page={page}&size={size}",
 tag = "Session"
 )]
 #[get("")]
@@ -99,11 +101,11 @@ responses(
 security(
 ("bearer_token" = [])
 ),
-path = "/api/v1/session/renew",
+path = "/api/v1/session/refresh",
 tag = "Session"
 )]
-#[patch("/renew")]
-pub async fn renew(session: Session) -> Result<impl Responder, ApiError> {
+#[patch("/refresh")]
+pub async fn refresh(session: Session) -> Result<impl Responder, ApiError> {
     let new_session = session.renew().await?;
 
     Ok(HttpResponse::Ok().json(new_session))
@@ -178,9 +180,13 @@ pub async fn delete_all(user: Phantom<User>) -> Result<impl Responder, ApiError>
 
 #[utoipa::path(post,
 responses(
-(status = 200, description = "Successfully created a new Session.", content_type = "application/json", body = Session),
+(status = 201, description = "Successfully created a new Session.", content_type = "application/json", body = Session),
+(status = 400, response = ValidationError),
 (status = 401, response = Unauthorized),
 (status = 500, response = InternalServerError)
+),
+security(
+("bearer_token" = [])
 ),
 path = "/api/v1/session",
 tag = "Session"
@@ -192,5 +198,5 @@ pub async fn create(credentials: Json<Credentials>) -> Result<impl Responder, Ap
     let user = User::authenticate(credentials).await?;
     let session = Session::new(user, session_name).await?;
 
-    Ok(HttpResponse::Ok().json(session))
+    Ok(HttpResponse::Created().json(session))
 }

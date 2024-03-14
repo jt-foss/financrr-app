@@ -22,6 +22,12 @@ With its intuitive interface and powerful features, Financrr empowers users to t
 - [ ] **Customizable Categories**: Customize expense categories to fit your specific needs and preferences.
 - [ ] **Multi-platform Support**: Access Financrr on multiple platforms, including web, iOS, and Android.
 
+## 🌐 Links
+
+- [Docs](https://financrr.github.io/financrr-app/docs/)
+- [Frontend stage](https://financrr.github.io/financrr-app/frontend-stage/)
+- [Backend stage](https://api-stage.financrr.app/swagger-ui/)
+
 ## 🔧 Contributing
 
 We welcome contributions from the community to make financrr even better! 
