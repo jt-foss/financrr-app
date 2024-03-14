@@ -68,12 +68,15 @@ impl Links {
         let page = page_size_param.page;
         let limit = page_size_param.limit;
 
+        // only show prev link if he isn't on the first page
         let prev = if page > 1 {
             Some(format!("{}?page={}&limit={}", uri.path(), page - 1, limit))
         } else {
             None
         };
-        let next = if total >= limit {
+
+        // only show next link if there are more items
+        let next = if total > page * limit {
             Some(format!("{}?page={}&limit={}", uri.path(), page + 1, limit))
         } else {
             None
