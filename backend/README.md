@@ -59,8 +59,10 @@ There is currently no way nor any plans to use/support other databases.
 **Why is that?**<br>
 
 - Concentrating on only one database makes it way easier to develop, maintain and test existing systems
-- Having an application designed for one specific database may yield performance improvements by fine tuning both the
+- Having an application designed for one specific database may yield performance improvements by fine-tuning both the
   database and application based on eachother
+- We can make use of PostgreSQL's advanced features, or query postgres-specific tables without having to worry about
+  compatibility issues
 
 ### Performance Configuration
 
