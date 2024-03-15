@@ -9,4 +9,5 @@ Everything here is still work in progress and subject to change!
     - [Frontend](features/frontend.md)
     - [Backend](features/backend.md)
 - [API](api/README.md)
+  - [Api Error](api/Error.md)
 - [Database](db/README.md) 

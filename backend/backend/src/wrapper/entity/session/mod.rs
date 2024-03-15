@@ -94,7 +94,7 @@ impl Session {
     pub async fn get_user_id(token: String) -> Result<i32, ApiError> {
         let user_id = Self::get_user_id_from_redis(token.to_owned()).await?;
         if user_id.is_none() {
-            return Err(ApiError::invalid_session());
+            return Err(ApiError::InvalidSession());
         }
 
         Ok(user_id.unwrap())
@@ -104,7 +104,7 @@ impl Session {
         let user_id = get(token.to_owned()).await?;
 
         match user_id.parse::<i32>() {
-            Err(_) => Err(ApiError::invalid_session()),
+            Err(_) => Err(ApiError::InvalidSession()),
             Ok(id) => Ok(Some(id)),
         }
     }
