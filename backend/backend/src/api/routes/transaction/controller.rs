@@ -75,7 +75,7 @@ pub async fn create(user: Phantom<User>, transaction: TransactionDTO) -> Result<
     // TODO add permission checks for budget
 
     if !transaction.check_account_access(user.get_id()).await? {
-        return Err(ApiError::unauthorized());
+        return Err(ApiError::Unauthorized());
     }
 
     Ok(HttpResponse::Created().json(Transaction::new(transaction, user.get_id()).await?))

@@ -18,8 +18,44 @@ Custom error codes always consist of at least four digits to prevent conflicts w
 <br>
 We call these custom error codes `Api Codes`.
 
-### Api Codes
+## Api Codes
 
-| Code | Description     |
-|------|-----------------|
-| 1000 | Invalid API Key |
+### Auth related
+
+| Code | Description                  |
+|------|------------------------------|
+| 1000 | Invalid Session              |
+| 1001 | Session limit reached        |
+| 1002 | Invalid credentials provided |
+| 1003 | Unauthorized                 |
+| 1004 | No bearer token provided     |
+
+### User-causes errors
+
+| Code | Description         |
+|------|---------------------|
+| 1100 | Resource not found  |
+| 1101 | Serialization error |
+| 1102 | Missing permissions |
+
+### Validation errors
+
+| Code | Description                   |
+|------|-------------------------------|
+| 1200 | JSON payload validation error |
+| 1201 | Validation error              | 
+
+### Internal server errors
+
+| Code | Description      |
+|------|------------------|
+| 1300 | DB-Entitiy error |
+| 1301 | Database error   |
+| 1302 | Redis error      |
+
+### Misc errors
+
+| Code | Description   |
+|------|---------------|
+| 9000 | Actix error   |
+| 9999 | Unknown error |

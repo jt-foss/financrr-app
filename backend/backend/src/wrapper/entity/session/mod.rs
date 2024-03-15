@@ -44,7 +44,7 @@ impl Session {
         let session_token = Self::generate_session_key();
 
         if Self::reached_session_limit(user.id).await? {
-            return Err(ApiError::session_limit_reached());
+            return Err(ApiError::SessionLimitReached());
         }
 
         // insert into database

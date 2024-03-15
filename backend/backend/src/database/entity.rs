@@ -17,7 +17,7 @@ pub async fn find_one_or_error<T: EntityTrait>(
     select_stm: Select<T>,
     resource_name: &str,
 ) -> Result<T::Model, ApiError> {
-    find_one(select_stm).await?.ok_or_else(|| ApiError::resource_not_found(resource_name))
+    find_one(select_stm).await?.ok_or_else(|| ApiError::ResourceNotFound(resource_name))
 }
 
 pub async fn find_all<T: EntityTrait>(select_stm: Select<T>) -> Result<Vec<T::Model>, ApiError> {
