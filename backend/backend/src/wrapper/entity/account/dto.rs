@@ -8,7 +8,7 @@ use validator::Validate;
 
 use crate::api::error::api::ApiError;
 use crate::util::validation::{validate_currency_exists, validate_iban};
-use crate::wrapper::account::Account;
+use crate::wrapper::entity::account::Account;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Validate, ToSchema)]
 pub struct AccountDTO {

@@ -4,7 +4,8 @@ use sea_orm::entity::prelude::*;
 use sea_orm::ActiveValue::Set;
 use serde::{Deserialize, Serialize};
 
-use crate::user_account;
+use crate::permissions;
+use crate::prelude::Permissions;
 use crate::utility::time::get_now;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
@@ -34,8 +35,6 @@ pub enum Relation {
         on_delete = "NoAction"
     )]
     Currency,
-    #[sea_orm(has_many = "super::user_account::Entity")]
-    UserAccount,
 }
 
 impl Related<super::currency::Entity> for Entity {
@@ -44,34 +43,20 @@ impl Related<super::currency::Entity> for Entity {
     }
 }
 
-impl Related<super::user_account::Entity> for Entity {
-    fn to() -> RelationDef {
-        Relation::UserAccount.def()
-    }
-}
-
-impl Related<super::user::Entity> for Entity {
-    fn to() -> RelationDef {
-        super::user_account::Relation::User.def()
-    }
-    fn via() -> Option<RelationDef> {
-        Some(super::user_account::Relation::Account.def().rev())
-    }
-}
-
 impl ActiveModelBehavior for ActiveModel {}
 
 impl Entity {
-    pub fn find_all_for_user(user_id: &i32) -> Select<user_account::Entity> {
+    pub fn find_all_for_user(user_id: &i32) -> Select<Permissions> {
         let user_id = user_id.to_owned();
 
-        user_account::Entity::find().filter(user_account::Column::UserId.eq(user_id))
+        permissions::Entity::find_all_accounts_for_user(user_id)
     }
 
-    pub fn find_by_id_and_user(id: &i32, user_id: &i32) -> Select<user_account::Entity> {
-        user_account::Entity::find()
-            .filter(user_account::Column::UserId.eq(user_id.to_owned()))
-            .filter(user_account::Column::AccountId.eq(id.to_owned()))
+    pub fn find_by_id_and_user(id: &i32, user_id: &i32) -> Select<Permissions> {
+        let id = id.to_owned();
+        let user_id = user_id.to_owned();
+
+        permissions::Entity::find_account_by_id_and_user(id, user_id)
     }
 }
 

@@ -7,12 +7,12 @@ use crate::api::documentation::response::ValidationError;
 use crate::api::documentation::response::{InternalServerError, ResourceNotFound, Unauthorized};
 use crate::api::error::api::ApiError;
 use crate::api::pagination::{PageSizeParam, Pagination};
-use crate::wrapper::permission::Permission;
-use crate::wrapper::session::dto::PublicSession;
-use crate::wrapper::session::Session;
+use crate::wrapper::entity::session::dto::PublicSession;
+use crate::wrapper::entity::session::Session;
+use crate::wrapper::entity::user::dto::Credentials;
+use crate::wrapper::entity::user::User;
+use crate::wrapper::permission::{HasPermissionOrError, Permissions};
 use crate::wrapper::types::phantom::Phantom;
-use crate::wrapper::user::dto::Credentials;
-use crate::wrapper::user::User;
 
 pub fn session_controller(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -62,9 +62,7 @@ tag = "Session"
 #[get("/{session_id}")]
 pub async fn get_one(user: Phantom<User>, session_id: Path<i32>) -> Result<impl Responder, ApiError> {
     let session = Session::find_by_id(session_id.into_inner()).await?;
-    if !session.has_access(user.get_id()).await? {
-        return Err(ApiError::resource_not_found("Session"));
-    }
+    session.has_permission_or_error(user.get_id(), Permissions::READ).await?;
 
     Ok(HttpResponse::Ok().json(PublicSession::from(session)))
 }
@@ -146,13 +144,7 @@ tag = "Session"
 #[delete("/{session_id}")]
 pub async fn delete(user: Phantom<User>, session_id: Path<i32>) -> Result<impl Responder, ApiError> {
     let session = Session::find_by_id(session_id.into_inner()).await?;
-
-    if !session.has_access(user.get_id()).await? {
-        return Err(ApiError::resource_not_found("Session"));
-    }
-    if !session.can_delete(user.get_id()).await? {
-        return Err(ApiError::unauthorized());
-    }
+    session.has_permission_or_error(user.get_id(), Permissions::READ_DELETE).await?;
 
     session.delete().await?;
 

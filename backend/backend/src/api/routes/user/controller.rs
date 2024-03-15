@@ -2,9 +2,9 @@ use actix_web::{get, post, web, HttpResponse, Responder};
 
 use crate::api::documentation::response::{InternalServerError, ResourceNotFound, Unauthorized, ValidationError};
 use crate::api::error::api::ApiError;
+use crate::wrapper::entity::user::dto::UserRegistration;
+use crate::wrapper::entity::user::User;
 use crate::wrapper::types::phantom::Phantom;
-use crate::wrapper::user::dto::UserRegistration;
-use crate::wrapper::user::User;
 
 pub fn user_controller(cfg: &mut web::ServiceConfig) {
     cfg.service(web::scope("/user").service(me).service(register));

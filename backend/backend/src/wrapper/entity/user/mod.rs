@@ -1,7 +1,7 @@
 use actix_web::dev::Payload;
 use actix_web::{FromRequest, HttpRequest};
 use futures_util::future::LocalBoxFuture;
-use sea_orm::EntityTrait;
+use sea_orm::{EntityName, EntityTrait};
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 use utoipa::ToSchema;
@@ -14,9 +14,11 @@ use entity::user::Model;
 use crate::api::error::api::ApiError;
 use crate::database::entity::{count, find_one, find_one_or_error, insert};
 use crate::util::auth::extract_bearer_token;
-use crate::wrapper::session::Session;
+use crate::wrapper::entity::session::Session;
+use crate::wrapper::entity::user::dto::UserRegistration;
+use crate::wrapper::entity::WrapperEntity;
+use crate::wrapper::permission::{HasPermissionOrError, Permission, Permissions};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
-use crate::wrapper::user::dto::UserRegistration;
 
 pub mod dto;
 
@@ -29,15 +31,6 @@ pub struct User {
     #[serde(with = "time::serde::rfc3339")]
     pub created_at: OffsetDateTime,
     pub is_admin: bool,
-}
-
-impl Identifiable for User {
-    async fn from_id(id: i32) -> Result<Self, ApiError>
-    where
-        Self: Sized,
-    {
-        Self::find_by_id(id).await
-    }
 }
 
 impl User {
@@ -75,13 +68,39 @@ impl User {
             registration.password,
         ) {
             Ok(user) => {
-                let user = insert(user).await?;
-                Ok(Self::from(user))
+                let model = insert(user).await?;
+                let user = Self::from(model);
+                user.add_permission(user.id, Permissions::all()).await?;
+
+                Ok(user)
             }
             Err(e) => Err(ApiError::from(e)),
         }
     }
 }
+
+impl Identifiable for User {
+    async fn from_id(id: i32) -> Result<Self, ApiError>
+    where
+        Self: Sized,
+    {
+        Self::find_by_id(id).await
+    }
+}
+
+impl WrapperEntity for User {
+    fn get_id(&self) -> i32 {
+        self.id
+    }
+
+    fn table_name(&self) -> String {
+        user::Entity.table_name().to_string()
+    }
+}
+
+impl Permission for User {}
+
+impl HasPermissionOrError for User {}
 
 impl FromRequest for User {
     type Error = ApiError;

@@ -96,6 +96,14 @@ impl ApiError {
         }
     }
 
+    pub fn missing_permissions() -> Self {
+        Self {
+            status_code: StatusCode::FORBIDDEN,
+            details: "Missing permissions.".to_string(),
+            reference: None,
+        }
+    }
+
     pub fn from_error_vec(errors: Vec<Self>, status_code: StatusCode) -> Self {
         Self {
             status_code,

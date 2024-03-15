@@ -38,12 +38,14 @@ use crate::config::{logger, Config};
 use crate::database::connection::{create_redis_client, establish_database_connection, get_database_connection};
 use crate::database::redis::clear_redis;
 use crate::util::validation::ValidationErrorJsonPayload;
-use crate::wrapper::session::Session;
+use crate::wrapper::entity::session::Session;
+use crate::wrapper::permission::cleanup::schedule_clean_up_task;
 
 pub mod api;
 pub mod config;
 pub mod database;
 pub mod event;
+pub mod scheduling;
 pub mod util;
 pub mod wrapper;
 
@@ -103,6 +105,9 @@ async fn main() -> Result<()> {
 
     info!("\t[*] Starting up event system...");
     event::init();
+
+    info!("\t[*] Scheduling clean up task...");
+    schedule_clean_up_task();
 
     // Make instance variable of ApiDoc so all worker threads gets the same instance.
     let openapi = ApiDoc::openapi();

@@ -5,7 +5,7 @@ use tokio::time::Duration;
 use tracing::error;
 
 use crate::event::{Event, EventBus, EventFilter, EventResult};
-use crate::wrapper::transaction::Transaction;
+use crate::wrapper::entity::transaction::Transaction;
 
 static TRANSACTION_EVENT_BUS: OnceCell<EventBus<TransactionEvent>> = OnceCell::new();
 

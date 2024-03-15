@@ -3,9 +3,8 @@ use actix_web::web::Json;
 use actix_web::{FromRequest, HttpRequest};
 use futures_util::future::LocalBoxFuture;
 use sea_orm::ActiveValue::Set;
-use sea_orm::EntityTrait;
+use sea_orm::{EntityName, EntityTrait};
 use serde::{Deserialize, Serialize};
-use tracing::info;
 use utoipa::ToSchema;
 
 use entity::currency;
@@ -13,10 +12,11 @@ use entity::currency;
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
 use crate::database::entity::{count, delete, find_all, find_all_paginated, find_one_or_error, insert, update};
-use crate::wrapper::currency::dto::CurrencyDTO;
-use crate::wrapper::permission::Permission;
+use crate::wrapper::entity::currency::dto::CurrencyDTO;
+use crate::wrapper::entity::user::User;
+use crate::wrapper::entity::WrapperEntity;
+use crate::wrapper::permission::{HasPermissionOrError, Permission, Permissions};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
-use crate::wrapper::user::User;
 
 pub mod dto;
 
@@ -45,8 +45,10 @@ impl Currency {
             user: Set(Some(user_id)),
         };
         let model = insert(currency).await?;
+        let currency = Self::from(model);
+        currency.add_permission(user_id, Permissions::all()).await?;
 
-        Ok(Self::from(model))
+        Ok(currency)
     }
 
     pub async fn delete(self) -> Result<(), ApiError> {
@@ -133,33 +135,19 @@ impl Currency {
     }
 }
 
-impl Permission for Currency {
-    async fn has_access(&self, user_id: i32) -> Result<bool, ApiError> {
-        if self.user.is_none() {
-            return Ok(true);
-        }
-
-        if let Some(user) = &self.user {
-            if user.get_id() == user_id {
-                return Ok(true);
-            }
-        }
-
-        Ok(false)
+impl WrapperEntity for Currency {
+    fn get_id(&self) -> i32 {
+        self.id
     }
 
-    async fn can_delete(&self, user_id: i32) -> Result<bool, ApiError> {
-        if let Some(user) = &self.user {
-            info!("Currency has user");
-            if user.get_id() == user_id {
-                info!("Currency has user and user is the same");
-                return Ok(true);
-            }
-        }
-
-        Ok(false)
+    fn table_name(&self) -> String {
+        currency::Entity.table_name().to_string()
     }
 }
+
+impl Permission for Currency {}
+
+impl HasPermissionOrError for Currency {}
 
 impl Identifiable for Currency {
     async fn from_id(id: i32) -> Result<Self, ApiError>

@@ -2,16 +2,15 @@ use actix_web::http::Uri;
 use actix_web::web::Path;
 use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
 use actix_web_validator::Json;
-use tracing::info;
 
 use crate::api::documentation::response::{InternalServerError, ResourceNotFound, Unauthorized, ValidationError};
 use crate::api::error::api::ApiError;
 use crate::api::pagination::{PageSizeParam, Pagination};
-use crate::wrapper::currency::dto::CurrencyDTO;
-use crate::wrapper::currency::Currency;
-use crate::wrapper::permission::Permission;
+use crate::wrapper::entity::currency::dto::CurrencyDTO;
+use crate::wrapper::entity::currency::Currency;
+use crate::wrapper::entity::user::User;
+use crate::wrapper::permission::{HasPermissionOrError, Permissions};
 use crate::wrapper::types::phantom::Phantom;
-use crate::wrapper::user::User;
 
 pub fn currency_controller(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -106,13 +105,7 @@ tag = "Currency")]
 #[delete("/{currency_id}")]
 pub async fn delete(user: Phantom<User>, currency_id: Path<i32>) -> Result<impl Responder, ApiError> {
     let currency = Currency::find_by_id(currency_id.into_inner()).await?;
-    info!("Currency: {:?}", currency);
-    if !currency.has_access(user.get_id()).await? {
-        return Err(ApiError::resource_not_found("Currency"));
-    }
-    if !currency.can_delete(user.get_id()).await? {
-        return Err(ApiError::unauthorized());
-    }
+    currency.has_permission_or_error(user.get_id(), Permissions::READ_DELETE).await?;
 
     currency.delete().await?;
     Ok(HttpResponse::NoContent())
@@ -138,9 +131,7 @@ pub async fn update(
     currency_id: Path<i32>,
 ) -> Result<impl Responder, ApiError> {
     let currency = Currency::find_by_id(currency_id.into_inner()).await?;
-    if !currency.has_access(user.get_id()).await? {
-        return Err(ApiError::resource_not_found("Currency"));
-    }
+    currency.has_permission_or_error(user.get_id(), Permissions::READ_WRITE).await?;
 
     Ok(HttpResponse::Ok().json(currency.update(update).await?))
 }

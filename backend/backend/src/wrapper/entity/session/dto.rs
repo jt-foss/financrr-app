@@ -2,8 +2,8 @@ use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 use utoipa::ToSchema;
 
-use crate::wrapper::session::Session;
-use crate::wrapper::user::User;
+use crate::wrapper::entity::session::Session;
+use crate::wrapper::entity::user::User;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub struct PublicSession {
