@@ -24,7 +24,7 @@ use crate::database::redis::{del, get, set_ex, zadd};
 use crate::util::auth::extract_bearer_token;
 use crate::wrapper::entity::user::User;
 use crate::wrapper::entity::WrapperEntity;
-use crate::wrapper::permission::{HasPermissionOrError, Permission};
+use crate::wrapper::permission::{HasPermissionOrError, Permission, Permissions};
 use crate::wrapper::util::handle_async_result_vec;
 
 pub mod dto;
@@ -61,6 +61,9 @@ impl Session {
 
         // insert into redis
         session.insert_into_redis().await?;
+
+        //grant permissions to user
+        session.add_permission(user.id, Permissions::all()).await?;
 
         Ok(session)
     }

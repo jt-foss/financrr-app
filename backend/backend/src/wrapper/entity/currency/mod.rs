@@ -15,7 +15,7 @@ use crate::database::entity::{count, delete, find_all, find_all_paginated, find_
 use crate::wrapper::entity::currency::dto::CurrencyDTO;
 use crate::wrapper::entity::user::User;
 use crate::wrapper::entity::WrapperEntity;
-use crate::wrapper::permission::{HasPermissionOrError, Permission};
+use crate::wrapper::permission::{HasPermissionOrError, Permission, Permissions};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
 pub mod dto;
@@ -45,8 +45,10 @@ impl Currency {
             user: Set(Some(user_id)),
         };
         let model = insert(currency).await?;
+        let currency = Self::from(model);
+        currency.add_permission(user_id, Permissions::all()).await?;
 
-        Ok(Self::from(model))
+        Ok(currency)
     }
 
     pub async fn delete(self) -> Result<(), ApiError> {

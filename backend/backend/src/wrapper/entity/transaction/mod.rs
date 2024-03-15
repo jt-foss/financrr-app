@@ -19,7 +19,7 @@ use crate::wrapper::entity::budget::Budget;
 use crate::wrapper::entity::currency::Currency;
 use crate::wrapper::entity::transaction::dto::TransactionDTO;
 use crate::wrapper::entity::WrapperEntity;
-use crate::wrapper::permission::{HasPermissionOrError, Permission};
+use crate::wrapper::permission::{HasPermissionOrError, Permission, Permissions};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
 pub mod dto;
@@ -40,7 +40,7 @@ pub struct Transaction {
 }
 
 impl Transaction {
-    pub async fn new(dto: TransactionDTO) -> Result<Self, ApiError> {
+    pub async fn new(dto: TransactionDTO, user_id: i32) -> Result<Self, ApiError> {
         let active_model = transaction::ActiveModel {
             id: Default::default(),
             source: Set(dto.source.map(|source| source.get_id())),
@@ -63,6 +63,9 @@ impl Transaction {
         } else {
             TransactionEvent::fire(TransactionEvent::Create(transaction.clone()));
         }
+
+        //grant permission
+        transaction.add_permission(user_id, Permissions::all()).await?;
 
         Ok(transaction)
     }

@@ -78,7 +78,7 @@ pub async fn create(user: Phantom<User>, transaction: TransactionDTO) -> Result<
         return Err(ApiError::unauthorized());
     }
 
-    Ok(HttpResponse::Created().json(Transaction::new(transaction).await?))
+    Ok(HttpResponse::Created().json(Transaction::new(transaction, user.get_id()).await?))
 }
 
 #[utoipa::path(delete,

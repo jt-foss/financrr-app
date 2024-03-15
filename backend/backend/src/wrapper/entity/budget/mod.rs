@@ -12,7 +12,7 @@ use crate::database::entity::{count, delete, find_all, find_all_paginated, find_
 use crate::wrapper::entity::budget::dto::BudgetDTO;
 use crate::wrapper::entity::user::User;
 use crate::wrapper::entity::WrapperEntity;
-use crate::wrapper::permission::{HasPermissionOrError, Permission};
+use crate::wrapper::permission::{HasPermissionOrError, Permission, Permissions};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
 pub mod dto;
@@ -30,6 +30,23 @@ pub struct Budget {
 }
 
 impl Budget {
+    pub async fn new(user_id: i32, dto: BudgetDTO) -> Result<Self, ApiError> {
+        let model = budget::ActiveModel {
+            id: Default::default(),
+            user: Set(user_id),
+            amount: Set(dto.amount),
+            name: Set(dto.name),
+            description: Set(dto.description),
+            created_at: Set(dto.created_at),
+        };
+
+        let model = insert(model).await?;
+        let budget = Self::from(model);
+        budget.add_permission(user_id, Permissions::all()).await?;
+
+        Ok(budget)
+    }
+
     pub async fn find_all_by_user(user_id: i32) -> Result<Vec<Self>, ApiError> {
         Ok(find_all(budget::Entity::find_all_by_user_id(user_id)).await?.into_iter().map(Self::from).collect())
     }
@@ -47,19 +64,6 @@ impl Budget {
 
     pub async fn count_all_by_user(user_id: i32) -> Result<u64, ApiError> {
         count(budget::Entity::find_all_by_user_id(user_id)).await
-    }
-
-    pub async fn new(user_id: i32, dto: BudgetDTO) -> Result<Self, ApiError> {
-        let model = budget::ActiveModel {
-            id: Default::default(),
-            user: Set(user_id),
-            amount: Set(dto.amount),
-            name: Set(dto.name),
-            description: Set(dto.description),
-            created_at: Set(dto.created_at),
-        };
-
-        Ok(insert(model).await?.into())
     }
 
     pub async fn delete(self) -> Result<(), ApiError> {
