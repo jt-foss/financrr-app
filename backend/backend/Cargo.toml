@@ -34,7 +34,7 @@ sea-orm.workspace = true
 entity = { path = "../entity" }
 migration = { path = "../migration" }
 # Redis
-redis = {  version = "0.25.1", features = ["aio", "tokio-comp"] }
+redis = {  version = "0.25.2", features = ["aio", "tokio-comp"] }
 
 # Serialization and deserialization
 serde.workspace = true
