@@ -610,7 +610,7 @@ packages:
     description:
       path: "."
       ref: "feature/sessions"
-      resolved-ref: "46cf20b66a3998932ea135ef80e1867660ed9e68"
+      resolved-ref: "90076724ef4f2e3a35b85fd86dd23cdbffb4a475"
       url: "https://github.com/financrr/restrr.git"
     source: git
     version: "0.7.0"

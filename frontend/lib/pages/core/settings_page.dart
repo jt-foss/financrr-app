@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:financrr_frontend/data/session_repository.dart';
 import 'package:financrr_frontend/pages/core/settings/currency_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings/theme_settings_page.dart';
@@ -93,9 +92,7 @@ class _SettingsPageState extends State<SettingsPage> {
               body: ListView.separated(
             itemCount: _cards.length,
             itemBuilder: (_, index) => _cards[index],
-            separatorBuilder: (_, index) => const Padding(
-              padding: EdgeInsets.symmetric(vertical: 5)
-            ),
+            separatorBuilder: (_, index) => const Padding(padding: EdgeInsets.symmetric(vertical: 5)),
           )),
         ),
       ),

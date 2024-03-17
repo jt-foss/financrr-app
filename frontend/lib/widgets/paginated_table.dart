@@ -10,7 +10,14 @@ class PaginatedTable<T> extends StatefulWidget {
   final bool fillWithEmptyRows;
   final double? width;
 
-  const PaginatedTable({super.key, required this.api, required this.initialPageFunction, required this.rowBuilder, required this.columns, this.width, this.fillWithEmptyRows = false});
+  const PaginatedTable(
+      {super.key,
+      required this.api,
+      required this.initialPageFunction,
+      required this.rowBuilder,
+      required this.columns,
+      this.width,
+      this.fillWithEmptyRows = false});
 
   @override
   State<PaginatedTable<T>> createState() => PaginatedTableState<T>();
@@ -38,12 +45,10 @@ class PaginatedTableState<T> extends State<PaginatedTable<T>> {
                   DataColumn(label: Text('ISO')),
                 ],
                 rows: [
-                  for (T item in result.page.items)
-                    widget.rowBuilder(item),
+                  for (T item in result.page.items) widget.rowBuilder(item),
                   if (widget.fillWithEmptyRows && result.page.items.length < result.page.limit)
                     for (int i = 0; i < result.page.limit - result.page.items.length; i++)
-                      const DataRow(
-                          cells: [DataCell(Text('')), DataCell(Text('')), DataCell(Text(''))])
+                      const DataRow(cells: [DataCell(Text('')), DataCell(Text('')), DataCell(Text(''))])
                 ],
               ),
             ),
@@ -51,7 +56,8 @@ class PaginatedTableState<T> extends State<PaginatedTable<T>> {
               padding: const EdgeInsets.only(top: 10),
               child: Row(
                 mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: result.hasNext && !result.hasPrevious ? MainAxisAlignment.end : MainAxisAlignment.spaceBetween,
+                mainAxisAlignment:
+                    result.hasNext && !result.hasPrevious ? MainAxisAlignment.end : MainAxisAlignment.spaceBetween,
                 children: [
                   if (result.hasPrevious)
                     TextButton.icon(

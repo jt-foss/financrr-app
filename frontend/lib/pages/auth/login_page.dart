@@ -3,14 +3,12 @@ import 'dart:async';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:financrr_frontend/data/session_repository.dart';
 import 'package:financrr_frontend/layout/templates/auth_page_template.dart';
-import 'package:financrr_frontend/pages/core/dashboard_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../layout/adaptive_scaffold.dart';
-import '../../router.dart';
 
 class LoginPage extends StatefulWidget {
   final Uri hostUri;

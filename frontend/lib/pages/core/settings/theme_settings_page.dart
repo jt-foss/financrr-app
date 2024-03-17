@@ -2,7 +2,6 @@ import 'package:financrr_frontend/main.dart';
 import 'package:financrr_frontend/themes.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../layout/adaptive_scaffold.dart';
 import '../../../router.dart';

@@ -1,13 +1,9 @@
 import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
-import 'package:financrr_frontend/data/host_repository.dart';
 import 'package:financrr_frontend/data/repositories.dart';
-import 'package:financrr_frontend/data/session_repository.dart';
-import 'package:financrr_frontend/pages/core/dashboard_page.dart';
 import 'package:financrr_frontend/router.dart';
 import 'package:financrr_frontend/themes.dart';
-import 'package:financrr_frontend/util/input_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,12 +11,9 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
-import 'package:restrr/restrr.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'data/theme_repository.dart';
-
-
 
 void main() async {
   usePathUrlStrategy();

@@ -35,12 +35,14 @@ class PaginatedWrapperState<T> extends State<PaginatedWrapper<T>> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     return _currentPage == null
         ? widget.onLoading.call(context, AsyncSnapshot<PaginatedDataResult<T>>.waiting())
-        : widget.onSuccess.call(context, AsyncSnapshot<PaginatedDataResult<T>>.withData(ConnectionState.done, PaginatedDataResult(_pages[_currentPage]!, hasNext, hasPrevious)));
+        : widget.onSuccess.call(
+            context,
+            AsyncSnapshot<PaginatedDataResult<T>>.withData(
+                ConnectionState.done, PaginatedDataResult(_pages[_currentPage]!, hasNext, hasPrevious)));
   }
 
   bool get hasNext => _pages[_currentPage]?.hasNext ?? false;

@@ -27,8 +27,9 @@ class SessionService {
     }
     final String token = (await Repositories.sessionRepository.read())!;
     try {
-      final Restrr api = await RestrrBuilder(uri: Uri.parse(hostPrefs.hostUrl), options: const RestrrOptions(isWeb: kIsWeb))
-          .refresh(sessionToken: token);
+      final Restrr api =
+          await RestrrBuilder(uri: Uri.parse(hostPrefs.hostUrl), options: const RestrrOptions(isWeb: kIsWeb))
+              .refresh(sessionToken: token);
       login(context, api);
       return true;
     } on RestrrException catch (_) {}

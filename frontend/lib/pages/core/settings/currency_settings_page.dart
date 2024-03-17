@@ -1,16 +1,12 @@
-import 'dart:async';
 
-import 'package:financrr_frontend/layout/scaffold_navbar_shell.dart';
-import 'package:financrr_frontend/widgets/async_wrapper.dart';
 import 'package:financrr_frontend/widgets/paginated_table.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../../layout/adaptive_scaffold.dart';
 import '../../../router.dart';
-import '../../../widgets/paginated_wrapper.dart';
 import '../settings_page.dart';
+import 'currency_create_settings_page.dart';
 
 class CurrencySettingsPage extends StatefulWidget {
   static const PagePathBuilder pagePath = PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'currency');
@@ -46,6 +42,14 @@ class _CurrencySettingsPageState extends State<CurrencySettingsPage> {
                   trailing: Text('US\$'),
                 ),
               ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  onPressed: () => context.goPath(CurrencyCreateSettingsPage.pagePath.build()),
+                  icon: const Icon(Icons.add),
+                  label: const Text('Create Currency'),
+                ),
+              ),
               const Divider(),
               PaginatedTable(
                 api: _api,
@@ -55,7 +59,7 @@ class _CurrencySettingsPageState extends State<CurrencySettingsPage> {
                 columns: const [
                   DataColumn(label: Text('Symbol')),
                   DataColumn(label: Text('Name')),
-                  DataColumn(label: Text('ISO')),
+                  DataColumn(label: Text('ISO Code')),
                 ],
                 rowBuilder: (currency) => DataRow(cells: [
                   DataCell(Text(currency.symbol)),

@@ -2,6 +2,7 @@ import 'package:financrr_frontend/layout/scaffold_navbar_shell.dart';
 import 'package:financrr_frontend/pages/auth/login_page.dart';
 import 'package:financrr_frontend/pages/auth/server_info_page.dart';
 import 'package:financrr_frontend/pages/context_navigator.dart';
+import 'package:financrr_frontend/pages/core/settings/currency_create_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings/currency_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings/theme_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings_page.dart';
@@ -48,20 +49,25 @@ class AppRouter {
             ]),
             StatefulShellBranch(routes: [
               GoRoute(
-                path: SettingsPage.pagePath.path,
-                pageBuilder: _defaultBranchPageBuilder(const SettingsPage()),
-                redirect: coreAuthGuard,
-                routes: [
-                  GoRoute(
-                      path: ThemeSettingsPage.pagePath.path,
-                      pageBuilder: _defaultBranchPageBuilder(const ThemeSettingsPage()),
-                      redirect: coreAuthGuard),
-                  GoRoute(
-                      path: CurrencySettingsPage.pagePath.path,
-                      pageBuilder: _defaultBranchPageBuilder(const CurrencySettingsPage()),
-                      redirect: coreAuthGuard)
-                ]
-              ),
+                  path: SettingsPage.pagePath.path,
+                  pageBuilder: _defaultBranchPageBuilder(const SettingsPage()),
+                  redirect: coreAuthGuard,
+                  routes: [
+                    GoRoute(
+                        path: ThemeSettingsPage.pagePath.path,
+                        pageBuilder: _defaultBranchPageBuilder(const ThemeSettingsPage()),
+                        redirect: coreAuthGuard),
+                    GoRoute(
+                        path: CurrencySettingsPage.pagePath.path,
+                        pageBuilder: _defaultBranchPageBuilder(const CurrencySettingsPage()),
+                        redirect: coreAuthGuard,
+                        routes: [
+                          GoRoute(
+                              path: CurrencyCreateSettingsPage.pagePath.path,
+                              pageBuilder: _defaultBranchPageBuilder(const CurrencyCreateSettingsPage()),
+                              redirect: coreAuthGuard)
+                        ])
+                  ]),
             ]),
           ]),
     ],
@@ -71,8 +77,7 @@ class AppRouter {
     return [
       GoRoute(
         path: ContextNavigatorPage.pagePath.path,
-        pageBuilder: (context, state) =>
-            _buildDefaultPageTransition(context, state, const ContextNavigatorPage()),
+        pageBuilder: (context, state) => _buildDefaultPageTransition(context, state, const ContextNavigatorPage()),
       ),
       GoRoute(
           path: ServerInfoPage.pagePath.path,
@@ -168,18 +173,10 @@ extension BuildContextExtension on BuildContext {
   Restrr? get api => authNotifier.api;
 
   void goPath(PagePath path, {Object? extra}) {
-    if (_isCurrentPath(path)) {
-      return;
-    }
     go(path.fullPath, extra: extra);
   }
 
   Future<T?> pushPath<T extends Object?>(PagePath path, {Object? extra}) {
-    if (_isCurrentPath(path)) {
-      return Future.value(null);
-    }
     return push(path.fullPath, extra: extra);
   }
-
-  bool _isCurrentPath(PagePath path) => GoRouterState.of(this).matchedLocation == path.fullPath;
 }
