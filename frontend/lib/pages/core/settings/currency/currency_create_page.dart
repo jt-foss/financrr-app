@@ -177,10 +177,11 @@ class CurrencyCreatePageState extends State<CurrencyCreatePage> {
     if (!_isValid) return;
     try {
       await _api.createCurrency(
-          name: _nameController.text,
-          symbol: _symbolController.text,
-          isoCode: _isoCodeController.text,
-          decimalPlaces: int.parse(_decimalPlacesController.text));
+        name: _nameController.text,
+        symbol: _symbolController.text,
+        decimalPlaces: int.parse(_decimalPlacesController.text),
+        isoCode: _isoCodeController.text.isEmpty ? null : _isoCodeController.text,
+      );
       if (!mounted) return;
       context.showSnackBar('Successfully created "${_nameController.text}"');
       context.pop();

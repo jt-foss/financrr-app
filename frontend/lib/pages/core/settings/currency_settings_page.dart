@@ -76,7 +76,7 @@ class _CurrencySettingsPageState extends State<CurrencySettingsPage> {
                   return DataRow(cells: [
                     DataCell(Text(currency.symbol)),
                     DataCell(Text(currency.name)),
-                    DataCell(Text(currency.isoCode ?? '')),
+                    DataCell(Text(currency.isoCode ?? 'N/A')),
                     DataCell(Row(
                       children: [
                         IconButton(

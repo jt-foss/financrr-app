@@ -106,8 +106,8 @@ class _CurrencyEditPageState extends State<CurrencyEditPage> {
             onChanged: () => setState(() => _isValid = _formKey.currentState?.validate() ?? false),
             child: Column(
               children: [
-                ...CurrencyCreatePageState.buildCurrencyPreview(size, _symbolController.text, _nameController.text, _isoCodeController.text,
-                    _decimalPlacesController.text, _randomNumber),
+                ...CurrencyCreatePageState.buildCurrencyPreview(size, _symbolController.text, _nameController.text,
+                    _isoCodeController.text, _decimalPlacesController.text, _randomNumber),
                 const Divider(),
                 ...CurrencyCreatePageState.buildFormFields(
                     _nameController, _symbolController, _isoCodeController, _decimalPlacesController, !_isCustom),
@@ -148,10 +148,11 @@ class _CurrencyEditPageState extends State<CurrencyEditPage> {
     if (!_isValid || !_isCustom) return;
     try {
       await currency.update(
-          name: _nameController.text,
-          symbol: _symbolController.text,
-          isoCode: _isoCodeController.text,
-          decimalPlaces: int.parse(_decimalPlacesController.text));
+        name: _nameController.text,
+        symbol: _symbolController.text,
+        decimalPlaces: int.parse(_decimalPlacesController.text),
+        isoCode: _isoCodeController.text.isEmpty ? null : _isoCodeController.text,
+      );
       if (!mounted) return;
       context.showSnackBar('Successfully edited "${_nameController.text}"');
       context.pop();
