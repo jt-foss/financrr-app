@@ -41,7 +41,7 @@ class CurrencyCreatePageState extends State<CurrencyCreatePage> {
     _nameController = TextEditingController(text: 'Euro');
     _isoCodeController = TextEditingController(text: 'EUR');
     _decimalPlacesController = TextEditingController(text: '2');
-    _isValid = _formKey.currentState?.validate() ?? true;
+    _isValid = _formKey.currentState?.validate() ?? false;
     final Random random = Random();
     _randomNumber = random.nextDouble() + (random.nextInt(128) + 128);
   }
