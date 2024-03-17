@@ -33,7 +33,7 @@ class ContextNavigatorPageState extends State<ContextNavigatorPage> {
   Future _navigate() async {
     final bool success = await SessionService.attemptRecovery(context);
     if (!mounted) return;
-    context.pushPath((success ? DashboardPage.pagePath : ServerInfoPage.pagePath).build());
+    context.goPath((success ? DashboardPage.pagePath : ServerInfoPage.pagePath).build());
   }
 
   @override

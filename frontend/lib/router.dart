@@ -51,6 +51,16 @@ class AppRouter {
                 path: SettingsPage.pagePath.path,
                 pageBuilder: _defaultBranchPageBuilder(const SettingsPage()),
                 redirect: coreAuthGuard,
+                routes: [
+                  GoRoute(
+                      path: ThemeSettingsPage.pagePath.path,
+                      pageBuilder: _defaultBranchPageBuilder(const ThemeSettingsPage()),
+                      redirect: coreAuthGuard),
+                  GoRoute(
+                      path: CurrencySettingsPage.pagePath.path,
+                      pageBuilder: _defaultBranchPageBuilder(const CurrencySettingsPage()),
+                      redirect: coreAuthGuard)
+                ]
               ),
             ]),
           ]),
@@ -69,14 +79,6 @@ class AppRouter {
           pageBuilder: (context, state) =>
               _buildDefaultPageTransition(context, state, ServerInfoPage(key: GlobalKeys.loginPage)),
           redirect: authGuard),
-      GoRoute(
-          path: ThemeSettingsPage.pagePath.path,
-          pageBuilder: _defaultBranchPageBuilder(const ThemeSettingsPage()),
-          redirect: coreAuthGuard),
-      GoRoute(
-          path: CurrencySettingsPage.pagePath.path,
-          pageBuilder: _defaultBranchPageBuilder(const CurrencySettingsPage()),
-          redirect: coreAuthGuard)
     ];
   }
 
@@ -166,22 +168,18 @@ extension BuildContextExtension on BuildContext {
   Restrr? get api => authNotifier.api;
 
   void goPath(PagePath path, {Object? extra}) {
-    //if (_isCurrentPath(path)) {
-    // TODO: Reimplement this
-    //  GlobalKeys.navBarKey.currentState?.shake();
-    //  return;
-    //}
+    if (_isCurrentPath(path)) {
+      return;
+    }
     go(path.fullPath, extra: extra);
   }
 
   Future<T?> pushPath<T extends Object?>(PagePath path, {Object? extra}) {
-    //if (_isCurrentPath(path)) {
-    // TODO: Reimplement this
-    //  GlobalKeys.navBarKey.currentState?.shake();
-    //  return Future.value(null);
-    //}
+    if (_isCurrentPath(path)) {
+      return Future.value(null);
+    }
     return push(path.fullPath, extra: extra);
   }
 
-// bool _isCurrentPath(PagePath path) => GoRouterState.of(this).location == path.fullPath;
+  bool _isCurrentPath(PagePath path) => GoRouterState.of(this).matchedLocation == path.fullPath;
 }

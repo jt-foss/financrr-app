@@ -1,14 +1,17 @@
 import 'dart:async';
 
+import 'package:financrr_frontend/layout/scaffold_navbar_shell.dart';
 import 'package:financrr_frontend/widgets/async_wrapper.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../../layout/adaptive_scaffold.dart';
 import '../../../router.dart';
+import '../settings_page.dart';
 
 class CurrencySettingsPage extends StatefulWidget {
-  static const PagePathBuilder pagePath = PagePathBuilder('/@me/settings/currency');
+  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'currency');
 
   const CurrencySettingsPage({super.key});
 
@@ -24,7 +27,7 @@ class _CurrencySettingsPageState extends State<CurrencySettingsPage> {
   @override
   void initState() {
     super.initState();
-    _api.retrieveAllCurrencies().then((currencies) => _currenciesController.sink.add(currencies));
+    _api.retrieveAllCurrencies(limit: 10).then((currencies) => _currenciesController.sink.add(currencies));
   }
 
   @override
@@ -36,44 +39,31 @@ class _CurrencySettingsPageState extends State<CurrencySettingsPage> {
   }
 
   Widget _buildVerticalLayout(Size size) {
-    return Scaffold(
-        appBar: AppBar(
-          title: const Text('Manage Currencies'),
-          actions: [
-            IconButton(
-              tooltip: 'Add custom currency',
-              icon: const Icon(Icons.add),
-              onPressed: () => Navigator.of(context).pushNamed('/@me/settings/currency/add'),
-            ),
-          ],
-        ),
-        body: Center(
-          child: SizedBox(
-            width: size.width / 1.1,
-            child: SingleChildScrollView(
-              child: StreamWrapper(
-                stream: _currenciesController.stream,
-                onError: (context, snap) => const Text('Error'),
-                onLoading: (context, snap) => const CircularProgressIndicator(),
-                onSuccess: (context, snap) {
-                  final Paginated<Currency> currencyPage = snap.data as Paginated<Currency>;
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    child: PaginatedDataTable(
-                      header: const Text('Currencies'),
-                      columns: const [
-                        DataColumn(label: Text('Symbol')),
-                        DataColumn(label: Text('Name')),
-                        DataColumn(label: Text('ISO Code')),
-                      ],
-                      source: _CurrencyDataSource(currencyPage),
-                    )
-                  );
-                },
-              ),
-            ),
+    return Align(
+      alignment: Alignment.topCenter,
+      child: SizedBox(
+        width: size.width / 1.1,
+        child: SingleChildScrollView(
+          child: StreamWrapper(
+            stream: _currenciesController.stream,
+            onError: (context, snap) => const Text('Error'),
+            onLoading: (context, snap) => const Center(child: CircularProgressIndicator()),
+            onSuccess: (context, snap) {
+              final Paginated<Currency> currencyPage = snap.data as Paginated<Currency>;
+              return PaginatedDataTable(
+                rowsPerPage: currencyPage.limit,
+                columns: const [
+                  DataColumn(label: Text('Symbol')),
+                  DataColumn(label: Text('Name')),
+                  DataColumn(label: Text('ISO Code')),
+                ],
+                source: _CurrencyDataSource(currencyPage),
+              );
+            },
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   Widget _buildCurrencyCard(Currency currency, {bool isPreferred = false}) {
