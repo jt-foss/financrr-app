@@ -37,20 +37,17 @@ pub async fn get_all(
     page_size: PageSizeParam,
     uri: Uri,
 ) -> Result<impl Responder, ApiError> {
-    let mut user_currency_count = 0;
-    let mut currencies = Currency::find_all_with_no_user_paginated(&page_size).await?;
     if let Some(user) = user {
-        let user_currencies = Currency::find_all_with_user_paginated(user.get_id(), &page_size).await?;
-        currencies.extend(user_currencies);
+        let size = Currency::count_all_with_no_user_and_user(user.get_id()).await?;
+        let currencies = Currency::find_all_with_no_user_and_user_paginated(user.get_id(), &page_size).await?;
 
-        user_currency_count = Currency::count_all_with_user(user.get_id()).await?;
+        Ok(HttpResponse::Ok().json(Pagination::new(currencies, &page_size, size, uri)))
+    } else {
+        let size = Currency::count_all_with_no_user().await?;
+        let currencies = Currency::find_all_with_no_user_paginated(&page_size).await?;
+
+        Ok(HttpResponse::Ok().json(Pagination::new(currencies, &page_size, size, uri)))
     }
-    currencies.truncate(page_size.limit as usize);
-
-    let currency_count = Currency::count_all_with_no_user().await?;
-    let size = currency_count + user_currency_count;
-
-    Ok(HttpResponse::Ok().json(Pagination::new(currencies, &page_size, size, uri)))
 }
 
 #[utoipa::path(get,
