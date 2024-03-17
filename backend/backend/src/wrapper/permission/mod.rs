@@ -146,9 +146,9 @@ pub trait HasPermissionOrError: Permission {
             let user_permissions = self.get_permissions(user_id).await?;
             if !user_permissions.contains(permissions.clone()) {
                 if permissions.contains(Permissions::READ) && !user_permissions.contains(Permissions::READ) {
-                    return Err(ApiError::resource_not_found(self.table_name().as_str()));
+                    return Err(ApiError::ResourceNotFound(self.table_name().as_str()));
                 }
-                return Err(ApiError::missing_permissions());
+                return Err(ApiError::MissingPermissions());
             }
 
             Ok(())

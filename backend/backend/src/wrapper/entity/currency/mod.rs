@@ -33,7 +33,7 @@ pub struct Currency {
 impl Currency {
     pub async fn new(creation: CurrencyDTO, user_id: i32) -> Result<Self, ApiError> {
         if !User::exists(user_id).await? {
-            return Err(ApiError::resource_not_found("User"));
+            return Err(ApiError::ResourceNotFound("User"));
         }
 
         let currency = currency::ActiveModel {

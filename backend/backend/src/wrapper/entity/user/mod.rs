@@ -53,10 +53,10 @@ impl User {
                 if user.verify_password(credentials.password.as_bytes()).unwrap_or(false) {
                     Ok(Self::from(user))
                 } else {
-                    Err(ApiError::invalid_credentials())
+                    Err(ApiError::InvalidCredentials())
                 }
             }
-            _ => Err(ApiError::invalid_credentials()),
+            _ => Err(ApiError::InvalidCredentials()),
         }
     }
 

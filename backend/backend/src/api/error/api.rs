@@ -12,6 +12,7 @@ use validator::{ValidationError, ValidationErrors};
 
 use entity::error::EntityError;
 
+use crate::api::error::api_codes::ApiCode;
 use crate::api::error::validation;
 use crate::util::validation::ValidationErrorJsonPayload;
 
@@ -20,6 +21,7 @@ use crate::util::validation::ValidationErrorJsonPayload;
 pub struct ApiError {
     #[serde(skip)]
     pub status_code: StatusCode,
+    pub api_code: ApiCode,
     pub details: String,
     pub reference: Option<SerializableStruct>,
 }
@@ -47,59 +49,46 @@ impl Serialize for SerializableStruct {
     }
 }
 
+macro_rules! api_errors {
+    (
+        $(
+            $(#[$docs:meta])*
+            ($status_code:expr, $api_code:expr, $details:expr, $func:ident);
+        )+
+    ) => {
+        impl ApiError {
+        $(
+            $(#[$docs])*
+            #[allow(non_snake_case)]
+            pub fn $func() -> Self {
+                Self {
+                    status_code: $status_code,
+                    api_code: $api_code,
+                    details: String::from($details),
+                    reference: None,
+                }
+            }
+        )+
+        }
+    }
+}
+
+api_errors!(
+    (StatusCode::UNAUTHORIZED, ApiCode::INVALID_SESSION, "Invalid session!", InvalidSession);
+    (StatusCode::CONFLICT, ApiCode::SESSION_LIMIT_REACHED, "Session limit reached!", SessionLimitReached);
+    (StatusCode::UNAUTHORIZED, ApiCode::INVALID_CREDENTIALS, "Invalid credentials!", InvalidCredentials);
+    (StatusCode::UNAUTHORIZED, ApiCode::UNAUTHORIZED, "Unauthorized!", Unauthorized);
+    (StatusCode::FORBIDDEN, ApiCode::MISSING_PERMISSIONS, "Missing permissions!", MissingPermissions);
+    (StatusCode::UNAUTHORIZED, ApiCode::NO_TOKEN_PROVIDED, "No token provided!", NoTOkenProvided);
+);
+
 impl ApiError {
-    pub fn invalid_session() -> Self {
-        Self {
-            status_code: StatusCode::UNAUTHORIZED,
-            details: "Session expired or invalid!".to_string(),
-            reference: None,
-        }
-    }
-
-    pub fn session_limit_reached() -> Self {
-        Self {
-            status_code: StatusCode::CONFLICT,
-            details: "Session limit reached!".to_string(),
-            reference: None,
-        }
-    }
-
-    pub fn signed_in() -> Self {
-        Self {
-            status_code: StatusCode::CONFLICT,
-            details: "User is signed in.".to_string(),
-            reference: None,
-        }
-    }
-
-    pub fn invalid_credentials() -> Self {
-        Self {
-            status_code: StatusCode::UNAUTHORIZED,
-            details: "Invalid credentials provided.".to_string(),
-            reference: None,
-        }
-    }
-
-    pub fn resource_not_found(resource_name: &str) -> Self {
+    #[allow(non_snake_case)]
+    pub fn ResourceNotFound(resource_name: &str) -> Self {
         Self {
             status_code: StatusCode::NOT_FOUND,
-            details: format!("Could not found {}", resource_name),
-            reference: None,
-        }
-    }
-
-    pub fn unauthorized() -> Self {
-        Self {
-            status_code: StatusCode::UNAUTHORIZED,
-            details: "Unauthorized.".to_string(),
-            reference: None,
-        }
-    }
-
-    pub fn missing_permissions() -> Self {
-        Self {
-            status_code: StatusCode::FORBIDDEN,
-            details: "Missing permissions.".to_string(),
+            api_code: ApiCode::RESOURCE_NOT_FOUND,
+            details: format!("Could not found {}!", resource_name),
             reference: None,
         }
     }
@@ -107,16 +96,9 @@ impl ApiError {
     pub fn from_error_vec(errors: Vec<Self>, status_code: StatusCode) -> Self {
         Self {
             status_code,
-            details: "Multiple errors occurred.".to_string(),
+            api_code: ApiCode::UNKNOWN,
+            details: "Multiple errors occurred!".to_string(),
             reference: SerializableStruct::new(&errors).ok(),
-        }
-    }
-
-    pub fn no_token_provided() -> Self {
-        Self {
-            status_code: StatusCode::UNAUTHORIZED,
-            details: "No token provided.".to_string(),
-            reference: None,
         }
     }
 }
@@ -139,6 +121,7 @@ impl From<EntityError> for ApiError {
     fn from(error: EntityError) -> Self {
         Self {
             status_code: StatusCode::INTERNAL_SERVER_ERROR,
+            api_code: ApiCode::ENTITIY_ERROR,
             details: error.to_string(),
             reference: None,
         }
@@ -149,6 +132,7 @@ impl From<DbErr> for ApiError {
     fn from(value: DbErr) -> Self {
         Self {
             status_code: StatusCode::INTERNAL_SERVER_ERROR,
+            api_code: ApiCode::DB_ERROR,
             details: value.to_string(),
             reference: None,
         }
@@ -159,6 +143,7 @@ impl From<RedisError> for ApiError {
     fn from(value: RedisError) -> Self {
         Self {
             status_code: StatusCode::INTERNAL_SERVER_ERROR,
+            api_code: ApiCode::REIDS_ERROR,
             details: value.to_string(),
             reference: None,
         }
@@ -170,6 +155,7 @@ impl From<ValidationErrorJsonPayload> for ApiError {
         let serializable_struct = SerializableStruct::new(&value).ok();
         Self {
             status_code: StatusCode::BAD_REQUEST,
+            api_code: ApiCode::JSON_PAYLOAD_VALIDATION_ERROR,
             details: value.message,
             reference: serializable_struct,
         }
@@ -198,6 +184,7 @@ impl From<serde_json::Error> for ApiError {
     fn from(value: serde_json::Error) -> Self {
         Self {
             status_code: StatusCode::BAD_REQUEST,
+            api_code: ApiCode::SERIALIZATION_ERROR,
             details: value.to_string(),
             reference: None,
         }
@@ -208,6 +195,7 @@ impl From<actix_web::Error> for ApiError {
     fn from(error: actix_web::Error) -> Self {
         Self {
             status_code: error.as_response_error().status_code(),
+            api_code: ApiCode::ACTIX_ERROR,
             details: error.to_string(),
             reference: None,
         }
