@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS currency
     id             SERIAL PRIMARY KEY,
     name           TEXT    NOT NULL,
     symbol         TEXT    NOT NULL,
-    iso_code       TEXT    NOT NULL,
+    iso_code TEXT,
     decimal_places INTEGER NOT NULL,
     "user"         INTEGER REFERENCES "user" (id) ON UPDATE CASCADE ON DELETE CASCADE
 );

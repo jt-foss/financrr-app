@@ -25,7 +25,7 @@ pub struct Currency {
     pub id: i32,
     pub name: String,
     pub symbol: String,
-    pub iso_code: String,
+    pub iso_code: Option<String>,
     pub decimal_places: i32,
     pub user: Option<Phantom<User>>,
 }

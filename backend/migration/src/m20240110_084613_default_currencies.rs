@@ -30,7 +30,7 @@ impl MigrationTrait for Migration {
                     id: Default::default(),
                     name: Set(parts[0].to_string()),
                     symbol: Set(parts[1].to_string()),
-                    iso_code: Set(parts[2].to_string()),
+                    iso_code: Set(Some(parts[2].to_string())),
                     decimal_places: Set(parts[3].parse().expect("Could not parse decimal places")),
                     user: Set(None),
                 };
