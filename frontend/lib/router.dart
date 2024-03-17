@@ -69,8 +69,8 @@ class AppRouter {
                               redirect: coreAuthGuard),
                           GoRoute(
                               path: CurrencyEditPage.pagePath.path,
-                              pageBuilder: (context, state) =>
-                                  _buildDefaultPageTransition(context, state, CurrencyEditPage(currencyId: state.uri.queryParameters['currencyId'])),
+                              pageBuilder: (context, state) => _buildDefaultPageTransition(context, state,
+                                  CurrencyEditPage(currencyId: state.uri.queryParameters['currencyId'])),
                               redirect: coreAuthGuard)
                         ])
                   ]),
