@@ -39,16 +39,12 @@ class PaginatedTableState<T> extends State<PaginatedTable<T>> {
             SizedBox(
               width: widget.width,
               child: DataTable(
-                columns: const [
-                  DataColumn(label: Text('Symbol')),
-                  DataColumn(label: Text('Name')),
-                  DataColumn(label: Text('ISO')),
-                ],
+                columns: widget.columns,
                 rows: [
                   for (T item in result.page.items) widget.rowBuilder(item),
                   if (widget.fillWithEmptyRows && result.page.items.length < result.page.limit)
                     for (int i = 0; i < result.page.limit - result.page.items.length; i++)
-                      const DataRow(cells: [DataCell(Text('')), DataCell(Text('')), DataCell(Text(''))])
+                      DataRow(cells: List.generate(widget.columns.length, (index) => const DataCell(Text(''))))
                 ],
               ),
             ),
@@ -79,4 +75,6 @@ class PaginatedTableState<T> extends State<PaginatedTable<T>> {
       },
     );
   }
+
+  void reset() => _paginatedKey.currentState?.reset();
 }

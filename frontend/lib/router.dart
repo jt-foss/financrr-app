@@ -2,7 +2,8 @@ import 'package:financrr_frontend/layout/scaffold_navbar_shell.dart';
 import 'package:financrr_frontend/pages/auth/login_page.dart';
 import 'package:financrr_frontend/pages/auth/server_info_page.dart';
 import 'package:financrr_frontend/pages/context_navigator.dart';
-import 'package:financrr_frontend/pages/core/settings/currency_create_settings_page.dart';
+import 'package:financrr_frontend/pages/core/settings/currency/currency_create_page.dart';
+import 'package:financrr_frontend/pages/core/settings/currency/currency_edit_page.dart';
 import 'package:financrr_frontend/pages/core/settings/currency_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings/theme_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings_page.dart';
@@ -63,8 +64,13 @@ class AppRouter {
                         redirect: coreAuthGuard,
                         routes: [
                           GoRoute(
-                              path: CurrencyCreateSettingsPage.pagePath.path,
-                              pageBuilder: _defaultBranchPageBuilder(const CurrencyCreateSettingsPage()),
+                              path: CurrencyCreatePage.pagePath.path,
+                              pageBuilder: _defaultBranchPageBuilder(const CurrencyCreatePage()),
+                              redirect: coreAuthGuard),
+                          GoRoute(
+                              path: CurrencyEditPage.pagePath.path,
+                              pageBuilder: (context, state) =>
+                                  _buildDefaultPageTransition(context, state, CurrencyEditPage(currencyId: state.uri.queryParameters['currencyId'])),
                               redirect: coreAuthGuard)
                         ])
                   ]),
@@ -99,18 +105,18 @@ class AppRouter {
   }
 
   static Page<T> _buildDefaultPageTransition<T>(BuildContext context, GoRouterState state, Widget child) {
-    return CupertinoPage(child: child);
+    return CustomTransitionPage(
+        child: child,
+        transitionsBuilder: (context, animation, _, child) {
+          return FadeTransition(
+            opacity: CurveTween(curve: Curves.easeInOut).animate(animation),
+            child: child,
+          );
+        });
   }
 
   static Page<T> Function(BuildContext, GoRouterState) _defaultBranchPageBuilder<T>(Widget child) =>
-      (context, state) => CustomTransitionPage(
-          child: child,
-          transitionsBuilder: (context, animation, _, child) {
-            return FadeTransition(
-              opacity: CurveTween(curve: Curves.easeInOut).animate(animation),
-              child: child,
-            );
-          });
+      (context, state) => _buildDefaultPageTransition(context, state, child);
 }
 
 class PagePathBuilder {
@@ -122,7 +128,7 @@ class PagePathBuilder {
   const PagePathBuilder.child({required this.parent, required this.path});
 
   PagePath build({Map<String, String>? pathParams, Map<String, dynamic>? queryParams}) {
-    String compiled = parent == null ? path : '${parent!.build(queryParams: queryParams).fullPath}/$path';
+    String compiled = parent == null ? path : '${parent!.build().fullPath}/$path';
     if (pathParams == null && queryParams == null) {
       return PagePath._(compiled);
     }

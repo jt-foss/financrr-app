@@ -25,10 +25,9 @@ void main() async {
   await Repositories.init(storage, preferences);
   await AppThemeLoader.init();
   final EffectiveThemePreferences themePreferences = await ThemeService.getOrInsertEffective();
+  Logger.root.level = kDebugMode ? Level.ALL : Level.INFO;
   Logger.root.onRecord.listen((record) {
-    if (kDebugMode) {
-      print('${record.level.name}: ${record.time}: ${record.message}');
-    }
+    print('${record.level.name}: ${record.time}: ${record.message}');
   });
   runApp(EasyLocalization(
       supportedLocales: const [Locale('en', 'US'), Locale('de', 'DE')],

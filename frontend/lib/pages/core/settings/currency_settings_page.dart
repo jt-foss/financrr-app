@@ -1,4 +1,4 @@
-
+import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/widgets/paginated_table.dart';
 import 'package:flutter/material.dart';
 import 'package:restrr/restrr.dart';
@@ -6,7 +6,8 @@ import 'package:restrr/restrr.dart';
 import '../../../layout/adaptive_scaffold.dart';
 import '../../../router.dart';
 import '../settings_page.dart';
-import 'currency_create_settings_page.dart';
+import 'currency/currency_create_page.dart';
+import 'currency/currency_edit_page.dart';
 
 class CurrencySettingsPage extends StatefulWidget {
   static const PagePathBuilder pagePath = PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'currency');
@@ -18,6 +19,7 @@ class CurrencySettingsPage extends StatefulWidget {
 }
 
 class _CurrencySettingsPageState extends State<CurrencySettingsPage> {
+  final GlobalKey<PaginatedTableState<Currency>> _tableKey = GlobalKey();
   late final Restrr _api = context.api!;
 
   @override
@@ -42,16 +44,24 @@ class _CurrencySettingsPageState extends State<CurrencySettingsPage> {
                   trailing: Text('US\$'),
                 ),
               ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: TextButton.icon(
-                  onPressed: () => context.goPath(CurrencyCreateSettingsPage.pagePath.build()),
-                  icon: const Icon(Icons.add),
-                  label: const Text('Create Currency'),
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  TextButton.icon(
+                    onPressed: () => context.goPath(CurrencyCreatePage.pagePath.build()),
+                    icon: const Icon(Icons.add),
+                    label: const Text('Create Currency'),
+                  ),
+                  TextButton.icon(
+                    onPressed: () => _tableKey.currentState?.reset(),
+                    label: const Text('Refresh'),
+                    icon: const Icon(Icons.refresh),
+                  )
+                ],
               ),
               const Divider(),
               PaginatedTable(
+                key: _tableKey,
                 api: _api,
                 initialPageFunction: (api) => api.retrieveAllCurrencies(limit: 10),
                 fillWithEmptyRows: true,
@@ -59,18 +69,44 @@ class _CurrencySettingsPageState extends State<CurrencySettingsPage> {
                 columns: const [
                   DataColumn(label: Text('Symbol')),
                   DataColumn(label: Text('Name')),
-                  DataColumn(label: Text('ISO Code')),
+                  DataColumn(label: Text('ISO')),
+                  DataColumn(label: Text('Actions')),
                 ],
-                rowBuilder: (currency) => DataRow(cells: [
-                  DataCell(Text(currency.symbol)),
-                  DataCell(Text(currency.name)),
-                  DataCell(Text(currency.isoCode)),
-                ]),
+                rowBuilder: (currency) {
+                  return DataRow(cells: [
+                    DataCell(Text(currency.symbol)),
+                    DataCell(Text(currency.name)),
+                    DataCell(Text(currency.isoCode)),
+                    DataCell(Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.edit),
+                          onPressed: currency is! CustomCurrency ? null : () =>
+                              context.goPath(CurrencyEditPage.pagePath.build(queryParams: {'currencyId': currency.id})),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete),
+                          onPressed: currency is! CustomCurrency ? null : () => _deleteCurrency(currency),
+                        ),
+                      ],
+                    )),
+                  ]);
+                },
               )
             ],
           ),
         ),
       ),
     );
+  }
+
+  void _deleteCurrency(CustomCurrency currency) async {
+    try {
+      await currency.delete();
+      if (!mounted) return;
+      context.showSnackBar('Successfully deleted "${currency.name}"');
+    } on RestrrException catch (e) {
+      context.showSnackBar(e.message!);
+    }
   }
 }

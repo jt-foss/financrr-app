@@ -35,6 +35,12 @@ class PaginatedWrapperState<T> extends State<PaginatedWrapper<T>> {
     });
   }
 
+  Future<void> _loadInitialPage() async {
+    final Paginated<T> page = await widget.initialPageFunction.call();
+    _pages[page.pageNumber] = page;
+    setState(() => _currentPage = page.pageNumber);
+  }
+
   @override
   Widget build(BuildContext context) {
     return _currentPage == null
@@ -48,6 +54,11 @@ class PaginatedWrapperState<T> extends State<PaginatedWrapper<T>> {
   bool get hasNext => _pages[_currentPage]?.hasNext ?? false;
 
   bool get hasPrevious => _pages[_currentPage]?.hasPrevious ?? false;
+
+  void reset() {
+    _pages.clear();
+    _loadInitialPage();
+  }
 
   Future<void>? nextPage(Restrr api) async {
     final Paginated<T>? currentPage = _pages[_currentPage];
