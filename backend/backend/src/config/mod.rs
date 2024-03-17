@@ -1,11 +1,18 @@
 use std::env;
 use std::str::FromStr;
+use serde::Serialize;
 
 use tracing::log::LevelFilter;
+use utoipa::ToSchema;
 
 use crate::CONFIG;
 
 pub mod logger;
+
+#[derive(Debug, Serialize, ToSchema)]
+pub struct PublicConfig {
+    pub session_lifetime_hours: u64,
+}
 
 #[derive(Debug)]
 pub struct Config {
