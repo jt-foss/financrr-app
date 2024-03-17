@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:financrr_frontend/pages/core/settings/currency/currency_create_page.dart';
 import 'package:financrr_frontend/pages/core/settings/currency_settings_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/input_utils.dart';
@@ -105,76 +106,11 @@ class _CurrencyEditPageState extends State<CurrencyEditPage> {
             onChanged: () => setState(() => _isValid = _formKey.currentState?.validate() ?? false),
             child: Column(
               children: [
-                Card(
-                  child: ListTile(
-                    leading: const Text('Preview'),
-                    title: Text(
-                        '${_randomNumber.toStringAsFixed(int.tryParse(_decimalPlacesController.text) ?? 0)} ${_symbolController.text}'),
-                  ),
-                ),
-                SizedBox(
-                  width: size.width,
-                  child: DataTable(columns: const [
-                    DataColumn(label: Text('Symbol')),
-                    DataColumn(label: Text('Name')),
-                    DataColumn(label: Text('ISO Code')),
-                  ], rows: [
-                    DataRow(cells: [
-                      DataCell(Text(_symbolController.text)),
-                      DataCell(Text(_nameController.text)),
-                      DataCell(Text(_isoCodeController.text))
-                    ])
-                  ]),
-                ),
+                ...CurrencyCreatePageState.buildCurrencyPreview(size, _symbolController.text, _nameController.text, _isoCodeController.text,
+                    _decimalPlacesController.text, _randomNumber),
                 const Divider(),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: TextFormField(
-                    controller: _nameController,
-                    readOnly: !_isCustom,
-                    decoration: const InputDecoration(labelText: 'Name'),
-                    validator: (value) => InputValidators.nonNull('Name', value),
-                    inputFormatters: [
-                      LengthLimitingTextInputFormatter(32),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: TextFormField(
-                    controller: _symbolController,
-                    readOnly: !_isCustom,
-                    decoration: const InputDecoration(labelText: 'Symbol'),
-                    validator: (value) => InputValidators.nonNull('Symbol', value),
-                    inputFormatters: [
-                      LengthLimitingTextInputFormatter(6),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: TextFormField(
-                    controller: _isoCodeController,
-                    readOnly: !_isCustom,
-                    decoration: const InputDecoration(labelText: 'ISO Code'),
-                    inputFormatters: [
-                      LengthLimitingTextInputFormatter(3),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: TextFormField(
-                    controller: _decimalPlacesController,
-                    readOnly: !_isCustom,
-                    decoration: const InputDecoration(labelText: 'Decimal Places'),
-                    validator: (value) => InputValidators.nonNull('Decimal Places', value),
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(1),
-                    ],
-                  ),
-                ),
+                ...CurrencyCreatePageState.buildFormFields(
+                    _nameController, _symbolController, _isoCodeController, _decimalPlacesController, !_isCustom),
                 SizedBox(
                   width: double.infinity,
                   height: 50,

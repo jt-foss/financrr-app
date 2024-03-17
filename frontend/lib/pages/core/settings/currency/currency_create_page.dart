@@ -17,10 +17,10 @@ class CurrencyCreatePage extends StatefulWidget {
   const CurrencyCreatePage({super.key});
 
   @override
-  State<StatefulWidget> createState() => _CurrencyCreatePageState();
+  State<StatefulWidget> createState() => CurrencyCreatePageState();
 }
 
-class _CurrencyCreatePageState extends State<CurrencyCreatePage> {
+class CurrencyCreatePageState extends State<CurrencyCreatePage> {
   final GlobalKey<FormState> _formKey = GlobalKey();
 
   late final Restrr _api = context.api!;
@@ -76,72 +76,11 @@ class _CurrencyCreatePageState extends State<CurrencyCreatePage> {
             onChanged: () => setState(() => _isValid = _formKey.currentState?.validate() ?? false),
             child: Column(
               children: [
-                Card(
-                  child: ListTile(
-                    leading: const Text('Preview'),
-                    title: Text(
-                        '${_randomNumber.toStringAsFixed(int.tryParse(_decimalPlacesController.text) ?? 0)} ${_symbolController.text}'),
-                  ),
-                ),
-                SizedBox(
-                  width: size.width,
-                  child: DataTable(columns: const [
-                    DataColumn(label: Text('Symbol')),
-                    DataColumn(label: Text('Name')),
-                    DataColumn(label: Text('ISO Code')),
-                  ], rows: [
-                    DataRow(cells: [
-                      DataCell(Text(_symbolController.text)),
-                      DataCell(Text(_nameController.text)),
-                      DataCell(Text(_isoCodeController.text))
-                    ])
-                  ]),
-                ),
+                ...buildCurrencyPreview(size, _symbolController.text, _nameController.text, _isoCodeController.text,
+                    _decimalPlacesController.text, _randomNumber),
                 const Divider(),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: TextFormField(
-                    controller: _nameController,
-                    decoration: const InputDecoration(labelText: 'Name'),
-                    validator: (value) => InputValidators.nonNull('Name', value),
-                    inputFormatters: [
-                      LengthLimitingTextInputFormatter(32),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: TextFormField(
-                    controller: _symbolController,
-                    decoration: const InputDecoration(labelText: 'Symbol'),
-                    validator: (value) => InputValidators.nonNull('Symbol', value),
-                    inputFormatters: [
-                      LengthLimitingTextInputFormatter(6),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: TextFormField(
-                    controller: _isoCodeController,
-                    decoration: const InputDecoration(labelText: 'ISO Code'),
-                    inputFormatters: [
-                      LengthLimitingTextInputFormatter(3),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: TextFormField(
-                    controller: _decimalPlacesController,
-                    decoration: const InputDecoration(labelText: 'Decimal Places'),
-                    validator: (value) => InputValidators.nonNull('Decimal Places', value),
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(1),
-                    ],
-                  ),
-                ),
+                ...buildFormFields(
+                    _nameController, _symbolController, _isoCodeController, _decimalPlacesController, false),
                 SizedBox(
                   width: double.infinity,
                   height: 50,
@@ -156,6 +95,82 @@ class _CurrencyCreatePageState extends State<CurrencyCreatePage> {
         ),
       ),
     );
+  }
+
+  static List<Widget> buildCurrencyPreview(
+      Size size, String symbol, String name, String isoCode, String decimalPlaces, double previewAmount) {
+    return [
+      Card(
+        child: ListTile(
+          leading: const Text('Preview'),
+          title: Text('${previewAmount.toStringAsFixed(int.tryParse(decimalPlaces) ?? 0)} $symbol'),
+        ),
+      ),
+      SizedBox(
+        width: size.width,
+        child: DataTable(columns: const [
+          DataColumn(label: Text('Symbol')),
+          DataColumn(label: Text('Name')),
+          DataColumn(label: Text('ISO')),
+        ], rows: [
+          DataRow(cells: [DataCell(Text(symbol)), DataCell(Text(name)), DataCell(Text(isoCode))])
+        ]),
+      ),
+    ];
+  }
+
+  static List<Widget> buildFormFields(TextEditingController nameController, TextEditingController symbolController,
+      TextEditingController isoCodeController, TextEditingController decimalPlacesController, bool readOnly) {
+    return [
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: TextFormField(
+          controller: nameController,
+          readOnly: readOnly,
+          decoration: const InputDecoration(labelText: 'Name'),
+          validator: (value) => InputValidators.nonNull('Name', value),
+          inputFormatters: [
+            LengthLimitingTextInputFormatter(32),
+          ],
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: TextFormField(
+          controller: symbolController,
+          readOnly: readOnly,
+          decoration: const InputDecoration(labelText: 'Symbol'),
+          validator: (value) => InputValidators.nonNull('Symbol', value),
+          inputFormatters: [
+            LengthLimitingTextInputFormatter(6),
+          ],
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: TextFormField(
+          controller: isoCodeController,
+          readOnly: readOnly,
+          decoration: const InputDecoration(labelText: 'ISO Code'),
+          inputFormatters: [
+            LengthLimitingTextInputFormatter(3),
+          ],
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: TextFormField(
+          controller: decimalPlacesController,
+          readOnly: readOnly,
+          decoration: const InputDecoration(labelText: 'Decimal Places'),
+          validator: (value) => InputValidators.nonNull('Decimal Places', value),
+          inputFormatters: [
+            FilteringTextInputFormatter.digitsOnly,
+            LengthLimitingTextInputFormatter(1),
+          ],
+        ),
+      ),
+    ];
   }
 
   Future<void> _createCurrency() async {
