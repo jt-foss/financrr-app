@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>API - Financrr Documentation</title>
+        <title>Api Error - Financrr Documentation</title>
 
 
         <!-- Custom HTML head -->
@@ -88,7 +88,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><li class="part-title">Reference</li><li class="chapter-item expanded "><a href="../goals/index.html"><strong aria-hidden="true">1.</strong> Goals</a></li><li class="chapter-item expanded "><a href="../features/index.html"><strong aria-hidden="true">2.</strong> Features</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../features/frontend.html"><strong aria-hidden="true">2.1.</strong> Frontend</a></li><li class="chapter-item expanded "><a href="../features/backend.html"><strong aria-hidden="true">2.2.</strong> Backend</a></li></ol></li><li class="chapter-item expanded "><a href="../api/index.html" class="active"><strong aria-hidden="true">3.</strong> API</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../api/Error.html"><strong aria-hidden="true">3.1.</strong> Api Error</a></li></ol></li><li class="chapter-item expanded "><a href="../db/index.html"><strong aria-hidden="true">4.</strong> Database</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><li class="part-title">Reference</li><li class="chapter-item expanded "><a href="../goals/index.html"><strong aria-hidden="true">1.</strong> Goals</a></li><li class="chapter-item expanded "><a href="../features/index.html"><strong aria-hidden="true">2.</strong> Features</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../features/frontend.html"><strong aria-hidden="true">2.1.</strong> Frontend</a></li><li class="chapter-item expanded "><a href="../features/backend.html"><strong aria-hidden="true">2.2.</strong> Backend</a></li></ol></li><li class="chapter-item expanded "><a href="../api/index.html"><strong aria-hidden="true">3.</strong> API</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../api/Error.html" class="active"><strong aria-hidden="true">3.1.</strong> Api Error</a></li></ol></li><li class="chapter-item expanded "><a href="../db/index.html"><strong aria-hidden="true">4.</strong> Database</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle">
                 <div class="sidebar-resize-indicator"></div>
@@ -173,24 +173,65 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="api"><a class="header" href="#api">API</a></h1>
-<h2 id="stage"><a class="header" href="#stage">Stage</a></h2>
-<p><strong>The stage gets wiped on every deploy!!!</strong>
+                        <h1 id="api-error"><a class="header" href="#api-error">API Error</a></h1>
+<p>We provide a custom error object that is utilized throughout the library.</p>
+<h2 id="error-and-http-codes"><a class="header" href="#error-and-http-codes">Error and HTTP Codes</a></h2>
+<p>We employ semantic HTTP codes to signify the type of error that occurred, enabling more precise error handling.
 <br>
-<strong>For development use only!!!</strong></p>
-<p>Url: <code>https://api-stage.financrr.app/swagger-ui/</code></p>
-<h2 id="production"><a class="header" href="#production">Production</a></h2>
-<p>Url: <code>https://api.financrr.app/swagger-ui/</code></p>
-
+If HTTP codes lack granularity, we offer a custom error code for more specific error handling scenarios. By default,
+HTTP codes are used.</p>
+<h2 id="custom-error-codes"><a class="header" href="#custom-error-codes">Custom Error Codes</a></h2>
+<p>Custom error codes come into play when HTTP codes lack granularity. For instance, if you need to handle a particular
+error in a specific manner, custom error codes allow for such tailored handling.
+<br>
+Custom error codes always consist of at least four digits to prevent conflicts with HTTP codes.
+<br>
+We call these custom error codes <code>Api Codes</code>.</p>
+<h2 id="api-codes"><a class="header" href="#api-codes">Api Codes</a></h2>
+<h3 id="auth-related"><a class="header" href="#auth-related">Auth related</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Code</th><th>Description</th></tr></thead><tbody>
+<tr><td>1000</td><td>Invalid Session</td></tr>
+<tr><td>1001</td><td>Session limit reached</td></tr>
+<tr><td>1002</td><td>Invalid credentials provided</td></tr>
+<tr><td>1003</td><td>Unauthorized</td></tr>
+<tr><td>1004</td><td>No bearer token provided</td></tr>
+</tbody></table>
+</div>
+<h3 id="user-causes-errors"><a class="header" href="#user-causes-errors">User-causes errors</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Code</th><th>Description</th></tr></thead><tbody>
+<tr><td>1100</td><td>Resource not found</td></tr>
+<tr><td>1101</td><td>Serialization error</td></tr>
+<tr><td>1102</td><td>Missing permissions</td></tr>
+</tbody></table>
+</div>
+<h3 id="validation-errors"><a class="header" href="#validation-errors">Validation errors</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Code</th><th>Description</th></tr></thead><tbody>
+<tr><td>1200</td><td>JSON payload validation error</td></tr>
+<tr><td>1201</td><td>Validation error</td></tr>
+</tbody></table>
+</div>
+<h3 id="internal-server-errors"><a class="header" href="#internal-server-errors">Internal server errors</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Code</th><th>Description</th></tr></thead><tbody>
+<tr><td>1300</td><td>DB-Entitiy error</td></tr>
+<tr><td>1301</td><td>Database error</td></tr>
+<tr><td>1302</td><td>Redis error</td></tr>
+</tbody></table>
+</div>
+<h3 id="misc-errors"><a class="header" href="#misc-errors">Misc errors</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Code</th><th>Description</th></tr></thead><tbody>
+<tr><td>9000</td><td>Actix error</td></tr>
+<tr><td>9999</td><td>Unknown error</td></tr>
+</tbody></table>
+</div>
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../features/backend.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../api/index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="../api/Error.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../db/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -200,11 +241,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../features/backend.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../api/index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="../api/Error.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../db/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
