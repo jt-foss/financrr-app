@@ -84,22 +84,20 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _buildVerticalLayout(Size size) {
-    return Center(
-      child: SizedBox(
-        width: size.width / 1.1,
-        child: Scaffold(
-            body: ListView.separated(
-          itemCount: _cards.length,
-          itemBuilder: (_, index) {
-            if (index == 0) {
-              return Padding(padding: const EdgeInsets.only(top: 10), child: _cards[index]);
-            }
-            return _cards[index];
-          },
-          separatorBuilder: (_, index) => const Padding(
-            padding: EdgeInsets.symmetric(vertical: 5)
-          ),
-        )),
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: Center(
+        child: SizedBox(
+          width: size.width / 1.1,
+          child: Scaffold(
+              body: ListView.separated(
+            itemCount: _cards.length,
+            itemBuilder: (_, index) => _cards[index],
+            separatorBuilder: (_, index) => const Padding(
+              padding: EdgeInsets.symmetric(vertical: 5)
+            ),
+          )),
+        ),
       ),
     );
   }

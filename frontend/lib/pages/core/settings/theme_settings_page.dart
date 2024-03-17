@@ -30,14 +30,14 @@ class _ThemeSettingsPageState extends State<ThemeSettingsPage> {
   }
 
   Widget _buildVerticalLayout(Size size) {
-    return Center(
-      child: SizedBox(
-        width: size.width / 1.1,
-        child: ListView(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 10),
-              child: Card(
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: Center(
+        child: SizedBox(
+          width: size.width / 1.1,
+          child: ListView(
+            children: [
+              Card(
                 child: ListTile(
                     title: const Text('Use System Theme'),
                     trailing: Switch(
@@ -48,15 +48,15 @@ class _ThemeSettingsPageState extends State<ThemeSettingsPage> {
                       },
                     )),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [for (AppTheme theme in AppTheme.themes) _buildThemePreview(theme)],
-              ),
-            )
-          ],
+              Padding(
+                padding: const EdgeInsets.only(top: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [for (AppTheme theme in AppTheme.themes) _buildThemePreview(theme)],
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );
