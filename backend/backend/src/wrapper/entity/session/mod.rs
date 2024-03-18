@@ -78,7 +78,7 @@ impl Session {
     }
 
     pub async fn renew(mut self) -> Result<Self, ApiError> {
-        self.expires_at = get_now().add(TimeDuration::hours(Config::get_config().session_lifetime_hours as i64));
+        self.expires_at = get_now().add(TimeDuration::hours(Config::get_config().session.lifetime_hours as i64));
         self.insert_into_redis().await?;
 
         let active_model = session::ActiveModel {
@@ -194,7 +194,7 @@ impl Session {
     pub async fn reached_session_limit(user_id: i32) -> Result<bool, ApiError> {
         let sessions = Self::count_all_by_user(user_id).await?;
 
-        Ok(sessions >= Config::get_config().session_limit)
+        Ok(sessions >= Config::get_config().session.limit)
     }
 
     pub async fn init() -> Result<(), ApiError> {
@@ -246,8 +246,8 @@ impl Session {
             name: model.name,
             token: model.token,
             user,
-            expires_at: model.created_at.add(TimeDuration::hours(Config::get_config().session_lifetime_hours as i64)),
-            created_at: model.created_at,
+            expires_at: model.created_at.add(TimeDuration::hours(Config::get_config().session.lifetime_hours as i64)),
+            created_at: model.created_at
         })
     }
 

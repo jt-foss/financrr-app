@@ -118,8 +118,8 @@ async fn main() -> Result<()> {
             .key_by(|req| {
                 Some(req.peer_addr().map(|addr| addr.ip().to_string()).unwrap_or_else(|| "unknown".to_string()))
             })
-            .limit(5000)
-            .period(Duration::from_secs(3600)) // 60 minutes
+            .limit(Config::get_config().rate_limiter.limit as usize)
+            .period(Duration::from_secs(Config::get_config().rate_limiter.duration_seconds)) // 60 minutes
             .build()
             .unwrap(),
     );

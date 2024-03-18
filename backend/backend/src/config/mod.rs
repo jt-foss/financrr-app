@@ -6,18 +6,19 @@ use tracing::log::LevelFilter;
 use crate::CONFIG;
 
 pub mod logger;
+pub mod public;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Config {
     pub address: String,
-    pub session_lifetime_hours: u64,
-    pub session_limit: u64,
     pub database: DatabaseConfig,
     pub cache: RedisConfig,
     pub cors: CorsConfig,
+    pub session: SessionConfig,
+    pub rate_limiter: RateLimiterConfig,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DatabaseConfig {
     pub host: String,
     pub port: u16,
@@ -31,13 +32,25 @@ pub struct DatabaseConfig {
     pub sqlx_log_level: LevelFilter,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct RedisConfig {
     pub host: String,
     pub port: u16,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
+pub struct SessionConfig {
+    pub lifetime_hours: u64,
+    pub limit: u64,
+}
+
+#[derive(Debug, Clone)]
+pub struct RateLimiterConfig {
+    pub limit: u64,
+    pub duration_seconds: u64,
+}
+
+#[derive(Debug, Clone)]
 pub struct CorsConfig {
     pub allowed_origins: Vec<String>,
     pub allow_any_origin: bool,
@@ -54,15 +67,11 @@ impl Config {
     pub fn load() -> Self {
         Self {
             address: get_env_or_error("ADDRESS"),
-            session_lifetime_hours: get_env_or_default("SESSION_LIFETIME_HOURS", "168")
-                .parse::<u64>()
-                .expect("Could not parse SESSION_LIFETIME_HOURS to u64!"),
-            session_limit: get_env_or_default("SESSION_LIMIT", "25")
-                .parse::<u64>()
-                .expect("Could not parse SESSION_LIMIT to u64!"),
             database: DatabaseConfig::build_config(),
             cache: RedisConfig::build_config(),
             cors: CorsConfig::build_config(),
+            session: SessionConfig::build_config(),
+            rate_limiter: RateLimiterConfig::build_config(),
         }
     }
 
@@ -119,6 +128,32 @@ impl CorsConfig {
         Self {
             allowed_origins,
             allow_any_origin: get_env_or_default("CORS_ALLOW_ANY_ORIGIN", "false").parse::<bool>().unwrap_or(false),
+        }
+    }
+}
+
+impl SessionConfig {
+    pub fn build_config() -> Self {
+        Self {
+            lifetime_hours: get_env_or_default("SESSION_LIFETIME_HOURS", "168")
+                .parse::<u64>()
+                .expect("Could not parse SESSION_LIFETIME_HOURS to u64!"),
+            limit: get_env_or_default("SESSION_LIMIT", "25")
+                .parse::<u64>()
+                .expect("Could not parse SESSION_LIMIT to u64!"),
+        }
+    }
+}
+
+impl RateLimiterConfig {
+    pub fn build_config() -> Self {
+        Self {
+            limit: get_env_or_default("RATE_LIMITER_LIMIT", "5000")
+                .parse::<u64>()
+                .expect("Could not parse RATE_LIMITER_LIMIT to u64!"),
+            duration_seconds: get_env_or_default("RATE_LIMITER_DURATION_SECONDS", "3600")
+                .parse::<u64>()
+                .expect("Could not parse RATE_LIMITER_DURATION to u64!"),
         }
     }
 }
