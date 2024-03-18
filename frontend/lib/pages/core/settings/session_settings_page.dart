@@ -1,9 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:financrr_frontend/data/session_repository.dart';
 import 'package:financrr_frontend/util/extensions.dart';
-import 'package:financrr_frontend/util/platform_utils.dart';
 import 'package:financrr_frontend/widgets/paginated_table.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:restrr/restrr.dart';
 
@@ -89,7 +87,8 @@ class _SessionSettingsPageState extends State<SessionSettingsPage> {
                         children: [
                           IconButton(
                             icon: Icon(isCurrentSession ? Icons.logout_rounded : Icons.delete_rounded),
-                            onPressed: () => isCurrentSession ? SessionService.logout(context, _api) : _deleteSession(session),
+                            onPressed: () =>
+                                isCurrentSession ? SessionService.logout(context, _api) : _deleteSession(session),
                           ),
                         ],
                       )),
