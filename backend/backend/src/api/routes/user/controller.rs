@@ -6,7 +6,7 @@ use crate::wrapper::entity::user::dto::UserRegistration;
 use crate::wrapper::entity::user::User;
 use crate::wrapper::types::phantom::Phantom;
 
-pub fn user_controller(cfg: &mut web::ServiceConfig) {
+pub(crate) fn user_controller(cfg: &mut web::ServiceConfig) {
     cfg.service(web::scope("/user").service(me).service(register));
 }
 
@@ -24,7 +24,7 @@ path = "/api/v1/user/@me",
 tag = "User"
 )]
 #[get("/@me")]
-pub async fn me(mut user: Phantom<User>) -> Result<impl Responder, ApiError> {
+pub(crate) async fn me(mut user: Phantom<User>) -> Result<impl Responder, ApiError> {
     Ok(HttpResponse::Ok().json(user.get_inner().await?))
 }
 
@@ -40,7 +40,7 @@ request_body = UserRegistration,
 tag = "User"
 )]
 #[post("/register")]
-pub async fn register(registration: UserRegistration) -> Result<impl Responder, ApiError> {
+pub(crate) async fn register(registration: UserRegistration) -> Result<impl Responder, ApiError> {
     let user = User::register(registration).await?;
 
     Ok(HttpResponse::Created().json(user))

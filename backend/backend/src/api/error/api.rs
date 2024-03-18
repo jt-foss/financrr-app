@@ -18,21 +18,21 @@ use crate::util::validation::ValidationErrorJsonPayload;
 
 #[derive(Debug, Display, Error, Serialize, ToSchema)]
 #[display("{}", serde_json::to_string(self).unwrap())]
-pub struct ApiError {
+pub(crate) struct ApiError {
     #[serde(skip)]
-    pub status_code: StatusCode,
-    pub api_code: ApiCode,
-    pub details: String,
-    pub reference: Option<SerializableStruct>,
+    pub(crate) status_code: StatusCode,
+    pub(crate) api_code: ApiCode,
+    pub(crate) details: String,
+    pub(crate) reference: Option<SerializableStruct>,
 }
 
 #[derive(Debug, ToSchema)]
-pub struct SerializableStruct {
+pub(crate) struct SerializableStruct {
     serialized: serde_json::Value,
 }
 
 impl SerializableStruct {
-    pub fn new<T: Serialize>(value: &T) -> Result<Self, serde_json::Error> {
+    pub(crate) fn new<T: Serialize>(value: &T) -> Result<Self, serde_json::Error> {
         let serialized = serde_json::to_value(value)?;
         Ok(Self {
             serialized,
@@ -60,7 +60,7 @@ macro_rules! api_errors {
         $(
             $(#[$docs])*
             #[allow(non_snake_case)]
-            pub fn $func() -> Self {
+            pub(crate) fn $func() -> Self {
                 Self {
                     status_code: $status_code,
                     api_code: $api_code,
@@ -84,7 +84,7 @@ api_errors!(
 
 impl ApiError {
     #[allow(non_snake_case)]
-    pub fn ResourceNotFound(resource_name: &str) -> Self {
+    pub(crate) fn ResourceNotFound(resource_name: &str) -> Self {
         Self {
             status_code: StatusCode::NOT_FOUND,
             api_code: ApiCode::RESOURCE_NOT_FOUND,
@@ -93,7 +93,7 @@ impl ApiError {
         }
     }
 
-    pub fn from_error_vec(errors: Vec<Self>, status_code: StatusCode) -> Self {
+    pub(crate) fn from_error_vec(errors: Vec<Self>, status_code: StatusCode) -> Self {
         Self {
             status_code,
             api_code: ApiCode::UNKNOWN,
@@ -121,7 +121,7 @@ impl From<EntityError> for ApiError {
     fn from(error: EntityError) -> Self {
         Self {
             status_code: StatusCode::INTERNAL_SERVER_ERROR,
-            api_code: ApiCode::ENTITIY_ERROR,
+            api_code: ApiCode::ENTITY_ERROR,
             details: error.to_string(),
             reference: None,
         }
@@ -143,7 +143,7 @@ impl From<RedisError> for ApiError {
     fn from(value: RedisError) -> Self {
         Self {
             status_code: StatusCode::INTERNAL_SERVER_ERROR,
-            api_code: ApiCode::REIDS_ERROR,
+            api_code: ApiCode::REDIS_ERROR,
             details: value.to_string(),
             reference: None,
         }

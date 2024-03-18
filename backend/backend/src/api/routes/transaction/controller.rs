@@ -11,7 +11,7 @@ use crate::wrapper::entity::user::User;
 use crate::wrapper::permission::{HasPermissionOrError, Permissions};
 use crate::wrapper::types::phantom::Phantom;
 
-pub fn transaction_controller(cfg: &mut web::ServiceConfig) {
+pub(crate) fn transaction_controller(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/transaction").service(get_one).service(get_all).service(create).service(delete).service(update),
     );
@@ -31,7 +31,11 @@ security(
 path = "/api/v1/transaction/?page={page}&size={size}",
 tag = "Transaction")]
 #[get("")]
-pub async fn get_all(user: Phantom<User>, page_size: PageSizeParam, uri: Uri) -> Result<impl Responder, ApiError> {
+pub(crate) async fn get_all(
+    user: Phantom<User>,
+    page_size: PageSizeParam,
+    uri: Uri,
+) -> Result<impl Responder, ApiError> {
     let total = Transaction::count_all_by_user(user.get_id()).await?;
     let transactions = Transaction::find_all_by_user_paginated(user.get_id(), &page_size).await?;
 
@@ -50,7 +54,7 @@ security(
 path = "/api/v1/transaction/{transaction_id}",
 tag = "Transaction")]
 #[get("/{transaction_id}")]
-pub async fn get_one(user: Phantom<User>, transaction_id: Path<i32>) -> Result<impl Responder, ApiError> {
+pub(crate) async fn get_one(user: Phantom<User>, transaction_id: Path<i32>) -> Result<impl Responder, ApiError> {
     let transaction_id = transaction_id.into_inner();
     let transaction = Transaction::find_by_id(transaction_id).await?;
     transaction.has_permission_or_error(user.get_id(), Permissions::READ).await?;
@@ -71,7 +75,7 @@ path = "/api/v1/transaction",
 request_body = TransactionDTO,
 tag = "Transaction")]
 #[post("")]
-pub async fn create(user: Phantom<User>, transaction: TransactionDTO) -> Result<impl Responder, ApiError> {
+pub(crate) async fn create(user: Phantom<User>, transaction: TransactionDTO) -> Result<impl Responder, ApiError> {
     // TODO add permission checks for budget
 
     if !transaction.check_account_access(user.get_id()).await? {
@@ -93,7 +97,7 @@ security(
 path = "/api/v1/transaction/{transaction_id}",
 tag = "Transaction")]
 #[delete("/{transaction_id}")]
-pub async fn delete(user: Phantom<User>, transaction_id: Path<i32>) -> Result<impl Responder, ApiError> {
+pub(crate) async fn delete(user: Phantom<User>, transaction_id: Path<i32>) -> Result<impl Responder, ApiError> {
     let transaction_id = transaction_id.into_inner();
     let transaction = Transaction::find_by_id(transaction_id).await?;
     transaction.has_permission_or_error(user.get_id(), Permissions::READ_DELETE).await?;
@@ -116,7 +120,7 @@ path = "/api/v1/transaction/{transaction_id}",
 request_body = TransactionDTO,
 tag = "Transaction")]
 #[patch("/{transaction_id}")]
-pub async fn update(
+pub(crate) async fn update(
     user: Phantom<User>,
     transaction_dto: TransactionDTO,
     transaction_id: Path<i32>,

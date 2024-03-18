@@ -17,9 +17,9 @@ use crate::wrapper::entity::currency::Currency;
 use crate::wrapper::entity::session::Session;
 use crate::wrapper::entity::transaction::Transaction;
 
-pub const DEFAULT_PAGE: u64 = 1;
-pub const DEFAULT_LIMIT: u64 = 50;
-pub const MAX_LIMIT: u64 = 500;
+pub(crate) const DEFAULT_PAGE: u64 = 1;
+pub(crate) const DEFAULT_LIMIT: u64 = 50;
+pub(crate) const MAX_LIMIT: u64 = 500;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, ToSchema)]
 #[aliases(
@@ -29,14 +29,14 @@ PaginatedCurrency = Pagination < Currency >,
 PaginatedTransaction = Pagination < Transaction >,
 PaginatedSession = Pagination < Session >
 )]
-pub struct Pagination<T: Serialize + ToSchema<'static>> {
+pub(crate) struct Pagination<T: Serialize + ToSchema<'static>> {
     #[serde(rename = "_metadata")]
-    pub metadata: Metadata,
-    pub data: Vec<T>,
+    pub(crate) metadata: Metadata,
+    pub(crate) data: Vec<T>,
 }
 
 impl<T: Serialize + ToSchema<'static>> Pagination<T> {
-    pub fn new(data: Vec<T>, page_size_param: &PageSizeParam, total: u64, uri: Uri) -> Self {
+    pub(crate) fn new(data: Vec<T>, page_size_param: &PageSizeParam, total: u64, uri: Uri) -> Self {
         Self {
             metadata: Metadata {
                 page: page_size_param.page,
@@ -50,21 +50,21 @@ impl<T: Serialize + ToSchema<'static>> Pagination<T> {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, ToSchema)]
-pub struct Metadata {
-    pub page: u64,
-    pub limit: u64,
-    pub total: u64,
-    pub links: Links,
+pub(crate) struct Metadata {
+    pub(crate) page: u64,
+    pub(crate) limit: u64,
+    pub(crate) total: u64,
+    pub(crate) links: Links,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, ToSchema)]
-pub struct Links {
-    pub prev: Option<String>,
-    pub next: Option<String>,
+pub(crate) struct Links {
+    pub(crate) prev: Option<String>,
+    pub(crate) next: Option<String>,
 }
 
 impl Links {
-    pub fn new(uri: Uri, page_size_param: &PageSizeParam, total: u64) -> Self {
+    pub(crate) fn new(uri: Uri, page_size_param: &PageSizeParam, total: u64) -> Self {
         let page = page_size_param.page;
         let limit = page_size_param.limit;
 
@@ -90,15 +90,15 @@ impl Links {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Validate, Deserialize)]
-pub struct PageSizeParam {
+pub(crate) struct PageSizeParam {
     #[validate(range(min = 1))]
-    pub page: u64,
+    pub(crate) page: u64,
     #[validate(range(min = 1, max = "MAX_LIMIT"))]
-    pub limit: u64,
+    pub(crate) limit: u64,
 }
 
 impl PageSizeParam {
-    pub fn new(page: u64, limit: u64) -> Self {
+    pub(crate) fn new(page: u64, limit: u64) -> Self {
         Self {
             page,
             limit,

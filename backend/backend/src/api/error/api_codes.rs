@@ -3,9 +3,9 @@ use utoipa::openapi::{RefOr, Schema};
 use utoipa::{schema, ToSchema};
 
 #[derive(Debug, Serialize)]
-pub struct ApiCode {
-    pub code: u16,
-    pub message: &'static str,
+pub(crate) struct ApiCode {
+    pub(crate) code: u16,
+    pub(crate) message: &'static str,
 }
 
 impl ToSchema<'static> for ApiCode {
@@ -32,7 +32,7 @@ macro_rules! api_codes {
         impl ApiCode {
         $(
             $(#[$docs])*
-            pub const $konst: ApiCode = ApiCode{code: $num, message: $phrase};
+            pub(crate) const $konst: ApiCode = ApiCode{code: $num, message: $phrase};
         )+
 
         }
@@ -58,14 +58,13 @@ api_codes!(
 //validation errors
 api_codes!(
     (1200, JSON_PAYLOAD_VALIDATION_ERROR, "JSON payload validation error!");
-    (1201, GENERIC_VALIDATION_ERROR, "Validation error!");
 );
 
 // internal server-errors
 api_codes!(
-    (1300, ENTITIY_ERROR, "DB-Entity error!");
+    (1300, ENTITY_ERROR, "DB-Entity error!");
     (1301, DB_ERROR, "Database error!");
-    (1302, REIDS_ERROR, "Redis error!");
+    (1302, REDIS_ERROR, "Redis error!");
 );
 
 // misc

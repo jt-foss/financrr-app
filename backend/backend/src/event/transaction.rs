@@ -9,11 +9,11 @@ use crate::wrapper::entity::transaction::Transaction;
 
 static TRANSACTION_EVENT_BUS: OnceCell<EventBus<TransactionEvent>> = OnceCell::new();
 
-pub type CreateOrDeleteFn = Box<dyn Fn(Transaction) -> EventResult + Send + Sync>;
-pub type UpdateFn = Box<dyn Fn(Transaction, Box<Transaction>) -> EventResult + Send + Sync>;
+pub(crate) type CreateOrDeleteFn = Box<dyn Fn(Transaction) -> EventResult + Send + Sync>;
+pub(crate) type UpdateFn = Box<dyn Fn(Transaction, Box<Transaction>) -> EventResult + Send + Sync>;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum TransactionEvent {
+pub(crate) enum TransactionEvent {
     Create(Transaction),
     Update(Transaction, Box<Transaction>),
     Delete(Transaction),
@@ -63,17 +63,17 @@ impl TransactionEvent {
         });
     }
 
-    pub fn subscribe_created(function: CreateOrDeleteFn) {
+    pub(crate) fn subscribe_created(function: CreateOrDeleteFn) {
         Self::generic_subscribe(EventFilter::Create, move |transaction, _| function(transaction));
     }
 
-    pub fn subscribe_updated(function: UpdateFn) {
+    pub(crate) fn subscribe_updated(function: UpdateFn) {
         Self::generic_subscribe(EventFilter::Update, move |old_transaction, new_transaction| {
             function(old_transaction, new_transaction.unwrap())
         });
     }
 
-    pub fn subscribe_deleted(function: CreateOrDeleteFn) {
+    pub(crate) fn subscribe_deleted(function: CreateOrDeleteFn) {
         Self::generic_subscribe(EventFilter::Delete, move |transaction, _| function(transaction));
     }
 }

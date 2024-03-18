@@ -10,24 +10,24 @@ use crate::api::error::api::ApiError;
 use crate::util::validation::{validate_password, validate_unique_username};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Validate, ToSchema)]
-pub struct UserRegistration {
+pub(crate) struct UserRegistration {
     #[validate(length(min = 1))]
-    pub username: String,
+    pub(crate) username: String,
     #[validate(email)]
-    pub email: Option<String>,
-    pub display_name: Option<String>,
+    pub(crate) email: Option<String>,
+    pub(crate) display_name: Option<String>,
     #[validate(custom = "validate_password")]
-    pub password: String,
+    pub(crate) password: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Validate, ToSchema)]
-pub struct Credentials {
+pub(crate) struct Credentials {
     #[validate(length(min = 1))]
-    pub username: String,
+    pub(crate) username: String,
     #[validate(length(min = 1))]
-    pub password: String,
+    pub(crate) password: String,
     #[validate(length(min = 1))]
-    pub session_name: Option<String>,
+    pub(crate) session_name: Option<String>,
 }
 
 impl FromRequest for UserRegistration {

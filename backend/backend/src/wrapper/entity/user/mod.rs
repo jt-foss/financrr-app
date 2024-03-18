@@ -23,30 +23,26 @@ use crate::wrapper::types::phantom::{Identifiable, Phantom};
 pub mod dto;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
-pub struct User {
-    pub id: i32,
-    pub username: String,
-    pub email: Option<String>,
-    pub display_name: Option<String>,
+pub(crate) struct User {
+    pub(crate) id: i32,
+    pub(crate) username: String,
+    pub(crate) email: Option<String>,
+    pub(crate) display_name: Option<String>,
     #[serde(with = "time::serde::rfc3339")]
-    pub created_at: OffsetDateTime,
-    pub is_admin: bool,
+    pub(crate) created_at: OffsetDateTime,
+    pub(crate) is_admin: bool,
 }
 
 impl User {
-    pub async fn find_by_id(id: i32) -> Result<Self, ApiError> {
+    pub(crate) async fn find_by_id(id: i32) -> Result<Self, ApiError> {
         Ok(Self::from(find_one_or_error(user::Entity::find_by_id(id), "User").await?))
     }
 
-    pub async fn find_by_username(username: &str) -> Result<Self, ApiError> {
-        Ok(Self::from(find_one_or_error(user::Entity::find_by_username(username), "User").await?))
-    }
-
-    pub async fn exists(id: i32) -> Result<bool, ApiError> {
+    pub(crate) async fn exists(id: i32) -> Result<bool, ApiError> {
         Ok(count(user::Entity::find_by_id(id)).await? > 0)
     }
 
-    pub async fn authenticate(credentials: Credentials) -> Result<Self, ApiError> {
+    pub(crate) async fn authenticate(credentials: Credentials) -> Result<Self, ApiError> {
         let user = find_one(DbUser::find_by_username(credentials.username.as_str())).await;
         match user {
             Ok(Some(user)) => {
@@ -60,7 +56,7 @@ impl User {
         }
     }
 
-    pub async fn register(registration: UserRegistration) -> Result<Self, ApiError> {
+    pub(crate) async fn register(registration: UserRegistration) -> Result<Self, ApiError> {
         match user::ActiveModel::register(
             registration.username,
             registration.email,

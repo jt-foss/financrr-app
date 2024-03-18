@@ -3,7 +3,7 @@ use itertools::{Either, Itertools};
 
 use crate::api::error::api::ApiError;
 
-pub fn handle_async_result_vec<T>(results: Vec<Result<T, ApiError>>) -> Result<Vec<T>, ApiError> {
+pub(crate) fn handle_async_result_vec<T>(results: Vec<Result<T, ApiError>>) -> Result<Vec<T>, ApiError> {
     let (entities, errors): (Vec<_>, Vec<_>) = results.into_iter().partition_map(|result| match result {
         Ok(entities) => Either::Left(entities),
         Err(error) => Either::Right(error),

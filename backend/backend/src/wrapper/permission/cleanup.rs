@@ -8,9 +8,9 @@ use crate::api::pagination::{PageSizeParam, Pagination};
 use crate::scheduling::schedule_task_with_interval;
 use crate::wrapper::permission::PermissionsEntity;
 
-pub const CLEAN_UP_INTERVAL_SECONDS: u64 = 60 * 60 * 24;
+pub(crate) const CLEAN_UP_INTERVAL_SECONDS: u64 = 60 * 60 * 24;
 
-pub fn schedule_clean_up_task() {
+pub(crate) fn schedule_clean_up_task() {
     let interval = interval(Duration::from_secs(CLEAN_UP_INTERVAL_SECONDS));
     schedule_task_with_interval(interval, clean_up_task);
 }

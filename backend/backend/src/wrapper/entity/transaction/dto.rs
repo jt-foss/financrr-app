@@ -16,19 +16,19 @@ use crate::wrapper::permission::{Permission, Permissions};
 use crate::wrapper::types::phantom::Phantom;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Validate, ToSchema)]
-pub struct TransactionDTO {
-    pub source: Option<Phantom<Account>>,
-    pub destination: Option<Phantom<Account>>,
-    pub amount: i64,
-    pub currency: Phantom<Currency>,
-    pub description: Option<String>,
-    pub budget: Option<Phantom<Budget>>,
+pub(crate) struct TransactionDTO {
+    pub(crate) source: Option<Phantom<Account>>,
+    pub(crate) destination: Option<Phantom<Account>>,
+    pub(crate) amount: i64,
+    pub(crate) currency: Phantom<Currency>,
+    pub(crate) description: Option<String>,
+    pub(crate) budget: Option<Phantom<Budget>>,
     #[serde(with = "time::serde::rfc3339")]
-    pub executed_at: OffsetDateTime,
+    pub(crate) executed_at: OffsetDateTime,
 }
 
 impl TransactionDTO {
-    pub async fn check_account_access(&self, user_id: i32) -> Result<bool, ApiError> {
+    pub(crate) async fn check_account_access(&self, user_id: i32) -> Result<bool, ApiError> {
         match (&self.source, &self.destination) {
             (Some(source), Some(destination)) => {
                 let source_permissions = source.has_permission(user_id, Permissions::READ_WRITE).await?;

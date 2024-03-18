@@ -17,20 +17,20 @@ use entity::utility::time::get_now;
 
 use crate::database::connection::get_database_connection;
 
-pub const MIN_PASSWORD_LENGTH: usize = 16;
-pub const MAX_PASSWORD_LENGTH: usize = 128;
+pub(crate) const MIN_PASSWORD_LENGTH: usize = 16;
+pub(crate) const MAX_PASSWORD_LENGTH: usize = 128;
 
 #[derive(Debug, Serialize, ToSchema)]
-pub struct ValidationErrorJsonPayload {
-    pub message: String,
-    pub fields: Vec<FieldError>,
+pub(crate) struct ValidationErrorJsonPayload {
+    pub(crate) message: String,
+    pub(crate) fields: Vec<FieldError>,
 }
 
 #[derive(Debug, Serialize, ToSchema)]
-pub struct FieldError {
-    pub field_name: String,
-    pub code: String,
-    pub params: HashMap<String, Value>,
+pub(crate) struct FieldError {
+    pub(crate) field_name: String,
+    pub(crate) code: String,
+    pub(crate) params: HashMap<String, Value>,
 }
 
 impl From<&validator::ValidationErrors> for ValidationErrorJsonPayload {
@@ -66,7 +66,7 @@ fn map_field_error(field: &str, error: &ValidationError) -> FieldError {
     }
 }
 
-pub fn validate_password(password: &str) -> Result<(), ValidationError> {
+pub(crate) fn validate_password(password: &str) -> Result<(), ValidationError> {
     let mut error = ValidationError::new("Password is invalid");
     if password.len() < MIN_PASSWORD_LENGTH {
         error.add_param(Cow::from("min"), &MIN_PASSWORD_LENGTH);
@@ -102,7 +102,7 @@ pub fn validate_password(password: &str) -> Result<(), ValidationError> {
     Ok(())
 }
 
-pub async fn validate_unique_username(username: &str) -> Result<(), ValidationError> {
+pub(crate) async fn validate_unique_username(username: &str) -> Result<(), ValidationError> {
     match User::find_by_username(username).one(get_database_connection()).await {
         Ok(Some(_)) => Err(ValidationError::new("Username is not unique")),
         Err(_) => Err(ValidationError::new("Internal server error")),
@@ -110,21 +110,21 @@ pub async fn validate_unique_username(username: &str) -> Result<(), ValidationEr
     }
 }
 
-pub fn validate_iban(iban: &str) -> Result<(), ValidationError> {
+pub(crate) fn validate_iban(iban: &str) -> Result<(), ValidationError> {
     match iban.parse::<Iban>() {
         Ok(_) => Ok(()),
         Err(_) => Err(ValidationError::new("IBAN is invalid")),
     }
 }
 
-pub fn validate_datetime_not_in_future(datetime: &OffsetDateTime) -> Result<(), ValidationError> {
+pub(crate) fn validate_datetime_not_in_future(datetime: &OffsetDateTime) -> Result<(), ValidationError> {
     if datetime > &get_now() {
         return Err(ValidationError::new("Date and time cannot be in the future"));
     }
     Ok(())
 }
 
-pub async fn validate_currency_exists(id: i32) -> Result<(), ValidationError> {
+pub(crate) async fn validate_currency_exists(id: i32) -> Result<(), ValidationError> {
     match currency::Entity::find_by_id(id).one(get_database_connection()).await {
         Ok(Some(_)) => Ok(()),
         _ => Err(ValidationError::new("Currency does not exist")),

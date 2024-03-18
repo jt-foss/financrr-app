@@ -49,9 +49,9 @@ pub mod scheduling;
 pub mod util;
 pub mod wrapper;
 
-pub static DB: OnceLock<DatabaseConnection> = OnceLock::new();
-pub static REDIS: OnceLock<Client> = OnceLock::new();
-pub static CONFIG: OnceLock<Config> = OnceLock::new();
+pub(crate) static DB: OnceLock<DatabaseConnection> = OnceLock::new();
+pub(crate) static REDIS: OnceLock<Client> = OnceLock::new();
+pub(crate) static CONFIG: OnceLock<Config> = OnceLock::new();
 
 #[utoipauto(paths = "./backend/src")]
 #[derive(OpenApi)]
@@ -67,9 +67,9 @@ tags(
 ),
 modifiers(& BearerTokenAddon)
 )]
-pub struct ApiDoc;
+pub(crate) struct ApiDoc;
 
-pub struct BearerTokenAddon;
+pub(crate) struct BearerTokenAddon;
 
 impl Modify for BearerTokenAddon {
     fn modify(&self, openapi: &mut OpenApiStruct) {

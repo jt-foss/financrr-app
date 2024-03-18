@@ -9,15 +9,15 @@ use validator::Validate;
 use crate::api::error::api::ApiError;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Validate, ToSchema)]
-pub struct CurrencyDTO {
+pub(crate) struct CurrencyDTO {
     #[validate(length(min = 1, max = 255))]
-    pub name: String,
+    pub(crate) name: String,
     #[validate(length(min = 1, max = 255))]
-    pub symbol: String,
+    pub(crate) symbol: String,
     #[validate(length(min = 1, max = 3))]
-    pub iso_code: Option<String>,
+    pub(crate) iso_code: Option<String>,
     #[validate(range(min = 0, max = 10))]
-    pub decimal_places: i32,
+    pub(crate) decimal_places: i32,
 }
 
 impl FromRequest for CurrencyDTO {

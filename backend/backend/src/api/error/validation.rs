@@ -1,25 +1,25 @@
 use std::borrow::Cow;
 
-pub struct ValidationError {
-    pub error: validator::ValidationError,
+pub(crate) struct ValidationError {
+    pub(crate) error: validator::ValidationError,
 }
 
 impl ValidationError {
-    pub fn new(message: &'static str) -> Self {
+    pub(crate) fn new(message: &'static str) -> Self {
         Self {
             error: validator::ValidationError::new(message),
         }
     }
 
-    pub fn add(&mut self, field: &'static str, message: &str) {
+    pub(crate) fn add(&mut self, field: &'static str, message: &str) {
         self.error.add_param(Cow::from(field), &message);
     }
 
-    pub fn get_error(&self) -> &validator::ValidationError {
+    pub(crate) fn get_error(&self) -> &validator::ValidationError {
         &self.error
     }
 
-    pub fn has_error(&self) -> bool {
+    pub(crate) fn has_error(&self) -> bool {
         !self.error.params.is_empty()
     }
 }

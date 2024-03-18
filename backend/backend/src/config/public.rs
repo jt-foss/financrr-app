@@ -4,14 +4,14 @@ use utoipa::ToSchema;
 use crate::config::Config;
 
 #[derive(Debug, Serialize, ToSchema)]
-pub struct PublicConfig {
-    pub session_lifetime_hours: u64,
-    pub rate_limiter_limit: u64,
-    pub rate_limiter_duration_seconds: u64,
+pub(crate) struct PublicConfig {
+    pub(crate) session_lifetime_hours: u64,
+    pub(crate) rate_limiter_limit: u64,
+    pub(crate) rate_limiter_duration_seconds: u64,
 }
 
 impl PublicConfig {
-    pub fn get() -> Self {
+    pub(crate) fn get() -> Self {
         let config = Config::get_config();
 
         config.into()

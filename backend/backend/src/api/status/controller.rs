@@ -5,7 +5,7 @@ use crate::config::public::PublicConfig;
 use crate::database::connection::{get_database_connection, get_redis_connection};
 use crate::database::redis::cmd;
 
-pub fn status_controller(cfg: &mut web::ServiceConfig) {
+pub(crate) fn status_controller(cfg: &mut web::ServiceConfig) {
     cfg.service(web::scope("/status").service(health).service(coffee).service(config));
 }
 
@@ -41,7 +41,7 @@ responses(
 path = "/api/status/coffee",
 tag = "Status")]
 #[get("/coffee")]
-pub async fn coffee() -> impl Responder {
+pub(crate) async fn coffee() -> impl Responder {
     HttpResponse::ImATeapot()
 }
 
@@ -65,6 +65,6 @@ responses(
 path = "/api/status/config",
 tag = "Status")]
 #[get("/config")]
-pub async fn config() -> impl Responder {
+pub(crate) async fn config() -> impl Responder {
     HttpResponse::Ok().json(PublicConfig::get())
 }

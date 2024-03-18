@@ -8,7 +8,7 @@ use entity::budget;
 
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
-use crate::database::entity::{count, delete, find_all, find_all_paginated, find_one_or_error, insert, update};
+use crate::database::entity::{count, delete, find_all_paginated, find_one_or_error, insert, update};
 use crate::wrapper::entity::budget::dto::BudgetDTO;
 use crate::wrapper::entity::user::User;
 use crate::wrapper::entity::WrapperEntity;
@@ -19,18 +19,18 @@ pub mod dto;
 pub mod event_listener;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
-pub struct Budget {
-    pub id: i32,
-    pub user: Phantom<User>,
-    pub amount: i64,
-    pub name: String,
-    pub description: Option<String>,
+pub(crate) struct Budget {
+    pub(crate) id: i32,
+    pub(crate) user: Phantom<User>,
+    pub(crate) amount: i64,
+    pub(crate) name: String,
+    pub(crate) description: Option<String>,
     #[serde(with = "time::serde::rfc3339")]
-    pub created_at: OffsetDateTime,
+    pub(crate) created_at: OffsetDateTime,
 }
 
 impl Budget {
-    pub async fn new(user_id: i32, dto: BudgetDTO) -> Result<Self, ApiError> {
+    pub(crate) async fn new(user_id: i32, dto: BudgetDTO) -> Result<Self, ApiError> {
         let model = budget::ActiveModel {
             id: Default::default(),
             user: Set(user_id),
@@ -47,11 +47,7 @@ impl Budget {
         Ok(budget)
     }
 
-    pub async fn find_all_by_user(user_id: i32) -> Result<Vec<Self>, ApiError> {
-        Ok(find_all(budget::Entity::find_all_by_user_id(user_id)).await?.into_iter().map(Self::from).collect())
-    }
-
-    pub async fn find_all_by_user_paginated(
+    pub(crate) async fn find_all_by_user_paginated(
         user_id: i32,
         page_size_param: &PageSizeParam,
     ) -> Result<Vec<Self>, ApiError> {
@@ -62,15 +58,15 @@ impl Budget {
             .collect())
     }
 
-    pub async fn count_all_by_user(user_id: i32) -> Result<u64, ApiError> {
+    pub(crate) async fn count_all_by_user(user_id: i32) -> Result<u64, ApiError> {
         count(budget::Entity::find_all_by_user_id(user_id)).await
     }
 
-    pub async fn delete(self) -> Result<(), ApiError> {
+    pub(crate) async fn delete(self) -> Result<(), ApiError> {
         delete(budget::Entity::delete_by_id(self.id)).await
     }
 
-    pub async fn update(self, dto: BudgetDTO) -> Result<Self, ApiError> {
+    pub(crate) async fn update(self, dto: BudgetDTO) -> Result<Self, ApiError> {
         let model = budget::ActiveModel {
             id: Set(self.id),
             user: Set(self.user.get_id()),

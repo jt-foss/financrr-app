@@ -7,16 +7,16 @@ use crate::util::validation::validate_datetime_not_in_future;
 use crate::wrapper::entity::budget::Budget;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Validate, ToSchema)]
-pub struct BudgetDTO {
+pub(crate) struct BudgetDTO {
     #[validate(range(min = 0))]
-    pub amount: i64,
+    pub(crate) amount: i64,
     #[validate(length(min = 1, max = 255))]
-    pub name: String,
+    pub(crate) name: String,
     #[validate(length(min = 0, max = 255))]
-    pub description: Option<String>,
+    pub(crate) description: Option<String>,
     #[serde(with = "time::serde::rfc3339")]
     #[validate(custom = "validate_datetime_not_in_future")]
-    pub created_at: OffsetDateTime,
+    pub(crate) created_at: OffsetDateTime,
 }
 
 impl From<&Budget> for BudgetDTO {

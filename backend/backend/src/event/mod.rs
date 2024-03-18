@@ -11,14 +11,14 @@ use crate::wrapper::entity::budget::event_listener::budget_listener;
 
 pub mod transaction;
 
-pub type EventResult = Pin<Box<dyn Future<Output = Result<(), ApiError>> + Send>>;
+pub(crate) type EventResult = Pin<Box<dyn Future<Output = Result<(), ApiError>> + Send>>;
 
-pub fn init() {
+pub(crate) fn init() {
     account_listener();
     budget_listener();
 }
 
-pub trait Event {
+pub(crate) trait Event {
     fn fire(self);
     fn fire_scheduled(self, delay: Duration);
     fn subscribe() -> Receiver<Self>
@@ -27,33 +27,33 @@ pub trait Event {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum EventFilter {
+pub(crate) enum EventFilter {
     Create,
     Update,
     Delete,
 }
 
-pub struct EventBus<T: Clone> {
+pub(crate) struct EventBus<T: Clone> {
     sender: Sender<T>,
 }
 
 impl<T: Clone + Send + 'static> EventBus<T> {
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         let (sender, _) = channel(100);
         Self {
             sender,
         }
     }
 
-    pub fn subscribe(&self) -> Receiver<T> {
+    pub(crate) fn subscribe(&self) -> Receiver<T> {
         self.sender.subscribe()
     }
 
-    pub fn fire(&self, event: T) {
+    pub(crate) fn fire(&self, event: T) {
         let _ = self.sender.send(event);
     }
 
-    pub fn fire_scheduled(&self, event: T, delay: Duration) {
+    pub(crate) fn fire_scheduled(&self, event: T, delay: Duration) {
         let sender = self.sender.clone();
         tokio::spawn(async move {
             sleep(delay).await;

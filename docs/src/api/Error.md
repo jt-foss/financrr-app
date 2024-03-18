@@ -42,8 +42,7 @@ We call these custom error codes `Api Codes`.
 
 | Code | Description                   |
 |------|-------------------------------|
-| 1200 | JSON payload validation error |
-| 1201 | Validation error              | 
+| 1200 | JSON payload validation error | 
 
 ### Internal server errors
 

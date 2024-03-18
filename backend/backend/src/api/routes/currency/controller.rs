@@ -12,7 +12,7 @@ use crate::wrapper::entity::user::User;
 use crate::wrapper::permission::{HasPermissionOrError, Permissions};
 use crate::wrapper::types::phantom::Phantom;
 
-pub fn currency_controller(cfg: &mut web::ServiceConfig) {
+pub(crate) fn currency_controller(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/currency").service(get_all).service(get_one).service(create).service(delete).service(update),
     );
@@ -32,7 +32,7 @@ params(PageSizeParam),
 path = "/api/v1/currency/?page={page}&limit={limit}",
 tag = "Currency")]
 #[get("")]
-pub async fn get_all(
+pub(crate) async fn get_all(
     user: Option<Phantom<User>>,
     page_size: PageSizeParam,
     uri: Uri,
@@ -63,7 +63,7 @@ security(
 path = "/api/v1/currency/{currency_id}",
 tag = "Currency")]
 #[get("/{currency_id}")]
-pub async fn get_one(user: Option<Phantom<User>>, currency_id: Path<i32>) -> Result<impl Responder, ApiError> {
+pub(crate) async fn get_one(user: Option<Phantom<User>>, currency_id: Path<i32>) -> Result<impl Responder, ApiError> {
     let currency_id = currency_id.into_inner();
     let user_id = user.map_or(-1, |user| user.get_id());
 
@@ -83,7 +83,7 @@ path = "/api/v1/currency",
 request_body = CurrencyDTO,
 tag = "Currency")]
 #[post("")]
-pub async fn create(user: Phantom<User>, currency: Json<CurrencyDTO>) -> Result<impl Responder, ApiError> {
+pub(crate) async fn create(user: Phantom<User>, currency: Json<CurrencyDTO>) -> Result<impl Responder, ApiError> {
     Ok(HttpResponse::Created().json(Currency::new(currency.into_inner(), user.get_id()).await?))
 }
 
@@ -100,7 +100,7 @@ security(
 path = "/api/v1/currency/{currency_id}",
 tag = "Currency")]
 #[delete("/{currency_id}")]
-pub async fn delete(user: Phantom<User>, currency_id: Path<i32>) -> Result<impl Responder, ApiError> {
+pub(crate) async fn delete(user: Phantom<User>, currency_id: Path<i32>) -> Result<impl Responder, ApiError> {
     let currency = Currency::find_by_id(currency_id.into_inner()).await?;
     currency.has_permission_or_error(user.get_id(), Permissions::READ_DELETE).await?;
 
@@ -122,7 +122,7 @@ path = "/api/v1/currency/{currency_id}",
 request_body = CurrencyDTO,
 tag = "Currency")]
 #[patch("/{currency_id}")]
-pub async fn update(
+pub(crate) async fn update(
     user: Phantom<User>,
     update: CurrencyDTO,
     currency_id: Path<i32>,
