@@ -1,15 +1,14 @@
 import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:financrr_frontend/data/session_repository.dart';
 import 'package:financrr_frontend/layout/templates/auth_page_template.dart';
-import 'package:financrr_frontend/pages/core/dashboard_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../layout/adaptive_scaffold.dart';
-import '../../router.dart';
 
 class LoginPage extends StatefulWidget {
   final Uri hostUri;
@@ -99,17 +98,15 @@ class LoginPageState extends State<LoginPage> {
       return;
     }
 
-    final RestResponse<Restrr> response =
-    await (RestrrBuilder.login(uri: widget.hostUri, username: username, password: password)
-      ..options = const RestrrOptions(isWeb: kIsWeb))
-        .on<ReadyEvent>(ReadyEvent, (event) => event.api.retrieveAllCurrencies())
-        .create();
-    if (!mounted) return;
-    if (response.hasData) {
-      context.authNotifier.setApi(response.data!);
-      context.pushPath(DashboardPage.pagePath.build());
-    } else {
-      context.showSnackBar(response.error!.name);
+    late Restrr api;
+    try {
+      api = await RestrrBuilder(uri: widget.hostUri, options: const RestrrOptions(isWeb: kIsWeb))
+          .login(username: username, password: password);
+      if (!mounted) return;
+    } on RestrrException catch (e) {
+      context.showSnackBar(e.message ?? 'err');
+      return;
     }
+    SessionService.login(context, api);
   }
 }

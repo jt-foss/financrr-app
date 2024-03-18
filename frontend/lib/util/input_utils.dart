@@ -1,9 +1,14 @@
-import 'package:flutter/cupertino.dart';
-
 class InputValidators {
   const InputValidators._();
 
-  static String? url(BuildContext context, String? value) {
+  static String? nonNull(String fieldName, String? value) {
+    if (value == null || value.isEmpty) {
+      return '$fieldName may not be null!';
+    }
+    return null;
+  }
+
+  static String? url(String? value) {
     if (value == null) {
       return null;
     }

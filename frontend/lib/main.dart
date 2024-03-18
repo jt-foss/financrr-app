@@ -1,12 +1,9 @@
 import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
-import 'package:financrr_frontend/data/host_repository.dart';
 import 'package:financrr_frontend/data/repositories.dart';
-import 'package:financrr_frontend/pages/core/dashboard_page.dart';
 import 'package:financrr_frontend/router.dart';
 import 'package:financrr_frontend/themes.dart';
-import 'package:financrr_frontend/util/input_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,7 +11,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
-import 'package:restrr/restrr.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'data/theme_repository.dart';
@@ -29,10 +25,9 @@ void main() async {
   await Repositories.init(storage, preferences);
   await AppThemeLoader.init();
   final EffectiveThemePreferences themePreferences = await ThemeService.getOrInsertEffective();
+  Logger.root.level = kDebugMode ? Level.ALL : Level.INFO;
   Logger.root.onRecord.listen((record) {
-    if (kDebugMode) {
-      print('${record.level.name}: ${record.time}: ${record.message}');
-    }
+    print('${record.level.name}: ${record.time}: ${record.message}');
   });
   runApp(EasyLocalization(
       supportedLocales: const [Locale('en', 'US'), Locale('de', 'DE')],
@@ -67,21 +62,6 @@ class FinancrrAppState extends State<FinancrrApp> {
     _activeLightTheme = widget.themePreferences.currentLightTheme;
     _activeDarkTheme = widget.themePreferences.currentDarkTheme;
     _themeMode = widget.themePreferences.themeMode;
-    // try to fetch user (user may still be logged in)
-    // TODO: this doesn't seem to work. wait until backend introduces session ids/tokens
-    final String hostUrl = HostService.get().hostUrl;
-    if (hostUrl.isNotEmpty && InputValidators.url(context, hostUrl) == null) {
-      (RestrrBuilder.savedSession(uri: Uri.parse(hostUrl))..options = const RestrrOptions(isWeb: kIsWeb))
-          .on<ReadyEvent>(ReadyEvent, (event) => event.api.retrieveAllCurrencies())
-          .create()
-          .then((response) {
-        if (response.hasData) {
-          context.authNotifier.setApi(response.data);
-          context.pushPath(DashboardPage.pagePath.build());
-        }
-      });
-    }
-
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       systemNavigationBarColor: Colors.transparent,

@@ -5,9 +5,10 @@ import 'package:flutter/material.dart';
 
 import '../../../layout/adaptive_scaffold.dart';
 import '../../../router.dart';
+import '../settings_page.dart';
 
 class ThemeSettingsPage extends StatefulWidget {
-  static const PagePathBuilder pagePath = PagePathBuilder('/@me/settings/theme');
+  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'theme');
 
   const ThemeSettingsPage({super.key});
 
@@ -28,40 +29,36 @@ class _ThemeSettingsPageState extends State<ThemeSettingsPage> {
   }
 
   Widget _buildVerticalLayout(Size size) {
-    return Scaffold(
-        appBar: AppBar(
-          title: const Text('Theme'),
-        ),
-        body: Center(
-          child: SizedBox(
-            width: size.width / 1.1,
-            child: ListView(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: Card.outlined(
-                    child: ListTile(
-                        title: const Text('Use System Theme'),
-                        trailing: Switch(
-                          value: _useSystemTheme,
-                          onChanged: (value) {
-                            FinancrrApp.of(context).changeAppTheme(theme: _selectedTheme, system: value);
-                            setState(() => _useSystemTheme = value);
-                          },
-                        )),
-                  ),
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: Center(
+        child: SizedBox(
+          width: size.width / 1.1,
+          child: ListView(
+            children: [
+              Card(
+                child: ListTile(
+                    title: const Text('Use System Theme'),
+                    trailing: Switch(
+                      value: _useSystemTheme,
+                      onChanged: (value) {
+                        FinancrrApp.of(context).changeAppTheme(theme: _selectedTheme, system: value);
+                        setState(() => _useSystemTheme = value);
+                      },
+                    )),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [for (AppTheme theme in AppTheme.themes) _buildThemePreview(theme)],
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [for (AppTheme theme in AppTheme.themes) _buildThemePreview(theme)],
-                  ),
-                )
-              ],
-            ),
+              )
+            ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   Widget _buildThemePreview(AppTheme theme) {

@@ -72,44 +72,58 @@ class ScaffoldNavBarShellState extends State<ScaffoldNavBarShell> {
         child: isMobile
             ? widget.navigationShell
             : Row(
-          children: [
-            StatefulBuilder(builder: (context, setState) {
-              return MouseRegion(
-                onEnter: (event) => setState(() => _isHovered = true),
-                onExit: (event) => setState(() => _isHovered = false),
-                child: NavigationRail(
-                    destinations: _navRailDestinations,
-                    extended: context.isWidescreen || _isHovered,
-                    onDestinationSelected: (index) => goToBranch(index),
-                    selectedIndex: widget.navigationShell.currentIndex),
-              );
-            }),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: widget.navigationShell,
+                children: [
+                  StatefulBuilder(builder: (context, setState) {
+                    return MouseRegion(
+                      onEnter: (event) => setState(() => _isHovered = true),
+                      onExit: (event) => setState(() => _isHovered = false),
+                      child: NavigationRail(
+                          destinations: _navRailDestinations,
+                          extended: context.isWidescreen || _isHovered,
+                          onDestinationSelected: (index) => goToBranch(index),
+                          selectedIndex: widget.navigationShell.currentIndex),
+                    );
+                  }),
+                  Expanded(
+                    child: widget.navigationShell,
+                  )
+                ],
               ),
-            )
-          ],
-        ),
       ),
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: GestureDetector(
+          onTap: () => resetLocation(index: 0),
+          child: const Text('financrr'),
+        ),
+        centerTitle: isMobile,
+        leading: canPop()
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => context.pop(),
+              )
+            : null,
+      ),
       bottomNavigationBar: isMobile
           ? NavigationBar(
-          onDestinationSelected: (index) => goToBranch(index),
-          selectedIndex: widget.navigationShell.currentIndex,
-          destinations: _navBarDestinations)
+              onDestinationSelected: (index) => goToBranch(index),
+              selectedIndex: widget.navigationShell.currentIndex,
+              destinations: _navBarDestinations)
           : null,
     );
   }
 
+  bool canPop() {
+    final GoRouterState state = GoRouterState.of(context);
+    return (state.fullPath ?? state.matchedLocation).characters.where((p0) => p0 == '/').length >= 3;
+  }
+
   // Resets the current branch. Useful for popping an unknown amount of pages.
-  void resetLocation() {
-    widget.navigationShell.goBranch(widget.navigationShell.currentIndex, initialLocation: true);
+  void resetLocation({int? index}) {
+    widget.navigationShell.goBranch(index ?? widget.navigationShell.currentIndex, initialLocation: true);
   }
 
   /// Jumps to the corresponding [StatefulShellBranch], based on the specified index.
   void goToBranch(int index) {
-    widget.navigationShell.goBranch(index, initialLocation: index != widget.navigationShell.currentIndex);
+    widget.navigationShell.goBranch(index);
   }
 }

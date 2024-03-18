@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:financrr_frontend/main.dart';
 import 'package:financrr_frontend/themes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:restrr/restrr.dart';
 
 extension LayoutExtension on BuildContext {
   bool get isMobile => MediaQuery.of(this).size.width < 550;
@@ -28,5 +31,24 @@ extension ThemeExtension on BuildContext {
 extension SnackBarExtension on BuildContext {
   void showSnackBar(String message, {SnackBarAction? action}) {
     ScaffoldMessenger.of(this).showSnackBar(SnackBar(content: Text(message), action: action));
+  }
+}
+
+extension StreamControllerExtension<T> on StreamController<T> {
+  Future<T?> fetchData(String? id, Future<T?> Function(Id) dataFunction) async {
+    if (id == null) {
+      sink.addError('Encountered null id!');
+      return null;
+    }
+    return _checkData(await dataFunction.call(int.tryParse(id) ?? 0));
+  }
+
+  Future<T?> _checkData(T? data) async {
+    if (data == null) {
+      sink.addError('Could not retrieve Data');
+      return null;
+    }
+    sink.add(data);
+    return data;
   }
 }
