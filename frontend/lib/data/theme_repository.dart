@@ -5,16 +5,16 @@ import '../themes.dart';
 
 class ThemePreferences {
   final ThemeMode themeMode;
-  final int currentLightThemeId;
-  final int currentDarkThemeId;
+  final String currentLightThemeId;
+  final String currentDarkThemeId;
 
   const ThemePreferences(
-      {this.themeMode = ThemeMode.system, this.currentLightThemeId = 1, this.currentDarkThemeId = 2});
+      {this.themeMode = ThemeMode.system, this.currentLightThemeId = "LIGHT", this.currentDarkThemeId = "DARK"});
 
   ThemePreferences copyWith({
     ThemeMode? themeMode,
-    int? currentLightThemeId,
-    int? currentDarkThemeId,
+    String? currentLightThemeId,
+    String? currentDarkThemeId,
   }) {
     return ThemePreferences(
       themeMode: themeMode ?? this.themeMode,
@@ -46,8 +46,8 @@ class ThemeRepository extends Repository<ThemePreferences> {
   ThemePreferences toData(Map<String, Object?> items) {
     return ThemePreferences(
         themeMode: ThemeMode.values.where((t) => t.name == (items[keys[0]] ?? 'system')).first,
-        currentLightThemeId: (items[keys[1]] ?? 1) as int,
-        currentDarkThemeId: (items[keys[2]] ?? 2) as int);
+        currentLightThemeId: (items[keys[1]] ?? "LIGHT") as String,
+        currentDarkThemeId: (items[keys[2]] ?? "DARK") as String);
   }
 }
 
@@ -69,8 +69,8 @@ class ThemeService {
     final ThemePreferences preferences = get();
     return EffectiveThemePreferences(
         themeMode: preferences.themeMode,
-        currentLightTheme: AppThemes.themes.where((t) => t.id == preferences.currentLightThemeId).first,
-        currentDarkTheme: AppThemes.themes.where((t) => t.id == preferences.currentDarkThemeId).first);
+        currentLightTheme: AppTheme.themes.where((t) => t.id == preferences.currentLightThemeId).first,
+        currentDarkTheme: AppTheme.themes.where((t) => t.id == preferences.currentDarkThemeId).first);
   }
 
   static Future<ThemePreferences> setThemePreferences(

@@ -1,36 +1,42 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:easy_localization/easy_localization.dart';
-import 'package:financrr_frontend/data/host_repository.dart';
 import 'package:financrr_frontend/data/repositories.dart';
 import 'package:financrr_frontend/router.dart';
 import 'package:financrr_frontend/themes.dart';
-import 'package:financrr_frontend/util/input_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
-import 'package:restrr/restrr.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'data/theme_repository.dart';
 
 void main() async {
+  usePathUrlStrategy();
   SharedPreferences.setPrefix('financrr.');
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
   final SharedPreferences preferences = await SharedPreferences.getInstance();
   const FlutterSecureStorage storage = FlutterSecureStorage();
   await Repositories.init(storage, preferences);
+  await AppThemeLoader.init();
   final EffectiveThemePreferences themePreferences = await ThemeService.getOrInsertEffective();
-  runApp(
-    EasyLocalization(
-        supportedLocales: const [Locale('en', 'US'), Locale('de', 'DE')],
-        path: 'assets/l10n',
-        fallbackLocale: const Locale('en', 'US'),
-        child: FinancrrApp(themePreferences: themePreferences))
-  );
+  Logger.root.level = kDebugMode ? Level.ALL : Level.INFO;
+  Logger.root.onRecord.listen((record) {
+    if (kDebugMode) {
+      print('${record.level.name}: ${record.time}: ${record.message}');
+    }
+  });
+  runApp(EasyLocalization(
+      supportedLocales: const [Locale('en', 'US'), Locale('de', 'DE')],
+      path: 'assets/l10n',
+      fallbackLocale: const Locale('en', 'US'),
+      child: FinancrrApp(themePreferences: themePreferences)));
 }
 
 class FinancrrApp extends StatefulWidget {
@@ -45,8 +51,8 @@ class FinancrrApp extends StatefulWidget {
 }
 
 class FinancrrAppState extends State<FinancrrApp> {
-  AppTheme _activeLightTheme = AppThemes.light();
-  AppTheme _activeDarkTheme = AppThemes.dark();
+  AppTheme _activeLightTheme = AppTheme.getById('LIGHT')!;
+  AppTheme _activeDarkTheme = AppTheme.getById('DARK')!;
   ThemeMode _themeMode = ThemeMode.system;
 
   ThemeMode get themeMode => _themeMode;
@@ -59,18 +65,6 @@ class FinancrrAppState extends State<FinancrrApp> {
     _activeLightTheme = widget.themePreferences.currentLightTheme;
     _activeDarkTheme = widget.themePreferences.currentDarkTheme;
     _themeMode = widget.themePreferences.themeMode;
-    // try to fetch user (user may still be logged in)
-    final String hostUrl = HostService.get().hostUrl;
-    if (hostUrl.isNotEmpty && InputValidators.url(context, hostUrl) == null) {
-      (RestrrBuilder.savedSession(uri: Uri.parse(hostUrl))..options = const RestrrOptions(isWeb: kIsWeb))
-          .create()
-          .then((response) {
-        if (response.hasData) {
-          context.authNotifier.setApi(response.data);
-        }
-      });
-    }
-
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       systemNavigationBarColor: Colors.transparent,
@@ -85,6 +79,7 @@ class FinancrrAppState extends State<FinancrrApp> {
           onGenerateTitle: (ctx) => 'brand_name'.tr(),
           routerConfig: AppRouter.goRouter,
           debugShowCheckedModeBanner: false,
+          scrollBehavior: CustomScrollBehavior(),
           localizationsDelegates: context.localizationDelegates,
           supportedLocales: context.supportedLocales,
           locale: context.locale,
@@ -127,4 +122,15 @@ class CustomHttpOverrides extends HttpOverrides {
     return super.createHttpClient(context)
       ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
   }
+}
+
+class CustomScrollBehavior extends MaterialScrollBehavior {
+  // Override behavior methods and getters like dragDevices
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+        PointerDeviceKind.stylus,
+        PointerDeviceKind.trackpad,
+      };
 }

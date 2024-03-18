@@ -25,7 +25,7 @@ pub struct Currency {
     pub id: i32,
     pub name: String,
     pub symbol: String,
-    pub iso_code: String,
+    pub iso_code: Option<String>,
     pub decimal_places: i32,
     pub user: Option<Phantom<User>>,
 }
@@ -101,6 +101,21 @@ impl Currency {
             .into_iter()
             .map(Self::from)
             .collect())
+    }
+
+    pub async fn find_all_with_no_user_and_user_paginated(
+        user_id: i32,
+        page_size: &PageSizeParam,
+    ) -> Result<Vec<Self>, ApiError> {
+        Ok(find_all_paginated(currency::Entity::find_all_with_no_user_and_user(user_id), page_size)
+            .await?
+            .into_iter()
+            .map(Self::from)
+            .collect())
+    }
+
+    pub async fn count_all_with_no_user_and_user(user_id: i32) -> Result<u64, ApiError> {
+        count(currency::Entity::count_all_with_no_user_and_user(user_id)).await
     }
 
     pub async fn count_all_with_user(user_id: i32) -> Result<u64, ApiError> {

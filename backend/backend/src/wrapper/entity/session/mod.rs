@@ -35,7 +35,9 @@ pub struct Session {
     pub token: String,
     pub name: Option<String>,
     #[serde(with = "time::serde::rfc3339")]
-    pub expired_at: OffsetDateTime,
+    pub expires_at: OffsetDateTime,
+    #[serde(with = "time::serde::rfc3339")]
+    pub created_at: OffsetDateTime,
     pub user: User,
 }
 
@@ -69,14 +71,14 @@ impl Session {
     }
 
     async fn insert_into_redis(&self) -> Result<(), ApiError> {
-        set_ex(self.token.to_owned(), self.user.id.to_string(), self.expired_at.unix_timestamp() as u64).await?;
-        zadd("sessions".to_owned(), self.token.to_owned(), self.expired_at.unix_timestamp() as f64).await?;
+        set_ex(self.token.to_owned(), self.user.id.to_string(), self.expires_at.unix_timestamp() as u64).await?;
+        zadd("sessions".to_owned(), self.token.to_owned(), self.expires_at.unix_timestamp() as f64).await?;
 
         Ok(())
     }
 
     pub async fn renew(mut self) -> Result<Self, ApiError> {
-        self.expired_at = get_now().add(TimeDuration::hours(Config::get_config().session.lifetime_hours as i64));
+        self.expires_at = get_now().add(TimeDuration::hours(Config::get_config().session.lifetime_hours as i64));
         self.insert_into_redis().await?;
 
         let active_model = session::ActiveModel {
@@ -217,7 +219,7 @@ impl Session {
 
     async fn schedule_deletion(self) -> Result<(), ApiError> {
         let now = get_now().unix_timestamp();
-        let expiration_timestamp = self.expired_at.unix_timestamp();
+        let expiration_timestamp = self.expires_at.unix_timestamp();
         let delay = expiration_timestamp - now;
         if delay > 0 {
             Self::schedule_deletion_task(self.token.to_owned(), delay as u64);
@@ -244,7 +246,8 @@ impl Session {
             name: model.name,
             token: model.token,
             user,
-            expired_at: model.created_at.add(TimeDuration::hours(Config::get_config().session.lifetime_hours as i64)),
+            expires_at: model.created_at.add(TimeDuration::hours(Config::get_config().session.lifetime_hours as i64)),
+            created_at: model.created_at
         })
     }
 

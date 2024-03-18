@@ -35,7 +35,7 @@ class ServerInfoPageState extends State<ServerInfoPage> {
   void initState() {
     super.initState();
     final String hostUrl = HostService.get().hostUrl;
-    if (hostUrl.isNotEmpty && InputValidators.url(context, hostUrl) == null) {
+    if (hostUrl.isNotEmpty && InputValidators.url(hostUrl) == null) {
       _urlController.text = hostUrl;
       _handleUrlCheck();
     }
@@ -64,7 +64,7 @@ class ServerInfoPageState extends State<ServerInfoPage> {
                     controller: _urlController,
                     decoration: const InputDecoration(labelText: 'Server URL'),
                     autofillHints: const [AutofillHints.username],
-                    validator: (value) => InputValidators.url(context, value),
+                    validator: (value) => InputValidators.url(value),
                     onChanged: (_) => setState(() {
                       _isValid = false;
                       _apiVersion = null;
@@ -100,7 +100,7 @@ class ServerInfoPageState extends State<ServerInfoPage> {
 
   Future<void> _handleUrlCheck() async {
     final String url = _urlController.text;
-    if (InputValidators.url(context, url) != null) {
+    if (InputValidators.url(url) != null) {
       context.showSnackBar('Please provide a valid URL');
       return;
     }
@@ -108,18 +108,20 @@ class ServerInfoPageState extends State<ServerInfoPage> {
       _isLoading = true;
       _isValid = false;
     });
-    final RestResponse<HealthResponse> response = await Restrr.checkUri(Uri.parse(url), isWeb: kIsWeb);
-    setState(() => _isLoading = false);
-    if (!mounted) return;
-    if (response.hasData) {
-      setState(() {
-        _isValid = true;
-        _apiVersion = response.data!.apiVersion;
-      });
-      _hostUri = Uri.parse(url);
-      HostService.setHostPreferences(url);
-    } else {
-      context.showSnackBar('Invalid URL');
+    late final ServerInfo info;
+    try {
+      info = await Restrr.checkUri(Uri.parse(url), isWeb: kIsWeb);
+    } on RestrrException catch (e) {
+      setState(() => _isLoading = false);
+      context.showSnackBar(e.message ?? 'err');
+      return;
     }
+    setState(() {
+      _isLoading = false;
+      _isValid = true;
+      _apiVersion = info.apiVersion;
+    });
+    _hostUri = Uri.parse(url);
+    HostService.setHostPreferences(url);
   }
 }
