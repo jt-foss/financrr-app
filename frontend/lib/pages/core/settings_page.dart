@@ -1,5 +1,6 @@
 import 'package:financrr_frontend/data/session_repository.dart';
 import 'package:financrr_frontend/pages/core/settings/currency_settings_page.dart';
+import 'package:financrr_frontend/pages/core/settings/session_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings/theme_settings_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
@@ -36,26 +37,33 @@ class _SettingsPageState extends State<SettingsPage> {
     Card(
       child: ListTile(
         onTap: () => context.goPath(CurrencySettingsPage.pagePath.build()),
-        leading: const Icon(Icons.currency_exchange),
-        title: const Text('Currency'),
+        leading: const Icon(Icons.currency_exchange_rounded),
+        title: const Text('Currencies'),
       ),
     ),
     Card(
       child: ListTile(
         onTap: () => context.goPath(ThemeSettingsPage.pagePath.build()),
-        leading: const Icon(Icons.brightness_4_outlined),
-        title: const Text('Theme'),
+        leading: const Icon(Icons.brightness_4_rounded),
+        title: const Text('Themes'),
+      ),
+    ),
+    Card(
+      child: ListTile(
+        onTap: () => context.goPath(SessionSettingsPage.pagePath.build()),
+        leading: const Icon(Icons.devices_rounded),
+        title: const Text('Sessions'),
       ),
     ),
     const Card(
       child: ListTile(
-        leading: Icon(Icons.language),
+        leading: Icon(Icons.language_rounded),
         title: Text('Language'),
       ),
     ),
     const Card(
       child: ListTile(
-        leading: Icon(Icons.format_align_left),
+        leading: Icon(Icons.format_align_left_rounded),
         title: Text('Logs'),
       ),
     ),

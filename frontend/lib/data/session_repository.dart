@@ -42,8 +42,11 @@ class SessionService {
     await Repositories.sessionRepository.write(api.session.token);
   }
 
-  static Future<bool> logout(BuildContext context, Restrr api) async {
-    final bool success = await api.deleteCurrentSession();
+  static Future<bool> logout(BuildContext context, Restrr api, {bool skipDeleteCurrent = false}) async {
+    bool success = skipDeleteCurrent;
+    if (!skipDeleteCurrent) {
+      success = await api.session.delete();
+    }
     if (success) {
       context.authNotifier.setApi(null);
       context.pushPath(ServerInfoPage.pagePath.build());

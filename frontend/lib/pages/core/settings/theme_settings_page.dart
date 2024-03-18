@@ -8,7 +8,7 @@ import '../../../router.dart';
 import '../settings_page.dart';
 
 class ThemeSettingsPage extends StatefulWidget {
-  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'theme');
+  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'themes');
 
   const ThemeSettingsPage({super.key});
 

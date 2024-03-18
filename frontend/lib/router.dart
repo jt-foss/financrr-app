@@ -5,6 +5,7 @@ import 'package:financrr_frontend/pages/context_navigator.dart';
 import 'package:financrr_frontend/pages/core/settings/currency/currency_create_page.dart';
 import 'package:financrr_frontend/pages/core/settings/currency/currency_edit_page.dart';
 import 'package:financrr_frontend/pages/core/settings/currency_settings_page.dart';
+import 'package:financrr_frontend/pages/core/settings/session_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings/theme_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings_page.dart';
 import 'package:financrr_frontend/pages/core/dashboard_page.dart';
@@ -72,7 +73,11 @@ class AppRouter {
                               pageBuilder: (context, state) => _buildDefaultPageTransition(context, state,
                                   CurrencyEditPage(currencyId: state.uri.queryParameters['currencyId'])),
                               redirect: coreAuthGuard)
-                        ])
+                        ]),
+                    GoRoute(
+                        path: SessionSettingsPage.pagePath.path,
+                        pageBuilder: _defaultBranchPageBuilder(const SessionSettingsPage()),
+                        redirect: coreAuthGuard),
                   ]),
             ]),
           ]),

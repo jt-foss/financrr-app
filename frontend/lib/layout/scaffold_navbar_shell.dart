@@ -18,22 +18,22 @@ class ScaffoldNavBarShellState extends State<ScaffoldNavBarShell> {
   static const List<NavigationDestination> _navBarDestinations = [
     NavigationDestination(
       icon: Icon(Icons.dashboard_outlined),
-      selectedIcon: Icon(Icons.dashboard),
+      selectedIcon: Icon(Icons.dashboard_rounded),
       label: 'Dashboard',
     ),
     NavigationDestination(
       icon: Icon(Icons.account_balance_wallet_outlined),
-      selectedIcon: Icon(Icons.account_balance_wallet),
+      selectedIcon: Icon(Icons.account_balance_wallet_rounded),
       label: 'Transactions',
     ),
     NavigationDestination(
       icon: Icon(Icons.leaderboard_outlined),
-      selectedIcon: Icon(Icons.leaderboard),
+      selectedIcon: Icon(Icons.leaderboard_rounded),
       label: 'Statistics',
     ),
     NavigationDestination(
       icon: Icon(Icons.settings_outlined),
-      selectedIcon: Icon(Icons.settings),
+      selectedIcon: Icon(Icons.settings_rounded),
       label: 'Settings',
     ),
   ];
@@ -41,22 +41,22 @@ class ScaffoldNavBarShellState extends State<ScaffoldNavBarShell> {
   static const List<NavigationRailDestination> _navRailDestinations = [
     NavigationRailDestination(
       icon: Icon(Icons.dashboard_outlined),
-      selectedIcon: Icon(Icons.dashboard),
+      selectedIcon: Icon(Icons.dashboard_rounded),
       label: Text('Dashboard'),
     ),
     NavigationRailDestination(
       icon: Icon(Icons.account_balance_wallet_outlined),
-      selectedIcon: Icon(Icons.account_balance_wallet),
+      selectedIcon: Icon(Icons.account_balance_wallet_rounded),
       label: Text('Transactions'),
     ),
     NavigationRailDestination(
       icon: Icon(Icons.leaderboard_outlined),
-      selectedIcon: Icon(Icons.leaderboard),
+      selectedIcon: Icon(Icons.leaderboard_rounded),
       label: Text('Statistics'),
     ),
     NavigationRailDestination(
       icon: Icon(Icons.settings_outlined),
-      selectedIcon: Icon(Icons.settings),
+      selectedIcon: Icon(Icons.settings_rounded),
       label: Text('Settings'),
     ),
   ];

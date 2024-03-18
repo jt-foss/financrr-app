@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:financrr_frontend/data/session_repository.dart';
 import 'package:financrr_frontend/layout/templates/auth_page_template.dart';
 import 'package:financrr_frontend/util/extensions.dart';
+import 'package:financrr_frontend/util/platform_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:restrr/restrr.dart';
@@ -101,7 +102,7 @@ class LoginPageState extends State<LoginPage> {
     late Restrr api;
     try {
       api = await RestrrBuilder(uri: widget.hostUri, options: const RestrrOptions(isWeb: kIsWeb))
-          .login(username: username, password: password);
+          .login(username: username, password: password, sessionName: await PlatformUtils.getPlatformDescription());
       if (!mounted) return;
     } on RestrrException catch (e) {
       context.showSnackBar(e.message ?? 'err');

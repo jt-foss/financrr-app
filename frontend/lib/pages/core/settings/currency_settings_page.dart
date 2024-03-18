@@ -1,5 +1,6 @@
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/widgets/paginated_table.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:restrr/restrr.dart';
 
@@ -10,7 +11,7 @@ import 'currency/currency_create_page.dart';
 import 'currency/currency_edit_page.dart';
 
 class CurrencySettingsPage extends StatefulWidget {
-  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'currency');
+  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'currencies');
 
   const CurrencySettingsPage({super.key});
 
@@ -60,40 +61,42 @@ class _CurrencySettingsPageState extends State<CurrencySettingsPage> {
                 ],
               ),
               const Divider(),
-              PaginatedTable(
-                key: _tableKey,
-                api: _api,
-                initialPageFunction: (api) => api.retrieveAllCurrencies(limit: 10),
-                fillWithEmptyRows: true,
-                width: size.width,
-                columns: const [
-                  DataColumn(label: Text('Symbol')),
-                  DataColumn(label: Text('Name')),
-                  DataColumn(label: Text('ISO')),
-                  DataColumn(label: Text('Actions')),
-                ],
-                rowBuilder: (currency) {
-                  return DataRow(cells: [
-                    DataCell(Text(currency.symbol)),
-                    DataCell(Text(currency.name)),
-                    DataCell(Text(currency.isoCode ?? 'N/A')),
-                    DataCell(Row(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.edit),
-                          onPressed: currency is! CustomCurrency
-                              ? null
-                              : () => context
-                                  .goPath(CurrencyEditPage.pagePath.build(queryParams: {'currencyId': currency.id})),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.delete),
-                          onPressed: currency is! CustomCurrency ? null : () => _deleteCurrency(currency),
-                        ),
-                      ],
-                    )),
-                  ]);
-                },
+              SingleChildScrollView(
+                child: PaginatedTable(
+                  key: _tableKey,
+                  api: _api,
+                  initialPageFunction: (api) => api.retrieveAllCurrencies(limit: 10),
+                  fillWithEmptyRows: true,
+                  width: size.width,
+                  columns: const [
+                    DataColumn(label: Text('Symbol')),
+                    DataColumn(label: Text('Name')),
+                    DataColumn(label: Text('ISO')),
+                    DataColumn(label: Text('Actions')),
+                  ],
+                  rowBuilder: (currency) {
+                    return DataRow(cells: [
+                      DataCell(Text(currency.symbol)),
+                      DataCell(Text(currency.name)),
+                      DataCell(Text(currency.isoCode ?? 'N/A')),
+                      DataCell(Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit),
+                            onPressed: currency is! CustomCurrency
+                                ? null
+                                : () => context
+                                    .goPath(CurrencyEditPage.pagePath.build(queryParams: {'currencyId': currency.id})),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: currency is! CustomCurrency ? null : () => _deleteCurrency(currency),
+                          ),
+                        ],
+                      )),
+                    ]);
+                  },
+                ),
               )
             ],
           ),

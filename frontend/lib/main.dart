@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:financrr_frontend/data/repositories.dart';
@@ -76,6 +77,7 @@ class FinancrrAppState extends State<FinancrrApp> {
           onGenerateTitle: (ctx) => 'brand_name'.tr(),
           routerConfig: AppRouter.goRouter,
           debugShowCheckedModeBanner: false,
+          scrollBehavior: CustomScrollBehavior(),
           localizationsDelegates: context.localizationDelegates,
           supportedLocales: context.supportedLocales,
           locale: context.locale,
@@ -118,4 +120,15 @@ class CustomHttpOverrides extends HttpOverrides {
     return super.createHttpClient(context)
       ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
   }
+}
+
+class CustomScrollBehavior extends MaterialScrollBehavior {
+  // Override behavior methods and getters like dragDevices
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+    PointerDeviceKind.touch,
+    PointerDeviceKind.mouse,
+    PointerDeviceKind.stylus,
+    PointerDeviceKind.trackpad,
+  };
 }
