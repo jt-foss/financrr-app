@@ -1,11 +1,12 @@
 use actix_web::{get, web, HttpResponse, Responder};
 
 use crate::api::status::dto::HealthResponse;
+use crate::config::public::PublicConfig;
 use crate::database::connection::{get_database_connection, get_redis_connection};
 use crate::database::redis::cmd;
 
 pub fn status_controller(cfg: &mut web::ServiceConfig) {
-    cfg.service(web::scope("/status").service(health).service(coffee));
+    cfg.service(web::scope("/status").service(health).service(coffee).service(config));
 }
 
 #[utoipa::path(get,
@@ -55,4 +56,15 @@ async fn is_redis_reachable() -> bool {
     };
 
     cmd(redis::cmd("PING")).await.is_ok()
+}
+
+#[utoipa::path(get,
+responses(
+(status = 200, description = "Config", content_type = "application/json", body = PublicConfig),
+),
+path = "/api/status/config",
+tag = "Status")]
+#[get("/config")]
+pub async fn config() -> impl Responder {
+    HttpResponse::Ok().json(PublicConfig::get())
 }
