@@ -11,7 +11,9 @@ pub struct PublicSession {
     pub user_id: i32,
     pub name: Option<String>,
     #[serde(with = "time::serde::rfc3339")]
-    pub expired_at: OffsetDateTime,
+    pub expires_at: OffsetDateTime,
+    #[serde(with = "time::serde::rfc3339")]
+    pub created_at: OffsetDateTime,
     pub user: User,
 }
 
@@ -21,7 +23,8 @@ impl From<Session> for PublicSession {
             id: value.id,
             user_id: value.user.id,
             name: value.name,
-            expired_at: value.expired_at,
+            expires_at: value.expires_at,
+            created_at: value.created_at,
             user: value.user,
         }
     }
