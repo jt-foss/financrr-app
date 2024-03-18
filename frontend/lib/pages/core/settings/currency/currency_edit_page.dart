@@ -4,9 +4,7 @@ import 'dart:math';
 import 'package:financrr_frontend/pages/core/settings/currency/currency_create_page.dart';
 import 'package:financrr_frontend/pages/core/settings/currency_settings_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
-import 'package:financrr_frontend/util/input_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:restrr/restrr.dart';
 
@@ -122,18 +120,22 @@ class _CurrencyEditPageState extends State<CurrencyEditPage> {
                 if (!_isCustom)
                   Padding(
                     padding: const EdgeInsets.only(top: 10),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // TODO: Wrap text
-                        const Icon(Icons.warning),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 5),
-                          child: Text('This currency is not custom and can therefore not be edited!',
-                              style: context.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700)),
-                        ),
-                      ],
+                    child: SizedBox(
+                      width: size.width,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.warning_amber_rounded),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 10),
+                              child: Text('This currency is not custom and can therefore not be edited!',
+                                  style: context.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700)),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   )
               ],
