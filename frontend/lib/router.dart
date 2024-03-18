@@ -1,6 +1,13 @@
 import 'package:financrr_frontend/layout/scaffold_navbar_shell.dart';
 import 'package:financrr_frontend/pages/auth/login_page.dart';
 import 'package:financrr_frontend/pages/auth/server_info_page.dart';
+import 'package:financrr_frontend/pages/context_navigator.dart';
+import 'package:financrr_frontend/pages/core/settings/currency/currency_create_page.dart';
+import 'package:financrr_frontend/pages/core/settings/currency/currency_edit_page.dart';
+import 'package:financrr_frontend/pages/core/settings/currency_settings_page.dart';
+import 'package:financrr_frontend/pages/core/settings/session_settings_page.dart';
+import 'package:financrr_frontend/pages/core/settings/theme_settings_page.dart';
+import 'package:financrr_frontend/pages/core/settings_page.dart';
 import 'package:financrr_frontend/pages/core/dashboard_page.dart';
 import 'package:financrr_frontend/pages/core/dummy_page.dart';
 import 'package:financrr_frontend/util/constants.dart';
@@ -16,10 +23,10 @@ class AppRouter {
   static final GlobalKey<NavigatorState> shellNavigatorKey = GlobalKey(debugLabel: 'shell');
 
   static final goRouter = GoRouter(
+    initialLocation: '/',
     navigatorKey: rootNavigatorKey,
     routes: [
       ..._noShellRoutes(),
-      GoRoute(path: '/', redirect: (_, __) => '/@me/dashboard'),
       GoRoute(path: '/@me', redirect: (_, __) => '/@me/dashboard'),
       StatefulShellRoute.indexedStack(
           builder: (context, state, shell) => ScaffoldNavBarShell(navigationShell: shell),
@@ -32,21 +39,46 @@ class AppRouter {
             ]),
             StatefulShellBranch(routes: [
               GoRoute(
-                  path: '/@me/a',
+                  path: '/@me/accounts',
                   pageBuilder: _defaultBranchPageBuilder(const DummyPage(text: 'A')),
                   redirect: coreAuthGuard),
             ]),
             StatefulShellBranch(routes: [
               GoRoute(
-                  path: '/@me/b',
+                  path: '/@me/statistics',
                   pageBuilder: _defaultBranchPageBuilder(const DummyPage(text: 'B')),
                   redirect: coreAuthGuard),
             ]),
             StatefulShellBranch(routes: [
               GoRoute(
-                  path: '/@me/c',
-                  pageBuilder: _defaultBranchPageBuilder(const DummyPage(text: 'C')),
-                  redirect: coreAuthGuard),
+                  path: SettingsPage.pagePath.path,
+                  pageBuilder: _defaultBranchPageBuilder(const SettingsPage()),
+                  redirect: coreAuthGuard,
+                  routes: [
+                    GoRoute(
+                        path: ThemeSettingsPage.pagePath.path,
+                        pageBuilder: _defaultBranchPageBuilder(const ThemeSettingsPage()),
+                        redirect: coreAuthGuard),
+                    GoRoute(
+                        path: CurrencySettingsPage.pagePath.path,
+                        pageBuilder: _defaultBranchPageBuilder(const CurrencySettingsPage()),
+                        redirect: coreAuthGuard,
+                        routes: [
+                          GoRoute(
+                              path: CurrencyCreatePage.pagePath.path,
+                              pageBuilder: _defaultBranchPageBuilder(const CurrencyCreatePage()),
+                              redirect: coreAuthGuard),
+                          GoRoute(
+                              path: CurrencyEditPage.pagePath.path,
+                              pageBuilder: (context, state) => _buildDefaultPageTransition(context, state,
+                                  CurrencyEditPage(currencyId: state.uri.queryParameters['currencyId'])),
+                              redirect: coreAuthGuard)
+                        ]),
+                    GoRoute(
+                        path: SessionSettingsPage.pagePath.path,
+                        pageBuilder: _defaultBranchPageBuilder(const SessionSettingsPage()),
+                        redirect: coreAuthGuard),
+                  ]),
             ]),
           ]),
     ],
@@ -55,7 +87,10 @@ class AppRouter {
   static List<GoRoute> _noShellRoutes() {
     return [
       GoRoute(
-          name: 'financrr — Login',
+        path: ContextNavigatorPage.pagePath.path,
+        pageBuilder: (context, state) => _buildDefaultPageTransition(context, state, const ContextNavigatorPage()),
+      ),
+      GoRoute(
           path: ServerInfoPage.pagePath.path,
           pageBuilder: (context, state) =>
               _buildDefaultPageTransition(context, state, ServerInfoPage(key: GlobalKeys.loginPage)),
@@ -71,22 +106,22 @@ class AppRouter {
   /// Checks whether the current user is authenticated. If not, this will redirect to the [LoginPage], including
   /// the `redirectTo` queryParam for the page the user was initially going to visit
   static String? coreAuthGuard(BuildContext context, GoRouterState state) {
-    return context.authNotifier.isAuthenticated ? null : ServerInfoPage.pagePath.build().fullPath;
+    return context.authNotifier.isAuthenticated ? null : ContextNavigatorPage.pagePath.build().fullPath;
   }
 
   static Page<T> _buildDefaultPageTransition<T>(BuildContext context, GoRouterState state, Widget child) {
-    return CupertinoPage(child: child);
+    return CustomTransitionPage(
+        child: child,
+        transitionsBuilder: (context, animation, _, child) {
+          return FadeTransition(
+            opacity: CurveTween(curve: Curves.easeInOut).animate(animation),
+            child: child,
+          );
+        });
   }
 
   static Page<T> Function(BuildContext, GoRouterState) _defaultBranchPageBuilder<T>(Widget child) =>
-      (context, state) => CustomTransitionPage(
-          child: child,
-          transitionsBuilder: (context, animation, _, child) {
-            return FadeTransition(
-              opacity: CurveTween(curve: Curves.easeInOut).animate(animation),
-              child: child,
-            );
-          });
+      (context, state) => _buildDefaultPageTransition(context, state, child);
 }
 
 class PagePathBuilder {
@@ -98,7 +133,7 @@ class PagePathBuilder {
   const PagePathBuilder.child({required this.parent, required this.path});
 
   PagePath build({Map<String, String>? pathParams, Map<String, dynamic>? queryParams}) {
-    String compiled = parent == null ? path : '${parent!.build(queryParams: queryParams).fullPath}/$path';
+    String compiled = parent == null ? path : '${parent!.build().fullPath}/$path';
     if (pathParams == null && queryParams == null) {
       return PagePath._(compiled);
     }
@@ -145,26 +180,14 @@ extension BuildContextExtension on BuildContext {
   /// Provides the [AuthenticationNotifier] using [BuildContext.read].
   AuthenticationNotifier get authNotifier => read<AuthenticationNotifier>();
 
-  /// Provides a nullable instance of [DURA], being only null if the user __is not__ logged in.
+  /// Provides a nullable instance of [Restrr], being only null if the user **is not** logged in.
   Restrr? get api => authNotifier.api;
 
   void goPath(PagePath path, {Object? extra}) {
-    //if (_isCurrentPath(path)) {
-    // TODO: Reimplement this
-    //  GlobalKeys.navBarKey.currentState?.shake();
-    //  return;
-    //}
     go(path.fullPath, extra: extra);
   }
 
   Future<T?> pushPath<T extends Object?>(PagePath path, {Object? extra}) {
-    //if (_isCurrentPath(path)) {
-    // TODO: Reimplement this
-    //  GlobalKeys.navBarKey.currentState?.shake();
-    //  return Future.value(null);
-    //}
     return push(path.fullPath, extra: extra);
   }
-
-// bool _isCurrentPath(PagePath path) => GoRouterState.of(this).location == path.fullPath;
 }

@@ -1,0 +1,289 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "definitions": {
+        "color": {
+            "anyOf": [
+                {
+                    "type": "string",
+                    "description": "The color's hex code"
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "hex": {
+                            "type": "string",
+                            "description": "The color's hex code"
+                        },
+                        "copy_from_path": {
+                            "type": "string",
+                            "format": "json-pointer",
+                            "description": "The path to the color to copy"
+                        },
+                        "opacity": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1,
+                            "default": 1,
+                            "description": "The opacity of the color"
+                        }
+                    }
+                }
+            ]
+        }
+    },
+    "title": "Financrr App Theme",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "string",
+            "pattern": "^[A-Z]+$",
+            "description": "A unique identifier for the theme"
+        },
+        "logo_path": {
+            "type": "string",
+            "description": "The path to the logo image"
+        },
+        "preview_color": {
+            "$ref": "#/definitions/color",
+            "description": "The color to use for the preview"
+        },
+        "theme_mode": {
+            "type": "string",
+            "enum": [
+                "light",
+                "dark"
+            ],
+            "description": "The theme mode"
+        },
+        "theme_data": {
+            "type": "object",
+            "properties": {
+                "brightness": {
+                    "type": "string",
+                    "enum": [
+                        "light",
+                        "dark"
+                    ],
+                    "description": "The theme's brightness"
+                },
+                "primary_color": {
+                    "anyOf": [
+                        {
+                            "type": "string",
+                            "description": "The color's hex code"
+                        },
+                        {
+                            "type": "object",
+                            "properties": {
+                                "hex": {
+                                    "type": "string",
+                                    "description": "The color's hex code"
+                                },
+                                "copy_from_path": {
+                                    "type": "string",
+                                    "description": "The path to the color to copy"
+                                },
+                                "opacity": {
+                                    "type": "number",
+                                    "minimum": 0,
+                                    "maximum": 1,
+                                    "default": 1,
+                                    "description": "The opacity of the color"
+                                }
+                            }
+                        }
+                    ],
+                    "description": "The primary color's hex code"
+                },
+                "background_color": {
+                    "$ref": "#/definitions/color",
+                    "description": "The background color's hex code"
+                },
+                "secondary_background_color": {
+                    "$ref": "#/definitions/color",
+                    "description": "The secondary background color's hex code"
+                },
+                "hint_color": {
+                    "$ref": "#/definitions/color",
+                    "description": "The hint color's hex code"
+                },
+                "card_color": {
+                    "$ref": "#/definitions/color",
+                    "description": "The card color's hex code"
+                },
+                "app_bar_theme_data": {
+                    "type": "object",
+                    "required": [
+                        "foreground_color",
+                        "title_color",
+                        "background_color"
+                    ],
+                    "properties": {
+                        "foreground_color": {
+                            "$ref": "#/definitions/color",
+                            "description": "The app bar's foreground color's hex code"
+                        },
+                        "title_color": {
+                            "$ref": "#/definitions/color",
+                            "description": "The app bar's title color's hex code"
+                        },
+                        "background_color": {
+                            "$ref": "#/definitions/color",
+                            "description": "The app bar's background color's hex code"
+                        }
+                    }
+                },
+                "navigation_bar_theme_data": {
+                    "type": "object",
+                    "required": [
+                        "indicator_color",
+                        "icon_color",
+                        "background_color",
+                        "label_color"
+                    ],
+                    "properties": {
+                        "indicator_color": {
+                            "$ref": "#/definitions/color",
+                            "description": "The navigation bar's indicator color's hex code"
+                        },
+                        "icon_color": {
+                            "$ref": "#/definitions/color",
+                            "description": "The navigation bar's icon color's hex code"
+                        },
+                        "background_color": {
+                            "$ref": "#/definitions/color",
+                            "description": "The navigation bar's background color's hex code"
+                        },
+                        "label_color": {
+                            "$ref": "#/definitions/color",
+                            "description": "The navigation bar's label color's hex code"
+                        }
+                    }
+                },
+                "navigation_rail_theme_data": {
+                    "type": "object",
+                    "required": [
+                        "indicator_color",
+                        "selected_icon_color",
+                        "background_color",
+                        "selected_label_color",
+                        "unselected_label_color"
+                    ],
+                    "properties": {
+                        "indicator_color": {
+                            "$ref": "#/definitions/color",
+                            "description": "The navigation rail's indicator color's hex code"
+                        },
+                        "selected_icon_color": {
+                            "$ref": "#/definitions/color",
+                            "description": "The navigation rail's selected icon color's hex code"
+                        },
+                        "background_color": {
+                            "$ref": "#/definitions/color",
+                            "description": "The navigation rail's background color's hex code"
+                        },
+                        "selected_label_color": {
+                            "$ref": "#/definitions/color",
+                            "description": "The navigation rail's selected label color's hex code"
+                        },
+                        "unselected_label_color": {
+                            "$ref": "#/definitions/color",
+                            "description": "The navigation rail's unselected label color's hex code"
+                        }
+                    }
+                },
+                "elevated_button_theme_data": {
+                    "type": "object",
+                    "required": [
+                        "foreground_color",
+                        "background_color"
+                    ],
+                    "properties": {
+                        "foreground_color": {
+                            "$ref": "#/definitions/color",
+                            "description": "The elevated button's foreground color's hex code"
+                        },
+                        "background_color": {
+                            "$ref": "#/definitions/color",
+                            "description": "The elevated button's background color's hex code"
+                        }
+                    }
+                },
+                "text_button_theme_data": {
+                    "type": "object",
+                    "required": [
+                        "foreground_color"
+                    ],
+                    "properties": {
+                        "foreground_color": {
+                            "$ref": "#/definitions/color",
+                            "description": "The elevated button's foreground color's hex code"
+                        }
+                    }
+                },
+                "text_selection_theme": {
+                    "type": "object",
+                    "required": [
+                        "selection_color"
+                    ],
+                    "properties": {
+                        "selection_color": {
+                            "$ref": "#/definitions/color",
+                            "description": "The text selection's color's hex code"
+                        }
+                    }
+                },
+                "switch_theme_data": {
+                    "type": "object",
+                    "required": [
+                        "thumb_color",
+                        "track_color"
+                    ],
+                    "properties": {
+                        "thumb_color": {
+                            "$ref": "#/definitions/color",
+                            "description": "The switch's thumb color's hex code"
+                        },
+                        "track_color": {
+                            "$ref": "#/definitions/color",
+                            "description": "The switch's track color's hex code"
+                        }
+                    }
+                },
+                "snack_bar_theme_data": {
+                    "type": "object",
+                    "required": [
+                        "background_color",
+                        "content_text_color"
+                    ],
+                    "properties": {
+                        "content_text_color": {
+                            "$ref": "#/definitions/color",
+                            "description": "The snack bar's content text color's hex code"
+                        },
+                        "background_color": {
+                            "$ref": "#/definitions/color",
+                            "description": "The snack bar's background color's hex code"
+                        }
+                    }
+                },
+                "drawer_theme_data": {
+                    "type": "object",
+                    "required": [
+                        "background_color"
+                    ],
+                    "properties": {
+                        "background_color": {
+                            "$ref": "#/definitions/color",
+                            "description": "The drawer's background color's hex code"
+                        },
+                        "scrim_color": {
+                            "$ref": "#/definitions/color",
+                            "description": "The drawer's scrim color's hex code"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

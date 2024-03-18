@@ -1,15 +1,15 @@
 import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:financrr_frontend/data/session_repository.dart';
 import 'package:financrr_frontend/layout/templates/auth_page_template.dart';
-import 'package:financrr_frontend/pages/core/dashboard_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
+import 'package:financrr_frontend/util/platform_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../layout/adaptive_scaffold.dart';
-import '../../router.dart';
 
 class LoginPage extends StatefulWidget {
   final Uri hostUri;
@@ -54,7 +54,7 @@ class LoginPageState extends State<LoginPage> {
                         controller: _usernameController,
                         decoration: InputDecoration(labelText: 'common_username'.tr()),
                         autofillHints: const [AutofillHints.username],
-                        validator: (value) => value!.isEmpty ? 'common_username_not_empty' : null,
+                        validator: (value) => value!.isEmpty ? 'common_username_required'.tr() : null,
                       ),
                     ),
                     TextFormField(
@@ -69,7 +69,7 @@ class LoginPageState extends State<LoginPage> {
                           )),
                       obscureText: _obscureText,
                       autofillHints: const [AutofillHints.password, AutofillHints.newPassword],
-                      validator: (value) => value!.isEmpty ? 'common_password_not_empty' : null,
+                      validator: (value) => value!.isEmpty ? 'common_password_required'.tr() : null,
                     ),
                   ],
                 )),
@@ -80,7 +80,7 @@ class LoginPageState extends State<LoginPage> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: _handleLogin,
-                    child: const Text('common.sign_in').tr(),
+                    child: const Text('common_login').tr(),
                   ),
                 )),
           ],
@@ -90,25 +90,24 @@ class LoginPageState extends State<LoginPage> {
   Future<void> _handleLogin() async {
     final String username = _usernameController.text;
     if (username.isEmpty) {
-      context.showSnackBar('common_username_not_empty');
+      context.showSnackBar('common_username_required'.tr());
       return;
     }
     final String password = _passwordController.text;
     if (username.isEmpty) {
-      context.showSnackBar('common_password_not_empty');
+      context.showSnackBar('common_password_required'.tr());
       return;
     }
 
-    final RestResponse<Restrr> response =
-        await (RestrrBuilder.login(uri: widget.hostUri, username: username, password: password)
-              ..options = const RestrrOptions(isWeb: kIsWeb))
-            .create();
-    if (!mounted) return;
-    if (response.hasData) {
-      context.authNotifier.setApi(response.data!);
-      context.pushPath(DashboardPage.pagePath.build());
-    } else {
-      context.showSnackBar(response.error!.name);
+    late Restrr api;
+    try {
+      api = await RestrrBuilder(uri: widget.hostUri, options: const RestrrOptions(isWeb: kIsWeb))
+          .login(username: username, password: password, sessionName: await PlatformUtils.getPlatformDescription());
+      if (!mounted) return;
+    } on RestrrException catch (e) {
+      context.showSnackBar(e.message ?? 'err');
+      return;
     }
+    SessionService.login(context, api);
   }
 }
