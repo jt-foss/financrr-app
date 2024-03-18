@@ -14,5 +14,5 @@ pub fn extract_bearer_token(req: &HttpRequest) -> Result<String, ApiError> {
                 None
             }
         })
-        .ok_or(ApiError::no_token_provided())
+        .ok_or(ApiError::NoTOkenProvided())
 }

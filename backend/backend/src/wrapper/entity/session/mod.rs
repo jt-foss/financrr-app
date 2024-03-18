@@ -3,7 +3,7 @@ use std::ops::Add;
 use actix_web::dev::Payload;
 use actix_web::{FromRequest, HttpRequest};
 use futures_util::future::{join_all, LocalBoxFuture};
-use sea_orm::{EntityTrait, Set};
+use sea_orm::{EntityName, EntityTrait, Set};
 use serde::{Deserialize, Serialize};
 use time::Duration as TimeDuration;
 use time::OffsetDateTime;
@@ -22,8 +22,9 @@ use crate::config::Config;
 use crate::database::entity::{count, delete, find_all_paginated, find_one_or_error, insert, update};
 use crate::database::redis::{del, get, set_ex, zadd};
 use crate::util::auth::extract_bearer_token;
-use crate::wrapper::permission::Permission;
-use crate::wrapper::user::User;
+use crate::wrapper::entity::user::User;
+use crate::wrapper::entity::WrapperEntity;
+use crate::wrapper::permission::{HasPermissionOrError, Permission, Permissions};
 use crate::wrapper::util::handle_async_result_vec;
 
 pub mod dto;
@@ -34,7 +35,9 @@ pub struct Session {
     pub token: String,
     pub name: Option<String>,
     #[serde(with = "time::serde::rfc3339")]
-    pub expired_at: OffsetDateTime,
+    pub expires_at: OffsetDateTime,
+    #[serde(with = "time::serde::rfc3339")]
+    pub created_at: OffsetDateTime,
     pub user: User,
 }
 
@@ -43,7 +46,7 @@ impl Session {
         let session_token = Self::generate_session_key();
 
         if Self::reached_session_limit(user.id).await? {
-            return Err(ApiError::session_limit_reached());
+            return Err(ApiError::SessionLimitReached());
         }
 
         // insert into database
@@ -61,18 +64,21 @@ impl Session {
         // insert into redis
         session.insert_into_redis().await?;
 
+        //grant permissions to user
+        session.add_permission(user.id, Permissions::all()).await?;
+
         Ok(session)
     }
 
     async fn insert_into_redis(&self) -> Result<(), ApiError> {
-        set_ex(self.token.to_owned(), self.user.id.to_string(), self.expired_at.unix_timestamp() as u64).await?;
-        zadd("sessions".to_owned(), self.token.to_owned(), self.expired_at.unix_timestamp() as f64).await?;
+        set_ex(self.token.to_owned(), self.user.id.to_string(), self.expires_at.unix_timestamp() as u64).await?;
+        zadd("sessions".to_owned(), self.token.to_owned(), self.expires_at.unix_timestamp() as f64).await?;
 
         Ok(())
     }
 
     pub async fn renew(mut self) -> Result<Self, ApiError> {
-        self.expired_at = get_now().add(TimeDuration::hours(Config::get_config().session_lifetime_hours as i64));
+        self.expires_at = get_now().add(TimeDuration::hours(Config::get_config().session_lifetime_hours as i64));
         self.insert_into_redis().await?;
 
         let active_model = session::ActiveModel {
@@ -90,7 +96,7 @@ impl Session {
     pub async fn get_user_id(token: String) -> Result<i32, ApiError> {
         let user_id = Self::get_user_id_from_redis(token.to_owned()).await?;
         if user_id.is_none() {
-            return Err(ApiError::invalid_session());
+            return Err(ApiError::InvalidSession());
         }
 
         Ok(user_id.unwrap())
@@ -100,7 +106,7 @@ impl Session {
         let user_id = get(token.to_owned()).await?;
 
         match user_id.parse::<i32>() {
-            Err(_) => Err(ApiError::invalid_session()),
+            Err(_) => Err(ApiError::InvalidSession()),
             Ok(id) => Ok(Some(id)),
         }
     }
@@ -213,7 +219,7 @@ impl Session {
 
     async fn schedule_deletion(self) -> Result<(), ApiError> {
         let now = get_now().unix_timestamp();
-        let expiration_timestamp = self.expired_at.unix_timestamp();
+        let expiration_timestamp = self.expires_at.unix_timestamp();
         let delay = expiration_timestamp - now;
         if delay > 0 {
             Self::schedule_deletion_task(self.token.to_owned(), delay as u64);
@@ -240,7 +246,8 @@ impl Session {
             name: model.name,
             token: model.token,
             user,
-            expired_at: model.created_at.add(TimeDuration::hours(Config::get_config().session_lifetime_hours as i64)),
+            expires_at: model.created_at.add(TimeDuration::hours(Config::get_config().session_lifetime_hours as i64)),
+            created_at: model.created_at,
         })
     }
 
@@ -249,19 +256,19 @@ impl Session {
     }
 }
 
-impl Permission for Session {
-    async fn has_access(&self, user_id: i32) -> Result<bool, ApiError> {
-        if self.user.id == user_id {
-            return Ok(true);
-        }
-
-        Ok(false)
+impl WrapperEntity for Session {
+    fn get_id(&self) -> i32 {
+        self.id
     }
 
-    async fn can_delete(&self, user_id: i32) -> Result<bool, ApiError> {
-        self.has_access(user_id).await
+    fn table_name(&self) -> String {
+        session::Entity.table_name().to_string()
     }
 }
+
+impl Permission for Session {}
+
+impl HasPermissionOrError for Session {}
 
 impl FromRequest for Session {
     type Error = ApiError;

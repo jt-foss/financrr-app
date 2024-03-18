@@ -9,10 +9,10 @@ use validator::Validate;
 
 use crate::api::error::api::ApiError;
 use crate::api::error::validation::ValidationError;
-use crate::wrapper::account::Account;
-use crate::wrapper::budget::Budget;
-use crate::wrapper::currency::Currency;
-use crate::wrapper::transaction::check_account_access;
+use crate::wrapper::entity::account::Account;
+use crate::wrapper::entity::budget::Budget;
+use crate::wrapper::entity::currency::Currency;
+use crate::wrapper::permission::{Permission, Permissions};
 use crate::wrapper::types::phantom::Phantom;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Validate, ToSchema)]
@@ -29,7 +29,23 @@ pub struct TransactionDTO {
 
 impl TransactionDTO {
     pub async fn check_account_access(&self, user_id: i32) -> Result<bool, ApiError> {
-        check_account_access(user_id, &self.source, &self.destination).await
+        match (&self.source, &self.destination) {
+            (Some(source), Some(destination)) => {
+                let source_permissions = source.has_permission(user_id, Permissions::READ_WRITE).await?;
+                let destination_permissions = destination.has_permission(user_id, Permissions::READ_WRITE).await?;
+
+                Ok(source_permissions && destination_permissions)
+            }
+            (Some(source), None) => {
+                let source_permissions = source.has_permission(user_id, Permissions::READ_WRITE).await?;
+                Ok(source_permissions)
+            }
+            (None, Some(destination)) => {
+                let destination_permissions = destination.has_permission(user_id, Permissions::READ_WRITE).await?;
+                Ok(destination_permissions)
+            }
+            (None, None) => Ok(false),
+        }
     }
 
     async fn validate(&self) -> Result<(), ApiError> {

@@ -18,12 +18,21 @@ CREATE TABLE IF NOT EXISTS session
     created_at timestamp with time zone                                           NOT NULL DEFAULT current_timestamp
 );
 
+CREATE TABLE IF NOT EXISTS permissions
+(
+    user_id     INTEGER REFERENCES "user" (id) ON UPDATE CASCADE ON DELETE CASCADE NOT NULL,
+    entity_type TEXT                                                               NOT NULL,
+    entity_id   INTEGER                                                            NOT NULL,
+    permissions INTEGER                                                            NOT NULL,
+    PRIMARY KEY (user_id, entity_type, entity_id)
+);
+
 CREATE TABLE IF NOT EXISTS currency
 (
     id             SERIAL PRIMARY KEY,
     name           TEXT    NOT NULL,
     symbol         TEXT    NOT NULL,
-    iso_code       TEXT    NOT NULL,
+    iso_code TEXT,
     decimal_places INTEGER NOT NULL,
     "user"         INTEGER REFERENCES "user" (id) ON UPDATE CASCADE ON DELETE CASCADE
 );
@@ -38,13 +47,6 @@ CREATE TABLE IF NOT EXISTS account
     original_balance BIGINT                           NOT NULL DEFAULT 0,
     currency         INTEGER REFERENCES Currency (id) NOT NULL,
     created_at       timestamp with time zone         NOT NULL DEFAULT current_timestamp
-);
-
-CREATE TABLE IF NOT EXISTS user_account
-(
-    user_id    INTEGER REFERENCES "user" (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    account_id INTEGER REFERENCES Account (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    PRIMARY KEY (user_id, account_id)
 );
 
 CREATE TABLE IF NOT EXISTS budget

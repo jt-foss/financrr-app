@@ -1,5 +1,5 @@
 use sea_orm::ActiveValue::Set;
-use sea_orm::EntityTrait;
+use sea_orm::{EntityName, EntityTrait};
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 use tokio::time::Duration;
@@ -14,11 +14,12 @@ use crate::api::pagination::PageSizeParam;
 use crate::database::entity::{count, delete, find_all, find_all_paginated, find_one_or_error, insert, update};
 use crate::event::transaction::TransactionEvent;
 use crate::event::Event;
-use crate::wrapper::account::Account;
-use crate::wrapper::budget::Budget;
-use crate::wrapper::currency::Currency;
-use crate::wrapper::permission::Permission;
-use crate::wrapper::transaction::dto::TransactionDTO;
+use crate::wrapper::entity::account::Account;
+use crate::wrapper::entity::budget::Budget;
+use crate::wrapper::entity::currency::Currency;
+use crate::wrapper::entity::transaction::dto::TransactionDTO;
+use crate::wrapper::entity::WrapperEntity;
+use crate::wrapper::permission::{HasPermissionOrError, Permission, Permissions};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
 pub mod dto;
@@ -39,7 +40,7 @@ pub struct Transaction {
 }
 
 impl Transaction {
-    pub async fn new(dto: TransactionDTO) -> Result<Self, ApiError> {
+    pub async fn new(dto: TransactionDTO, user_id: i32) -> Result<Self, ApiError> {
         let active_model = transaction::ActiveModel {
             id: Default::default(),
             source: Set(dto.source.map(|source| source.get_id())),
@@ -62,6 +63,9 @@ impl Transaction {
         } else {
             TransactionEvent::fire(TransactionEvent::Create(transaction.clone()));
         }
+
+        //grant permission
+        transaction.add_permission(user_id, Permissions::all()).await?;
 
         Ok(transaction)
     }
@@ -114,15 +118,19 @@ impl Transaction {
     }
 }
 
-impl Permission for Transaction {
-    async fn has_access(&self, user_id: i32) -> Result<bool, ApiError> {
-        check_account_access(user_id, &self.source, &self.destination).await
+impl WrapperEntity for Transaction {
+    fn get_id(&self) -> i32 {
+        self.id
     }
 
-    async fn can_delete(&self, user_id: i32) -> Result<bool, ApiError> {
-        self.has_access(user_id).await
+    fn table_name(&self) -> String {
+        transaction::Entity.table_name().to_string()
     }
 }
+
+impl Permission for Transaction {}
+
+impl HasPermissionOrError for Transaction {}
 
 impl Identifiable for Transaction {
     async fn from_id(id: i32) -> Result<Self, ApiError> {
@@ -143,22 +151,5 @@ impl From<transaction::Model> for Transaction {
             created_at: value.created_at,
             executed_at: value.executed_at,
         }
-    }
-}
-
-pub(super) async fn check_account_access(
-    user_id: i32,
-    source: &Option<Phantom<Account>>,
-    destination: &Option<Phantom<Account>>,
-) -> Result<bool, ApiError> {
-    match (source, destination) {
-        (Some(source), Some(destination)) => {
-            let source_access = source.has_access(user_id).await?;
-            let destination_access = destination.has_access(user_id).await?;
-            Ok(source_access || destination_access)
-        }
-        (Some(source), None) => Ok(source.has_access(user_id).await?),
-        (None, Some(destination)) => Ok(destination.has_access(user_id).await?),
-        (None, None) => Ok(false),
     }
 }

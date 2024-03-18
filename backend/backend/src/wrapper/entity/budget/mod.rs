@@ -1,5 +1,5 @@
 use sea_orm::ActiveValue::Set;
-use sea_orm::EntityTrait;
+use sea_orm::{EntityName, EntityTrait};
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 use utoipa::ToSchema;
@@ -9,10 +9,11 @@ use entity::budget;
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
 use crate::database::entity::{count, delete, find_all, find_all_paginated, find_one_or_error, insert, update};
-use crate::wrapper::budget::dto::BudgetDTO;
-use crate::wrapper::permission::Permission;
+use crate::wrapper::entity::budget::dto::BudgetDTO;
+use crate::wrapper::entity::user::User;
+use crate::wrapper::entity::WrapperEntity;
+use crate::wrapper::permission::{HasPermissionOrError, Permission, Permissions};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
-use crate::wrapper::user::User;
 
 pub mod dto;
 pub mod event_listener;
@@ -29,6 +30,23 @@ pub struct Budget {
 }
 
 impl Budget {
+    pub async fn new(user_id: i32, dto: BudgetDTO) -> Result<Self, ApiError> {
+        let model = budget::ActiveModel {
+            id: Default::default(),
+            user: Set(user_id),
+            amount: Set(dto.amount),
+            name: Set(dto.name),
+            description: Set(dto.description),
+            created_at: Set(dto.created_at),
+        };
+
+        let model = insert(model).await?;
+        let budget = Self::from(model);
+        budget.add_permission(user_id, Permissions::all()).await?;
+
+        Ok(budget)
+    }
+
     pub async fn find_all_by_user(user_id: i32) -> Result<Vec<Self>, ApiError> {
         Ok(find_all(budget::Entity::find_all_by_user_id(user_id)).await?.into_iter().map(Self::from).collect())
     }
@@ -46,19 +64,6 @@ impl Budget {
 
     pub async fn count_all_by_user(user_id: i32) -> Result<u64, ApiError> {
         count(budget::Entity::find_all_by_user_id(user_id)).await
-    }
-
-    pub async fn new(user_id: i32, dto: BudgetDTO) -> Result<Self, ApiError> {
-        let model = budget::ActiveModel {
-            id: Default::default(),
-            user: Set(user_id),
-            amount: Set(dto.amount),
-            name: Set(dto.name),
-            description: Set(dto.description),
-            created_at: Set(dto.created_at),
-        };
-
-        Ok(insert(model).await?.into())
     }
 
     pub async fn delete(self) -> Result<(), ApiError> {
@@ -85,15 +90,19 @@ impl Identifiable for Budget {
     }
 }
 
-impl Permission for Budget {
-    async fn has_access(&self, user_id: i32) -> Result<bool, ApiError> {
-        Ok(self.user.get_id() == user_id)
+impl WrapperEntity for Budget {
+    fn get_id(&self) -> i32 {
+        self.id
     }
 
-    async fn can_delete(&self, user_id: i32) -> Result<bool, ApiError> {
-        self.has_access(user_id).await
+    fn table_name(&self) -> String {
+        budget::Entity.table_name().to_string()
     }
 }
+
+impl Permission for Budget {}
+
+impl HasPermissionOrError for Budget {}
 
 impl From<budget::Model> for Budget {
     fn from(model: budget::Model) -> Self {

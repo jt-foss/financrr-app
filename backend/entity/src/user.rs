@@ -31,10 +31,10 @@ pub enum Relation {
     Budget,
     #[sea_orm(has_many = "super::currency::Entity")]
     Currency,
+    #[sea_orm(has_many = "super::permissions::Entity")]
+    Permissions,
     #[sea_orm(has_many = "super::session::Entity")]
     Session,
-    #[sea_orm(has_many = "super::user_account::Entity")]
-    UserAccount,
 }
 
 impl Related<super::budget::Entity> for Entity {
@@ -49,24 +49,15 @@ impl Related<super::currency::Entity> for Entity {
     }
 }
 
+impl Related<super::permissions::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Permissions.def()
+    }
+}
+
 impl Related<super::session::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::Session.def()
-    }
-}
-
-impl Related<super::user_account::Entity> for Entity {
-    fn to() -> RelationDef {
-        Relation::UserAccount.def()
-    }
-}
-
-impl Related<super::account::Entity> for Entity {
-    fn to() -> RelationDef {
-        super::user_account::Relation::Account.def()
-    }
-    fn via() -> Option<RelationDef> {
-        Some(super::user_account::Relation::User.def().rev())
     }
 }
 
