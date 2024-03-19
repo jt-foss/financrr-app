@@ -5,16 +5,16 @@ use utoipa::ToSchema;
 use entity::utility::time::get_now;
 
 #[derive(Serialize, ToSchema)]
-pub struct HealthResponse {
-    pub healthy: bool,
-    pub api_version: u8,
+pub(crate) struct HealthResponse {
+    pub(crate) healthy: bool,
+    pub(crate) api_version: u8,
     #[serde(with = "time::serde::rfc3339")]
-    pub local_time_now: OffsetDateTime,
-    pub details: Option<String>,
+    pub(crate) local_time_now: OffsetDateTime,
+    pub(crate) details: Option<String>,
 }
 
 impl HealthResponse {
-    pub fn new(healthy: bool, details: Option<String>) -> Self {
+    pub(crate) fn new(healthy: bool, details: Option<String>) -> Self {
         Self {
             healthy,
             api_version: 1,

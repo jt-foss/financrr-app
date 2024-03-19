@@ -2,7 +2,7 @@ use actix_web::HttpRequest;
 
 use crate::api::error::api::ApiError;
 
-pub fn extract_bearer_token(req: &HttpRequest) -> Result<String, ApiError> {
+pub(crate) fn extract_bearer_token(req: &HttpRequest) -> Result<String, ApiError> {
     req.headers()
         .get("Authorization")
         .and_then(|header| header.to_str().ok())

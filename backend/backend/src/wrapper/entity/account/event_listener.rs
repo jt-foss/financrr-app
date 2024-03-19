@@ -5,14 +5,14 @@ use crate::wrapper::entity::account::Account;
 use crate::wrapper::entity::transaction::Transaction;
 
 async fn update_account_balance(account: &Account, amount: i64) -> Result<(), ApiError> {
-    let mut dto = AccountDTO::from(account);
-    dto.balance += amount;
-    account.to_owned().update(dto).await?;
+    let dto = AccountDTO::from(account);
+    let balance = account.balance + amount;
+    account.update_with_balance(dto, balance).await?;
 
     Ok(())
 }
 
-pub fn account_listener() {
+pub(crate) fn account_listener() {
     TransactionEvent::subscribe_created(Box::new(|transaction| Box::pin(transaction_created(transaction))));
     TransactionEvent::subscribe_updated(Box::new(|old_transaction, new_transaction| {
         Box::pin(transaction_updated(old_transaction, new_transaction))

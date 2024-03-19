@@ -8,10 +8,10 @@ use actix_web::middleware::{Compress, DefaultHeaders, NormalizePath, TrailingSla
 use actix_web::web::Data;
 use actix_web::{
     error,
-    middleware::Logger,
     web::{self},
     App, HttpResponse, HttpServer,
 };
+use actix_web_prom::{PrometheusMetrics, PrometheusMetricsBuilder};
 use actix_web_validator::{Error, JsonConfig, PathConfig, QueryConfig};
 use dotenvy::dotenv;
 use redis::Client;
@@ -49,15 +49,16 @@ pub mod scheduling;
 pub mod util;
 pub mod wrapper;
 
-pub static DB: OnceLock<DatabaseConnection> = OnceLock::new();
-pub static REDIS: OnceLock<Client> = OnceLock::new();
-pub static CONFIG: OnceLock<Config> = OnceLock::new();
+pub(crate) static DB: OnceLock<DatabaseConnection> = OnceLock::new();
+pub(crate) static REDIS: OnceLock<Client> = OnceLock::new();
+pub(crate) static CONFIG: OnceLock<Config> = OnceLock::new();
 
 #[utoipauto(paths = "./backend/src")]
 #[derive(OpenApi)]
 #[openapi(
 tags(
 (name = "Status", description = "Endpoints that contain information about the health status of the server."),
+(name = "Metrics", description = "Endpoints for prometheus metrics."),
 (name = "Session", description = "Endpoints for session management."),
 (name = "User", description = "Endpoints for user management."),
 (name = "Account", description = "Endpoints for finance-account management."),
@@ -67,9 +68,9 @@ tags(
 ),
 modifiers(& BearerTokenAddon)
 )]
-pub struct ApiDoc;
+pub(crate) struct ApiDoc;
 
-pub struct BearerTokenAddon;
+pub(crate) struct BearerTokenAddon;
 
 impl Modify for BearerTokenAddon {
     fn modify(&self, openapi: &mut OpenApiStruct) {
@@ -113,24 +114,18 @@ async fn main() -> Result<()> {
     let openapi = ApiDoc::openapi();
 
     info!("\t[*] Initializing rate limiter...");
-    let limiter = Data::new(
-        Limiter::builder(Config::get_config().cache.get_url())
-            .key_by(|req| {
-                Some(req.peer_addr().map(|addr| addr.ip().to_string()).unwrap_or_else(|| "unknown".to_string()))
-            })
-            .limit(Config::get_config().rate_limiter.limit as usize)
-            .period(Duration::from_secs(Config::get_config().rate_limiter.duration_seconds)) // 60 minutes
-            .build()
-            .unwrap(),
-    );
+    let limiter = Data::new(build_rate_limiter());
+
+    info!("\t[*] Initializing prometheus metrics...");
+    let prometheus_metrics = build_prometheus_metrics();
 
     info!("Starting server... Listening on: {}", Config::get_config().address);
 
     HttpServer::new(move || {
         App::new()
-            .wrap(Logger::default())
             .wrap(Compress::default())
             .wrap(build_cors())
+            .wrap(prometheus_metrics.clone())
             .app_data(JsonConfig::default().error_handler(|err, _| handle_validation_error(err)))
             .app_data(QueryConfig::default().error_handler(|err, _| handle_validation_error(err)))
             .app_data(PathConfig::default().error_handler(|err, _| handle_validation_error(err)))
@@ -152,29 +147,6 @@ fn handle_validation_error(err: Error) -> actix_web::Error {
         },
     };
     error::InternalError::from_response(err, HttpResponse::BadRequest().json(json_error)).into()
-}
-
-fn build_cors() -> Cors {
-    let cors_config = &Config::get_config().cors;
-    let mut cors = Cors::default()
-        .allowed_methods(vec!["GET", "POST", "PATCH", "DELETE"])
-        .allowed_headers(vec!["Authorization", "Content-Type", "Accept"])
-        .max_age(3600);
-
-    if cors_config.allow_any_origin {
-        cors = cors.allow_any_origin();
-    } else {
-        cors = cors.allowed_origin_fn(move |origin, _req_head| {
-            cors_config.allowed_origins.iter().any(|allowed_origin| {
-                if allowed_origin == "*" {
-                    return true;
-                }
-                origin == allowed_origin
-            })
-        });
-    }
-
-    cors
 }
 
 fn configure_api(cfg: &mut web::ServiceConfig) {
@@ -201,4 +173,40 @@ fn configure_api_v1(cfg: &mut web::ServiceConfig) {
             .configure(budget_controller)
             .configure(session_controller),
     );
+}
+
+fn build_cors() -> Cors {
+    let cors_config = &Config::get_config().cors;
+    let mut cors = Cors::default()
+        .allowed_methods(vec!["GET", "POST", "PATCH", "DELETE"])
+        .allowed_headers(vec!["Authorization", "Content-Type", "Accept"])
+        .max_age(3600);
+
+    if cors_config.allow_any_origin {
+        cors = cors.allow_any_origin();
+    } else {
+        cors = cors.allowed_origin_fn(move |origin, _req_head| {
+            cors_config.allowed_origins.iter().any(|allowed_origin| {
+                if allowed_origin == "*" {
+                    return true;
+                }
+                origin == allowed_origin
+            })
+        });
+    }
+
+    cors
+}
+
+fn build_rate_limiter() -> Limiter {
+    Limiter::builder(Config::get_config().cache.get_url())
+        .key_by(|req| Some(req.peer_addr().map(|addr| addr.ip().to_string()).unwrap_or_else(|| "unknown".to_string())))
+        .limit(Config::get_config().rate_limiter.limit as usize)
+        .period(Duration::from_secs(Config::get_config().rate_limiter.duration_seconds)) // 60 minutes
+        .build()
+        .unwrap()
+}
+
+fn build_prometheus_metrics() -> PrometheusMetrics {
+    PrometheusMetricsBuilder::new("api").endpoint("/metrics").build().unwrap()
 }

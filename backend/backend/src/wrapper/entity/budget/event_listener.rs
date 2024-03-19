@@ -12,7 +12,7 @@ async fn update_budget_amount(budget: &Budget, amount: i64) -> Result<(), ApiErr
     Ok(())
 }
 
-pub fn budget_listener() {
+pub(crate) fn budget_listener() {
     TransactionEvent::subscribe_created(Box::new(|transaction| Box::pin(transaction_created(transaction))));
     TransactionEvent::subscribe_updated(Box::new(|old_transaction, new_transaction| {
         Box::pin(transaction_updated(old_transaction, new_transaction))

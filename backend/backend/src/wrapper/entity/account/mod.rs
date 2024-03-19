@@ -1,5 +1,5 @@
 use futures_util::future::join_all;
-use sea_orm::{EntityName, EntityTrait, IntoActiveModel, Set};
+use sea_orm::{EntityName, EntityTrait, Set};
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 use utoipa::ToSchema;
@@ -8,8 +8,7 @@ use entity::account;
 use entity::utility::time::get_now;
 
 use crate::api::error::api::ApiError;
-use crate::api::pagination::PageSizeParam;
-use crate::database::entity::{count, delete, find_all, find_all_paginated, find_one_or_error, insert, update};
+use crate::database::entity::{count, delete, find_all, find_one_or_error, insert, update};
 use crate::wrapper::entity::account::dto::AccountDTO;
 use crate::wrapper::entity::currency::Currency;
 use crate::wrapper::entity::WrapperEntity;
@@ -21,27 +20,27 @@ pub mod dto;
 pub mod event_listener;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
-pub struct Account {
-    pub id: i32,
-    pub name: String,
-    pub description: Option<String>,
-    pub iban: Option<String>,
-    pub balance: i64,
-    pub original_balance: i64,
-    pub currency: Phantom<Currency>,
+pub(crate) struct Account {
+    pub(crate) id: i32,
+    pub(crate) name: String,
+    pub(crate) description: Option<String>,
+    pub(crate) iban: Option<String>,
+    pub(crate) balance: i64,
+    pub(crate) original_balance: i64,
+    pub(crate) currency: Phantom<Currency>,
     #[serde(with = "time::serde::rfc3339")]
-    pub created_at: OffsetDateTime,
+    pub(crate) created_at: OffsetDateTime,
 }
 
 impl Account {
-    pub async fn new(dto: AccountDTO, user_id: i32) -> Result<Self, ApiError> {
+    pub(crate) async fn new(dto: AccountDTO, user_id: i32) -> Result<Self, ApiError> {
         let active_model = account::ActiveModel {
             id: Default::default(),
             name: Set(dto.name),
             description: Set(dto.description),
             iban: Set(dto.iban),
-            balance: Set(dto.balance),
-            original_balance: Set(dto.balance),
+            balance: Set(dto.original_balance),
+            original_balance: Set(dto.original_balance),
             currency: Set(dto.currency_id),
             created_at: Set(get_now()),
         };
@@ -53,17 +52,21 @@ impl Account {
         Ok(account)
     }
 
-    pub async fn delete(self) -> Result<(), ApiError> {
+    pub(crate) async fn delete(self) -> Result<(), ApiError> {
         delete(account::Entity::delete_by_id(self.id)).await
     }
 
-    pub async fn update(self, dto: AccountDTO) -> Result<Self, ApiError> {
+    pub(crate) async fn update(&self, dto: AccountDTO) -> Result<Self, ApiError> {
+        self.update_with_balance(dto, self.balance).await
+    }
+
+    pub(crate) async fn update_with_balance(&self, dto: AccountDTO, balance: i64) -> Result<Self, ApiError> {
         let active_model = account::ActiveModel {
             id: Set(self.id),
             name: Set(dto.name),
             description: Set(dto.description),
             iban: Set(dto.iban),
-            balance: Set(dto.balance),
+            balance: Set(balance),
             original_balance: Set(dto.original_balance),
             currency: Set(dto.currency_id),
             created_at: Set(self.created_at),
@@ -73,23 +76,15 @@ impl Account {
         Ok(Self::from(model))
     }
 
-    pub async fn update_balance(&self, new_balance: i64) -> Result<Self, ApiError> {
-        let mut active_model = self.to_model().into_active_model();
-        active_model.balance = Set(new_balance);
-        let model = update(active_model).await?;
-
-        Ok(Self::from(model))
-    }
-
-    pub async fn exists(id: i32) -> Result<bool, ApiError> {
+    pub(crate) async fn exists(id: i32) -> Result<bool, ApiError> {
         Ok(count(account::Entity::find_by_id(id)).await? > 0)
     }
 
-    pub async fn find_by_id(id: i32) -> Result<Self, ApiError> {
+    pub(crate) async fn find_by_id(id: i32) -> Result<Self, ApiError> {
         Ok(Self::from(find_one_or_error(account::Entity::find_by_id(id), "Account").await?))
     }
 
-    pub async fn find_all_by_user(user_id: i32) -> Result<Vec<Self>, ApiError> {
+    pub(crate) async fn find_all_by_user(user_id: i32) -> Result<Vec<Self>, ApiError> {
         let results = join_all(
             find_all(account::Entity::find_all_for_user(&user_id))
                 .await?
@@ -101,34 +96,8 @@ impl Account {
         handle_async_result_vec(results)
     }
 
-    pub async fn find_all_by_user_paginated(user_id: i32, page_size: &PageSizeParam) -> Result<Vec<Self>, ApiError> {
-        let results = join_all(
-            find_all_paginated(account::Entity::find_all_for_user(&user_id), page_size)
-                .await?
-                .into_iter()
-                .map(|model| Self::find_by_id(model.entity_id)),
-        )
-        .await;
-
-        handle_async_result_vec(results)
-    }
-
-    pub async fn count_all_by_user(user_id: i32) -> Result<u64, ApiError> {
+    pub(crate) async fn count_all_by_user(user_id: i32) -> Result<u64, ApiError> {
         count(account::Entity::find_all_for_user(&user_id)).await
-    }
-
-    fn to_model(&self) -> account::Model {
-        let account = self.clone();
-        account::Model {
-            id: account.id,
-            name: account.name,
-            description: account.description,
-            iban: account.iban,
-            balance: account.balance,
-            original_balance: account.original_balance,
-            currency: account.currency.get_id(),
-            created_at: account.created_at,
-        }
     }
 }
 

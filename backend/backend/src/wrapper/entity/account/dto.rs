@@ -11,16 +11,15 @@ use crate::util::validation::{validate_currency_exists, validate_iban};
 use crate::wrapper::entity::account::Account;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Validate, ToSchema)]
-pub struct AccountDTO {
+pub(crate) struct AccountDTO {
     #[validate(length(min = 1, max = 255))]
-    pub name: String,
+    pub(crate) name: String,
     #[validate(length(max = 25000))]
-    pub description: Option<String>,
+    pub(crate) description: Option<String>,
     #[validate(custom = "validate_iban")]
-    pub iban: Option<String>,
-    pub balance: i64,
-    pub original_balance: i64,
-    pub currency_id: i32,
+    pub(crate) iban: Option<String>,
+    pub(crate) original_balance: i64,
+    pub(crate) currency_id: i32,
 }
 
 impl FromRequest for AccountDTO {
@@ -45,7 +44,6 @@ impl From<Account> for AccountDTO {
             name: value.name,
             description: value.description,
             iban: value.iban,
-            balance: value.balance,
             original_balance: value.original_balance,
             currency_id: value.currency.get_id(),
         }

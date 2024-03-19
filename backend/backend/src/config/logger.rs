@@ -10,7 +10,7 @@ use tracing_subscriber::fmt;
 use tracing_subscriber::fmt::time::OffsetTime;
 use tracing_subscriber::fmt::writer::MakeWriterExt;
 
-pub fn configure() -> WorkerGuard {
+pub(crate) fn configure() -> WorkerGuard {
     LogTracer::init().expect("Failed to set  tracing-log adapter!");
 
     // Time format: 2021-01-01 00:00:00

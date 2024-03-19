@@ -20,7 +20,7 @@ pub mod cleanup;
 
 bitflags! {
     #[derive(Debug, Clone, PartialEq, Eq, Serialize, ToSchema)]
-    pub struct Permissions: u32 {
+    pub(crate) struct Permissions: u32 {
         const READ = 0b001;
         const WRITE = 0b010;
         const DELETE = 0b100;
@@ -31,15 +31,15 @@ bitflags! {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, ToSchema)]
-pub struct PermissionsEntity {
-    pub user_id: i32,
-    pub entity_type: String,
-    pub entity_id: i32,
-    pub permissions: Permissions,
+pub(crate) struct PermissionsEntity {
+    pub(crate) user_id: i32,
+    pub(crate) entity_type: String,
+    pub(crate) entity_id: i32,
+    pub(crate) permissions: Permissions,
 }
 
 impl PermissionsEntity {
-    pub async fn get_all_paginated(page_size: PageSizeParam) -> Result<Pagination<Self>, ApiError> {
+    pub(crate) async fn get_all_paginated(page_size: PageSizeParam) -> Result<Pagination<Self>, ApiError> {
         let count = Self::count_all().await?;
         let permissions = find_all_paginated(permissions::Entity::find_all(), &page_size)
             .await?
@@ -50,15 +50,15 @@ impl PermissionsEntity {
         Ok(Pagination::new(permissions, &page_size, count, Uri::default()))
     }
 
-    pub async fn count_all() -> Result<u64, ApiError> {
+    pub(crate) async fn count_all() -> Result<u64, ApiError> {
         count(permissions::Entity::count_all()).await
     }
 
-    pub async fn delete(self) -> Result<(), ApiError> {
+    pub(crate) async fn delete(self) -> Result<(), ApiError> {
         delete(permissions::Entity::delete_by_id((self.user_id, self.entity_type, self.entity_id))).await
     }
 
-    pub async fn should_be_cleaned_up(&self) -> Result<bool, ApiError> {
+    pub(crate) async fn should_be_cleaned_up(&self) -> Result<bool, ApiError> {
         let table_exists = does_table_exists(self.entity_type.as_str(), get_database_connection()).await?;
         if !table_exists {
             return Ok(true);
@@ -97,7 +97,7 @@ impl From<Option<permissions::Model>> for Permissions {
     }
 }
 
-pub trait Permission: WrapperEntity {
+pub(crate) trait Permission: WrapperEntity {
     fn get_permissions(&self, user_id: i32) -> impl Future<Output = Result<Permissions, ApiError>> {
         async move {
             Ok(Permissions::from(
@@ -136,7 +136,7 @@ pub trait Permission: WrapperEntity {
     }
 }
 
-pub trait HasPermissionOrError: Permission {
+pub(crate) trait HasPermissionOrError: Permission {
     fn has_permission_or_error(
         &self,
         user_id: i32,

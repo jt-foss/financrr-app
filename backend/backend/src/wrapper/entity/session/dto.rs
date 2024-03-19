@@ -6,15 +6,15 @@ use crate::wrapper::entity::session::Session;
 use crate::wrapper::entity::user::User;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
-pub struct PublicSession {
-    pub id: i32,
-    pub user_id: i32,
-    pub name: Option<String>,
+pub(crate) struct PublicSession {
+    pub(crate) id: i32,
+    pub(crate) user_id: i32,
+    pub(crate) name: Option<String>,
     #[serde(with = "time::serde::rfc3339")]
-    pub expires_at: OffsetDateTime,
+    pub(crate) expires_at: OffsetDateTime,
     #[serde(with = "time::serde::rfc3339")]
-    pub created_at: OffsetDateTime,
-    pub user: User,
+    pub(crate) created_at: OffsetDateTime,
+    pub(crate) user: User,
 }
 
 impl From<Session> for PublicSession {

@@ -8,21 +8,21 @@ use crate::api::error::api::ApiError;
 use crate::config::Config;
 use crate::{DB, REDIS};
 
-pub fn get_database_connection<'a>() -> &'a DatabaseConnection {
+pub(crate) fn get_database_connection<'a>() -> &'a DatabaseConnection {
     DB.get().expect("Could not get database connection!")
 }
 
-pub async fn get_redis_connection() -> Result<MultiplexedConnection, ApiError> {
+pub(crate) async fn get_redis_connection() -> Result<MultiplexedConnection, ApiError> {
     let pool = REDIS.get().expect("Could not get redis pool!");
     pool.get_multiplexed_tokio_connection().await.map_err(ApiError::from)
 }
 
-pub async fn create_redis_client() -> Client {
+pub(crate) async fn create_redis_client() -> Client {
     let config = Config::get_config();
     Client::open(config.cache.get_url()).expect("Could not open redis connection!")
 }
 
-pub async fn establish_database_connection() -> DatabaseConnection {
+pub(crate) async fn establish_database_connection() -> DatabaseConnection {
     let db = Database::connect(get_connection_options()).await.expect("Could not open database connection!");
     assert!(db.ping().await.is_ok());
     db

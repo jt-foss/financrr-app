@@ -9,62 +9,62 @@ pub mod logger;
 pub mod public;
 
 #[derive(Debug, Clone)]
-pub struct Config {
-    pub address: String,
-    pub database: DatabaseConfig,
-    pub cache: RedisConfig,
-    pub cors: CorsConfig,
-    pub session: SessionConfig,
-    pub rate_limiter: RateLimiterConfig,
+pub(crate) struct Config {
+    pub(crate) address: String,
+    pub(crate) database: DatabaseConfig,
+    pub(crate) cache: RedisConfig,
+    pub(crate) cors: CorsConfig,
+    pub(crate) session: SessionConfig,
+    pub(crate) rate_limiter: RateLimiterConfig,
 }
 
 #[derive(Debug, Clone)]
-pub struct DatabaseConfig {
-    pub host: String,
-    pub port: u16,
-    pub user: String,
-    pub password: String,
-    pub name: String,
-    pub schema: String,
-    pub min_connections: u32,
-    pub max_connections: u32,
-    pub sqlx_logging: bool,
-    pub sqlx_log_level: LevelFilter,
+pub(crate) struct DatabaseConfig {
+    pub(crate) host: String,
+    pub(crate) port: u16,
+    pub(crate) user: String,
+    pub(crate) password: String,
+    pub(crate) name: String,
+    pub(crate) schema: String,
+    pub(crate) min_connections: u32,
+    pub(crate) max_connections: u32,
+    pub(crate) sqlx_logging: bool,
+    pub(crate) sqlx_log_level: LevelFilter,
 }
 
 #[derive(Debug, Clone)]
-pub struct RedisConfig {
-    pub host: String,
-    pub port: u16,
+pub(crate) struct RedisConfig {
+    pub(crate) host: String,
+    pub(crate) port: u16,
 }
 
 #[derive(Debug, Clone)]
-pub struct SessionConfig {
-    pub lifetime_hours: u64,
-    pub limit: u64,
+pub(crate) struct SessionConfig {
+    pub(crate) lifetime_hours: u64,
+    pub(crate) limit: u64,
 }
 
 #[derive(Debug, Clone)]
-pub struct RateLimiterConfig {
-    pub limit: u64,
-    pub duration_seconds: u64,
+pub(crate) struct RateLimiterConfig {
+    pub(crate) limit: u64,
+    pub(crate) duration_seconds: u64,
 }
 
 #[derive(Debug, Clone)]
-pub struct CorsConfig {
-    pub allowed_origins: Vec<String>,
-    pub allow_any_origin: bool,
+pub(crate) struct CorsConfig {
+    pub(crate) allowed_origins: Vec<String>,
+    pub(crate) allow_any_origin: bool,
 }
 
 impl Config {
-    pub fn get_database_url(&self) -> String {
+    pub(crate) fn get_database_url(&self) -> String {
         format!(
             "postgresql://{}:{}@{}:{}/{}",
             self.database.user, self.database.password, self.database.host, self.database.port, self.database.name,
         )
     }
 
-    pub fn load() -> Self {
+    pub(crate) fn load() -> Self {
         Self {
             address: get_env_or_error("ADDRESS"),
             database: DatabaseConfig::build_config(),
@@ -75,7 +75,7 @@ impl Config {
         }
     }
 
-    pub fn get_config<'a>() -> &'a Self {
+    pub(crate) fn get_config<'a>() -> &'a Self {
         CONFIG.get().unwrap_or_else(|| {
             CONFIG.set(Self::load()).expect("Could not load and set config!");
             CONFIG.get().expect("Could not get config!")
@@ -84,14 +84,14 @@ impl Config {
 }
 
 impl DatabaseConfig {
-    pub fn build_config() -> Self {
+    pub(crate) fn build_config() -> Self {
         Self {
             host: get_env_or_error("DATABASE_HOST"),
             port: get_env_or_error("DATABASE_PORT").parse::<u16>().expect("Could not parse DATABASE_PORT to u16!"),
             user: get_env_or_error("DATABASE_USER"),
             password: get_env_or_error("DATABASE_PASSWORD"),
             name: get_env_or_error("DATABASE_NAME"),
-            schema: get_env_or_default("DATABASE_SCHEMA", "public"),
+            schema: get_env_or_default("DATABASE_SCHEMA", "Public"),
             min_connections: get_env_or_default("DATABASE_MIN_CONNECTIONS", "5")
                 .parse::<u32>()
                 .expect("Could not parse DATABASE_MIN_CONNECTIONS to u32!"),
@@ -108,20 +108,20 @@ impl DatabaseConfig {
 }
 
 impl RedisConfig {
-    pub fn build_config() -> Self {
+    pub(crate) fn build_config() -> Self {
         Self {
             host: get_env_or_error("REDIS_HOST"),
             port: get_env_or_error("REDIS_PORT").parse::<u16>().expect("Could not parse REDIS_PORT to u16!"),
         }
     }
 
-    pub fn get_url(&self) -> String {
+    pub(crate) fn get_url(&self) -> String {
         format!("redis://{}:{}", self.host, self.port)
     }
 }
 
 impl CorsConfig {
-    pub fn build_config() -> Self {
+    pub(crate) fn build_config() -> Self {
         let allowed_origins =
             get_env_or_default("CORS_ALLOWED_ORIGINS", "").split(',').map(|s| s.to_string()).collect();
 
@@ -133,7 +133,7 @@ impl CorsConfig {
 }
 
 impl SessionConfig {
-    pub fn build_config() -> Self {
+    pub(crate) fn build_config() -> Self {
         Self {
             lifetime_hours: get_env_or_default("SESSION_LIFETIME_HOURS", "168")
                 .parse::<u64>()
@@ -146,7 +146,7 @@ impl SessionConfig {
 }
 
 impl RateLimiterConfig {
-    pub fn build_config() -> Self {
+    pub(crate) fn build_config() -> Self {
         Self {
             limit: get_env_or_default("RATE_LIMITER_LIMIT", "5000")
                 .parse::<u64>()
@@ -158,10 +158,10 @@ impl RateLimiterConfig {
     }
 }
 
-pub fn get_env_or_error(key: &str) -> String {
+pub(crate) fn get_env_or_error(key: &str) -> String {
     env::var(key).unwrap_or_else(|_| panic!("'{}' env variable must be set!", key))
 }
 
-pub fn get_env_or_default(key: &str, default: &str) -> String {
+pub(crate) fn get_env_or_default(key: &str, default: &str) -> String {
     env::var(key).unwrap_or_else(|_| default.to_string())
 }

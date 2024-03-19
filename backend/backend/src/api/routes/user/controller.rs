@@ -6,16 +6,16 @@ use crate::wrapper::entity::user::dto::UserRegistration;
 use crate::wrapper::entity::user::User;
 use crate::wrapper::types::phantom::Phantom;
 
-pub fn user_controller(cfg: &mut web::ServiceConfig) {
+pub(crate) fn user_controller(cfg: &mut web::ServiceConfig) {
     cfg.service(web::scope("/user").service(me).service(register));
 }
 
 #[utoipa::path(get,
 responses(
 (status = 200, description = "Successfully retrieved your own User.", content_type = "application/json", body = User),
-(status = 401, response = Unauthorized),
-(status = 404, response = ResourceNotFound),
-(status = 500, response = InternalServerError),
+Unauthorized,
+ResourceNotFound,
+InternalServerError,
 ),
 security(
 ("bearer_token" = [])
@@ -24,7 +24,7 @@ path = "/api/v1/user/@me",
 tag = "User"
 )]
 #[get("/@me")]
-pub async fn me(mut user: Phantom<User>) -> Result<impl Responder, ApiError> {
+pub(crate) async fn me(mut user: Phantom<User>) -> Result<impl Responder, ApiError> {
     Ok(HttpResponse::Ok().json(user.get_inner().await?))
 }
 
@@ -32,15 +32,15 @@ pub async fn me(mut user: Phantom<User>) -> Result<impl Responder, ApiError> {
 responses(
 (status = 201, description = "Successfully registered.", content_type = "application/json", body = User),
 (status = 409, description = "User is signed in."),
-(status = 400, response = ValidationError),
-(status = 500, response = InternalServerError)
+ValidationError,
+InternalServerError,
 ),
 path = "/api/v1/user/register",
 request_body = UserRegistration,
 tag = "User"
 )]
 #[post("/register")]
-pub async fn register(registration: UserRegistration) -> Result<impl Responder, ApiError> {
+pub(crate) async fn register(registration: UserRegistration) -> Result<impl Responder, ApiError> {
     let user = User::register(registration).await?;
 
     Ok(HttpResponse::Created().json(user))
