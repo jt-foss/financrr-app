@@ -46,7 +46,7 @@ impl Session {
         let session_token = Self::generate_session_key();
 
         if Self::reached_session_limit(user.id).await? {
-            return Err(ApiError::SessionLimitReached());
+            Self::delete_oldest_session(user.id).await?;
         }
 
         // insert into database
@@ -103,11 +103,11 @@ impl Session {
     }
 
     async fn get_user_id_from_redis(token: String) -> Result<Option<i32>, ApiError> {
-        let user_id = get(token.to_owned()).await?;
+        let user_id = get::<Option<i32>>(token.to_owned()).await?;
 
-        match user_id.parse::<i32>() {
-            Err(_) => Err(ApiError::InvalidSession()),
-            Ok(id) => Ok(Some(id)),
+        match user_id {
+            Some(id) => Ok(Some(id)),
+            None => Err(ApiError::InvalidSession()),
         }
     }
 
@@ -240,6 +240,14 @@ impl Session {
                 error!("Could not delete session {}: {}", session_key, e);
             }
         });
+    }
+
+    async fn delete_oldest_session(user_id: i32) -> Result<(), ApiError> {
+        let model = find_one_or_error(session::Entity::find_oldest_session_from_user(user_id), "Session").await?;
+        let session = Self::from_model(model).await?;
+        session.delete().await?;
+
+        Ok(())
     }
 
     async fn from_model(model: session::Model) -> Result<Self, ApiError> {

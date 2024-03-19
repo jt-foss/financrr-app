@@ -75,7 +75,6 @@ macro_rules! api_errors {
 
 api_errors!(
     (StatusCode::UNAUTHORIZED, ApiCode::INVALID_SESSION, "Invalid session!", InvalidSession);
-    (StatusCode::CONFLICT, ApiCode::SESSION_LIMIT_REACHED, "Session limit reached!", SessionLimitReached);
     (StatusCode::UNAUTHORIZED, ApiCode::INVALID_CREDENTIALS, "Invalid credentials!", InvalidCredentials);
     (StatusCode::UNAUTHORIZED, ApiCode::UNAUTHORIZED, "Unauthorized!", Unauthorized);
     (StatusCode::FORBIDDEN, ApiCode::MISSING_PERMISSIONS, "Missing permissions!", MissingPermissions);

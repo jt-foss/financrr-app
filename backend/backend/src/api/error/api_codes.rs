@@ -42,7 +42,6 @@ macro_rules! api_codes {
 // Auth related
 api_codes!(
     (1000, INVALID_SESSION, "Invalid session!");
-    (1001, SESSION_LIMIT_REACHED, "Session limit reached!");
     (1002, INVALID_CREDENTIALS, "Invalid credentials provided!");
     (1004, UNAUTHORIZED, "Unauthorized!");
     (1006, NO_TOKEN_PROVIDED, "No bearer token provided!");
