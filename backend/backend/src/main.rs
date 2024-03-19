@@ -8,7 +8,6 @@ use actix_web::middleware::{Compress, DefaultHeaders, NormalizePath, TrailingSla
 use actix_web::web::Data;
 use actix_web::{
     error,
-    middleware::Logger,
     web::{self},
     App, HttpResponse, HttpServer,
 };
@@ -124,7 +123,6 @@ async fn main() -> Result<()> {
 
     HttpServer::new(move || {
         App::new()
-            .wrap(Logger::default())
             .wrap(Compress::default())
             .wrap(build_cors())
             .wrap(prometheus_metrics.clone())

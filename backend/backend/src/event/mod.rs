@@ -1,3 +1,4 @@
+use std::fmt::Debug;
 use std::future::Future;
 use std::pin::Pin;
 
@@ -37,7 +38,7 @@ pub(crate) struct EventBus<T: Clone> {
     sender: Sender<T>,
 }
 
-impl<T: Clone + Send + 'static> EventBus<T> {
+impl<T: Debug + Clone + Send + 'static> EventBus<T> {
     pub(crate) fn new() -> Self {
         let (sender, _) = channel(100);
         Self {
@@ -62,7 +63,7 @@ impl<T: Clone + Send + 'static> EventBus<T> {
     }
 }
 
-impl<T: Clone + Send + 'static> Default for EventBus<T> {
+impl<T: Debug + Clone + Send + 'static> Default for EventBus<T> {
     fn default() -> Self {
         Self::new()
     }

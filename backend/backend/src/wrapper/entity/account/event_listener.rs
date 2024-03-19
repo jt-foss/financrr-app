@@ -5,9 +5,9 @@ use crate::wrapper::entity::account::Account;
 use crate::wrapper::entity::transaction::Transaction;
 
 async fn update_account_balance(account: &Account, amount: i64) -> Result<(), ApiError> {
-    let mut dto = AccountDTO::from(account);
-    dto.balance += amount;
-    account.to_owned().update(dto).await?;
+    let dto = AccountDTO::from(account);
+    let balance = account.balance + amount;
+    account.update_with_balance(dto, balance).await?;
 
     Ok(())
 }

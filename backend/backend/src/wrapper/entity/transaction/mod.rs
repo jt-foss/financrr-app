@@ -55,6 +55,10 @@ impl Transaction {
         let model = insert(active_model).await?;
 
         let transaction = Self::from(model);
+
+        //grant permission
+        transaction.add_permission(user_id, Permissions::all()).await?;
+
         // check if execute_at is in the future
         if transaction.executed_at > get_now() {
             let delay = transaction.executed_at - get_now();
@@ -63,9 +67,6 @@ impl Transaction {
         } else {
             TransactionEvent::fire(TransactionEvent::Create(transaction.clone()));
         }
-
-        //grant permission
-        transaction.add_permission(user_id, Permissions::all()).await?;
 
         Ok(transaction)
     }

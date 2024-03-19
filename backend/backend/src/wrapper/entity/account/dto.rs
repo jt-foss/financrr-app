@@ -18,7 +18,6 @@ pub(crate) struct AccountDTO {
     pub(crate) description: Option<String>,
     #[validate(custom = "validate_iban")]
     pub(crate) iban: Option<String>,
-    pub(crate) balance: i64,
     pub(crate) original_balance: i64,
     pub(crate) currency_id: i32,
 }
@@ -45,7 +44,6 @@ impl From<Account> for AccountDTO {
             name: value.name,
             description: value.description,
             iban: value.iban,
-            balance: value.balance,
             original_balance: value.original_balance,
             currency_id: value.currency.get_id(),
         }

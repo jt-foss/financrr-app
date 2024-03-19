@@ -181,9 +181,6 @@ responses(
 (status = 401, response = Unauthorized),
 (status = 500, response = InternalServerError)
 ),
-security(
-("bearer_token" = [])
-),
 path = "/api/v1/session",
 tag = "Session"
 )]

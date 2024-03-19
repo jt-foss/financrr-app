@@ -39,8 +39,8 @@ impl Account {
             name: Set(dto.name),
             description: Set(dto.description),
             iban: Set(dto.iban),
-            balance: Set(dto.balance),
-            original_balance: Set(dto.balance),
+            balance: Set(dto.original_balance),
+            original_balance: Set(dto.original_balance),
             currency: Set(dto.currency_id),
             created_at: Set(get_now()),
         };
@@ -56,13 +56,17 @@ impl Account {
         delete(account::Entity::delete_by_id(self.id)).await
     }
 
-    pub(crate) async fn update(self, dto: AccountDTO) -> Result<Self, ApiError> {
+    pub(crate) async fn update(&self, dto: AccountDTO) -> Result<Self, ApiError> {
+        self.update_with_balance(dto, self.balance).await
+    }
+
+    pub(crate) async fn update_with_balance(&self, dto: AccountDTO, balance: i64) -> Result<Self, ApiError> {
         let active_model = account::ActiveModel {
             id: Set(self.id),
             name: Set(dto.name),
             description: Set(dto.description),
             iban: Set(dto.iban),
-            balance: Set(dto.balance),
+            balance: Set(balance),
             original_balance: Set(dto.original_balance),
             currency: Set(dto.currency_id),
             created_at: Set(self.created_at),

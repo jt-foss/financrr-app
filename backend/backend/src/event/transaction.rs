@@ -53,7 +53,7 @@ impl TransactionEvent {
                                 }
                             }
                             _ => {
-                                error!("Received unexpected event with invalid event filter.\nEvent: {:?}\nEventFilter: {:?}", event, filter);
+                                // we ignore this because if they do not match up then nothing should happen
                             }
                         }
                     }
