@@ -25,7 +25,6 @@ We call these custom error codes `Api Codes`.
 | Code | Description                  |
 |------|------------------------------|
 | 1000 | Invalid Session              |
-| 1001 | Session limit reached        |
 | 1002 | Invalid credentials provided |
 | 1003 | Unauthorized                 |
 | 1004 | No bearer token provided     |
