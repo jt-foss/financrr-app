@@ -21,9 +21,9 @@ pub(crate) fn budget_controller(cfg: &mut web::ServiceConfig) {
 #[utoipa::path(get,
 responses(
 (status = 200, description = "Successfully retrieved the Budgets.", content_type = "application/json", body = PaginatedBudget),
-(status = 400, response = ValidationError),
-(status = 401, response = Unauthorized),
-(status = 500, response = InternalServerError)
+ValidationError,
+Unauthorized,
+InternalServerError,
 ),
 params(PageSizeParam),
 security(
@@ -47,9 +47,9 @@ pub(crate) async fn get_all(
 #[utoipa::path(get,
 responses(
 (status = 200, description = "Successfully retrieved the Budget.", content_type = "application/json", body = Budget),
-(status = 401, response = Unauthorized),
-(status = 404, response = ResourceNotFound),
-(status = 500, response = InternalServerError)
+Unauthorized,
+ResourceNotFound,
+InternalServerError,
 ),
 security(
 ("bearer_token" = [])
@@ -68,9 +68,9 @@ pub(crate) async fn get_one(user: Phantom<User>, budget_id: Path<i32>) -> Result
 #[utoipa::path(post,
 responses(
 (status = 201, description = "Successfully created the Budget.", content_type = "application/json", body = Budget),
-(status = 400, response = ValidationError),
-(status = 401, response = Unauthorized),
-(status = 500, response = InternalServerError)
+ValidationError,
+Unauthorized,
+InternalServerError,
 ),
 security(
 ("bearer_token" = [])
@@ -88,9 +88,9 @@ pub(crate) async fn create(user: Phantom<User>, budget: Json<BudgetDTO>) -> Resu
 #[utoipa::path(delete,
 responses(
 (status = 204, description = "Successfully deleted the Budget."),
-(status = 401, response = Unauthorized),
-(status = 404, response = ResourceNotFound),
-(status = 500, response = InternalServerError)
+Unauthorized,
+ResourceNotFound,
+InternalServerError,
 ),
 security(
 ("bearer_token" = [])
@@ -111,10 +111,10 @@ pub(crate) async fn delete(user: Phantom<User>, budget_id: Path<i32>) -> Result<
 #[utoipa::path(patch,
 responses(
 (status = 200, description = "Successfully updated the Budget.", content_type = "application/json", body = Budget),
-(status = 400, response = ValidationError),
-(status = 401, response = Unauthorized),
-(status = 404, response = ResourceNotFound),
-(status = 500, response = InternalServerError)
+ValidationError,
+Unauthorized,
+ResourceNotFound,
+InternalServerError,
 ),
 security(
 ("bearer_token" = [])

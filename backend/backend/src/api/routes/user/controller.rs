@@ -13,9 +13,9 @@ pub(crate) fn user_controller(cfg: &mut web::ServiceConfig) {
 #[utoipa::path(get,
 responses(
 (status = 200, description = "Successfully retrieved your own User.", content_type = "application/json", body = User),
-(status = 401, response = Unauthorized),
-(status = 404, response = ResourceNotFound),
-(status = 500, response = InternalServerError),
+Unauthorized,
+ResourceNotFound,
+InternalServerError,
 ),
 security(
 ("bearer_token" = [])
@@ -32,8 +32,8 @@ pub(crate) async fn me(mut user: Phantom<User>) -> Result<impl Responder, ApiErr
 responses(
 (status = 201, description = "Successfully registered.", content_type = "application/json", body = User),
 (status = 409, description = "User is signed in."),
-(status = 400, response = ValidationError),
-(status = 500, response = InternalServerError)
+ValidationError,
+InternalServerError,
 ),
 path = "/api/v1/user/register",
 request_body = UserRegistration,

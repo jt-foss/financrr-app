@@ -20,8 +20,8 @@ pub(crate) fn account_controller(cfg: &mut web::ServiceConfig) {
 #[utoipa::path(get,
 responses(
 (status = 200, description = "Successfully retrieved all Accounts.", content_type = "application/json", body = PaginatedAccount),
-(status = 400, response = ValidationError),
-(status = 401, response = Unauthorized),
+ValidationError,
+Unauthorized,
 ),
 params(PageSizeParam),
 security(
@@ -44,9 +44,9 @@ pub(crate) async fn get_all(
 #[utoipa::path(get,
 responses(
 (status = 200, description = "Successfully retrieved Account.", content_type = "application/json", body = Account),
-(status = 401, response = Unauthorized),
-(status = 404, response = ResourceNotFound),
-(status = 500, response = InternalServerError)
+Unauthorized,
+ResourceNotFound,
+InternalServerError,
 ),
 security(
 ("bearer_token" = [])
@@ -64,10 +64,10 @@ pub(crate) async fn get_one(user: Phantom<User>, account_id: Path<i32>) -> Resul
 #[utoipa::path(post,
 responses(
 (status = 201, description = "Successfully created AccountDTO.", content_type = "application/json", body = Account),
-(status = 401, response = Unauthorized),
-(status = 400, response = ValidationError),
-(status = 404, response = ResourceNotFound),
-(status = 500, response = InternalServerError)
+Unauthorized,
+ValidationError,
+ResourceNotFound,
+InternalServerError,
 ),
 security(
 ("bearer_token" = [])
@@ -83,9 +83,9 @@ pub(crate) async fn create(user: Phantom<User>, account: AccountDTO) -> Result<i
 #[utoipa::path(delete,
 responses(
 (status = 204, description = "Successfully deleted an Account."),
-(status = 401, response = Unauthorized),
-(status = 404, response = ResourceNotFound),
-(status = 500, response = InternalServerError)
+Unauthorized,
+ResourceNotFound,
+InternalServerError,
 ),
 security(
 ("bearer_token" = [])
@@ -105,10 +105,10 @@ pub(crate) async fn delete(user: Phantom<User>, account_id: Path<i32>) -> Result
 #[utoipa::path(patch,
 responses(
 (status = 200, description = "Successfully updated an Account.", content_type = "application/json", body = Account),
-(status = 401, response = Unauthorized),
-(status = 400, response = ValidationError),
-(status = 404, response = ResourceNotFound),
-(status = 500, response = InternalServerError)
+Unauthorized,
+ValidationError,
+ResourceNotFound,
+InternalServerError,
 ),
 security(
 ("bearer_token" = [])

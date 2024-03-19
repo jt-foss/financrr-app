@@ -21,9 +21,9 @@ pub(crate) fn currency_controller(cfg: &mut web::ServiceConfig) {
 #[utoipa::path(get,
 responses(
 (status = 200, description = "Successfully retrieved all Currencies.", content_type = "application/json", body = PaginatedCurrency),
-(status = 400, response = ValidationError),
-(status = 401, response = Unauthorized),
-(status = 500, response = InternalServerError)
+ValidationError,
+Unauthorized,
+InternalServerError,
 ),
 security(
 ("bearer_token" = [])
@@ -53,9 +53,9 @@ pub(crate) async fn get_all(
 #[utoipa::path(get,
 responses(
 (status = 200, description = "Successfully retrieved the Currency.", content_type = "application/json", body = Currency),
-(status = 401, response = Unauthorized),
-(status = 404, response = ResourceNotFound),
-(status = 500, response = InternalServerError)
+Unauthorized,
+ResourceNotFound,
+InternalServerError,
 ),
 security(
 ("bearer_token" = [])
@@ -73,8 +73,8 @@ pub(crate) async fn get_one(user: Option<Phantom<User>>, currency_id: Path<i32>)
 #[utoipa::path(post,
 responses(
 (status = 201, description = "Successfully created the Currency.", content_type = "application/json", body = Currency),
-(status = 401, response = Unauthorized),
-(status = 500, response = InternalServerError)
+Unauthorized,
+InternalServerError,
 ),
 security(
 ("bearer_token" = [])
@@ -90,9 +90,9 @@ pub(crate) async fn create(user: Phantom<User>, currency: Json<CurrencyDTO>) -> 
 #[utoipa::path(delete,
 responses(
 (status = 200, description = "Successfully deleted the Currency."),
-(status = 401, response = Unauthorized),
-(status = 404, response = ResourceNotFound),
-(status = 500, response = InternalServerError)
+Unauthorized,
+ResourceNotFound,
+InternalServerError,
 ),
 security(
 ("bearer_token" = [])
@@ -111,9 +111,9 @@ pub(crate) async fn delete(user: Phantom<User>, currency_id: Path<i32>) -> Resul
 #[utoipa::path(patch,
 responses(
 (status = 200, description = "Successfully updated the Currency.", content_type = "application/json", body = Currency),
-(status = 401, response = Unauthorized),
-(status = 404, response = ResourceNotFound),
-(status = 500, response = InternalServerError)
+Unauthorized,
+ResourceNotFound,
+InternalServerError,
 ),
 security(
 ("bearer_token" = [])

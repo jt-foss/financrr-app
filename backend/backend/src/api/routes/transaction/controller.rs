@@ -20,9 +20,9 @@ pub(crate) fn transaction_controller(cfg: &mut web::ServiceConfig) {
 #[utoipa::path(get,
 responses(
 (status = 200, description = "Successfully retrieved all Transactions.", content_type = "application/json", body = PaginatedTransaction),
-(status = 400, response = ValidationError),
-(status = 401, response = Unauthorized),
-(status = 500, response = InternalServerError)
+ValidationError,
+Unauthorized,
+InternalServerError,
 ),
 params(PageSizeParam),
 security(
@@ -45,8 +45,8 @@ pub(crate) async fn get_all(
 #[utoipa::path(get,
 responses(
 (status = 200, description = "Successfully retrieved Transaction.", content_type = "application/json", body = Transaction),
-(status = 401, response = Unauthorized),
-(status = 500, response = InternalServerError)
+Unauthorized,
+InternalServerError,
 ),
 security(
 ("bearer_token" = [])
@@ -65,8 +65,8 @@ pub(crate) async fn get_one(user: Phantom<User>, transaction_id: Path<i32>) -> R
 #[utoipa::path(post,
 responses(
 (status = 201, description = "Successfully created Transaction.", content_type = "application/json", body = Transaction),
-(status = 401, response = Unauthorized),
-(status = 500, response = InternalServerError)
+Unauthorized,
+InternalServerError,
 ),
 security(
 ("bearer_token" = [])
@@ -88,8 +88,8 @@ pub(crate) async fn create(user: Phantom<User>, transaction: TransactionDTO) -> 
 #[utoipa::path(delete,
 responses(
 (status = 204, description = "Successfully deleted Transaction."),
-(status = 401, response = Unauthorized),
-(status = 500, response = InternalServerError)
+Unauthorized,
+InternalServerError,
 ),
 security(
 ("bearer_token" = [])
@@ -110,8 +110,8 @@ pub(crate) async fn delete(user: Phantom<User>, transaction_id: Path<i32>) -> Re
 #[utoipa::path(patch,
 responses(
 (status = 200, description = "Successfully updated Transaction.", content_type = "application/json", body = Transaction),
-(status = 401, response = Unauthorized),
-(status = 500, response = InternalServerError)
+Unauthorized,
+InternalServerError,
 ),
 security(
 ("bearer_token" = [])
