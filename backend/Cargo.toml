@@ -33,6 +33,9 @@ cognitive_complexity = "deny"
 use_self = "warn"
 
 [workspace.dependencies]
+# Async runtime
+tokio = { version = "1.36.0", features = ["macros", "rt", "rt-multi-thread", "sync", "time", "parking_lot"] }
+
 # Serialization/Deserialization
 serde = { version = "1.0.197", features = ["derive"] }
 
