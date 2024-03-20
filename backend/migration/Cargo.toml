@@ -15,14 +15,14 @@ workspace = true
 
 [dependencies]
 # Async runtime
-async-std = { version = "1.12.0", features = ["attributes", "tokio1"] }
+tokio.workspace = true
 
 # Entity
 entity = { path = "../entity" }
 
 # Sea-orm
 sea-orm.workspace = true
-sea-orm-migration = "1.0.0-rc.1"
+sea-orm-migration = { version = "1.0.0-rc.1", features = ["sqlx-postgres", "runtime-tokio-rustls"] }
 tracing.workspace = true
 
 # Date/Time
