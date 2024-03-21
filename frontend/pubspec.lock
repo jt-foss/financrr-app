@@ -625,11 +625,11 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "feature/sessions"
-      resolved-ref: "246fa607322ad0d671fedbdf44110959ed2b9988"
+      ref: "feature/accounts-and-transactions"
+      resolved-ref: "693e4f5e93a581eb115e204f425d43c63777eb9b"
       url: "https://github.com/financrr/restrr.git"
     source: git
-    version: "0.7.0"
+    version: "0.8.0"
   shared_preferences:
     dependency: "direct main"
     description:
