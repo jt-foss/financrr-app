@@ -39,7 +39,7 @@ migration = { path = "../migration" }
 redis = {  version = "0.25.2", features = ["aio", "tokio-comp"] }
 
 # (Open-)search
-opensearch = { version = "2.2.0", features = ["native-tls"], default-features = false }
+opensearch = { version = "2.2.0", features = ["rustls-tls"], default-features = false }
 
 # Serialization and deserialization
 serde.workspace = true
