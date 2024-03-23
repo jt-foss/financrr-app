@@ -4,20 +4,20 @@ use std::time::Duration;
 
 use actix_cors::Cors;
 use actix_limitation::{Limiter, RateLimiter};
+use actix_web::{
+    App,
+    error,
+    HttpResponse, HttpServer, web::{self},
+};
 use actix_web::middleware::{Compress, DefaultHeaders, NormalizePath, TrailingSlash};
 use actix_web::web::Data;
-use actix_web::{
-    error,
-    web::{self},
-    App, HttpResponse, HttpServer,
-};
 use actix_web_prom::{PrometheusMetrics, PrometheusMetricsBuilder};
 use actix_web_validator::{Error, JsonConfig, PathConfig, QueryConfig};
 use dotenvy::dotenv;
 use tracing::info;
-use utoipa::openapi::security::{Http, HttpAuthScheme, SecurityScheme};
-use utoipa::openapi::OpenApi as OpenApiStruct;
 use utoipa::{Modify, OpenApi};
+use utoipa::openapi::OpenApi as OpenApiStruct;
+use utoipa::openapi::security::{Http, HttpAuthScheme, SecurityScheme};
 use utoipa_swagger_ui::SwaggerUi;
 use utoipauto::utoipauto;
 
@@ -32,13 +32,13 @@ use crate::api::routes::session::controller::session_controller;
 use crate::api::routes::transaction::controller::transaction_controller;
 use crate::api::routes::user::controller::user_controller;
 use crate::api::status::controller::status_controller;
-use crate::config::{logger, Config};
+use crate::config::{Config, logger};
 use crate::databases::connections::init_data_sources;
 use crate::databases::connections::psql::get_database_connection;
 use crate::databases::redis::clear_redis;
 use crate::util::validation::ValidationErrorJsonPayload;
+use crate::wrapper::entity::init_wrapper;
 use crate::wrapper::entity::session::Session;
-use crate::wrapper::entity::transaction;
 use crate::wrapper::permission::cleanup::schedule_clean_up_task;
 
 pub(crate) mod api;
@@ -48,6 +48,7 @@ pub(crate) mod event;
 pub(crate) mod scheduling;
 pub(crate) mod util;
 pub(crate) mod wrapper;
+pub(crate) mod search;
 
 pub(crate) static CONFIG: OnceLock<Config> = OnceLock::new();
 
@@ -82,40 +83,42 @@ async fn main() -> Result<()> {
     dotenv().ok();
     let _guard = logger::configure(); // We need to keep the guard alive to keep the logger running.
 
-    info!("Starting up...");
+    info!("[*]Starting up...");
     CONFIG.set(Config::load()).expect("Could not load config!");
 
-    info!("\t[*] Initializing data sources...");
+    info!("[*] Initializing data sources...");
     init_data_sources().await;
 
-    info!("\t[*] Cleaning redis...");
+    info!("[*] Cleaning redis...");
     clear_redis().await.expect("Could not clear redis!");
 
-    info!("\t[*] Loading schema...");
+    info!("[*] Loading schema...");
     load_schema(get_database_connection()).await;
 
-    info!("\t[*] Migrating database...");
+    info!("[*] Migrating database...");
     Migrator::up(get_database_connection(), None).await.expect("Could not migrate database!");
 
-    info!("\t[*] Loading sessions...");
+    info!("[*] Loading sessions...");
     Session::init().await.expect("Could not load sessions!");
 
-    info!("\t[*] Starting up event system...");
+    info!("[*] Starting up event system...");
     event::init();
 
-    info!("\t[*] Scheduling clean up task...");
+    info!("[*] Scheduling clean up task...");
     schedule_clean_up_task();
 
-    transaction::search::init().await;
+    info!("[*] Initializing wrapper...");
+    init_wrapper().await;
 
-    // Make instance variable of ApiDoc so all worker threads gets the same instance.
-    let openapi = ApiDoc::openapi();
-
-    info!("\t[*] Initializing rate limiter...");
+    info!("[*] Initializing rate limiter...");
     let limiter = Data::new(build_rate_limiter());
 
-    info!("\t[*] Initializing prometheus metrics...");
+    info!("[*] Initializing prometheus metrics...");
     let prometheus_metrics = build_prometheus_metrics();
+
+    info!("[*] Building OpenApi documentation...");
+    // Make instance variable of ApiDoc so all worker threads gets the same instance.
+    let openapi = ApiDoc::openapi();
 
     info!("Starting server... Listening on: {}", Config::get_config().address);
 
