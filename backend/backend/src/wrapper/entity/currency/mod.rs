@@ -14,8 +14,10 @@ use crate::api::pagination::PageSizeParam;
 use crate::database::entity::{count, delete, find_all_paginated, find_one_or_error, insert, update};
 use crate::wrapper::entity::currency::dto::CurrencyDTO;
 use crate::wrapper::entity::user::User;
-use crate::wrapper::entity::WrapperEntity;
-use crate::wrapper::permission::{HasPermissionOrError, Permission, Permissions};
+use crate::wrapper::entity::{TableName, WrapperEntity};
+use crate::wrapper::permission::{
+    HasPermissionByIdOrError, HasPermissionOrError, Permission, PermissionByIds, Permissions,
+};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
 pub mod dto;
@@ -108,19 +110,25 @@ impl Currency {
     }
 }
 
+impl TableName for Currency {
+    fn table_name() -> &'static str {
+        currency::Entity.table_name()
+    }
+}
+
 impl WrapperEntity for Currency {
     fn get_id(&self) -> i32 {
         self.id
     }
-
-    fn table_name(&self) -> String {
-        currency::Entity.table_name().to_string()
-    }
 }
+
+impl PermissionByIds for Currency {}
 
 impl Permission for Currency {}
 
 impl HasPermissionOrError for Currency {}
+
+impl HasPermissionByIdOrError for Currency {}
 
 impl Identifiable for Currency {
     async fn from_id(id: i32) -> Result<Self, ApiError>

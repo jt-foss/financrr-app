@@ -18,8 +18,10 @@ use crate::wrapper::entity::account::Account;
 use crate::wrapper::entity::budget::Budget;
 use crate::wrapper::entity::currency::Currency;
 use crate::wrapper::entity::transaction::dto::TransactionDTO;
-use crate::wrapper::entity::WrapperEntity;
-use crate::wrapper::permission::{HasPermissionOrError, Permission, Permissions};
+use crate::wrapper::entity::{TableName, WrapperEntity};
+use crate::wrapper::permission::{
+    HasPermissionByIdOrError, HasPermissionOrError, Permission, PermissionByIds, Permissions,
+};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
 pub mod dto;
@@ -118,19 +120,25 @@ impl Transaction {
     }
 }
 
+impl TableName for Transaction {
+    fn table_name() -> &'static str {
+        transaction::Entity.table_name()
+    }
+}
+
 impl WrapperEntity for Transaction {
     fn get_id(&self) -> i32 {
         self.id
     }
-
-    fn table_name(&self) -> String {
-        transaction::Entity.table_name().to_string()
-    }
 }
+
+impl PermissionByIds for Transaction {}
 
 impl Permission for Transaction {}
 
 impl HasPermissionOrError for Transaction {}
+
+impl HasPermissionByIdOrError for Transaction {}
 
 impl Identifiable for Transaction {
     async fn from_id(id: i32) -> Result<Self, ApiError> {

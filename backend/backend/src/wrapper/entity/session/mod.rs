@@ -23,8 +23,10 @@ use crate::database::entity::{count, delete, find_all_paginated, find_one_or_err
 use crate::database::redis::{del, get, set_ex, zadd};
 use crate::util::auth::extract_bearer_token;
 use crate::wrapper::entity::user::User;
-use crate::wrapper::entity::WrapperEntity;
-use crate::wrapper::permission::{HasPermissionOrError, Permission, Permissions};
+use crate::wrapper::entity::{TableName, WrapperEntity};
+use crate::wrapper::permission::{
+    HasPermissionByIdOrError, HasPermissionOrError, Permission, PermissionByIds, Permissions,
+};
 use crate::wrapper::util::handle_async_result_vec;
 
 pub mod dto;
@@ -267,19 +269,25 @@ impl Session {
     }
 }
 
+impl TableName for Session {
+    fn table_name() -> &'static str {
+        session::Entity.table_name()
+    }
+}
+
 impl WrapperEntity for Session {
     fn get_id(&self) -> i32 {
         self.id
     }
-
-    fn table_name(&self) -> String {
-        session::Entity.table_name().to_string()
-    }
 }
+
+impl PermissionByIds for Session {}
 
 impl Permission for Session {}
 
 impl HasPermissionOrError for Session {}
+
+impl HasPermissionByIdOrError for Session {}
 
 impl FromRequest for Session {
     type Error = ApiError;
