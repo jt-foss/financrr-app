@@ -19,15 +19,15 @@ use entity::utility::time::get_now;
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
 use crate::config::Config;
-use crate::database::entity::{count, delete, find_all_paginated, find_one_or_error, insert, update};
-use crate::database::redis::{del, get, set_ex, zadd};
+use crate::databases::entity::{count, delete, find_all_paginated, find_one_or_error, insert, update};
+use crate::databases::redis::{del, get, set_ex, zadd};
 use crate::util::auth::extract_bearer_token;
 use crate::wrapper::entity::user::User;
 use crate::wrapper::entity::WrapperEntity;
 use crate::wrapper::permission::{HasPermissionOrError, Permission, Permissions};
 use crate::wrapper::util::handle_async_result_vec;
 
-pub mod dto;
+pub(crate) mod dto;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub(crate) struct Session {

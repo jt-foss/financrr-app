@@ -14,8 +14,6 @@ use actix_web::{
 use actix_web_prom::{PrometheusMetrics, PrometheusMetricsBuilder};
 use actix_web_validator::{Error, JsonConfig, PathConfig, QueryConfig};
 use dotenvy::dotenv;
-use redis::Client;
-use sea_orm::DatabaseConnection;
 use tracing::info;
 use utoipa::openapi::security::{Http, HttpAuthScheme, SecurityScheme};
 use utoipa::openapi::OpenApi as OpenApiStruct;
@@ -35,22 +33,22 @@ use crate::api::routes::transaction::controller::transaction_controller;
 use crate::api::routes::user::controller::user_controller;
 use crate::api::status::controller::status_controller;
 use crate::config::{logger, Config};
-use crate::database::connection::{create_redis_client, establish_database_connection, get_database_connection};
-use crate::database::redis::clear_redis;
+use crate::databases::connections::init_data_sources;
+use crate::databases::connections::psql::get_database_connection;
+use crate::databases::redis::clear_redis;
 use crate::util::validation::ValidationErrorJsonPayload;
 use crate::wrapper::entity::session::Session;
+use crate::wrapper::entity::transaction;
 use crate::wrapper::permission::cleanup::schedule_clean_up_task;
 
-pub mod api;
-pub mod config;
-pub mod database;
-pub mod event;
-pub mod scheduling;
-pub mod util;
-pub mod wrapper;
+pub(crate) mod api;
+pub(crate) mod config;
+pub(crate) mod databases;
+pub(crate) mod event;
+pub(crate) mod scheduling;
+pub(crate) mod util;
+pub(crate) mod wrapper;
 
-pub(crate) static DB: OnceLock<DatabaseConnection> = OnceLock::new();
-pub(crate) static REDIS: OnceLock<Client> = OnceLock::new();
 pub(crate) static CONFIG: OnceLock<Config> = OnceLock::new();
 
 #[utoipauto(paths = "./backend/src")]
@@ -79,7 +77,7 @@ impl Modify for BearerTokenAddon {
     }
 }
 
-#[actix_web::main]
+#[tokio::main]
 async fn main() -> Result<()> {
     dotenv().ok();
     let _guard = logger::configure(); // We need to keep the guard alive to keep the logger running.
@@ -87,10 +85,8 @@ async fn main() -> Result<()> {
     info!("Starting up...");
     CONFIG.set(Config::load()).expect("Could not load config!");
 
-    info!("\t[*] Establishing database connection...");
-    DB.set(establish_database_connection().await).expect("Could not set database!");
-    info!("\t[*] Establishing redis connection...");
-    REDIS.set(create_redis_client().await).expect("Could not set redis!");
+    info!("\t[*] Initializing data sources...");
+    init_data_sources().await;
 
     info!("\t[*] Cleaning redis...");
     clear_redis().await.expect("Could not clear redis!");
@@ -109,6 +105,8 @@ async fn main() -> Result<()> {
 
     info!("\t[*] Scheduling clean up task...");
     schedule_clean_up_task();
+
+    transaction::search::init().await;
 
     // Make instance variable of ApiDoc so all worker threads gets the same instance.
     let openapi = ApiDoc::openapi();

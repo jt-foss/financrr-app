@@ -1,9 +1,9 @@
-pub mod account;
-pub mod budget;
-pub mod currency;
-pub mod session;
-pub mod transaction;
-pub mod user;
+pub(crate) mod account;
+pub(crate) mod budget;
+pub(crate) mod currency;
+pub(crate) mod session;
+pub(crate) mod transaction;
+pub(crate) mod user;
 
 pub(crate) trait WrapperEntity {
     fn get_id(&self) -> i32;

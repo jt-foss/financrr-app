@@ -16,6 +16,9 @@ bin/build.bash
 echo "Stopping containers"
 docker compose --profile all down -v
 
+echo "Pulling images"
+docker compose --profile all pull
+
 echo "Starting containers"
 docker compose --profile all up -d
 

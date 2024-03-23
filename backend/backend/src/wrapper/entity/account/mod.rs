@@ -8,7 +8,7 @@ use entity::account;
 use entity::utility::time::get_now;
 
 use crate::api::error::api::ApiError;
-use crate::database::entity::{count, delete, find_all, find_one_or_error, insert, update};
+use crate::databases::entity::{count, delete, find_all, find_one_or_error, insert, update};
 use crate::wrapper::entity::account::dto::AccountDTO;
 use crate::wrapper::entity::currency::Currency;
 use crate::wrapper::entity::WrapperEntity;
@@ -16,8 +16,8 @@ use crate::wrapper::permission::{HasPermissionOrError, Permission, Permissions};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 use crate::wrapper::util::handle_async_result_vec;
 
-pub mod dto;
-pub mod event_listener;
+pub(crate) mod dto;
+pub(crate) mod event_listener;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub(crate) struct Account {

@@ -11,7 +11,7 @@ use entity::utility::time::get_now;
 
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
-use crate::database::entity::{count, delete, find_all_paginated, find_one_or_error, insert, update};
+use crate::databases::entity::{count, delete, find_all_paginated, find_one_or_error, insert, update};
 use crate::event::transaction::TransactionEvent;
 use crate::event::Event;
 use crate::wrapper::entity::account::Account;
@@ -22,7 +22,8 @@ use crate::wrapper::entity::WrapperEntity;
 use crate::wrapper::permission::{HasPermissionOrError, Permission, Permissions};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
-pub mod dto;
+pub(crate) mod dto;
+pub(crate) mod search;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub(crate) struct Transaction {

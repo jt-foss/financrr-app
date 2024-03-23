@@ -10,7 +10,7 @@ use crate::api::error::api::ApiError;
 use crate::wrapper::entity::account::event_listener::account_listener;
 use crate::wrapper::entity::budget::event_listener::budget_listener;
 
-pub mod transaction;
+pub(crate) mod transaction;
 
 pub(crate) type EventResult = Pin<Box<dyn Future<Output = Result<(), ApiError>> + Send>>;
 

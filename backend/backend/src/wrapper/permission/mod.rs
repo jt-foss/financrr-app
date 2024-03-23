@@ -12,11 +12,11 @@ use entity::utility::table::{does_entity_exist, does_table_exists};
 
 use crate::api::error::api::ApiError;
 use crate::api::pagination::{PageSizeParam, Pagination};
-use crate::database::connection::get_database_connection;
-use crate::database::entity::{count, delete, find_all_paginated, find_one, insert, update};
+use crate::databases::connections::psql::get_database_connection;
+use crate::databases::entity::{count, delete, find_all_paginated, find_one, insert, update};
 use crate::wrapper::entity::WrapperEntity;
 
-pub mod cleanup;
+pub(crate) mod cleanup;
 
 bitflags! {
     #[derive(Debug, Clone, PartialEq, Eq, Serialize, ToSchema)]
