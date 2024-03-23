@@ -18,8 +18,10 @@ async fn init_search() {
     init_transactions_search().await;
 }
 
-pub(crate) trait WrapperEntity {
+pub(crate) trait WrapperEntity: TableName {
     fn get_id(&self) -> i32;
+}
 
-    fn table_name(&self) -> String;
+pub(crate) trait TableName {
+    fn table_name() -> &'static str;
 }

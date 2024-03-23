@@ -10,9 +10,12 @@ use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
 use crate::databases::entity::{count, delete, find_all_paginated, find_one_or_error, insert, update};
 use crate::wrapper::entity::budget::dto::BudgetDTO;
+use crate::wrapper::entity::transaction::Transaction;
 use crate::wrapper::entity::user::User;
-use crate::wrapper::entity::WrapperEntity;
-use crate::wrapper::permission::{HasPermissionOrError, Permission, Permissions};
+use crate::wrapper::entity::{TableName, WrapperEntity};
+use crate::wrapper::permission::{
+    HasPermissionByIdOrError, HasPermissionOrError, Permission, PermissionByIds, Permissions,
+};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
 pub(crate) mod dto;
@@ -78,6 +81,23 @@ impl Budget {
 
         Ok(update(model).await?.into())
     }
+
+    pub(crate) async fn find_related_transactions_paginated(
+        budget_id: i32,
+        page_size: &PageSizeParam,
+    ) -> Result<Vec<Transaction>, ApiError> {
+        let transactions = find_all_paginated(budget::Entity::find_related_transactions(budget_id), page_size)
+            .await?
+            .into_iter()
+            .map(Transaction::from)
+            .collect();
+
+        Ok(transactions)
+    }
+
+    pub(crate) async fn count_related_transactions(budget_id: i32) -> Result<u64, ApiError> {
+        count(budget::Entity::find_related_transactions(budget_id)).await
+    }
 }
 
 impl Identifiable for Budget {
@@ -86,19 +106,25 @@ impl Identifiable for Budget {
     }
 }
 
+impl TableName for Budget {
+    fn table_name() -> &'static str {
+        budget::Entity.table_name()
+    }
+}
+
 impl WrapperEntity for Budget {
     fn get_id(&self) -> i32 {
         self.id
     }
-
-    fn table_name(&self) -> String {
-        budget::Entity.table_name().to_string()
-    }
 }
+
+impl PermissionByIds for Budget {}
 
 impl Permission for Budget {}
 
 impl HasPermissionOrError for Budget {}
+
+impl HasPermissionByIdOrError for Budget {}
 
 impl From<budget::Model> for Budget {
     fn from(model: budget::Model) -> Self {

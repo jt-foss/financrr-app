@@ -16,8 +16,8 @@ use crate::databases::entity::{count, find_one, find_one_or_error, insert};
 use crate::util::auth::extract_bearer_token;
 use crate::wrapper::entity::session::Session;
 use crate::wrapper::entity::user::dto::UserRegistration;
-use crate::wrapper::entity::WrapperEntity;
-use crate::wrapper::permission::{HasPermissionOrError, Permission, Permissions};
+use crate::wrapper::entity::{TableName, WrapperEntity};
+use crate::wrapper::permission::{HasPermissionOrError, Permission, PermissionByIds, Permissions};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
 pub(crate) mod dto;
@@ -84,15 +84,19 @@ impl Identifiable for User {
     }
 }
 
+impl TableName for User {
+    fn table_name() -> &'static str {
+        user::Entity.table_name()
+    }
+}
+
 impl WrapperEntity for User {
     fn get_id(&self) -> i32 {
         self.id
     }
-
-    fn table_name(&self) -> String {
-        user::Entity.table_name().to_string()
-    }
 }
+
+impl PermissionByIds for User {}
 
 impl Permission for User {}
 

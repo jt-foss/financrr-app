@@ -14,7 +14,7 @@ use crate::api::error::api::ApiError;
 use crate::api::pagination::{PageSizeParam, Pagination};
 use crate::databases::connections::psql::get_database_connection;
 use crate::databases::entity::{count, delete, find_all_paginated, find_one, insert, update};
-use crate::wrapper::entity::WrapperEntity;
+use crate::wrapper::entity::{TableName, WrapperEntity};
 
 pub(crate) mod cleanup;
 
@@ -97,42 +97,21 @@ impl From<Option<permissions::Model>> for Permissions {
     }
 }
 
-pub(crate) trait Permission: WrapperEntity {
+pub(crate) trait Permission: PermissionByIds + WrapperEntity {
     fn get_permissions(&self, user_id: i32) -> impl Future<Output = Result<Permissions, ApiError>> {
-        async move {
-            Ok(Permissions::from(
-                find_one(permissions::Entity::find_permission(user_id, self.table_name().as_str(), self.get_id()))
-                    .await?,
-            ))
-        }
+        async move { Self::get_permissions_by_id(self.get_id(), user_id).await }
     }
 
     fn has_permission(&self, user_id: i32, permissions: Permissions) -> impl Future<Output = Result<bool, ApiError>> {
-        async move {
-            Ok(Permissions::from(
-                find_one(permissions::Entity::find_permission(user_id, self.table_name().as_str(), self.get_id()))
-                    .await?,
-            )
-            .contains(permissions))
-        }
+        async move { Self::has_permission_by_id(self.get_id(), user_id, permissions).await }
     }
 
     fn add_permission(&self, user_id: i32, permissions: Permissions) -> impl Future<Output = Result<(), ApiError>> {
-        async move {
-            let current_permissions = self.get_permissions(user_id).await?;
-            let permissions = current_permissions | permissions;
-
-            save_permission_active_model(self, user_id, permissions).await
-        }
+        async move { Self::add_permission_by_id(self.get_id(), user_id, permissions).await }
     }
 
     fn remove_permission(&self, user_id: i32, permissions: Permissions) -> impl Future<Output = Result<(), ApiError>> {
-        async move {
-            let mut current_permissions = self.get_permissions(user_id).await?;
-            current_permissions.remove(permissions);
-
-            save_permission_active_model(self, user_id, current_permissions).await
-        }
+        async move { Self::remove_permission_by_id(self.get_id(), user_id, permissions).await }
     }
 }
 
@@ -144,33 +123,103 @@ pub(crate) trait HasPermissionOrError: Permission {
     ) -> impl Future<Output = Result<(), ApiError>> {
         async move {
             let user_permissions = self.get_permissions(user_id).await?;
-            if !user_permissions.contains(permissions.clone()) {
-                if permissions.contains(Permissions::READ) && !user_permissions.contains(Permissions::READ) {
-                    return Err(ApiError::ResourceNotFound(self.table_name().as_str()));
-                }
-                return Err(ApiError::MissingPermissions());
-            }
 
-            Ok(())
+            has_permission_or_error_raw(user_permissions, permissions, Self::table_name())
         }
     }
 }
 
-async fn save_permission_active_model<T: Permission + ?Sized>(
-    permission: &T,
+pub(crate) trait PermissionByIds: TableName {
+    fn get_permissions_by_id(entity_id: i32, user_id: i32) -> impl Future<Output = Result<Permissions, ApiError>> {
+        async move {
+            Ok(Permissions::from(
+                find_one(permissions::Entity::find_permission(user_id, Self::table_name(), entity_id)).await?,
+            ))
+        }
+    }
+
+    fn has_permission_by_id(
+        entity_id: i32,
+        user_id: i32,
+        permissions: Permissions,
+    ) -> impl Future<Output = Result<bool, ApiError>> {
+        async move {
+            Ok(Permissions::from(
+                find_one(permissions::Entity::find_permission(user_id, Self::table_name(), entity_id)).await?,
+            )
+            .contains(permissions))
+        }
+    }
+
+    fn add_permission_by_id(
+        entity_id: i32,
+        user_id: i32,
+        permissions: Permissions,
+    ) -> impl Future<Output = Result<(), ApiError>> {
+        async move {
+            let current_permissions = Self::get_permissions_by_id(entity_id, user_id).await?;
+            let permissions = current_permissions | permissions;
+
+            save_permission_active_model(entity_id, Self::table_name(), user_id, permissions).await
+        }
+    }
+
+    fn remove_permission_by_id(
+        entity_id: i32,
+        user_id: i32,
+        permissions: Permissions,
+    ) -> impl Future<Output = Result<(), ApiError>> {
+        async move {
+            let mut current_permissions = Self::get_permissions_by_id(entity_id, user_id).await?;
+            current_permissions.remove(permissions);
+
+            save_permission_active_model(entity_id, Self::table_name(), user_id, current_permissions).await
+        }
+    }
+}
+
+pub(crate) trait HasPermissionByIdOrError: PermissionByIds {
+    fn has_permission_by_id_or_error(
+        entity_id: i32,
+        user_id: i32,
+        permissions: Permissions,
+    ) -> impl Future<Output = Result<(), ApiError>> {
+        async move {
+            let user_permissions = Self::get_permissions_by_id(entity_id, user_id).await?;
+
+            has_permission_or_error_raw(user_permissions, permissions, Self::table_name())
+        }
+    }
+}
+
+fn has_permission_or_error_raw(
+    user_permissions: Permissions,
+    permissions: Permissions,
+    table_name: &str,
+) -> Result<(), ApiError> {
+    if !user_permissions.contains(permissions.clone()) {
+        if permissions.contains(Permissions::READ) && !user_permissions.contains(Permissions::READ) {
+            return Err(ApiError::ResourceNotFound(table_name));
+        }
+        return Err(ApiError::MissingPermissions());
+    }
+
+    Ok(())
+}
+
+async fn save_permission_active_model(
+    entity_id: i32,
+    table_name: &str,
     user_id: i32,
     permissions: Permissions,
 ) -> Result<(), ApiError> {
     let active_model = permissions::ActiveModel {
         user_id: Set(user_id),
-        entity_type: Set(permission.table_name().to_string()),
-        entity_id: Set(permission.get_id()),
+        entity_type: Set(table_name.to_string()),
+        entity_id: Set(entity_id),
         permissions: Set(permissions.bits() as i32),
     };
-    if count(permissions::Entity::find_permission(user_id, permission.table_name().as_str(), permission.get_id()))
-        .await?
-        > 0
-    {
+    if count(permissions::Entity::find_permission(user_id, table_name, entity_id)).await? > 0 {
         update(active_model).await?;
     } else {
         insert(active_model).await?;

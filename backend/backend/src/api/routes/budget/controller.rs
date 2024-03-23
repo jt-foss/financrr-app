@@ -9,12 +9,18 @@ use crate::api::pagination::{PageSizeParam, Pagination};
 use crate::wrapper::entity::budget::dto::BudgetDTO;
 use crate::wrapper::entity::budget::Budget;
 use crate::wrapper::entity::user::User;
-use crate::wrapper::permission::{HasPermissionOrError, Permissions};
+use crate::wrapper::permission::{HasPermissionByIdOrError, HasPermissionOrError, Permissions};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
 pub(crate) fn budget_controller(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("/budget").service(get_one).service(get_all).service(create).service(delete).service(update),
+        web::scope("/budget")
+            .service(get_one)
+            .service(get_all)
+            .service(get_transactions)
+            .service(create)
+            .service(delete)
+            .service(update),
     );
 }
 
@@ -63,6 +69,36 @@ pub(crate) async fn get_one(user: Phantom<User>, budget_id: Path<i32>) -> Result
     budget.has_permission_or_error(user.get_id(), Permissions::READ).await?;
 
     Ok(HttpResponse::Ok().json(budget))
+}
+
+#[utoipa::path(get,
+responses(
+(status = 200, description = "Successfully retrieved the Transactions.", content_type = "application/json", body = PaginatedTransaction),
+Unauthorized,
+ResourceNotFound,
+InternalServerError,
+),
+params(PageSizeParam),
+security(
+("bearer_token" = [])
+),
+path = "/api/v1/budget/{budget_id}/transactions/?page={page}&size={size}",
+tag = "Budget"
+)]
+#[get("/{budget_id}/transactions")]
+pub(crate) async fn get_transactions(
+    user: Phantom<User>,
+    budget_id: Path<i32>,
+    page_size: PageSizeParam,
+    uri: Uri,
+) -> Result<impl Responder, ApiError> {
+    let budget_id = budget_id.into_inner();
+    Budget::has_permission_by_id_or_error(budget_id, user.get_id(), Permissions::READ).await?;
+
+    let transactions = Budget::find_related_transactions_paginated(budget_id, &page_size).await?;
+    let total = Budget::count_related_transactions(budget_id).await?;
+
+    Ok(HttpResponse::Ok().json(Pagination::new(transactions, &page_size, total, uri)))
 }
 
 #[utoipa::path(post,
