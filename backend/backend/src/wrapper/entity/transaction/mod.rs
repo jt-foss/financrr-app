@@ -119,6 +119,18 @@ impl Transaction {
     pub(crate) async fn count_all_by_user(user_id: i32) -> Result<u64, ApiError> {
         count(transaction::Entity::find_all_by_user(user_id)).await
     }
+
+    pub(crate) async fn find_all_paginated(page_size: PageSizeParam) -> Result<Vec<Self>, ApiError> {
+        Ok(find_all_paginated(transaction::Entity::find(), &page_size)
+            .await?
+            .into_iter()
+            .map(Self::from)
+            .collect())
+    }
+
+    pub(crate) async fn count_all() -> Result<u64, ApiError> {
+        count(transaction::Entity::find()).await
+    }
 }
 
 impl TableName for Transaction {

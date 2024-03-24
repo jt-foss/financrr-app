@@ -9,7 +9,7 @@ use entity::utility::time::get_now;
 
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
-use crate::databases::entity::{count, delete, find_all, find_one_or_error, insert, update};
+use crate::databases::entity::{count, delete, find_all, find_all_paginated, find_one_or_error, insert, update};
 use crate::wrapper::entity::account::dto::AccountDTO;
 use crate::wrapper::entity::currency::Currency;
 use crate::wrapper::entity::transaction::Transaction;

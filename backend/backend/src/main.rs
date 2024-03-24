@@ -6,8 +6,7 @@ use actix_cors::Cors;
 use actix_limitation::{Limiter, RateLimiter};
 use actix_web::{
     App,
-    error,
-    HttpResponse, HttpServer, web::{self},
+    HttpServer, web::{self},
 };
 use actix_web::middleware::{Compress, DefaultHeaders, NormalizePath, TrailingSlash};
 use actix_web::web::Data;
@@ -24,6 +23,7 @@ use utoipauto::utoipauto;
 use entity::utility::loading::load_schema;
 use migration::Migrator;
 use migration::MigratorTrait;
+use crate::api::error::api::ApiError;
 
 use crate::api::routes::account::controller::account_controller;
 use crate::api::routes::budget::controller::budget_controller;
@@ -127,9 +127,9 @@ async fn main() -> Result<()> {
             .wrap(Compress::default())
             .wrap(build_cors())
             .wrap(prometheus_metrics.clone())
-            .app_data(JsonConfig::default().error_handler(|err, _| handle_validation_error(err)))
-            .app_data(QueryConfig::default().error_handler(|err, _| handle_validation_error(err)))
-            .app_data(PathConfig::default().error_handler(|err, _| handle_validation_error(err)))
+            .app_data(JsonConfig::default().error_handler(|err, _| handle_validation_error(err).into()))
+            .app_data(QueryConfig::default().error_handler(|err, _| handle_validation_error(err).into()))
+            .app_data(PathConfig::default().error_handler(|err, _| handle_validation_error(err).into()))
             .app_data(limiter.clone())
             .configure(configure_api)
             .service(SwaggerUi::new("/swagger-ui/{_:.*}").url("/api-docs/openapi.json", openapi.clone()))
@@ -139,7 +139,7 @@ async fn main() -> Result<()> {
     .await
 }
 
-fn handle_validation_error(err: Error) -> actix_web::Error {
+fn handle_validation_error(err: Error) -> ApiError {
     let json_error = match &err {
         Error::Validate(error) => ValidationErrorJsonPayload::from(error),
         _ => ValidationErrorJsonPayload {
@@ -147,7 +147,8 @@ fn handle_validation_error(err: Error) -> actix_web::Error {
             fields: Vec::new(),
         },
     };
-    error::InternalError::from_response(err, HttpResponse::BadRequest().json(json_error)).into()
+
+    ApiError::from(json_error)
 }
 
 fn configure_api(cfg: &mut web::ServiceConfig) {

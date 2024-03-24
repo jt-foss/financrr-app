@@ -1,7 +1,10 @@
 use std::collections::HashMap;
+
 use opensearch::BulkParts;
+use opensearch::http::request::JsonBody;
 use opensearch::indices::IndicesCreateParts;
-use serde_json::json;
+use serde_json::{json, Value};
+
 use crate::databases::connections::search::get_open_search_client;
 
 #[derive(Debug)]
@@ -54,29 +57,15 @@ impl IndexType {
 pub(crate) struct Indexer;
 
 impl Indexer {
-    pub(crate) async fn index_documents(index: &str, documents: Vec<HashMap<String, String>>) {
-        let client = get_open_search_client();
-        let body = documents
-            .iter()
-            .map(|document| {
-                json!({
-                    "index": {
-                        "_index": index,
-                        "_id": document.get("id").unwrap(),
-                    }
-                })
-            })
-            .chain(documents.iter().map(|document| {
-                json!(document)
-            }))
-            .collect::<Vec<_>>();
+    pub(crate) async fn index_documents(index: &str, documents: Vec<Value>) {
+        let body: Vec<JsonBody<_>> = documents.into_iter().map(JsonBody::new).collect();
 
+        let client = get_open_search_client();
         client
             .bulk(BulkParts::Index(index))
-            .body(body)
+            .body(body.into())
             .send()
             .await
             .expect(format!("Documents not indexed in {}", index).as_str());
     }
-
 }
