@@ -1,8 +1,10 @@
 use std::collections::HashMap;
 
+use opensearch::BulkParts;
 use opensearch::http::request::JsonBody;
 use opensearch::indices::IndicesCreateParts;
-use opensearch::BulkParts;
+use serde::de::DeserializeOwned;
+use serde_aux::prelude::serde_introspect;
 use serde_json::{json, Value};
 
 use crate::databases::connections::search::get_open_search_client;
@@ -52,6 +54,7 @@ pub(crate) struct IndexType;
 impl IndexType {
     pub(crate) const TEXT: &'static str = "text";
     pub(crate) const INTEGER: &'static str = "integer";
+    pub(crate) const DATE: &'static str = "date";
 }
 
 pub(crate) struct Indexer;

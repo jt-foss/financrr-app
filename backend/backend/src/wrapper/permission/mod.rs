@@ -13,7 +13,7 @@ use entity::utility::table::{does_entity_exist, does_table_exists};
 use crate::api::error::api::ApiError;
 use crate::api::pagination::{PageSizeParam, Pagination};
 use crate::databases::connections::psql::get_database_connection;
-use crate::databases::entity::{count, delete, find_all_paginated, find_one, insert, update};
+use crate::databases::entity::{count, delete, find_all, find_all_paginated, find_one, insert, update};
 use crate::wrapper::entity::{TableName, WrapperEntity};
 
 pub(crate) mod cleanup;
@@ -71,6 +71,19 @@ impl PermissionsEntity {
         }
 
         Ok(false)
+    }
+
+    pub(crate) async fn find_users_with_permissions(
+        entity_type: &str,
+        entity_id: i32,
+        permissions: Permissions) -> Result<Vec<i32>, ApiError> {
+        let permissions = find_all(permissions::Entity::find_users_with_permissions(entity_type, entity_id, permissions.bits() as i32))
+            .await?
+            .into_iter()
+            .map(|p| p.user_id)
+            .collect();
+
+        Ok(permissions)
     }
 }
 
