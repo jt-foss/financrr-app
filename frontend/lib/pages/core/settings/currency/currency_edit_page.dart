@@ -13,7 +13,8 @@ import '../../../../router.dart';
 import '../../../../widgets/async_wrapper.dart';
 
 class CurrencyEditPage extends StatefulWidget {
-  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: CurrencySettingsPage.pagePath, path: 'edit');
+  static const PagePathBuilder pagePath =
+      PagePathBuilder.child(parent: CurrencySettingsPage.pagePath, path: ':currencyId/edit');
 
   final String? currencyId;
 

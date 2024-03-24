@@ -1,7 +1,6 @@
-import 'dart:math';
+import 'dart:async';
 
-import 'package:financrr_frontend/pages/core/settings/currency_settings_page.dart';
-import 'package:financrr_frontend/pages/core/transactions_list_page.dart';
+import 'package:financrr_frontend/pages/core/account_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/input_utils.dart';
 import 'package:flutter/material.dart';
@@ -11,60 +10,72 @@ import 'package:restrr/restrr.dart';
 
 import '../../../../../layout/adaptive_scaffold.dart';
 import '../../../../../router.dart';
+import '../../../widgets/async_wrapper.dart';
+import '../../../widgets/entities/transaction_card.dart';
 
 class TransactionCreatePage extends StatefulWidget {
-  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: TransactionListPage.pagePath, path: 'create');
+  static const PagePathBuilder pagePath =
+      PagePathBuilder.child(parent: AccountPage.pagePath, path: 'transactions/create');
 
-  const TransactionCreatePage({super.key});
+  final String? accountId;
+
+  const TransactionCreatePage({super.key, required this.accountId});
 
   @override
   State<StatefulWidget> createState() => TransactionCreatePageState();
 }
 
 class TransactionCreatePageState extends State<TransactionCreatePage> {
+  final StreamController<Account> _accountStreamController = StreamController.broadcast();
   final GlobalKey<FormState> _formKey = GlobalKey();
-
   late final Restrr _api = context.api!;
 
-  late final TextEditingController _symbolController;
-  late final TextEditingController _nameController;
-  late final TextEditingController _isoCodeController;
-  late final TextEditingController _decimalPlacesController;
-
-  late final double _randomNumber;
+  final TextEditingController _amountController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
 
   bool _isValid = false;
+  TransactionType _type = TransactionType.deposit;
+
+  Future<Account?> _fetchAccount({bool forceRetrieve = false}) async {
+    return _accountStreamController.fetchData(
+        widget.accountId, (id) => _api.retrieveAccountById(id, forceRetrieve: forceRetrieve));
+  }
 
   @override
   void initState() {
     super.initState();
-    _symbolController = TextEditingController(text: '€');
-    _nameController = TextEditingController(text: 'Euro');
-    _isoCodeController = TextEditingController(text: 'EUR');
-    _decimalPlacesController = TextEditingController(text: '2');
+    _fetchAccount();
     _isValid = _formKey.currentState?.validate() ?? false;
-    final Random random = Random();
-    _randomNumber = random.nextDouble() + (random.nextInt(128) + 128);
   }
 
   @override
   void dispose() {
-    _symbolController.dispose();
-    _nameController.dispose();
-    _isoCodeController.dispose();
-    _decimalPlacesController.dispose();
+    _amountController.dispose();
+    _descriptionController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return AdaptiveScaffold(
-      resizeToAvoidBottomInset: false,
-      verticalBuilder: (_, __, size) => SafeArea(child: _buildVerticalLayout(size)),
+    return AdaptiveScaffold(verticalBuilder: (_, __, size) => SafeArea(child: _handleAccountStream(size)));
+  }
+
+  Widget _handleAccountStream(Size size) {
+    return StreamWrapper(
+      stream: _accountStreamController.stream,
+      onSuccess: (ctx, snap) {
+        return _buildVerticalLayout(snap.data!, size);
+      },
+      onLoading: (ctx, snap) {
+        return const Center(child: CircularProgressIndicator());
+      },
+      onError: (ctx, snap) {
+        return const Text('Could not find account');
+      },
     );
   }
 
-  Widget _buildVerticalLayout(Size size) {
+  Widget _buildVerticalLayout(Account account, Size size) {
     return Padding(
       padding: const EdgeInsets.only(top: 10, bottom: 20),
       child: Align(
@@ -77,17 +88,23 @@ class TransactionCreatePageState extends State<TransactionCreatePage> {
             onChanged: () => setState(() => _isValid = _formKey.currentState?.validate() ?? false),
             child: Column(
               children: [
-                ...buildCurrencyPreview(size, _symbolController.text, _nameController.text, _isoCodeController.text,
-                    _decimalPlacesController.text, _randomNumber),
+                buildTransactionPreview(
+                  _amountController.text,
+                  _descriptionController.text,
+                  account,
+                  _type,
+                ),
                 const Divider(),
-                ...buildFormFields(
-                    _nameController, _symbolController, _isoCodeController, _decimalPlacesController, false),
+                ...buildFormFields(context, account, _amountController, _descriptionController, _type, false,
+                    onSelectionChanged: (types) {
+                  setState(() => _type = types.first);
+                }),
                 SizedBox(
                   width: double.infinity,
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: _isValid ? () => _createCurrency() : null,
-                    child: Text(_nameController.text.isEmpty ? 'Create Currency' : 'Create "${_nameController.text}"'),
+                    onPressed: _isValid ? () => _createTransaction(account, _type) : null,
+                    child: const Text('Create Transaction'),
                   ),
                 ),
               ],
@@ -98,51 +115,68 @@ class TransactionCreatePageState extends State<TransactionCreatePage> {
     );
   }
 
-  static List<Widget> buildCurrencyPreview(
-      Size size, String symbol, String name, String isoCode, String decimalPlaces, double previewAmount) {
-    return [
-      Card(
-        child: ListTile(
-          leading: const Text('Preview'),
-          title: Text('${previewAmount.toStringAsFixed(int.tryParse(decimalPlaces) ?? 0)} $symbol'),
-        ),
-      ),
-      SizedBox(
-        width: size.width,
-        child: DataTable(columns: const [
-          DataColumn(label: Text('Symbol')),
-          DataColumn(label: Text('Name')),
-          DataColumn(label: Text('ISO')),
-        ], rows: [
-          DataRow(cells: [DataCell(Text(symbol)), DataCell(Text(name)), DataCell(Text(isoCode))])
-        ]),
-      ),
-    ];
+  static Widget buildTransactionPreview(String amount, String description, Account account, TransactionType type) {
+    return TransactionCard.fromData(
+      id: 0,
+      amount: int.tryParse(amount) ?? 0,
+      account: account,
+      description: description.isEmpty ? null : description,
+      type: type,
+      createdAt: DateTime.now(),
+      executedAt: DateTime.now(),
+      interactive: false,
+    );
   }
 
-  static List<Widget> buildFormFields(TextEditingController nameController, TextEditingController symbolController,
-      TextEditingController isoCodeController, TextEditingController decimalPlacesController, bool readOnly) {
+  static List<Widget> buildFormFields(
+      BuildContext context,
+      Account currentAccount,
+      TextEditingController amountController,
+      TextEditingController descriptionController,
+      TransactionType selected,
+      bool readOnly,
+      {Function(Set<TransactionType>)? onSelectionChanged,
+      Function(Account?)? onSecondaryChanged}) {
     return [
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
-        child: TextFormField(
-          controller: nameController,
-          readOnly: readOnly,
-          decoration: const InputDecoration(labelText: 'Name'),
-          validator: (value) => InputValidators.nonNull('Name', value),
-          inputFormatters: [
-            LengthLimitingTextInputFormatter(32),
-          ],
+        child: SizedBox(
+          width: double.infinity,
+          child: SegmentedButton(
+            onSelectionChanged: onSelectionChanged,
+            segments: const [
+              ButtonSegment(label: Text('Deposit'), value: TransactionType.deposit),
+              ButtonSegment(label: Text('Withdrawal'), value: TransactionType.withdrawal),
+              ButtonSegment(label: Text('Transfer'), value: TransactionType.transfer),
+            ],
+            selected: {selected},
+          ),
         ),
       ),
+      if (selected == TransactionType.transfer)
+        Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: DropdownButtonFormField(
+              decoration: const InputDecoration(labelText: 'Transfer To'),
+              validator: (value) => InputValidators.nonNull('Transfer To', value?.id.toString()),
+              items:
+                  currentAccount.api.getAccounts().where((account) => account.id != currentAccount.id).map((account) {
+                return DropdownMenuItem(
+                  value: account,
+                  child: Text(account.name, style: context.textTheme.bodyMedium),
+                );
+              }).toList(),
+              onChanged: onSecondaryChanged,
+            )),
       Padding(
-        padding: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.symmetric(vertical: 10),
         child: TextFormField(
-          controller: symbolController,
+          controller: amountController,
           readOnly: readOnly,
-          decoration: const InputDecoration(labelText: 'Symbol'),
-          validator: (value) => InputValidators.nonNull('Symbol', value),
+          decoration: const InputDecoration(labelText: 'Amount'),
+          validator: (value) => InputValidators.nonNull('Amount', value),
           inputFormatters: [
+            FilteringTextInputFormatter.digitsOnly,
             LengthLimitingTextInputFormatter(6),
           ],
         ),
@@ -150,41 +184,43 @@ class TransactionCreatePageState extends State<TransactionCreatePage> {
       Padding(
         padding: const EdgeInsets.only(bottom: 10),
         child: TextFormField(
-          controller: isoCodeController,
+          controller: descriptionController,
           readOnly: readOnly,
-          decoration: const InputDecoration(labelText: 'ISO Code'),
+          decoration: const InputDecoration(labelText: 'Description'),
+          validator: (value) => InputValidators.nonNull('Description', value),
           inputFormatters: [
-            LengthLimitingTextInputFormatter(3),
+            LengthLimitingTextInputFormatter(32),
           ],
         ),
       ),
       Padding(
         padding: const EdgeInsets.only(bottom: 10),
-        child: TextFormField(
-          controller: decimalPlacesController,
-          readOnly: readOnly,
-          decoration: const InputDecoration(labelText: 'Decimal Places'),
-          validator: (value) => InputValidators.nonNull('Decimal Places', value),
-          inputFormatters: [
-            FilteringTextInputFormatter.digitsOnly,
-            LengthLimitingTextInputFormatter(1),
-          ],
+        child: InputDatePickerFormField(
+          firstDate: DateTime.now().subtract(const Duration(days: 365)),
+          lastDate: DateTime.now().add(const Duration(days: 365)),
+          initialDate: DateTime.now(),
         ),
       ),
     ];
   }
 
-  Future<void> _createCurrency() async {
+  Future<void> _createTransaction(Account account, TransactionType type, {Account? secondary}) async {
     if (!_isValid) return;
+    final (Id?, Id?) sourceAndDest = switch (_type) {
+      TransactionType.deposit => (null, account.id),
+      TransactionType.withdrawal => (account.id, null),
+      TransactionType.transfer => (account.id, secondary!.id),
+    };
     try {
-      await _api.createCurrency(
-        name: _nameController.text,
-        symbol: _symbolController.text,
-        decimalPlaces: int.parse(_decimalPlacesController.text),
-        isoCode: _isoCodeController.text.isEmpty ? null : _isoCodeController.text,
-      );
+      await _api.createTransaction(
+          source: sourceAndDest.$1,
+          destination: sourceAndDest.$2,
+          amount: int.parse(_amountController.text),
+          description: _descriptionController.text,
+          executedAt: DateTime.now(),
+          currency: account.currency);
       if (!mounted) return;
-      context.showSnackBar('Successfully created "${_nameController.text}"');
+      context.showSnackBar('Successfully created transaction');
       context.pop();
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);

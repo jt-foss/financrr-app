@@ -1,9 +1,7 @@
 import 'dart:async';
 
 import 'package:financrr_frontend/pages/core/settings/account_settings_page.dart';
-import 'package:financrr_frontend/pages/core/transactions_list_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
-import 'package:financrr_frontend/util/text_utils.dart';
 import 'package:financrr_frontend/widgets/async_wrapper.dart';
 import 'package:financrr_frontend/widgets/entities/account_card.dart';
 import 'package:financrr_frontend/widgets/entities/transaction_card.dart';
@@ -83,11 +81,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   ],
                 ),
               ),
-              for (Account a in _api.getAccounts())
-                Padding(
-                  padding: const EdgeInsets.only(top: 20),
-                  child: AccountCard(account: a),
-                ),
+              for (Account a in _api.getAccounts()) AccountCard(account: a),
               if (_api.getAccounts().isEmpty)
                 Padding(
                   padding: const EdgeInsets.only(top: 20),
@@ -113,35 +107,24 @@ class _DashboardPageState extends State<DashboardPage> {
 
   Widget _buildTransactionSection() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.only(top: 20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Latest Transactions', style: context.textTheme.titleMedium),
-              TextButton.icon(
-                  label: const Text('View all'),
-                  icon: const Icon(Icons.manage_search),
-                  onPressed: () => context.goPath(TransactionListPage.pagePath.build()))
-            ],
-          ),
+          child: Text('Latest Transactions', style: context.textTheme.titleMedium),
         ),
-        Padding(
-          padding: const EdgeInsets.only(top: 20),
-          child: StreamWrapper(
-              stream: _transactionStreamController.stream,
-              onError: (context, snap) => const Text('Error'),
-              onLoading: (context, snap) => const Center(child: CircularProgressIndicator()),
-              onSuccess: (context, snap) {
-                return Column(
-                  children: [
-                    for (Transaction t in snap.data!.items)
-                      SizedBox(width: double.infinity, child: TransactionCard(transaction: t))
-                  ],
-                );
-              }),
-        )
+        StreamWrapper(
+            stream: _transactionStreamController.stream,
+            onError: (context, snap) => const Text('Error'),
+            onLoading: (context, snap) => const Center(child: CircularProgressIndicator()),
+            onSuccess: (context, snap) {
+              return Column(
+                children: [
+                  for (Transaction t in snap.data!.items)
+                    SizedBox(width: double.infinity, child: TransactionCard(transaction: t))
+                ],
+              );
+            })
       ],
     );
   }

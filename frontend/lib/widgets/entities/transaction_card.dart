@@ -1,46 +1,83 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:financrr_frontend/router.dart';
 import 'package:financrr_frontend/util/extensions.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:restrr/restrr.dart';
 
+import '../../pages/core/transactions/transaction_page.dart';
 import '../../util/text_utils.dart';
 
 class TransactionCard extends StatelessWidget {
-  final Transaction transaction;
+  final Id id;
+  final Id? source;
+  final Id? destination;
+  final int amount;
+  final String? description;
+  final DateTime executedAt;
+  final DateTime createdAt;
+  final Account account;
+  final TransactionType type;
 
-  const TransactionCard({super.key, required this.transaction});
+  final bool interactive;
+
+  TransactionCard({super.key, required Transaction transaction, this.interactive = true})
+      : id = transaction.id,
+        source = transaction.source,
+        destination = transaction.destination,
+        amount = transaction.amount,
+        description = transaction.description,
+        executedAt = transaction.executedAt,
+        createdAt = transaction.createdAt,
+        account = transaction.getSourceAccount() ?? transaction.getDestinationAccount()!,
+        type = transaction.type;
+
+  const TransactionCard.fromData(
+      {super.key,
+      required this.id,
+      this.source,
+      this.destination,
+      required this.amount,
+      required this.description,
+      required this.executedAt,
+      required this.createdAt,
+      required this.account,
+      required this.type,
+      this.interactive = true});
 
   @override
   Widget build(BuildContext context) {
-    final String amount =
-        TextUtils.formatCurrency(transaction.amount, _getEffectiveAccount().getCurrency()!, decimalSeparator: ',');
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(transaction.description ?? 'UNKNOWN', style: context.textTheme.titleSmall),
-            Text(_getEffectiveAccount().iban ?? _getEffectiveAccount().name),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(DateFormat('dd.mm.yyyy HH:mm').format(transaction.executedAt)),
-                Text('${transaction.type == TransactionType.deposit ? '' : '-'}$amount',
-                    style: context.textTheme.titleSmall?.copyWith(color: context.theme.primaryColor)),
-              ],
-            ),
-          ],
+    final String amountStr = TextUtils.formatCurrency(amount, account.getCurrency()!, decimalSeparator: ',');
+    return GestureDetector(
+      onTap: !interactive
+          ? null
+          : () => context.goPath(TransactionPage.pagePath
+              .build(pathParams: {'accountId': account.id.toString(), 'transactionId': id.toString()})),
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(description ?? 'Transaction', style: context.textTheme.titleSmall),
+              Text(TextUtils.formatIBAN(account.iban) ?? account.name),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(DateFormat('dd.MM.yyyy HH:mm').format(executedAt)),
+                  Text('${type == TransactionType.deposit ? '' : '-'}$amountStr',
+                      style: context.textTheme.titleMedium?.copyWith(
+                          color: type == TransactionType.deposit
+                              ? context.theme.primaryColor
+                              : context.theme.colorScheme.error)),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
-  }
-
-  Account _getEffectiveAccount() {
-    return transaction.getSourceAccount() ?? transaction.getDestinationAccount()!;
   }
 }

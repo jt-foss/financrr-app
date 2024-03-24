@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:financrr_frontend/pages/core/settings/account_settings_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/input_utils.dart';
@@ -10,6 +8,7 @@ import 'package:restrr/restrr.dart';
 
 import '../../../../../layout/adaptive_scaffold.dart';
 import '../../../../../router.dart';
+import '../../../../widgets/entities/account_card.dart';
 
 class AccountCreatePage extends StatefulWidget {
   static const PagePathBuilder pagePath = PagePathBuilder.child(parent: AccountSettingsPage.pagePath, path: 'create');
@@ -30,7 +29,7 @@ class AccountCreatePageState extends State<AccountCreatePage> {
   late final TextEditingController _ibanController = TextEditingController();
   late final TextEditingController _originalBalanceController = TextEditingController();
 
-  late Currency _currency;
+  Currency? _currency;
 
   bool _isValid = false;
 
@@ -70,11 +69,12 @@ class AccountCreatePageState extends State<AccountCreatePage> {
             onChanged: () => setState(() => _isValid = _formKey.currentState?.validate() ?? false),
             child: Column(
               children: [
-                buildAccountPreview(size, _nameController.text, _descriptionController.text, _ibanController.text,
-                    _originalBalanceController.text),
+                buildAccountPreview(context, size, _nameController.text, _descriptionController.text,
+                    _ibanController.text, _originalBalanceController.text, _currency ?? _api.getCurrencies().first),
                 const Divider(),
                 ...buildFormFields(context, _api, _nameController, _descriptionController, _ibanController,
-                    _originalBalanceController, false, (currency) => _currency = currency!),
+                    _originalBalanceController, false,
+                    onCurrencyChanged: (currency) => _currency = currency!),
                 SizedBox(
                   width: double.infinity,
                   height: 50,
@@ -91,12 +91,15 @@ class AccountCreatePageState extends State<AccountCreatePage> {
     );
   }
 
-  static Widget buildAccountPreview(Size size, String symbol, String name, String isoCode, String decimalPlaces) {
-    return Card(
-      child: ListTile(
-        leading: const Text('Preview'),
-        title: Text('test'),
-      ),
+  static Widget buildAccountPreview(BuildContext context, Size size, String name, String description, String iban,
+      String originalBalance, Currency currency) {
+    return AccountCard.fromData(
+      id: 0,
+      name: name,
+      iban: iban,
+      description: description,
+      balance: int.tryParse(originalBalance) ?? 0,
+      currency: currency,
     );
   }
 
@@ -108,7 +111,8 @@ class AccountCreatePageState extends State<AccountCreatePage> {
       TextEditingController ibanController,
       TextEditingController decimalPlacesController,
       bool readOnly,
-      void Function(Currency?)? onCurrencyChanged) {
+      {void Function(Currency?)? onCurrencyChanged,
+      Currency? initialCurrency}) {
     return [
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
@@ -161,6 +165,7 @@ class AccountCreatePageState extends State<AccountCreatePage> {
         child: DropdownButtonFormField(
             decoration: const InputDecoration(labelText: 'Currency'),
             validator: (value) => InputValidators.nonNull('Currency', value?.id.toString()),
+            value: initialCurrency,
             items: api.getCurrencies().map((currency) {
               return DropdownMenuItem(
                 value: currency,
@@ -173,14 +178,14 @@ class AccountCreatePageState extends State<AccountCreatePage> {
   }
 
   Future<void> _createAccount() async {
-    if (!_isValid) return;
+    if (!_isValid || _currency == null) return;
     try {
       await _api.createAccount(
         name: _nameController.text,
         description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
         iban: _ibanController.text.isEmpty ? null : _ibanController.text,
         originalBalance: int.tryParse(_originalBalanceController.text) ?? 0,
-        currency: _currency.id,
+        currency: _currency!.id,
       );
       if (!mounted) return;
       context.showSnackBar('Successfully created "${_nameController.text}"');

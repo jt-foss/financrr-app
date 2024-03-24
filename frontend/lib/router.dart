@@ -2,8 +2,10 @@ import 'package:financrr_frontend/layout/scaffold_navbar_shell.dart';
 import 'package:financrr_frontend/pages/auth/login_page.dart';
 import 'package:financrr_frontend/pages/auth/server_info_page.dart';
 import 'package:financrr_frontend/pages/context_navigator.dart';
+import 'package:financrr_frontend/pages/core/account_page.dart';
 import 'package:financrr_frontend/pages/core/settings/account_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings/accounts/account_create_page.dart';
+import 'package:financrr_frontend/pages/core/settings/accounts/account_edit_page.dart';
 import 'package:financrr_frontend/pages/core/settings/currency/currency_create_page.dart';
 import 'package:financrr_frontend/pages/core/settings/currency/currency_edit_page.dart';
 import 'package:financrr_frontend/pages/core/settings/currency_settings_page.dart';
@@ -12,7 +14,8 @@ import 'package:financrr_frontend/pages/core/settings/theme_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings_page.dart';
 import 'package:financrr_frontend/pages/core/dashboard_page.dart';
 import 'package:financrr_frontend/pages/core/dummy_page.dart';
-import 'package:financrr_frontend/pages/core/transactions_list_page.dart';
+import 'package:financrr_frontend/pages/core/transactions/transaction_create_page.dart';
+import 'package:financrr_frontend/pages/core/transactions/transaction_page.dart';
 import 'package:financrr_frontend/util/constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
@@ -39,19 +42,21 @@ class AppRouter {
                   path: DashboardPage.pagePath.path,
                   pageBuilder: _defaultBranchPageBuilder(const DashboardPage()),
                   redirect: coreAuthGuard),
+              ..._shellRoutes(),
             ]),
             StatefulShellBranch(routes: [
               GoRoute(
-                  path: TransactionListPage.pagePath.path,
-                  pageBuilder: (context, state) => _buildDefaultPageTransition(
-                      context, state, TransactionListPage(accountId: state.uri.queryParameters['accountId'])),
+                  path: '/@me/abc',
+                  pageBuilder: _defaultBranchPageBuilder(const DummyPage(text: 'A')),
                   redirect: coreAuthGuard),
+              ..._shellRoutes(),
             ]),
             StatefulShellBranch(routes: [
               GoRoute(
                   path: '/@me/statistics',
                   pageBuilder: _defaultBranchPageBuilder(const DummyPage(text: 'B')),
                   redirect: coreAuthGuard),
+              ..._shellRoutes(),
             ]),
             StatefulShellBranch(routes: [
               GoRoute(
@@ -68,6 +73,11 @@ class AppRouter {
                               path: AccountCreatePage.pagePath.path,
                               pageBuilder: _defaultBranchPageBuilder(const AccountCreatePage()),
                               redirect: coreAuthGuard),
+                          GoRoute(
+                              path: AccountEditPage.pagePath.path,
+                              pageBuilder: (context, state) => _buildDefaultPageTransition(
+                                  context, state, AccountEditPage(accountId: state.pathParameters['accountId'])),
+                              redirect: coreAuthGuard)
                         ]),
                     GoRoute(
                         path: ThemeSettingsPage.pagePath.path,
@@ -84,8 +94,8 @@ class AppRouter {
                               redirect: coreAuthGuard),
                           GoRoute(
                               path: CurrencyEditPage.pagePath.path,
-                              pageBuilder: (context, state) => _buildDefaultPageTransition(context, state,
-                                  CurrencyEditPage(currencyId: state.uri.queryParameters['currencyId'])),
+                              pageBuilder: (context, state) => _buildDefaultPageTransition(
+                                  context, state, CurrencyEditPage(currencyId: state.pathParameters['currencyId'])),
                               redirect: coreAuthGuard)
                         ]),
                     GoRoute(
@@ -93,6 +103,7 @@ class AppRouter {
                         pageBuilder: _defaultBranchPageBuilder(const SessionSettingsPage()),
                         redirect: coreAuthGuard),
                   ]),
+              ..._shellRoutes(),
             ]),
           ]),
     ],
@@ -109,6 +120,32 @@ class AppRouter {
           pageBuilder: (context, state) =>
               _buildDefaultPageTransition(context, state, ServerInfoPage(key: GlobalKeys.loginPage)),
           redirect: authGuard),
+    ];
+  }
+
+  static List<GoRoute> _shellRoutes() {
+    return [
+      GoRoute(
+          path: AccountPage.pagePath.path,
+          pageBuilder: (context, state) =>
+              _buildDefaultPageTransition(context, state, AccountPage(accountId: state.pathParameters['accountId'])),
+          redirect: coreAuthGuard,
+          routes: [
+            GoRoute(
+                path: TransactionPage.pagePath.path,
+                pageBuilder: (context, state) => _buildDefaultPageTransition(
+                    context,
+                    state,
+                    TransactionPage(
+                        accountId: state.pathParameters['accountId'],
+                        transactionId: state.pathParameters['transactionId'])),
+                redirect: coreAuthGuard),
+            GoRoute(
+                path: TransactionCreatePage.pagePath.path,
+                pageBuilder: (context, state) => _buildDefaultPageTransition(
+                    context, state, TransactionCreatePage(accountId: state.pathParameters['accountId'])),
+                redirect: coreAuthGuard),
+          ]),
     ];
   }
 
