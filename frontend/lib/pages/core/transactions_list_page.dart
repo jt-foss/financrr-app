@@ -61,9 +61,8 @@ class _TransactionListPageState extends State<TransactionListPage> {
       padding: const EdgeInsets.only(top: 10),
       child: Center(
         child: SizedBox(
-          width: size.width / 1.1,
-          child: ListView(
-            children: [
+            width: size.width / 1.1,
+            child: ListView(children: [
               Card(
                 child: ListTile(
                   title: const Text('Selected Account'),
@@ -114,9 +113,7 @@ class _TransactionListPageState extends State<TransactionListPage> {
                   },
                 ),
               )
-            ]
-          )
-        ),
+            ])),
       ),
     );
   }

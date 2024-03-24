@@ -14,7 +14,8 @@ class TransactionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String amount = TextUtils.formatCurrency(transaction.amount, _getEffectiveAccount().getCurrency()!, decimalSeparator: ',');
+    final String amount =
+        TextUtils.formatCurrency(transaction.amount, _getEffectiveAccount().getCurrency()!, decimalSeparator: ',');
     return Card(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
