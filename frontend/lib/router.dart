@@ -15,6 +15,7 @@ import 'package:financrr_frontend/pages/core/settings_page.dart';
 import 'package:financrr_frontend/pages/core/dashboard_page.dart';
 import 'package:financrr_frontend/pages/core/dummy_page.dart';
 import 'package:financrr_frontend/pages/core/transactions/transaction_create_page.dart';
+import 'package:financrr_frontend/pages/core/transactions/transaction_edit_page.dart';
 import 'package:financrr_frontend/pages/core/transactions/transaction_page.dart';
 import 'package:financrr_frontend/util/constants.dart';
 import 'package:flutter/cupertino.dart';
@@ -132,6 +133,11 @@ class AppRouter {
           redirect: coreAuthGuard,
           routes: [
             GoRoute(
+                path: TransactionCreatePage.pagePath.path,
+                pageBuilder: (context, state) => _buildDefaultPageTransition(
+                    context, state, TransactionCreatePage(accountId: state.pathParameters['accountId'])),
+                redirect: coreAuthGuard),
+            GoRoute(
                 path: TransactionPage.pagePath.path,
                 pageBuilder: (context, state) => _buildDefaultPageTransition(
                     context,
@@ -139,12 +145,18 @@ class AppRouter {
                     TransactionPage(
                         accountId: state.pathParameters['accountId'],
                         transactionId: state.pathParameters['transactionId'])),
-                redirect: coreAuthGuard),
-            GoRoute(
-                path: TransactionCreatePage.pagePath.path,
-                pageBuilder: (context, state) => _buildDefaultPageTransition(
-                    context, state, TransactionCreatePage(accountId: state.pathParameters['accountId'])),
-                redirect: coreAuthGuard),
+                redirect: coreAuthGuard,
+                routes: [
+                  GoRoute(
+                      path: TransactionEditPage.pagePath.path,
+                      pageBuilder: (context, state) => _buildDefaultPageTransition(
+                          context,
+                          state,
+                          TransactionEditPage(
+                              accountId: state.pathParameters['accountId'],
+                              transactionId: state.pathParameters['transactionId'])),
+                      redirect: coreAuthGuard)
+                ]),
           ]),
     ];
   }

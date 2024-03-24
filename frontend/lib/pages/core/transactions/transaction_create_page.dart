@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:financrr_frontend/pages/core/account_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/input_utils.dart';
@@ -35,6 +36,7 @@ class TransactionCreatePageState extends State<TransactionCreatePage> {
 
   bool _isValid = false;
   TransactionType _type = TransactionType.deposit;
+  DateTime _executedAt = DateTime.now();
 
   Future<Account?> _fetchAccount({bool forceRetrieve = false}) async {
     return _accountStreamController.fetchData(
@@ -95,10 +97,18 @@ class TransactionCreatePageState extends State<TransactionCreatePage> {
                   _type,
                 ),
                 const Divider(),
-                ...buildFormFields(context, account, _amountController, _descriptionController, _type, false,
-                    onSelectionChanged: (types) {
-                  setState(() => _type = types.first);
-                }),
+                ...buildFormFields(
+                  context,
+                  account,
+                  _amountController,
+                  _descriptionController,
+                  _type,
+                  false,
+                  onSelectionChanged: (types) {
+                    setState(() => _type = types.first);
+                  },
+                  onExecutedAtChanged: (date) => setState(() => _executedAt = date),
+                ),
                 SizedBox(
                   width: double.infinity,
                   height: 50,
@@ -135,8 +145,10 @@ class TransactionCreatePageState extends State<TransactionCreatePage> {
       TextEditingController descriptionController,
       TransactionType selected,
       bool readOnly,
-      {Function(Set<TransactionType>)? onSelectionChanged,
-      Function(Account?)? onSecondaryChanged}) {
+      {DateTime? executedAt,
+      Function(Set<TransactionType>)? onSelectionChanged,
+      Function(Account?)? onSecondaryChanged,
+      Function(DateTime)? onExecutedAtChanged}) {
     return [
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
@@ -195,10 +207,23 @@ class TransactionCreatePageState extends State<TransactionCreatePage> {
       ),
       Padding(
         padding: const EdgeInsets.only(bottom: 10),
-        child: InputDatePickerFormField(
-          firstDate: DateTime.now().subtract(const Duration(days: 365)),
-          lastDate: DateTime.now().add(const Duration(days: 365)),
-          initialDate: DateTime.now(),
+        child: TextFormField(
+          onTap: () async {
+            final DateTime? date = await showDatePicker(
+              context: context,
+              firstDate: (executedAt ?? DateTime.now()).subtract(const Duration(days: 365)),
+              lastDate: (executedAt ?? DateTime.now()).add(const Duration(days: 365)),
+            );
+            if (date == null) return;
+            final TimeOfDay? time = await showTimePicker(
+                context: context,
+                initialTime: executedAt != null ? TimeOfDay.fromDateTime(executedAt) : TimeOfDay.now());
+            if (time == null) return;
+            onExecutedAtChanged?.call(date.copyWith(hour: time.hour, minute: time.minute));
+          },
+          initialValue: DateFormat('dd.MM.yyyy HH:mm').format(executedAt ?? DateTime.now()),
+          readOnly: true,
+          decoration: const InputDecoration(labelText: 'Executed At'),
         ),
       ),
     ];
@@ -217,7 +242,7 @@ class TransactionCreatePageState extends State<TransactionCreatePage> {
           destination: sourceAndDest.$2,
           amount: int.parse(_amountController.text),
           description: _descriptionController.text,
-          executedAt: DateTime.now(),
+          executedAt: _executedAt,
           currency: account.currency);
       if (!mounted) return;
       context.showSnackBar('Successfully created transaction');
