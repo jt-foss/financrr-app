@@ -36,6 +36,7 @@ use crate::config::{logger, Config};
 use crate::databases::connections::init_data_sources;
 use crate::databases::connections::psql::get_database_connection;
 use crate::databases::redis::clear_redis;
+use crate::util::panic;
 use crate::util::validation::ValidationErrorJsonPayload;
 use crate::wrapper::entity::init_wrapper;
 use crate::wrapper::entity::session::Session;
@@ -83,7 +84,12 @@ async fn main() -> Result<()> {
     dotenv().ok();
     let _guard = logger::configure(); // We need to keep the guard alive to keep the logger running.
 
-    info!("[*]Starting up...");
+    info!("Starting up...");
+
+    info!("[*] Installing panic hook...");
+    panic::install_panic_hook();
+
+    info!("[*] Loading configuration..");
     CONFIG.set(Config::load()).expect("Could not load config!");
 
     info!("[*] Initializing data sources...");

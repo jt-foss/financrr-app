@@ -22,6 +22,8 @@ services:
         condition: service_healthy
       cache:
         condition: service_healthy
+      search:
+        condition: service_healthy
 
   db:
     image: postgres:16.2-alpine3.19
@@ -88,6 +90,11 @@ services:
         hard: 65536
     volumes:
       - opensearch-data:/usr/share/opensearch/data # Creates volume called opensearch-data1 and mounts it to the container
+    healthcheck:
+      test: 'curl --fail localhost:9200/_cat/health >/dev/null || exit 1'
+      interval: 5s
+      timeout: 5s
+      retries: 30
     ports:
       - "127.0.0.1:9200:9200" # REST API
       - "127.0.0.1:9600:9600" # Performance Analyzer
