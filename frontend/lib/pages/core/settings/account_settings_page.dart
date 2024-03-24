@@ -9,16 +9,15 @@ import '../settings_page.dart';
 import 'currency/currency_create_page.dart';
 import 'currency/currency_edit_page.dart';
 
-class CurrencySettingsPage extends StatefulWidget {
-  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'currencies');
+class AccountSettingsPage extends StatefulWidget {
+  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'accounts');
 
-  const CurrencySettingsPage({super.key});
-
+  const AccountSettingsPage({super.key});
   @override
-  State<StatefulWidget> createState() => _CurrencySettingsPageState();
+  State<StatefulWidget> createState() => _AccountSettingsPageState();
 }
 
-class _CurrencySettingsPageState extends State<CurrencySettingsPage> {
+class _AccountSettingsPageState extends State<AccountSettingsPage> {
   final GlobalKey<PaginatedTableState<Currency>> _tableKey = GlobalKey();
   late final Restrr _api = context.api!;
 

@@ -2,6 +2,8 @@ import 'package:financrr_frontend/layout/scaffold_navbar_shell.dart';
 import 'package:financrr_frontend/pages/auth/login_page.dart';
 import 'package:financrr_frontend/pages/auth/server_info_page.dart';
 import 'package:financrr_frontend/pages/context_navigator.dart';
+import 'package:financrr_frontend/pages/core/settings/account_settings_page.dart';
+import 'package:financrr_frontend/pages/core/settings/accounts/account_create_page.dart';
 import 'package:financrr_frontend/pages/core/settings/currency/currency_create_page.dart';
 import 'package:financrr_frontend/pages/core/settings/currency/currency_edit_page.dart';
 import 'package:financrr_frontend/pages/core/settings/currency_settings_page.dart';
@@ -10,6 +12,7 @@ import 'package:financrr_frontend/pages/core/settings/theme_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings_page.dart';
 import 'package:financrr_frontend/pages/core/dashboard_page.dart';
 import 'package:financrr_frontend/pages/core/dummy_page.dart';
+import 'package:financrr_frontend/pages/core/transactions_list_page.dart';
 import 'package:financrr_frontend/util/constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
@@ -39,8 +42,9 @@ class AppRouter {
             ]),
             StatefulShellBranch(routes: [
               GoRoute(
-                  path: '/@me/accounts',
-                  pageBuilder: _defaultBranchPageBuilder(const DummyPage(text: 'A')),
+                  path: TransactionListPage.pagePath.path,
+                  pageBuilder: (context, state) => _buildDefaultPageTransition(
+                      context, state, TransactionListPage(accountId: state.uri.queryParameters['accountId'])),
                   redirect: coreAuthGuard),
             ]),
             StatefulShellBranch(routes: [
@@ -55,6 +59,16 @@ class AppRouter {
                   pageBuilder: _defaultBranchPageBuilder(const SettingsPage()),
                   redirect: coreAuthGuard,
                   routes: [
+                    GoRoute(
+                        path: AccountSettingsPage.pagePath.path,
+                        pageBuilder: _defaultBranchPageBuilder(const AccountSettingsPage()),
+                        redirect: coreAuthGuard,
+                        routes: [
+                          GoRoute(
+                              path: AccountCreatePage.pagePath.path,
+                              pageBuilder: _defaultBranchPageBuilder(const AccountCreatePage()),
+                              redirect: coreAuthGuard),
+                        ]),
                     GoRoute(
                         path: ThemeSettingsPage.pagePath.path,
                         pageBuilder: _defaultBranchPageBuilder(const ThemeSettingsPage()),

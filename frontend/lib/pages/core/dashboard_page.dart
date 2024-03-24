@@ -1,12 +1,18 @@
 import 'dart:async';
 
+import 'package:financrr_frontend/pages/core/settings/account_settings_page.dart';
+import 'package:financrr_frontend/pages/core/transactions_list_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
+import 'package:financrr_frontend/util/text_utils.dart';
 import 'package:financrr_frontend/widgets/async_wrapper.dart';
+import 'package:financrr_frontend/widgets/entities/account_card.dart';
+import 'package:financrr_frontend/widgets/entities/transaction_card.dart';
 import 'package:flutter/material.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../layout/adaptive_scaffold.dart';
 import '../../router.dart';
+import 'settings/accounts/account_create_page.dart';
 
 class DashboardPage extends StatefulWidget {
   static const PagePathBuilder pagePath = PagePathBuilder('/@me/dashboard');
@@ -23,7 +29,8 @@ class _DashboardPageState extends State<DashboardPage> {
   final StreamController<Paginated<Transaction>> _transactionStreamController = StreamController.broadcast();
 
   Future<Paginated<Transaction>> _fetchLatestTransactions({bool forceRetrieve = false}) async {
-    final Paginated<Transaction> transactions = await _api.retrieveAllTransactions(limit: 10, forceRetrieve: forceRetrieve);
+    final Paginated<Transaction> transactions =
+        await _api.retrieveAllTransactions(limit: 10, forceRetrieve: forceRetrieve);
     _transactionStreamController.add(transactions);
     return transactions;
   }
@@ -47,92 +54,93 @@ class _DashboardPageState extends State<DashboardPage> {
       padding: const EdgeInsets.only(top: 10),
       child: Center(
         child: SizedBox(
-          width: size.width / 1.1,
-          child: ListView(
-            children: [
-              Text('Quick Actions', style: context.textTheme.titleMedium),
+            width: size.width / 1.1,
+            child: ListView(children: [
               Padding(
-                padding: const EdgeInsets.only(top: 20),
-                child: SizedBox(
-                  height: 75,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    shrinkWrap: true,
-                    itemCount: 10,
-                    itemBuilder: (_, index) => _buildQuickActionButton(),
-                    separatorBuilder: (_, __) => const SizedBox(width: 20)
-                  ),
+                padding: const EdgeInsets.only(top: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Account and Cards', style: context.textTheme.titleMedium),
+                    PopupMenuButton(
+                        icon: const Icon(Icons.more_horiz),
+                        itemBuilder: (context) {
+                          return [
+                            PopupMenuItem(
+                                child: ListTile(
+                              title: const Text('Manage Accounts'),
+                              leading: const Icon(Icons.manage_accounts_rounded),
+                              onTap: () => context.goPath(AccountSettingsPage.pagePath.build()),
+                            )),
+                            PopupMenuItem(
+                                child: ListTile(
+                              title: const Text('Create Account'),
+                              leading: const Icon(Icons.add),
+                              onTap: () => context.goPath(AccountCreatePage.pagePath.build()),
+                            ))
+                          ];
+                        })
+                  ],
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 20),
-                child: Text('Account and Cards', style: context.textTheme.titleMedium),
               ),
               for (Account a in _api.getAccounts())
                 Padding(
                   padding: const EdgeInsets.only(top: 20),
-                  child: Card(
-                    child: ListTile(
-                      leading: Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: context.theme.cardColor,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Center(child: Text(a.name[0])),
-                      ),
-                      title: Text(a.name),
-                      subtitle: a.iban == null && a.description == null ? null : Text(a.iban ?? a.description!),
-                      trailing: Text('${a.balance.toStringAsFixed(2)}€'),
-                    ),
-                  ),
+                  child: AccountCard(account: a),
                 ),
-              Padding(
-                padding: const EdgeInsets.only(top: 20),
-                child: Text('Latest Transactions', style: context.textTheme.titleMedium),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 20),
-                child: StreamWrapper<Paginated<Transaction>>(
-                  stream: _transactionStreamController.stream,
-                  onError: (context, snap) => const Text('Error'),
-                  onLoading: (context, snap) => const Center(child: CircularProgressIndicator()),
-                  onSuccess: (context, snap) {
-                    return Column(
+              if (_api.getAccounts().isEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 20),
+                  child: Center(
+                      child: Column(
                     children: [
-                      for (Transaction t in snap.data!.items)
-                        ListTile(
-                          title: Text(t.description ?? 'Transaction'),
-                          subtitle: Text(t.amount.toString()),
-                          trailing: Text(t.executedAt.toIso8601String()),
-                        )
+                      Text('No accounts found',
+                          style: context.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                      const Text('Create an account to get started'),
+                      TextButton.icon(
+                        onPressed: () => context.goPath(AccountCreatePage.pagePath.build()),
+                        icon: const Icon(Icons.add),
+                        label: const Text('Create Account'),
+                      )
                     ],
-                  );
-                  }
+                  )),
                 ),
-              )
-            ]
-          )
-        ),
+              if (_api.getAccounts().isNotEmpty) _buildTransactionSection()
+            ])),
       ),
     );
   }
 
-  Widget _buildQuickActionButton() {
+  Widget _buildTransactionSection() {
     return Column(
       children: [
-        Container(
-          width: 50,
-          height: 50,
-          decoration: BoxDecoration(
-            color: context.theme.cardColor,
-            shape: BoxShape.circle,
+        Padding(
+          padding: const EdgeInsets.only(top: 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Latest Transactions', style: context.textTheme.titleMedium),
+              TextButton.icon(
+                  label: const Text('View all'),
+                  icon: const Icon(Icons.manage_search),
+                  onPressed: () => context.goPath(TransactionListPage.pagePath.build()))
+            ],
           ),
         ),
         Padding(
-          padding: const EdgeInsets.only(top: 5),
-          child: const Text('Action'),
+          padding: const EdgeInsets.only(top: 20),
+          child: StreamWrapper(
+              stream: _transactionStreamController.stream,
+              onError: (context, snap) => const Text('Error'),
+              onLoading: (context, snap) => const Center(child: CircularProgressIndicator()),
+              onSuccess: (context, snap) {
+                return Column(
+                  children: [
+                    for (Transaction t in snap.data!.items)
+                      SizedBox(width: double.infinity, child: TransactionCard(transaction: t))
+                  ],
+                );
+              }),
         )
       ],
     );
