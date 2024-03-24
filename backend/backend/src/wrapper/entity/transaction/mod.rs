@@ -121,11 +121,7 @@ impl Transaction {
     }
 
     pub(crate) async fn find_all_paginated(page_size: PageSizeParam) -> Result<Vec<Self>, ApiError> {
-        Ok(find_all_paginated(transaction::Entity::find(), &page_size)
-            .await?
-            .into_iter()
-            .map(Self::from)
-            .collect())
+        Ok(find_all_paginated(transaction::Entity::find(), &page_size).await?.into_iter().map(Self::from).collect())
     }
 
     pub(crate) async fn count_all() -> Result<u64, ApiError> {

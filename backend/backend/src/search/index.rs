@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
-use opensearch::BulkParts;
 use opensearch::http::request::JsonBody;
 use opensearch::indices::IndicesCreateParts;
+use opensearch::BulkParts;
 use serde_json::{json, Value};
 
 use crate::databases::connections::search::get_open_search_client;
@@ -15,7 +15,7 @@ pub(crate) struct IndexBuilder {
 
 impl IndexBuilder {
     pub(crate) fn new(name: &str) -> Self {
-        IndexBuilder {
+        Self {
             name: name.to_string(),
             fields: Default::default(),
         }
@@ -43,7 +43,7 @@ impl IndexBuilder {
             }))
             .send()
             .await
-            .expect(format!("INDEX {} not created", self.name).as_str());
+            .unwrap_or_else(|_| panic!("INDEX {} not created", self.name));
     }
 }
 
@@ -63,9 +63,9 @@ impl Indexer {
         let client = get_open_search_client();
         client
             .bulk(BulkParts::Index(index))
-            .body(body.into())
+            .body(body)
             .send()
             .await
-            .expect(format!("Documents not indexed in {}", index).as_str());
+            .unwrap_or_else(|_| panic!("Documents not indexed in {}", index));
     }
 }

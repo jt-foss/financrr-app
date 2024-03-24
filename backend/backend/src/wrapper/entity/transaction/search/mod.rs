@@ -2,7 +2,7 @@ use tracing::info;
 
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
-use crate::search::index::{IndexBuilder, Indexer, IndexType};
+use crate::search::index::{IndexBuilder, IndexType, Indexer};
 use crate::wrapper::entity::transaction::Transaction;
 
 pub(crate) async fn init_transactions_search() {
@@ -17,7 +17,8 @@ async fn create_index() {
     IndexBuilder::new("transaction")
         .add_field("id", IndexType::INTEGER)
         .add_field("description", IndexType::TEXT)
-        .send().await;
+        .send()
+        .await;
 }
 
 async fn index_transactions() -> Result<(), ApiError> {

@@ -4,26 +4,26 @@ use std::time::Duration;
 
 use actix_cors::Cors;
 use actix_limitation::{Limiter, RateLimiter};
-use actix_web::{
-    App,
-    HttpServer, web::{self},
-};
 use actix_web::middleware::{Compress, DefaultHeaders, NormalizePath, TrailingSlash};
 use actix_web::web::Data;
+use actix_web::{
+    web::{self},
+    App, HttpServer,
+};
 use actix_web_prom::{PrometheusMetrics, PrometheusMetricsBuilder};
 use actix_web_validator::{Error, JsonConfig, PathConfig, QueryConfig};
 use dotenvy::dotenv;
 use tracing::info;
-use utoipa::{Modify, OpenApi};
-use utoipa::openapi::OpenApi as OpenApiStruct;
 use utoipa::openapi::security::{Http, HttpAuthScheme, SecurityScheme};
+use utoipa::openapi::OpenApi as OpenApiStruct;
+use utoipa::{Modify, OpenApi};
 use utoipa_swagger_ui::SwaggerUi;
 use utoipauto::utoipauto;
 
+use crate::api::error::api::ApiError;
 use entity::utility::loading::load_schema;
 use migration::Migrator;
 use migration::MigratorTrait;
-use crate::api::error::api::ApiError;
 
 use crate::api::routes::account::controller::account_controller;
 use crate::api::routes::budget::controller::budget_controller;
@@ -32,7 +32,7 @@ use crate::api::routes::session::controller::session_controller;
 use crate::api::routes::transaction::controller::transaction_controller;
 use crate::api::routes::user::controller::user_controller;
 use crate::api::status::controller::status_controller;
-use crate::config::{Config, logger};
+use crate::config::{logger, Config};
 use crate::databases::connections::init_data_sources;
 use crate::databases::connections::psql::get_database_connection;
 use crate::databases::redis::clear_redis;
@@ -46,9 +46,9 @@ pub(crate) mod config;
 pub(crate) mod databases;
 pub(crate) mod event;
 pub(crate) mod scheduling;
+pub(crate) mod search;
 pub(crate) mod util;
 pub(crate) mod wrapper;
-pub(crate) mod search;
 
 pub(crate) static CONFIG: OnceLock<Config> = OnceLock::new();
 
