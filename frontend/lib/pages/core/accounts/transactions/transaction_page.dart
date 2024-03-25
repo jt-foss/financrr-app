@@ -1,8 +1,7 @@
 import 'dart:async';
 
-import 'package:easy_localization/easy_localization.dart';
-import 'package:financrr_frontend/pages/core/account_page.dart';
-import 'package:financrr_frontend/pages/core/transactions/transaction_edit_page.dart';
+import 'package:financrr_frontend/pages/core/accounts/account_page.dart';
+import 'package:financrr_frontend/pages/core/accounts/transactions/transaction_edit_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/text_utils.dart';
 import 'package:flutter/material.dart';
@@ -11,8 +10,8 @@ import 'package:restrr/restrr.dart';
 
 import '../../../../../layout/adaptive_scaffold.dart';
 import '../../../../../router.dart';
-import '../../../data/l10n_repository.dart';
-import '../../../widgets/async_wrapper.dart';
+import '../../../../data/l10n_repository.dart';
+import '../../../../widgets/async_wrapper.dart';
 
 class TransactionPage extends StatefulWidget {
   static const PagePathBuilder pagePath =
@@ -111,8 +110,10 @@ class TransactionPageState extends State<TransactionPage> {
                       icon: const Icon(Icons.delete_rounded, size: 17),
                       label: const Text('Delete Transaction')),
                   TextButton.icon(
-                      onPressed: () => context.goPath(
-                          TransactionEditPage.pagePath.build(pathParams: {'accountId': account.id.toString(), 'transactionId': transaction.id.toString()})),
+                      onPressed: () => context.goPath(TransactionEditPage.pagePath.build(pathParams: {
+                            'accountId': account.id.toString(),
+                            'transactionId': transaction.id.toString()
+                          })),
                       icon: const Icon(Icons.create_rounded, size: 17),
                       label: const Text('Edit Transaction'))
                 ],

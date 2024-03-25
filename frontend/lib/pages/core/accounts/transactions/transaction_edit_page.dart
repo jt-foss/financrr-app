@@ -1,20 +1,15 @@
 import 'dart:async';
 
-import 'package:easy_localization/easy_localization.dart';
-import 'package:financrr_frontend/pages/core/account_page.dart';
-import 'package:financrr_frontend/pages/core/transactions/transaction_create_page.dart';
-import 'package:financrr_frontend/pages/core/transactions/transaction_page.dart';
+import 'package:financrr_frontend/pages/core/accounts/transactions/transaction_create_page.dart';
+import 'package:financrr_frontend/pages/core/accounts/transactions/transaction_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
-import 'package:financrr_frontend/util/input_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../../../../layout/adaptive_scaffold.dart';
 import '../../../../../router.dart';
-import '../../../widgets/async_wrapper.dart';
-import '../../../widgets/entities/transaction_card.dart';
+import '../../../../widgets/async_wrapper.dart';
 
 class TransactionEditPage extends StatefulWidget {
   static const PagePathBuilder pagePath = PagePathBuilder.child(parent: TransactionPage.pagePath, path: 'edit');
@@ -56,17 +51,18 @@ class TransactionEditPageState extends State<TransactionEditPage> {
   void initState() {
     super.initState();
 
-
     _fetchAccount().then((_) {
-      Future.delayed(const Duration(milliseconds: 100), () => _fetchTransaction().then((transaction) {
-        if (transaction != null) {
-          _amountController = TextEditingController(text: transaction.amount.toString());
-          _descriptionController = TextEditingController(text: transaction.description);
-          _isValid = _formKey.currentState?.validate() ?? false;
-          _type = transaction.type;
-          _executedAt = transaction.executedAt;
-        }
-      }));
+      Future.delayed(
+          const Duration(milliseconds: 100),
+          () => _fetchTransaction().then((transaction) {
+                if (transaction != null) {
+                  _amountController = TextEditingController(text: transaction.amount.toString());
+                  _descriptionController = TextEditingController(text: transaction.description);
+                  _isValid = _formKey.currentState?.validate() ?? false;
+                  _type = transaction.type;
+                  _executedAt = transaction.executedAt;
+                }
+              }));
     });
   }
 

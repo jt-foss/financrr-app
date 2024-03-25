@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:financrr_frontend/pages/core/account_page.dart';
+import 'package:financrr_frontend/pages/core/accounts/account_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/input_utils.dart';
 import 'package:flutter/material.dart';
@@ -10,9 +10,9 @@ import 'package:restrr/restrr.dart';
 
 import '../../../../../layout/adaptive_scaffold.dart';
 import '../../../../../router.dart';
-import '../../../data/l10n_repository.dart';
-import '../../../widgets/async_wrapper.dart';
-import '../../../widgets/entities/transaction_card.dart';
+import '../../../../data/l10n_repository.dart';
+import '../../../../widgets/async_wrapper.dart';
+import '../../../../widgets/entities/transaction_card.dart';
 
 class TransactionCreatePage extends StatefulWidget {
   static const PagePathBuilder pagePath =

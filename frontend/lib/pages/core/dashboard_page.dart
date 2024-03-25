@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:financrr_frontend/pages/core/settings/account_settings_page.dart';
+import 'package:financrr_frontend/pages/core/accounts/accounts_overview_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/widgets/async_wrapper.dart';
 import 'package:financrr_frontend/widgets/entities/account_card.dart';
@@ -10,7 +10,7 @@ import 'package:restrr/restrr.dart';
 
 import '../../layout/adaptive_scaffold.dart';
 import '../../router.dart';
-import 'settings/accounts/account_create_page.dart';
+import 'accounts/account_create_page.dart';
 
 class DashboardPage extends StatefulWidget {
   static const PagePathBuilder pagePath = PagePathBuilder('/@me/dashboard');
@@ -68,7 +68,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                 child: ListTile(
                               title: const Text('Manage Accounts'),
                               leading: const Icon(Icons.manage_accounts_rounded),
-                              onTap: () => context.goPath(AccountSettingsPage.pagePath.build()),
+                              onTap: () => context.goPath(AccountsOverviewPage.pagePath.build()),
                             )),
                             PopupMenuItem(
                                 child: ListTile(

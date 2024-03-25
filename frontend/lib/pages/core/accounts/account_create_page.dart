@@ -1,4 +1,4 @@
-import 'package:financrr_frontend/pages/core/settings/account_settings_page.dart';
+import 'package:financrr_frontend/pages/core/accounts/accounts_overview_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/input_utils.dart';
 import 'package:flutter/material.dart';
@@ -6,12 +6,12 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:restrr/restrr.dart';
 
-import '../../../../../layout/adaptive_scaffold.dart';
-import '../../../../../router.dart';
-import '../../../../widgets/entities/account_card.dart';
+import '../../../../layout/adaptive_scaffold.dart';
+import '../../../../router.dart';
+import '../../../widgets/entities/account_card.dart';
 
 class AccountCreatePage extends StatefulWidget {
-  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: AccountSettingsPage.pagePath, path: 'create');
+  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: AccountsOverviewPage.pagePath, path: 'create');
 
   const AccountCreatePage({super.key});
 

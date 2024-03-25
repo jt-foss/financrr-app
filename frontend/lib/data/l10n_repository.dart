@@ -49,7 +49,8 @@ class L10nService {
   static L10nPreferences get() => Repositories.l10nRepository.read();
 
   static Future<L10nPreferences> setL10nPreferences({String? dateTimeFormat, String? decimalSeparator}) async {
-    final L10nPreferences preferences = get().copyWith(dateTimeFormat: dateTimeFormat, decimalSeparator: decimalSeparator);
+    final L10nPreferences preferences =
+        get().copyWith(dateTimeFormat: dateTimeFormat, decimalSeparator: decimalSeparator);
     await Repositories.l10nRepository.save(preferences);
     return preferences;
   }

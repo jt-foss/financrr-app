@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../data/l10n_repository.dart';
-import '../../pages/core/transactions/transaction_page.dart';
+import '../../pages/core/accounts/transactions/transaction_page.dart';
 import '../../util/text_utils.dart';
 
 class TransactionCard extends StatelessWidget {

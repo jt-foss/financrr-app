@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:financrr_frontend/pages/core/settings/accounts/account_edit_page.dart';
-import 'package:financrr_frontend/pages/core/transactions/transaction_create_page.dart';
+import 'package:financrr_frontend/pages/core/accounts/transactions/transaction_create_page.dart';
+import 'package:financrr_frontend/pages/core/accounts/account_edit_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/text_utils.dart';
 import 'package:financrr_frontend/widgets/async_wrapper.dart';
@@ -10,11 +10,13 @@ import 'package:financrr_frontend/widgets/paginated_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:restrr/restrr.dart';
 
-import '../../layout/adaptive_scaffold.dart';
-import '../../router.dart';
+import '../../../layout/adaptive_scaffold.dart';
+import '../../../router.dart';
+import 'accounts_overview_page.dart';
 
 class AccountPage extends StatefulWidget {
-  static const PagePathBuilder pagePath = PagePathBuilder('/@me/accounts/:accountId');
+  static const PagePathBuilder pagePath =
+      PagePathBuilder.child(parent: AccountsOverviewPage.pagePath, path: ':accountId');
 
   final String? accountId;
 
@@ -84,6 +86,11 @@ class _AccountPageState extends State<AccountPage> {
                           TransactionCreatePage.pagePath.build(pathParams: {'accountId': account.id.toString()})),
                       icon: const Icon(Icons.add, size: 17),
                       label: const Text('Create Transaction')),
+                  const Spacer(),
+                  TextButton.icon(
+                      onPressed: () => _deleteAccount(account),
+                      icon: const Icon(Icons.delete_rounded, size: 17),
+                      label: const Text('Delete Account')),
                   TextButton.icon(
                       onPressed: () => context
                           .goPath(AccountEditPage.pagePath.build(pathParams: {'accountId': account.id.toString()})),
@@ -123,5 +130,15 @@ class _AccountPageState extends State<AccountPage> {
         )
       ],
     );
+  }
+
+  void _deleteAccount(Account account) async {
+    try {
+      await account.delete();
+      if (!mounted) return;
+      context.showSnackBar('Successfully deleted "${account.name}"');
+    } on RestrrException catch (e) {
+      context.showSnackBar(e.message!);
+    }
   }
 }

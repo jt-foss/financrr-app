@@ -24,7 +24,7 @@ class ScaffoldNavBarShellState extends State<ScaffoldNavBarShell> {
     NavigationDestination(
       icon: Icon(Icons.account_balance_wallet_outlined),
       selectedIcon: Icon(Icons.account_balance_wallet_rounded),
-      label: 'Transactions',
+      label: 'Accounts',
     ),
     NavigationDestination(
       icon: Icon(Icons.leaderboard_outlined),
@@ -47,7 +47,7 @@ class ScaffoldNavBarShellState extends State<ScaffoldNavBarShell> {
     NavigationRailDestination(
       icon: Icon(Icons.account_balance_wallet_outlined),
       selectedIcon: Icon(Icons.account_balance_wallet_rounded),
-      label: Text('Transactions'),
+      label: Text('Accounts'),
     ),
     NavigationRailDestination(
       icon: Icon(Icons.leaderboard_outlined),

@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:financrr_frontend/pages/core/account_page.dart';
+import 'package:financrr_frontend/pages/core/accounts/account_page.dart';
 import 'package:financrr_frontend/router.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';

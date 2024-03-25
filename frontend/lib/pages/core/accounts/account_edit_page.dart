@@ -1,19 +1,19 @@
 import 'dart:async';
 
-import 'package:financrr_frontend/pages/core/settings/account_settings_page.dart';
-import 'package:financrr_frontend/pages/core/settings/accounts/account_create_page.dart';
+import 'package:financrr_frontend/pages/core/accounts/accounts_overview_page.dart';
+import 'package:financrr_frontend/pages/core/accounts/account_create_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:restrr/restrr.dart';
 
-import '../../../../../layout/adaptive_scaffold.dart';
-import '../../../../../router.dart';
-import '../../../../widgets/async_wrapper.dart';
+import '../../../../layout/adaptive_scaffold.dart';
+import '../../../../router.dart';
+import '../../../widgets/async_wrapper.dart';
+import 'account_page.dart';
 
 class AccountEditPage extends StatefulWidget {
-  static const PagePathBuilder pagePath =
-      PagePathBuilder.child(parent: AccountSettingsPage.pagePath, path: ':accountId/edit');
+  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: AccountPage.pagePath, path: 'edit');
 
   final String? accountId;
 
