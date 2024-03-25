@@ -21,6 +21,7 @@ pub(crate) struct TransactionDTO {
     pub(crate) destination_id: Option<Phantom<Account>>,
     pub(crate) amount: i64,
     pub(crate) currency_id: Phantom<Currency>,
+    pub(crate) name: String,
     pub(crate) description: Option<String>,
     pub(crate) budget_id: Option<Phantom<Budget>>,
     #[serde(with = "time::serde::rfc3339")]

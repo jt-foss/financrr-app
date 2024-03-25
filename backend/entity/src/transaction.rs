@@ -13,6 +13,8 @@ pub struct Model {
     pub destination: Option<i32>,
     pub amount: i64,
     pub currency: i32,
+    #[sea_orm(column_type = "Text")]
+    pub name: String,
     #[sea_orm(column_type = "Text", nullable)]
     pub description: Option<String>,
     pub budget: Option<i32>,

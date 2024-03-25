@@ -40,13 +40,13 @@ CREATE TABLE IF NOT EXISTS currency
 CREATE TABLE IF NOT EXISTS account
 (
     id               SERIAL PRIMARY KEY,
-    name             TEXT                             NOT NULL,
+    name             TEXT                                                                 NOT NULL,
     description      TEXT,
     iban             TEXT UNIQUE,
-    balance          BIGINT                           NOT NULL DEFAULT 0,
-    original_balance BIGINT                           NOT NULL DEFAULT 0,
-    currency INTEGER REFERENCES Currency (id) ON UPDATE CASCADE ON DELETE CASCADE NOT NULL,
-    created_at       timestamp with time zone         NOT NULL DEFAULT current_timestamp
+    balance          BIGINT                                                               NOT NULL DEFAULT 0,
+    original_balance BIGINT                                                               NOT NULL DEFAULT 0,
+    currency         INTEGER REFERENCES Currency (id) ON UPDATE CASCADE ON DELETE CASCADE NOT NULL,
+    created_at       timestamp with time zone                                             NOT NULL DEFAULT current_timestamp
 );
 
 CREATE TABLE IF NOT EXISTS budget
@@ -64,11 +64,12 @@ CREATE TABLE IF NOT EXISTS transaction
     id          SERIAL PRIMARY KEY,
     source      INTEGER REFERENCES Account (id) ON UPDATE CASCADE ON DELETE CASCADE,
     destination INTEGER REFERENCES Account (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    amount      BIGINT                           NOT NULL,
+    amount      BIGINT                   NOT NULL,
     currency    INTEGER REFERENCES Currency (id) ON UPDATE CASCADE ON DELETE CASCADE NOT NULL,
+    name        TEXT                     NOT NULL,
     description TEXT,
     budget      INTEGER REFERENCES budget (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    created_at  timestamp with time zone         NOT NULL DEFAULT current_timestamp,
-    executed_at timestamp with time zone         NOT NULL DEFAULT current_timestamp,
+    created_at  timestamp with time zone NOT NULL DEFAULT current_timestamp,
+    executed_at timestamp with time zone NOT NULL DEFAULT current_timestamp,
     CHECK (source IS NOT NULL OR destination IS NOT NULL)
 );
