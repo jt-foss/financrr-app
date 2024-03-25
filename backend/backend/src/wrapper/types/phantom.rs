@@ -35,6 +35,10 @@ impl<T: Identifiable + Send + 'static> Phantom<T> {
         Ok(self.inner.as_ref().unwrap())
     }
 
+    pub(crate) async fn fetch_inner(&self) -> Result<T, ApiError> {
+        T::from_id(self.id).await
+    }
+
     pub(crate) fn set_inner(&mut self, inner: T) {
         self.inner = Some(inner);
     }

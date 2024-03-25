@@ -66,6 +66,7 @@ impl Account {
     }
 
     pub(crate) async fn update_with_balance(&self, dto: AccountDTO, balance: i64) -> Result<Self, ApiError> {
+        let balance = Self::calculate_new_balance(balance, dto.original_balance, self.original_balance);
         let active_model = account::ActiveModel {
             id: Set(self.id),
             name: Set(dto.name),
@@ -77,8 +78,15 @@ impl Account {
             created_at: Set(self.created_at),
         };
         let model = update(active_model).await?;
+        let account = Self::from(model);
 
-        Ok(Self::from(model))
+        //AccountUpdate::new(self.clone(), account.clone()).fire();
+
+        Ok(account)
+    }
+
+    fn calculate_new_balance(balance: i64, new_original_balance: i64, old_original_balance: i64) -> i64 {
+        balance + new_original_balance - old_original_balance
     }
 
     pub(crate) async fn exists(id: i32) -> Result<bool, ApiError> {

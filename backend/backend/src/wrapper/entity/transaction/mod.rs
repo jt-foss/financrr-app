@@ -12,8 +12,8 @@ use entity::utility::time::get_now;
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
 use crate::database::entity::{count, delete, find_all_paginated, find_one_or_error, insert, update};
-use crate::event::transaction::TransactionEvent;
-use crate::event::Event;
+use crate::event::lifecycle::transaction::{TransactionCreation, TransactionDeletion, TransactionUpdate};
+use crate::event::GenericEvent;
 use crate::wrapper::entity::account::Account;
 use crate::wrapper::entity::budget::Budget;
 use crate::wrapper::entity::currency::Currency;
@@ -65,9 +65,9 @@ impl Transaction {
         if transaction.executed_at > get_now() {
             let delay = transaction.executed_at - get_now();
             let delay = Duration::new(delay.whole_seconds() as u64, 0);
-            TransactionEvent::fire_scheduled(TransactionEvent::Create(transaction.clone()), delay);
+            TransactionCreation::fire_scheduled(TransactionCreation::new(transaction.clone()), delay);
         } else {
-            TransactionEvent::fire(TransactionEvent::Create(transaction.clone()));
+            TransactionCreation::fire(TransactionCreation::new(transaction.clone()));
         }
 
         Ok(transaction)
@@ -87,7 +87,7 @@ impl Transaction {
         };
         let transaction = Self::from(update(active_model).await?);
 
-        TransactionEvent::fire(TransactionEvent::Update(self.clone(), Box::new(transaction.clone())));
+        TransactionUpdate::fire(TransactionUpdate::new(self.clone(), transaction.clone()));
 
         Ok(transaction)
     }
@@ -95,7 +95,7 @@ impl Transaction {
     pub(crate) async fn delete(self) -> Result<(), ApiError> {
         delete(transaction::Entity::delete_by_id(self.id)).await?;
 
-        TransactionEvent::fire(TransactionEvent::Delete(self.clone()));
+        TransactionDeletion::fire(TransactionDeletion::new(self.clone()));
 
         Ok(())
     }

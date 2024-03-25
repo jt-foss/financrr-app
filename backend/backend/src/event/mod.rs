@@ -1,37 +1,67 @@
 use std::fmt::Debug;
 use std::future::Future;
-use std::pin::Pin;
 
+use tokio::spawn;
 use tokio::sync::broadcast::{channel, Receiver, Sender};
 use tokio::time::sleep;
 use tokio::time::Duration;
+use tracing::error;
 
 use crate::api::error::api::ApiError;
 use crate::wrapper::entity::account::event_listener::account_listener;
 use crate::wrapper::entity::budget::event_listener::budget_listener;
 
-pub mod transaction;
-
-pub(crate) type EventResult = Pin<Box<dyn Future<Output = Result<(), ApiError>> + Send>>;
+pub(crate) mod lifecycle;
+pub(crate) mod macros;
 
 pub(crate) fn init() {
     account_listener();
     budget_listener();
 }
 
-pub(crate) trait Event {
-    fn fire(self);
-    fn fire_scheduled(self, delay: Duration);
-    fn subscribe() -> Receiver<Self>
-    where
-        Self: Sized;
-}
+pub(crate) trait GenericEvent
+where
+    Self: Debug + Clone + Send + 'static,
+{
+    fn get_event_bus() -> &'static EventBus<Self>;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) enum EventFilter {
-    Create,
-    Update,
-    Delete,
+    fn fire(self) {
+        Self::get_event_bus().fire(self);
+    }
+
+    fn fire_scheduled(self, delay: Duration) {
+        Self::get_event_bus().fire_scheduled(self, delay);
+    }
+
+    fn get_receiver() -> Receiver<Self>
+    where
+        Self: Sized,
+    {
+        Self::get_event_bus().subscribe()
+    }
+
+    fn subscribe<F, Fut>(function: F)
+    where
+        F: Fn(Self) -> Fut + Send + 'static,
+        Fut: Future<Output = Result<(), ApiError>> + Send + 'static,
+    {
+        spawn(async move {
+            loop {
+                let event_result = Self::get_receiver().recv().await;
+                match event_result {
+                    Ok(event) => {
+                        let future = function(event);
+                        if let Err(e) = future.await {
+                            error!("Error executing event callback: {}", e);
+                        }
+                    }
+                    Err(e) => {
+                        error!("Error receiving event: {}", e);
+                    }
+                }
+            }
+        });
+    }
 }
 
 pub(crate) struct EventBus<T: Clone> {
@@ -40,7 +70,7 @@ pub(crate) struct EventBus<T: Clone> {
 
 impl<T: Debug + Clone + Send + 'static> EventBus<T> {
     pub(crate) fn new() -> Self {
-        let (sender, _) = channel(100);
+        let (sender, _) = channel(1_000);
         Self {
             sender,
         }
@@ -56,7 +86,7 @@ impl<T: Debug + Clone + Send + 'static> EventBus<T> {
 
     pub(crate) fn fire_scheduled(&self, event: T, delay: Duration) {
         let sender = self.sender.clone();
-        tokio::spawn(async move {
+        spawn(async move {
             sleep(delay).await;
             let _ = sender.send(event);
         });
