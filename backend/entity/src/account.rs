@@ -32,8 +32,8 @@ pub enum Relation {
         belongs_to = "super::currency::Entity",
         from = "Column::Currency",
         to = "super::currency::Column::Id",
-        on_update = "NoAction",
-        on_delete = "NoAction"
+        on_update = "Cascade",
+        on_delete = "Cascade"
     )]
     Currency,
 }
