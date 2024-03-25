@@ -24,9 +24,7 @@ class _DummyPageState extends State<DummyPage> {
         child: SizedBox(
           width: size.width / 1.1,
           child: ListView(
-            children: [
-              Card(child: ListTile(title: Text(widget.text)))
-            ],
+            children: [Card(child: ListTile(title: Text(widget.text)))],
           ),
         ),
       ),
