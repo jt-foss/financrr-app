@@ -58,7 +58,7 @@ time.workspace = true
 # Utils
 dotenvy = "0.15.7"
 derive_more = { version = "1.0.0-beta.6", features = ["display", "error"] }
-regex = { version = "1.10.3", features = ["std", "perf", "unicode"] }
+regex = { version = "1.10.4", features = ["std", "perf", "unicode"] }
 itertools = "0.12.1"
 bitflags = {  version = "2.5.0", features = ["std", "serde"] }
 
