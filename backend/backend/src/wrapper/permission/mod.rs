@@ -76,12 +76,17 @@ impl PermissionsEntity {
     pub(crate) async fn find_users_with_permissions(
         entity_type: &str,
         entity_id: i32,
-        permissions: Permissions) -> Result<Vec<i32>, ApiError> {
-        let permissions = find_all(permissions::Entity::find_users_with_permissions(entity_type, entity_id, permissions.bits() as i32))
-            .await?
-            .into_iter()
-            .map(|p| p.user_id)
-            .collect();
+        permissions: Permissions,
+    ) -> Result<Vec<i32>, ApiError> {
+        let permissions = find_all(permissions::Entity::find_users_with_permissions(
+            entity_type,
+            entity_id,
+            permissions.bits() as i32,
+        ))
+        .await?
+        .into_iter()
+        .map(|p| p.user_id)
+        .collect();
 
         Ok(permissions)
     }

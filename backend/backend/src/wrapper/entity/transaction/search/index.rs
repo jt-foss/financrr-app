@@ -3,17 +3,19 @@ use time::OffsetDateTime;
 
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
-use crate::search::index::{IndexBuilder, Indexer, IndexType};
-use crate::wrapper::entity::TableName;
+use crate::search::index::{IndexBuilder, IndexType, Indexer};
 use crate::wrapper::entity::transaction::Transaction;
+use crate::wrapper::entity::TableName;
 use crate::wrapper::permission::{Permissions, PermissionsEntity};
+
+pub const INDEX_NAME: &str = "transaction";
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub(super) struct TransactionIndex {
     id: i32,
     source: Option<i32>,
     destination: Option<i32>,
-    description: String,
+    description: Option<String>,
     currency: i32,
     budget: Option<i32>,
     #[serde(with = "time::serde::rfc3339")]
@@ -27,8 +29,8 @@ impl TransactionIndex {
             id: transaction.id,
             source: transaction.source.map(|s| s.get_id()),
             destination: transaction.destination.map(|d| d.get_id()),
-            description: transaction.description.map(|d| d.get_id()),
-            currency: transaction.currency,
+            description: transaction.description,
+            currency: transaction.currency.get_id(),
             budget: transaction.budget.map(|b| b.get_id()),
             executed_at: transaction.executed_at,
             user_ids,
@@ -36,7 +38,7 @@ impl TransactionIndex {
     }
 
     pub(super) async fn create_index() {
-        IndexBuilder::new("transaction")
+        IndexBuilder::new(INDEX_NAME)
             .add_field("id", IndexType::INTEGER)
             .add_field("source", IndexType::INTEGER)
             .add_field("destination", IndexType::INTEGER)
@@ -58,20 +60,27 @@ pub(super) async fn index_transactions() -> Result<(), ApiError> {
     for page in 1..pages {
         let page_size_param = PageSizeParam::new(page, page_size);
         let transactions = Transaction::find_all_paginated(page_size_param).await?;
-        for transaction in transactions {
-            tokio::spawn(async move || {
+        tokio::spawn(async move {
+            let mut docs = Vec::with_capacity(transactions.len());
+            for transaction in transactions {
                 let user_ids = PermissionsEntity::find_users_with_permissions(
                     Transaction::table_name(),
                     transaction.id,
-                    Permission::READ,
-                );
+                    Permissions::READ,
+                )
+                .await
+                .unwrap_or_default();
+                if user_ids.is_empty() {
+                    continue;
+                }
+
                 let index = TransactionIndex::from_transaction(transaction, user_ids);
                 let doc = serde_json::to_value(index).unwrap();
-                Indexer::index_document("transaction", doc).await;
-            });
-        }
+                docs.push(doc);
+            }
+            Indexer::index_documents(INDEX_NAME, docs).await;
+        });
     }
 
     Ok(())
 }
-

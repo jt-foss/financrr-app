@@ -1,10 +1,8 @@
 use std::collections::HashMap;
 
-use opensearch::BulkParts;
 use opensearch::http::request::JsonBody;
 use opensearch::indices::IndicesCreateParts;
-use serde::de::DeserializeOwned;
-use serde_aux::prelude::serde_introspect;
+use opensearch::BulkParts;
 use serde_json::{json, Value};
 
 use crate::databases::connections::search::get_open_search_client;
