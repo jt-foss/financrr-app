@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:easy_localization/easy_localization.dart';
 import 'package:financrr_frontend/pages/core/account_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/input_utils.dart';
@@ -11,6 +10,7 @@ import 'package:restrr/restrr.dart';
 
 import '../../../../../layout/adaptive_scaffold.dart';
 import '../../../../../router.dart';
+import '../../../data/l10n_repository.dart';
 import '../../../widgets/async_wrapper.dart';
 import '../../../widgets/entities/transaction_card.dart';
 
@@ -221,7 +221,7 @@ class TransactionCreatePageState extends State<TransactionCreatePage> {
             if (time == null) return;
             onExecutedAtChanged?.call(date.copyWith(hour: time.hour, minute: time.minute));
           },
-          initialValue: DateFormat('dd.MM.yyyy HH:mm').format(executedAt ?? DateTime.now()),
+          initialValue: dateTimeFormat.format(executedAt ?? DateTime.now()),
           readOnly: true,
           decoration: const InputDecoration(labelText: 'Executed At'),
         ),

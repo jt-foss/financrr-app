@@ -56,7 +56,7 @@ class AccountCard extends StatelessWidget {
                 ],
               ),
               const Spacer(),
-              Text(TextUtils.formatCurrency(balance, currency!, decimalSeparator: ','),
+              Text(TextUtils.formatCurrency(balance, currency!),
                   style: context.textTheme.titleSmall?.copyWith(color: context.theme.primaryColor))
             ],
           ),

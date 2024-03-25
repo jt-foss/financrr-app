@@ -1,10 +1,9 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:financrr_frontend/router.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:restrr/restrr.dart';
 
+import '../../data/l10n_repository.dart';
 import '../../pages/core/transactions/transaction_page.dart';
 import '../../util/text_utils.dart';
 
@@ -47,7 +46,7 @@ class TransactionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String amountStr = TextUtils.formatCurrency(amount, account.getCurrency()!, decimalSeparator: ',');
+    final String amountStr = TextUtils.formatCurrency(amount, account.getCurrency()!);
     return GestureDetector(
       onTap: !interactive
           ? null
@@ -66,7 +65,7 @@ class TransactionCard extends StatelessWidget {
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(DateFormat('dd.MM.yyyy HH:mm').format(executedAt)),
+                  Text(dateTimeFormat.format(executedAt)),
                   Text('${type == TransactionType.deposit ? '' : '-'}$amountStr',
                       style: context.textTheme.titleMedium?.copyWith(
                           color: type == TransactionType.deposit

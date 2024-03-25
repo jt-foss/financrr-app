@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:financrr_frontend/data/l10n_repository.dart';
 import 'package:financrr_frontend/data/session_repository.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/widgets/paginated_table.dart';
@@ -81,8 +82,8 @@ class _SessionSettingsPageState extends State<SessionSettingsPage> {
                     return DataRow(cells: [
                       DataCell(Text(session.id.toString())),
                       DataCell(Text(session.name ?? 'N/A')),
-                      DataCell(Text(DateFormat('dd.MM.yyyy HH:mm').format(session.createdAt))),
-                      DataCell(Text(DateFormat('dd.MM.yyyy HH:mm').format(session.expiresAt))),
+                      DataCell(Text(dateTimeFormat.format(session.createdAt))),
+                      DataCell(Text(dateTimeFormat.format(session.expiresAt))),
                       DataCell(Row(
                         children: [
                           IconButton(

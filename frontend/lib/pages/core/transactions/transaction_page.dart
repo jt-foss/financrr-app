@@ -11,6 +11,7 @@ import 'package:restrr/restrr.dart';
 
 import '../../../../../layout/adaptive_scaffold.dart';
 import '../../../../../router.dart';
+import '../../../data/l10n_repository.dart';
 import '../../../widgets/async_wrapper.dart';
 
 class TransactionPage extends StatefulWidget {
@@ -126,8 +127,8 @@ class TransactionPageState extends State<TransactionPage> {
                     _buildTableRow('Description', transaction.description ?? 'N/A'),
                     _buildTableRow('From', transaction.getSourceAccount()?.name ?? 'N/A'),
                     _buildTableRow('To', transaction.getDestinationAccount()?.name ?? 'N/A'),
-                    _buildTableRow('Executed at', DateFormat('dd.MM.yyyy HH:mm').format(transaction.executedAt)),
-                    _buildTableRow('Created at', DateFormat('dd.MM.yyyy HH:mm').format(transaction.createdAt)),
+                    _buildTableRow('Executed at', dateTimeFormat.format(transaction.executedAt)),
+                    _buildTableRow('Created at', dateTimeFormat.format(transaction.createdAt)),
                   ],
                 ),
               )

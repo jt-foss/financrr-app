@@ -1,9 +1,10 @@
+import 'package:financrr_frontend/data/l10n_repository.dart';
 import 'package:restrr/restrr.dart';
 
 class TextUtils {
   const TextUtils._();
 
-  static String formatCurrency(int amount, Currency currency, {String decimalSeparator = '.'}) {
+  static String formatCurrency(int amount, Currency currency) {
     if (currency.decimalPlaces == 0) return '$amount${currency.symbol}';
     final String amountStr = amount.toString();
     if (amountStr.length <= currency.decimalPlaces) {
