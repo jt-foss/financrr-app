@@ -24,7 +24,7 @@ pub(crate) mod event_listener;
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub(crate) struct Budget {
     pub(crate) id: i32,
-    pub(crate) user: Phantom<User>,
+    pub(crate) user_id: Phantom<User>,
     pub(crate) amount: i64,
     pub(crate) name: String,
     pub(crate) description: Option<String>,
@@ -72,7 +72,7 @@ impl Budget {
     pub(crate) async fn update(self, dto: BudgetDTO) -> Result<Self, ApiError> {
         let model = budget::ActiveModel {
             id: Set(self.id),
-            user: Set(self.user.get_id()),
+            user: Set(self.user_id.get_id()),
             amount: Set(dto.amount),
             name: Set(dto.name),
             description: Set(dto.description),
@@ -130,7 +130,7 @@ impl From<budget::Model> for Budget {
     fn from(model: budget::Model) -> Self {
         Self {
             id: model.id,
-            user: Phantom::new(model.user),
+            user_id: Phantom::new(model.user),
             amount: model.amount,
             name: model.name,
             description: model.description,

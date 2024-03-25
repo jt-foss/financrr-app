@@ -12,8 +12,8 @@ use entity::utility::time::get_now;
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
 use crate::databases::entity::{count, delete, find_all_paginated, find_one_or_error, insert, update};
-use crate::event::transaction::TransactionEvent;
-use crate::event::Event;
+use crate::event::lifecycle::transaction::{TransactionCreation, TransactionDeletion, TransactionUpdate};
+use crate::event::GenericEvent;
 use crate::wrapper::entity::account::Account;
 use crate::wrapper::entity::budget::Budget;
 use crate::wrapper::entity::currency::Currency;
@@ -30,12 +30,13 @@ pub(crate) mod search;
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub(crate) struct Transaction {
     pub(crate) id: i32,
-    pub(crate) source: Option<Phantom<Account>>,
-    pub(crate) destination: Option<Phantom<Account>>,
+    pub(crate) source_id: Option<Phantom<Account>>,
+    pub(crate) destination_id: Option<Phantom<Account>>,
     pub(crate) amount: i64,
-    pub(crate) currency: Phantom<Currency>,
+    pub(crate) currency_id: Phantom<Currency>,
+    pub(crate) name: String,
     pub(crate) description: Option<String>,
-    pub(crate) budget: Option<Phantom<Budget>>,
+    pub(crate) budget_id: Option<Phantom<Budget>>,
     #[serde(with = "time::serde::rfc3339")]
     pub(crate) created_at: OffsetDateTime,
     #[serde(with = "time::serde::rfc3339")]
@@ -46,12 +47,13 @@ impl Transaction {
     pub(crate) async fn new(dto: TransactionDTO, user_id: i32) -> Result<Self, ApiError> {
         let active_model = transaction::ActiveModel {
             id: Default::default(),
-            source: Set(dto.source.map(|source| source.get_id())),
-            destination: Set(dto.destination.map(|destination| destination.get_id())),
+            source: Set(dto.source_id.map(|source| source.get_id())),
+            destination: Set(dto.destination_id.map(|destination| destination.get_id())),
             amount: Set(dto.amount),
-            currency: Set(dto.currency.get_id()),
+            currency: Set(dto.currency_id.get_id()),
+            name: Set(dto.name),
             description: Set(dto.description),
-            budget: Set(dto.budget.map(|budget| budget.get_id())),
+            budget: Set(dto.budget_id.map(|budget| budget.get_id())),
             created_at: Set(get_now()),
             executed_at: Set(dto.executed_at),
         };
@@ -66,9 +68,9 @@ impl Transaction {
         if transaction.executed_at > get_now() {
             let delay = transaction.executed_at - get_now();
             let delay = Duration::new(delay.whole_seconds() as u64, 0);
-            TransactionEvent::fire_scheduled(TransactionEvent::Create(transaction.clone()), delay);
+            TransactionCreation::fire_scheduled(TransactionCreation::new(transaction.clone()), delay);
         } else {
-            TransactionEvent::fire(TransactionEvent::Create(transaction.clone()));
+            TransactionCreation::fire(TransactionCreation::new(transaction.clone()));
         }
 
         Ok(transaction)
@@ -77,18 +79,19 @@ impl Transaction {
     pub(crate) async fn update(self, updated_dto: TransactionDTO) -> Result<Self, ApiError> {
         let active_model = transaction::ActiveModel {
             id: Set(self.id),
-            source: Set(updated_dto.source.map(|source| source.get_id())),
-            destination: Set(updated_dto.destination.map(|destination| destination.get_id())),
+            source: Set(updated_dto.source_id.map(|source| source.get_id())),
+            destination: Set(updated_dto.destination_id.map(|destination| destination.get_id())),
             amount: Set(updated_dto.amount),
-            currency: Set(updated_dto.currency.get_id()),
+            currency: Set(updated_dto.currency_id.get_id()),
+            name: Set(updated_dto.name),
             description: Set(updated_dto.description),
-            budget: Set(updated_dto.budget.map(|budget| budget.get_id())),
+            budget: Set(updated_dto.budget_id.map(|budget| budget.get_id())),
             created_at: Set(self.created_at),
             executed_at: Set(updated_dto.executed_at),
         };
         let transaction = Self::from(update(active_model).await?);
 
-        TransactionEvent::fire(TransactionEvent::Update(self.clone(), Box::new(transaction.clone())));
+        TransactionUpdate::fire(TransactionUpdate::new(self.clone(), transaction.clone()));
 
         Ok(transaction)
     }
@@ -96,7 +99,7 @@ impl Transaction {
     pub(crate) async fn delete(self) -> Result<(), ApiError> {
         delete(transaction::Entity::delete_by_id(self.id)).await?;
 
-        TransactionEvent::fire(TransactionEvent::Delete(self.clone()));
+        TransactionDeletion::fire(TransactionDeletion::new(self.clone()));
 
         Ok(())
     }
@@ -159,12 +162,13 @@ impl From<transaction::Model> for Transaction {
     fn from(value: Model) -> Self {
         Self {
             id: value.id,
-            source: Phantom::from_option(value.source),
-            destination: Phantom::from_option(value.destination),
+            source_id: Phantom::from_option(value.source),
+            destination_id: Phantom::from_option(value.destination),
             amount: value.amount,
-            currency: Phantom::new(value.currency),
+            currency_id: Phantom::new(value.currency),
+            name: value.name,
             description: value.description,
-            budget: Phantom::from_option(value.budget),
+            budget_id: Phantom::from_option(value.budget),
             created_at: value.created_at,
             executed_at: value.executed_at,
         }
