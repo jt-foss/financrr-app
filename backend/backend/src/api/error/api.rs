@@ -192,20 +192,11 @@ impl From<serde_json::Error> for ApiError {
 
 impl From<actix_web::Error> for ApiError {
     fn from(error: actix_web::Error) -> Self {
-        if error.as_response_error().status_code().eq(&StatusCode::BAD_REQUEST) {
-            Self {
-                status_code: StatusCode::BAD_REQUEST,
-                api_code: ApiCode::JSON_PAYLOAD_VALIDATION_ERROR,
-                details: error.to_string(),
-                reference: None,
-            }
-        } else {
-            Self {
-                status_code: error.as_response_error().status_code(),
-                api_code: ApiCode::ACTIX_ERROR,
-                details: error.to_string(),
-                reference: None,
-            }
+        Self {
+            status_code: error.as_response_error().status_code(),
+            api_code: ApiCode::ACTIX_ERROR,
+            details: error.to_string(),
+            reference: None,
         }
     }
 }

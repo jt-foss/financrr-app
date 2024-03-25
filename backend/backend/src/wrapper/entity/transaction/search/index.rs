@@ -1,12 +1,16 @@
+use opensearch::SearchParts;
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 use time::OffsetDateTime;
 
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
-use crate::search::index::{IndexBuilder, IndexType, Indexer};
-use crate::wrapper::entity::transaction::Transaction;
+use crate::databases::connections::search::get_open_search_client;
+use crate::search::index::{IndexBuilder, Indexer, IndexType};
 use crate::wrapper::entity::TableName;
+use crate::wrapper::entity::transaction::Transaction;
 use crate::wrapper::permission::{Permissions, PermissionsEntity};
+use crate::wrapper::search::{Searchable, SearchQuery};
 
 pub const INDEX_NAME: &str = "transaction";
 
@@ -36,8 +40,10 @@ impl TransactionIndex {
             user_ids,
         }
     }
+}
 
-    pub(super) async fn create_index() {
+impl Searchable for TransactionIndex {
+    async fn create_index() {
         IndexBuilder::new(INDEX_NAME)
             .add_field("id", IndexType::INTEGER)
             .add_field("source", IndexType::INTEGER)
@@ -50,37 +56,62 @@ impl TransactionIndex {
             .send()
             .await;
     }
-}
 
-pub(super) async fn index_transactions() -> Result<(), ApiError> {
-    let page_size = 500;
-    let total = Transaction::count_all().await?;
-    let pages = (total as f64 / page_size as f64).ceil() as u64;
+    async fn index() -> Result<(), ApiError> {
+        let page_size = 500;
+        let total = Transaction::count_all().await?;
+        let pages = (total as f64 / page_size as f64).ceil() as u64;
 
-    for page in 1..pages {
-        let page_size_param = PageSizeParam::new(page, page_size);
-        let transactions = Transaction::find_all_paginated(page_size_param).await?;
-        tokio::spawn(async move {
-            let mut docs = Vec::with_capacity(transactions.len());
-            for transaction in transactions {
-                let user_ids = PermissionsEntity::find_users_with_permissions(
-                    Transaction::table_name(),
-                    transaction.id,
-                    Permissions::READ,
-                )
-                .await
-                .unwrap_or_default();
-                if user_ids.is_empty() {
-                    continue;
+        for page in 1..pages {
+            let page_size_param = PageSizeParam::new(page, page_size);
+            let transactions = Transaction::find_all_paginated(page_size_param).await?;
+            tokio::spawn(async move {
+                let mut docs = Vec::with_capacity(transactions.len());
+                for transaction in transactions {
+                    let user_ids = PermissionsEntity::find_users_with_permissions(
+                        Transaction::table_name(),
+                        transaction.id,
+                        Permissions::READ,
+                    )
+                        .await
+                        .unwrap_or_default();
+                    if user_ids.is_empty() {
+                        continue;
+                    }
+
+                    let index = TransactionIndex::from_transaction(transaction, user_ids);
+                    let doc = serde_json::to_value(index).unwrap();
+                    docs.push(doc);
                 }
+                Indexer::index_documents(INDEX_NAME, docs).await;
+            });
+        }
 
-                let index = TransactionIndex::from_transaction(transaction, user_ids);
-                let doc = serde_json::to_value(index).unwrap();
-                docs.push(doc);
-            }
-            Indexer::index_documents(INDEX_NAME, docs).await;
-        });
+        Ok(())
     }
 
-    Ok(())
+    async fn search(_query: SearchQuery, user_id: i32, page_size: PageSizeParam) -> Result<Vec<Self>, ApiError> {
+        let from = page_size.page * page_size.limit;
+
+        let client = get_open_search_client();
+        client
+            .search(SearchParts::Index(&[INDEX_NAME]))
+            .from(from as i64)
+            .size(page_size.limit as i64)
+            .body(json!({
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "terms": {
+                                    "user_ids": [user_id]
+                                }
+                            }
+                        ]
+                    }
+                }
+            })
+            .await
+            .map_err(ApiError::from)
+    }
 }
