@@ -32,7 +32,7 @@ pub(crate) struct Account {
     pub(crate) iban: Option<String>,
     pub(crate) balance: i64,
     pub(crate) original_balance: i64,
-    pub(crate) currency: Phantom<Currency>,
+    pub(crate) currency_id: Phantom<Currency>,
     #[serde(with = "time::serde::rfc3339")]
     pub(crate) created_at: OffsetDateTime,
 }
@@ -161,7 +161,7 @@ impl From<account::Model> for Account {
             iban: value.iban,
             balance: value.balance,
             original_balance: value.original_balance,
-            currency: Phantom::new(value.currency),
+            currency_id: Phantom::new(value.currency),
             created_at: value.created_at,
         }
     }

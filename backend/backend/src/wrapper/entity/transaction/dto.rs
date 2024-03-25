@@ -17,19 +17,19 @@ use crate::wrapper::types::phantom::Phantom;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Validate, ToSchema)]
 pub(crate) struct TransactionDTO {
-    pub(crate) source: Option<Phantom<Account>>,
-    pub(crate) destination: Option<Phantom<Account>>,
+    pub(crate) source_id: Option<Phantom<Account>>,
+    pub(crate) destination_id: Option<Phantom<Account>>,
     pub(crate) amount: i64,
-    pub(crate) currency: Phantom<Currency>,
+    pub(crate) currency_id: Phantom<Currency>,
     pub(crate) description: Option<String>,
-    pub(crate) budget: Option<Phantom<Budget>>,
+    pub(crate) budget_id: Option<Phantom<Budget>>,
     #[serde(with = "time::serde::rfc3339")]
     pub(crate) executed_at: OffsetDateTime,
 }
 
 impl TransactionDTO {
     pub(crate) async fn check_account_access(&self, user_id: i32) -> Result<bool, ApiError> {
-        match (&self.source, &self.destination) {
+        match (&self.source_id, &self.destination_id) {
             (Some(source), Some(destination)) => {
                 let source_permissions = source.has_permission(user_id, Permissions::READ_WRITE).await?;
                 let destination_permissions = destination.has_permission(user_id, Permissions::READ_WRITE).await?;
@@ -51,11 +51,11 @@ impl TransactionDTO {
     async fn validate(&self) -> Result<(), ApiError> {
         let mut error = ValidationError::new("Transaction validation error");
         // TODO add check if budget exists
-        if self.source.is_none() && self.destination.is_none() {
+        if self.source_id.is_none() && self.destination_id.is_none() {
             error.add("account", "source or destination must be present");
         }
 
-        match (&self.source, &self.destination) {
+        match (&self.source_id, &self.destination_id) {
             (Some(source), Some(destination)) => {
                 if !Account::exists(source.get_id()).await? {
                     error.add("account", "source account does not exist");

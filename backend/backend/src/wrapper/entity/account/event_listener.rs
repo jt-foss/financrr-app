@@ -21,10 +21,10 @@ pub(crate) fn account_listener() {
 }
 
 async fn transaction_created(mut transaction: Transaction) -> Result<(), ApiError> {
-    if let Some(source) = &mut transaction.source {
+    if let Some(source) = &mut transaction.source_id {
         update_account_balance(source.get_inner().await?, -transaction.amount).await?;
     }
-    if let Some(destination) = &mut transaction.destination {
+    if let Some(destination) = &mut transaction.destination_id {
         update_account_balance(destination.get_inner().await?, transaction.amount).await?;
     }
 
@@ -35,16 +35,16 @@ async fn transaction_updated(
     mut old_transaction: Transaction,
     mut new_transaction: Box<Transaction>,
 ) -> Result<(), ApiError> {
-    if let Some(source) = &mut old_transaction.source {
+    if let Some(source) = &mut old_transaction.source_id {
         update_account_balance(source.get_inner().await?, old_transaction.amount).await?;
     }
-    if let Some(destination) = &mut old_transaction.destination {
+    if let Some(destination) = &mut old_transaction.destination_id {
         update_account_balance(destination.get_inner().await?, -old_transaction.amount).await?;
     }
-    if let Some(source) = &mut new_transaction.source {
+    if let Some(source) = &mut new_transaction.source_id {
         update_account_balance(source.get_inner().await?, -new_transaction.amount).await?;
     }
-    if let Some(destination) = &mut new_transaction.destination {
+    if let Some(destination) = &mut new_transaction.destination_id {
         update_account_balance(destination.get_inner().await?, new_transaction.amount).await?;
     }
 
@@ -52,10 +52,10 @@ async fn transaction_updated(
 }
 
 async fn transaction_deleted(mut transaction: Transaction) -> Result<(), ApiError> {
-    if let Some(source) = &mut transaction.source {
+    if let Some(source) = &mut transaction.source_id {
         update_account_balance(source.get_inner().await?, transaction.amount).await?;
     }
-    if let Some(destination) = &mut transaction.destination {
+    if let Some(destination) = &mut transaction.destination_id {
         update_account_balance(destination.get_inner().await?, -transaction.amount).await?;
     }
 

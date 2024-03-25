@@ -29,12 +29,12 @@ pub mod dto;
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub(crate) struct Transaction {
     pub(crate) id: i32,
-    pub(crate) source: Option<Phantom<Account>>,
-    pub(crate) destination: Option<Phantom<Account>>,
+    pub(crate) source_id: Option<Phantom<Account>>,
+    pub(crate) destination_id: Option<Phantom<Account>>,
     pub(crate) amount: i64,
-    pub(crate) currency: Phantom<Currency>,
+    pub(crate) currency_id: Phantom<Currency>,
     pub(crate) description: Option<String>,
-    pub(crate) budget: Option<Phantom<Budget>>,
+    pub(crate) budget_id: Option<Phantom<Budget>>,
     #[serde(with = "time::serde::rfc3339")]
     pub(crate) created_at: OffsetDateTime,
     #[serde(with = "time::serde::rfc3339")]
@@ -45,12 +45,12 @@ impl Transaction {
     pub(crate) async fn new(dto: TransactionDTO, user_id: i32) -> Result<Self, ApiError> {
         let active_model = transaction::ActiveModel {
             id: Default::default(),
-            source: Set(dto.source.map(|source| source.get_id())),
-            destination: Set(dto.destination.map(|destination| destination.get_id())),
+            source: Set(dto.source_id.map(|source| source.get_id())),
+            destination: Set(dto.destination_id.map(|destination| destination.get_id())),
             amount: Set(dto.amount),
-            currency: Set(dto.currency.get_id()),
+            currency: Set(dto.currency_id.get_id()),
             description: Set(dto.description),
-            budget: Set(dto.budget.map(|budget| budget.get_id())),
+            budget: Set(dto.budget_id.map(|budget| budget.get_id())),
             created_at: Set(get_now()),
             executed_at: Set(dto.executed_at),
         };
@@ -76,12 +76,12 @@ impl Transaction {
     pub(crate) async fn update(self, updated_dto: TransactionDTO) -> Result<Self, ApiError> {
         let active_model = transaction::ActiveModel {
             id: Set(self.id),
-            source: Set(updated_dto.source.map(|source| source.get_id())),
-            destination: Set(updated_dto.destination.map(|destination| destination.get_id())),
+            source: Set(updated_dto.source_id.map(|source| source.get_id())),
+            destination: Set(updated_dto.destination_id.map(|destination| destination.get_id())),
             amount: Set(updated_dto.amount),
-            currency: Set(updated_dto.currency.get_id()),
+            currency: Set(updated_dto.currency_id.get_id()),
             description: Set(updated_dto.description),
-            budget: Set(updated_dto.budget.map(|budget| budget.get_id())),
+            budget: Set(updated_dto.budget_id.map(|budget| budget.get_id())),
             created_at: Set(self.created_at),
             executed_at: Set(updated_dto.executed_at),
         };
@@ -150,12 +150,12 @@ impl From<transaction::Model> for Transaction {
     fn from(value: Model) -> Self {
         Self {
             id: value.id,
-            source: Phantom::from_option(value.source),
-            destination: Phantom::from_option(value.destination),
+            source_id: Phantom::from_option(value.source),
+            destination_id: Phantom::from_option(value.destination),
             amount: value.amount,
-            currency: Phantom::new(value.currency),
+            currency_id: Phantom::new(value.currency),
             description: value.description,
-            budget: Phantom::from_option(value.budget),
+            budget_id: Phantom::from_option(value.budget),
             created_at: value.created_at,
             executed_at: value.executed_at,
         }

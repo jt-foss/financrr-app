@@ -46,7 +46,7 @@ impl From<Account> for AccountDTO {
             description: value.description,
             iban: value.iban,
             original_balance: value.original_balance,
-            currency_id: value.currency.get_id(),
+            currency_id: value.currency_id.get_id(),
         }
     }
 }

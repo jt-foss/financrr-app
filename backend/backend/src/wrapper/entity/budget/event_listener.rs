@@ -21,7 +21,7 @@ pub(crate) fn budget_listener() {
 }
 
 async fn transaction_created(mut transaction: Transaction) -> Result<(), ApiError> {
-    if let Some(budget) = &mut transaction.budget {
+    if let Some(budget) = &mut transaction.budget_id {
         update_budget_amount(budget.get_inner().await?, transaction.amount).await?;
     }
 
@@ -32,10 +32,10 @@ async fn transaction_updated(
     mut old_transaction: Transaction,
     mut new_transaction: Box<Transaction>,
 ) -> Result<(), ApiError> {
-    if let Some(budget) = &mut old_transaction.budget {
+    if let Some(budget) = &mut old_transaction.budget_id {
         update_budget_amount(budget.get_inner().await?, old_transaction.amount).await?;
     }
-    if let Some(budget) = &mut new_transaction.budget {
+    if let Some(budget) = &mut new_transaction.budget_id {
         update_budget_amount(budget.get_inner().await?, -new_transaction.amount).await?;
     }
 
@@ -43,7 +43,7 @@ async fn transaction_updated(
 }
 
 async fn transaction_deleted(mut transaction: Transaction) -> Result<(), ApiError> {
-    if let Some(budget) = &mut transaction.budget {
+    if let Some(budget) = &mut transaction.budget_id {
         update_budget_amount(budget.get_inner().await?, -transaction.amount).await?;
     }
 
