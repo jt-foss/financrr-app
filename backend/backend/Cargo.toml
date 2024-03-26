@@ -43,7 +43,7 @@ opensearch = { version = "2.2.0", features = ["rustls-tls"], default-features = 
 
 # Serialization and deserialization
 serde.workspace = true
-serde_json = "1.0.114"
+serde_json = "1.0.115"
 
 # Generating openapi spec
 utoipa = { version = "4.2.0", features = ["actix_extras", "openapi_extensions", "time", "preserve_order", "preserve_path_order", "non_strict_integers"] }
