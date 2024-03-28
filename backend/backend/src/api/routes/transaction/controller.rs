@@ -1,11 +1,12 @@
 use actix_web::http::Uri;
-use actix_web::web::Path;
+use actix_web::web::{Path, Query};
 use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
 
 use crate::api::documentation::response::{InternalServerError, Unauthorized, ValidationError};
 use crate::api::error::api::ApiError;
 use crate::api::pagination::{PageSizeParam, Pagination};
 use crate::wrapper::entity::transaction::dto::TransactionDTO;
+use crate::wrapper::entity::transaction::search::query::TransactionQuery;
 use crate::wrapper::entity::transaction::Transaction;
 use crate::wrapper::entity::user::User;
 use crate::wrapper::permission::{HasPermissionOrError, Permissions};
@@ -13,7 +14,13 @@ use crate::wrapper::types::phantom::Phantom;
 
 pub(crate) fn transaction_controller(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("/transaction").service(get_one).service(get_all).service(create).service(delete).service(update),
+        web::scope("/transaction")
+            .service(search)
+            //.service(get_one)
+            .service(get_all)
+            .service(create)
+            .service(delete)
+            .service(update),
     );
 }
 
@@ -60,6 +67,32 @@ pub(crate) async fn get_one(user: Phantom<User>, transaction_id: Path<i32>) -> R
     transaction.has_permission_or_error(user.get_id(), Permissions::READ).await?;
 
     Ok(HttpResponse::Ok().json(transaction))
+}
+
+#[utoipa::path(get,
+responses(
+(status = 200, description = "Successfully searched Transactions.", content_type = "application/json", body = PaginatedTransaction),
+ValidationError,
+Unauthorized,
+InternalServerError,
+),
+params(PageSizeParam),
+security(
+("bearer_token" = [])
+),
+path = "/api/v1/transaction/search?page={page}&size={size}&search_query={search_query}",
+tag = "Transaction")]
+#[get("/search")]
+pub(crate) async fn search(
+    user: Phantom<User>,
+    search_query: Query<TransactionQuery>,
+    //page_size: PageSizeParam,
+    uri: Uri,
+) -> Result<impl Responder, ApiError> {
+    let page_size = PageSizeParam::default();
+    let transactions = Transaction::search(user.get_id(), page_size.clone(), search_query.into_inner().fts).await?;
+
+    Ok(HttpResponse::Ok().json(Pagination::new(transactions, &page_size, 0, uri)))
 }
 
 #[utoipa::path(post,

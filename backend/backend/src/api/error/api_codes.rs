@@ -52,6 +52,7 @@ api_codes!(
     (1100, RESOURCE_NOT_FOUND, "Requested resource was not found!");
     (1101, SERIALIZATION_ERROR, "Serialization error!");
     (1102, MISSING_PERMISSIONS, "Missing permissions!");
+    (1103, MISSING_QUERY_PARAM, "Missing query parameter!");
 );
 
 //validation errors
@@ -64,6 +65,7 @@ api_codes!(
     (1300, ENTITY_ERROR, "DB-Entity error!");
     (1301, DB_ERROR, "Database error!");
     (1302, REDIS_ERROR, "Redis error!");
+    (1303, OPEN_SEARCH_ERROR, "Open search error!");
 );
 
 // misc

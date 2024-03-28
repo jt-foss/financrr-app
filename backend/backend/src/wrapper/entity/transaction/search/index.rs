@@ -1,41 +1,43 @@
-use opensearch::SearchParts;
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use time::OffsetDateTime;
+use tracing::error;
+use utoipa::ToSchema;
 
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
-use crate::databases::connections::search::get_open_search_client;
-use crate::search::index::{IndexBuilder, Indexer, IndexType};
-use crate::wrapper::entity::TableName;
+use crate::search::index::{IndexBuilder, IndexType, Indexer};
+use crate::search::query::BooleanQuery;
 use crate::wrapper::entity::transaction::Transaction;
+use crate::wrapper::entity::TableName;
 use crate::wrapper::permission::{Permissions, PermissionsEntity};
-use crate::wrapper::search::{Searchable, SearchQuery};
+use crate::wrapper::search::Searchable;
 
 pub const INDEX_NAME: &str = "transaction";
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub(super) struct TransactionIndex {
-    id: i32,
-    source: Option<i32>,
-    destination: Option<i32>,
-    description: Option<String>,
-    currency: i32,
-    budget: Option<i32>,
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
+pub(crate) struct TransactionIndex {
+    pub(crate) id: i32,
+    pub(crate) source: Option<i32>,
+    pub(crate) destination: Option<i32>,
+    pub(crate) name: String,
+    pub(crate) description: Option<String>,
+    pub(crate) currency: i32,
+    pub(crate) budget: Option<i32>,
     #[serde(with = "time::serde::rfc3339")]
-    executed_at: OffsetDateTime,
-    user_ids: Vec<i32>,
+    pub(crate) executed_at: OffsetDateTime,
+    pub(crate) user_ids: Vec<i32>,
 }
 
 impl TransactionIndex {
     pub(super) fn from_transaction(transaction: Transaction, user_ids: Vec<i32>) -> Self {
         Self {
             id: transaction.id,
-            source: transaction.source.map(|s| s.get_id()),
-            destination: transaction.destination.map(|d| d.get_id()),
+            source: transaction.source_id.map(|s| s.get_id()),
+            destination: transaction.destination_id.map(|d| d.get_id()),
+            name: transaction.name,
             description: transaction.description,
-            currency: transaction.currency.get_id(),
-            budget: transaction.budget.map(|b| b.get_id()),
+            currency: transaction.currency_id.get_id(),
+            budget: transaction.budget_id.map(|b| b.get_id()),
             executed_at: transaction.executed_at,
             user_ids,
         }
@@ -43,11 +45,16 @@ impl TransactionIndex {
 }
 
 impl Searchable for TransactionIndex {
+    fn get_index_name() -> &'static str {
+        INDEX_NAME
+    }
+
     async fn create_index() {
         IndexBuilder::new(INDEX_NAME)
             .add_field("id", IndexType::INTEGER)
             .add_field("source", IndexType::INTEGER)
             .add_field("destination", IndexType::INTEGER)
+            .add_field("name", IndexType::TEXT)
             .add_field("description", IndexType::TEXT)
             .add_field("currency", IndexType::INTEGER)
             .add_field("budget", IndexType::INTEGER)
@@ -62,7 +69,8 @@ impl Searchable for TransactionIndex {
         let total = Transaction::count_all().await?;
         let pages = (total as f64 / page_size as f64).ceil() as u64;
 
-        for page in 1..pages {
+        for page in 0..pages {
+            let page = page + 1;
             let page_size_param = PageSizeParam::new(page, page_size);
             let transactions = Transaction::find_all_paginated(page_size_param).await?;
             tokio::spawn(async move {
@@ -73,15 +81,19 @@ impl Searchable for TransactionIndex {
                         transaction.id,
                         Permissions::READ,
                     )
-                        .await
-                        .unwrap_or_default();
+                    .await
+                    .unwrap_or_default();
                     if user_ids.is_empty() {
                         continue;
                     }
 
-                    let index = TransactionIndex::from_transaction(transaction, user_ids);
-                    let doc = serde_json::to_value(index).unwrap();
-                    docs.push(doc);
+                    let index = Self::from_transaction(transaction, user_ids);
+                    match serde_json::to_value(index) {
+                        Ok(doc) => docs.push(doc),
+                        Err(e) => {
+                            error!("Error serializing transaction index: {}", e);
+                        }
+                    }
                 }
                 Indexer::index_documents(INDEX_NAME, docs).await;
             });
@@ -90,28 +102,7 @@ impl Searchable for TransactionIndex {
         Ok(())
     }
 
-    async fn search(_query: SearchQuery, user_id: i32, page_size: PageSizeParam) -> Result<Vec<Self>, ApiError> {
-        let from = page_size.page * page_size.limit;
-
-        let client = get_open_search_client();
-        client
-            .search(SearchParts::Index(&[INDEX_NAME]))
-            .from(from as i64)
-            .size(page_size.limit as i64)
-            .body(json!({
-                "query": {
-                    "bool": {
-                        "must": [
-                            {
-                                "terms": {
-                                    "user_ids": [user_id]
-                                }
-                            }
-                        ]
-                    }
-                }
-            })
-            .await
-            .map_err(ApiError::from)
+    async fn search(query: String, user_id: i32, page_size: PageSizeParam) -> Result<Vec<Self>, ApiError> {
+        BooleanQuery::new().add_fts(Some(query)).paginate(page_size).user_restriction(user_id).send().await
     }
 }

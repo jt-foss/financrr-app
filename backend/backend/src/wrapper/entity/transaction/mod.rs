@@ -1,3 +1,4 @@
+use futures_util::{stream, StreamExt};
 use sea_orm::ActiveValue::Set;
 use sea_orm::{EntityName, EntityTrait};
 use serde::{Deserialize, Serialize};
@@ -18,10 +19,12 @@ use crate::wrapper::entity::account::Account;
 use crate::wrapper::entity::budget::Budget;
 use crate::wrapper::entity::currency::Currency;
 use crate::wrapper::entity::transaction::dto::TransactionDTO;
+use crate::wrapper::entity::transaction::search::index::TransactionIndex;
 use crate::wrapper::entity::{TableName, WrapperEntity};
 use crate::wrapper::permission::{
     HasPermissionByIdOrError, HasPermissionOrError, Permission, PermissionByIds, Permissions,
 };
+use crate::wrapper::search::Searchable;
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
 pub(crate) mod dto;
@@ -129,6 +132,21 @@ impl Transaction {
 
     pub(crate) async fn count_all() -> Result<u64, ApiError> {
         count(transaction::Entity::find()).await
+    }
+
+    pub(crate) async fn search(user_id: i32, page_size: PageSizeParam, query: String) -> Result<Vec<Self>, ApiError> {
+        let indices = TransactionIndex::search(query, user_id, page_size).await?;
+        let transactions = stream::iter(indices)
+            .then(|index| async move {
+                match Self::find_by_id(index.id).await {
+                    Ok(transaction) => Some(transaction),
+                    Err(_) => None,
+                }
+            })
+            .filter_map(|x| async move { x })
+            .collect::<Vec<_>>()
+            .await;
+        Ok(transactions)
     }
 }
 

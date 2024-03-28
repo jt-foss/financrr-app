@@ -1,10 +1,12 @@
-use actix_web::error::ResponseError;
+use actix_web::error::{QueryPayloadError, ResponseError};
 use actix_web::http::header::ContentType;
 use actix_web::http::StatusCode;
 use actix_web::HttpResponse;
 use derive_more::{Display, Error};
+use opensearch::http::response::Response;
 use redis::RedisError;
 use sea_orm::DbErr;
+use serde::de::value;
 use serde::{Serialize, Serializer};
 use tracing::error;
 use utoipa::ToSchema;
@@ -17,7 +19,7 @@ use crate::api::error::validation;
 use crate::util::validation::ValidationErrorJsonPayload;
 
 #[derive(Debug, Display, Error, Serialize, ToSchema)]
-#[display("{}", serde_json::to_string(self).unwrap())]
+#[display("{}", serde_json::to_string(self).expect("Could not display API-Error"))]
 pub(crate) struct ApiError {
     #[serde(skip)]
     pub(crate) status_code: StatusCode,
@@ -79,6 +81,7 @@ api_errors!(
     (StatusCode::UNAUTHORIZED, ApiCode::UNAUTHORIZED, "Unauthorized!", Unauthorized);
     (StatusCode::FORBIDDEN, ApiCode::MISSING_PERMISSIONS, "Missing permissions!", MissingPermissions);
     (StatusCode::UNAUTHORIZED, ApiCode::NO_TOKEN_PROVIDED, "No token provided!", NoTOkenProvided);
+    (StatusCode::BAD_REQUEST, ApiCode::MISSING_QUERY_PARAM, "Missing query parameter!", MissingQueryParam);
 );
 
 impl ApiError {
@@ -190,12 +193,70 @@ impl From<serde_json::Error> for ApiError {
     }
 }
 
+impl From<value::Error> for ApiError {
+    fn from(value: value::Error) -> Self {
+        Self {
+            status_code: StatusCode::BAD_REQUEST,
+            api_code: ApiCode::SERIALIZATION_ERROR,
+            details: value.to_string(),
+            reference: None,
+        }
+    }
+}
+
+impl From<serde_qs::Error> for ApiError {
+    fn from(value: serde_qs::Error) -> Self {
+        Self {
+            status_code: StatusCode::BAD_REQUEST,
+            api_code: ApiCode::SERIALIZATION_ERROR,
+            details: value.to_string(),
+            reference: None,
+        }
+    }
+}
+
 impl From<actix_web::Error> for ApiError {
     fn from(error: actix_web::Error) -> Self {
         Self {
             status_code: error.as_response_error().status_code(),
             api_code: ApiCode::ACTIX_ERROR,
             details: error.to_string(),
+            reference: None,
+        }
+    }
+}
+
+impl From<QueryPayloadError> for ApiError {
+    fn from(value: QueryPayloadError) -> Self {
+        match value {
+            QueryPayloadError::Deserialize(err) => Self::from(err),
+            _ => Self {
+                status_code: value.status_code(),
+                api_code: ApiCode::ACTIX_ERROR,
+                details: value.to_string(),
+                reference: None,
+            },
+        }
+    }
+}
+
+impl From<opensearch::Error> for ApiError {
+    fn from(value: opensearch::Error) -> Self {
+        Self {
+            status_code: StatusCode::INTERNAL_SERVER_ERROR,
+            api_code: ApiCode::OPEN_SEARCH_ERROR,
+            details: value.to_string(),
+            reference: None,
+        }
+    }
+}
+
+impl From<Response> for ApiError {
+    fn from(value: Response) -> Self {
+        Self {
+            status_code: value.status_code(),
+            api_code: ApiCode::OPEN_SEARCH_ERROR,
+            details: format!("{:?}", value),
             reference: None,
         }
     }

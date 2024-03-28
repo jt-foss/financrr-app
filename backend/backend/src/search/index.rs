@@ -59,7 +59,7 @@ pub(crate) struct Indexer;
 
 impl Indexer {
     pub(crate) async fn index_documents(index: &str, documents: Vec<Value>) {
-        let body: Vec<JsonBody<_>> = documents.into_iter().map(JsonBody::new).collect();
+        let body: Vec<JsonBody<Value>> = documents.into_iter().map(JsonBody::new).collect();
 
         let client = get_open_search_client();
         client

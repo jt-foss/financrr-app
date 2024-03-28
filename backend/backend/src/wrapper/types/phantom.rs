@@ -32,7 +32,11 @@ impl<T: Identifiable + Send + 'static> Phantom<T> {
         if self.inner.is_none() {
             self.set_inner(T::from_id(self.id).await?);
         }
-        Ok(self.inner.as_ref().unwrap())
+
+        Ok(self
+            .inner
+            .as_ref()
+            .unwrap_or_else(|| unreachable!("This cannot be reached as we checked if Option::is_none!")))
     }
 
     pub(crate) async fn fetch_inner(&self) -> Result<T, ApiError> {

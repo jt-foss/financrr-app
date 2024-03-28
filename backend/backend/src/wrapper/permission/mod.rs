@@ -19,7 +19,7 @@ use crate::wrapper::entity::{TableName, WrapperEntity};
 pub(crate) mod cleanup;
 
 bitflags! {
-    #[derive(Debug, Clone, PartialEq, Eq, Serialize, ToSchema)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, ToSchema)]
     pub(crate) struct Permissions: u32 {
         const READ = 0b001;
         const WRITE = 0b010;
@@ -78,15 +78,12 @@ impl PermissionsEntity {
         entity_id: i32,
         permissions: Permissions,
     ) -> Result<Vec<i32>, ApiError> {
-        let permissions = find_all(permissions::Entity::find_users_with_permissions(
-            entity_type,
-            entity_id,
-            permissions.bits() as i32,
-        ))
-        .await?
-        .into_iter()
-        .map(|p| p.user_id)
-        .collect();
+        let permissions = find_all(permissions::Entity::find_users(entity_type, entity_id))
+            .await?
+            .into_iter()
+            .filter(|p| Permissions::from(p.to_owned()).contains(permissions))
+            .map(|p| p.user_id)
+            .collect();
 
         Ok(permissions)
     }
@@ -215,7 +212,7 @@ fn has_permission_or_error_raw(
     permissions: Permissions,
     table_name: &str,
 ) -> Result<(), ApiError> {
-    if !user_permissions.contains(permissions.clone()) {
+    if !user_permissions.contains(permissions) {
         if permissions.contains(Permissions::READ) && !user_permissions.contains(Permissions::READ) {
             return Err(ApiError::ResourceNotFound(table_name));
         }

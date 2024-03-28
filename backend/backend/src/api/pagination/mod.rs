@@ -136,12 +136,12 @@ impl FromRequest for PageSizeParam {
 }
 
 impl IntoParams for PageSizeParam {
-    fn into_params(parameter_in_provider: impl Fn() -> Option<ParameterIn>) -> Vec<Parameter> {
+    fn into_params(_parameter_in_provider: impl Fn() -> Option<ParameterIn>) -> Vec<Parameter> {
         vec![
             ParameterBuilder::new()
                 .name("page")
                 .required(Required::False)
-                .parameter_in(parameter_in_provider().unwrap_or_default())
+                .parameter_in(ParameterIn::Query)
                 .description(Some(format!("The page number. Default: {}", DEFAULT_PAGE)))
                 .schema(Some(
                     ObjectBuilder::new()
@@ -152,7 +152,7 @@ impl IntoParams for PageSizeParam {
             ParameterBuilder::new()
                 .name("limit")
                 .required(Required::False)
-                .parameter_in(parameter_in_provider().unwrap_or_default())
+                .parameter_in(ParameterIn::Query)
                 .description(Some(format!("The number of items per page. Default: {}", DEFAULT_LIMIT)))
                 .schema(Some(
                     ObjectBuilder::new()
