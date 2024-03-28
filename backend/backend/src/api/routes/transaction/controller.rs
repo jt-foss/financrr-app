@@ -80,7 +80,7 @@ params(PageSizeParam, TransactionQuery),
 security(
 ("bearer_token" = [])
 ),
-path = "/api/v1/transaction/search?page={page}&size={size}&search_query={search_query}",
+path = "/api/v1/transaction/search?page={page}&size={size}&search_query={search_query}&sort_by={sort_by}",
 tag = "Transaction")]
 #[get("/search")]
 pub(crate) async fn search(

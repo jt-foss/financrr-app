@@ -8,7 +8,7 @@ use serde_json::{json, Value};
 use tracing::error;
 
 use crate::databases::connections::search::get_open_search_client;
-use crate::wrapper::search::Searchable;
+use crate::search::Searchable;
 
 #[derive(Debug)]
 pub(crate) struct IndexBuilder {

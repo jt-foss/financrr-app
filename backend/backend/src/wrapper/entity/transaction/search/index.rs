@@ -6,11 +6,11 @@ use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
 use crate::search::index::{IndexBuilder, IndexType, Indexer};
 use crate::search::query::BooleanQuery;
+use crate::search::Searchable;
 use crate::wrapper::entity::transaction::search::query::TransactionQuery;
 use crate::wrapper::entity::transaction::Transaction;
 use crate::wrapper::entity::TableName;
 use crate::wrapper::permission::{Permissions, PermissionsEntity};
-use crate::wrapper::search::Searchable;
 
 pub const INDEX_NAME: &str = "transaction";
 
@@ -103,6 +103,12 @@ impl Searchable for TransactionIndex {
     }
 
     async fn search(query: TransactionQuery, user_id: i32, page_size: PageSizeParam) -> Result<Vec<Self>, ApiError> {
-        BooleanQuery::new().add_fts(query.fts).paginate(page_size).user_restriction(user_id).send().await
+        BooleanQuery::new()
+            .add_fts(query.fts)
+            .add_sort(query.sort_by)
+            .paginate(page_size)
+            .user_restriction(user_id)
+            .send()
+            .await
     }
 }

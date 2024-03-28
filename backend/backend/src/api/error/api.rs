@@ -81,7 +81,6 @@ api_errors!(
     (StatusCode::UNAUTHORIZED, ApiCode::UNAUTHORIZED, "Unauthorized!", Unauthorized);
     (StatusCode::FORBIDDEN, ApiCode::MISSING_PERMISSIONS, "Missing permissions!", MissingPermissions);
     (StatusCode::UNAUTHORIZED, ApiCode::NO_TOKEN_PROVIDED, "No token provided!", NoTOkenProvided);
-    (StatusCode::BAD_REQUEST, ApiCode::MISSING_QUERY_PARAM, "Missing query parameter!", MissingQueryParam);
 );
 
 impl ApiError {

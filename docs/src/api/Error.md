@@ -35,8 +35,7 @@ We call these custom error codes `Api Codes`.
 |------|-------------------------|
 | 1100 | Resource not found      |
 | 1101 | Serialization error     |
-| 1102 | Missing permissions     |
-| 1103 | Missing query parameter | 
+| 1102 | Missing permissions     | 
 
 ### Validation errors
 

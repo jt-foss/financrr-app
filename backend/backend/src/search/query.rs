@@ -6,7 +6,7 @@ use tracing::error;
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
 use crate::databases::connections::search::get_open_search_client;
-use crate::wrapper::search::Searchable;
+use crate::search::{Searchable, Sortable};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct BooleanQuery {
@@ -31,7 +31,7 @@ impl BooleanQuery {
 
     pub(crate) fn add_fts(mut self, query: Option<String>) -> Self {
         if let Some(fts) = query {
-            match self.body["query"]["bool"]["should"].as_array_mut() {
+            match self.body["query"]["bool"]["must"].as_array_mut() {
                 Some(doc) => doc.push(json!({
                     "multi_match": {
                     "query": fts,
@@ -59,6 +59,28 @@ impl BooleanQuery {
                 }
             })),
             None => error!("Could not get '[query][bool][must]' from query body!"),
+        }
+
+        self
+    }
+
+    pub(crate) fn add_sort<T: Sortable>(mut self, sort: Option<T>) -> Self {
+        if let Some(sort) = sort {
+            let (sort_attribute, sort_type) = sort.get_sort_attribute();
+            match self.body["sort"].as_array_mut() {
+                Some(doc) => doc.push(json!({
+                    sort_attribute: {
+                        "order": sort_type.to_string().to_lowercase()
+                    }
+                })),
+                None => {
+                    self.body["sort"] = json!([{
+                        sort_attribute: {
+                            "order": sort_type.to_string().to_lowercase()
+                        }
+                    }]);
+                }
+            }
         }
 
         self

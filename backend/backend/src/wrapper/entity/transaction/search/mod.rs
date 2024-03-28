@@ -1,7 +1,7 @@
+use crate::search::Searchable;
 use tracing::info;
 
 use crate::wrapper::entity::transaction::search::index::TransactionIndex;
-use crate::wrapper::search::Searchable;
 
 pub(crate) mod index;
 pub(crate) mod query;

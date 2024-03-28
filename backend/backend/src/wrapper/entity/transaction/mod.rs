@@ -15,6 +15,7 @@ use crate::api::pagination::PageSizeParam;
 use crate::databases::entity::{count, delete, find_all_paginated, find_one_or_error, insert, update};
 use crate::event::lifecycle::transaction::{TransactionCreation, TransactionDeletion, TransactionUpdate};
 use crate::event::GenericEvent;
+use crate::search::Searchable;
 use crate::wrapper::entity::account::Account;
 use crate::wrapper::entity::budget::Budget;
 use crate::wrapper::entity::currency::Currency;
@@ -25,7 +26,6 @@ use crate::wrapper::entity::{TableName, WrapperEntity};
 use crate::wrapper::permission::{
     HasPermissionByIdOrError, HasPermissionOrError, Permission, PermissionByIds, Permissions,
 };
-use crate::wrapper::search::Searchable;
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
 pub(crate) mod dto;
