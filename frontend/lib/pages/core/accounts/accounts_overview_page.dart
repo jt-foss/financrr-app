@@ -28,7 +28,7 @@ class _AccountsOverviewPageState extends State<AccountsOverviewPage> {
   late final Map<Currency, int> _currencies = _api.getAccounts().fold(
     {},
     (map, account) {
-      map.update(account.getCurrency()!, (value) => value + account.balance, ifAbsent: () => account.balance);
+      map.update(account.currencyId.get()!, (value) => value + account.balance, ifAbsent: () => account.balance);
       return map;
     },
   );

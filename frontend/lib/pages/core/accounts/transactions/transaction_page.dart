@@ -82,7 +82,7 @@ class TransactionPageState extends State<TransactionPage> {
 
   Widget _buildVerticalLayout(Account account, Transaction transaction, Size size) {
     final String amountStr = (transaction.type == TransactionType.deposit ? '' : '-') +
-        TextUtils.formatCurrency(transaction.amount, account.getCurrency()!);
+        TextUtils.formatCurrency(transaction.amount, account.currencyId.get()!);
     return Padding(
       padding: const EdgeInsets.only(top: 10, bottom: 20),
       child: Align(
@@ -126,8 +126,8 @@ class TransactionPageState extends State<TransactionPage> {
                     _buildTableRow('Type', transaction.type.name),
                     _buildTableRow('Amount', amountStr),
                     _buildTableRow('Description', transaction.description ?? 'N/A'),
-                    _buildTableRow('From', transaction.getSourceAccount()?.name ?? 'N/A'),
-                    _buildTableRow('To', transaction.getDestinationAccount()?.name ?? 'N/A'),
+                    _buildTableRow('From', transaction.sourceId?.get()?.name ?? 'N/A'),
+                    _buildTableRow('To', transaction.destinationId?.get()?.name ?? 'N/A'),
                     _buildTableRow('Executed at', dateTimeFormat.format(transaction.executedAt)),
                     _buildTableRow('Created at', dateTimeFormat.format(transaction.createdAt)),
                   ],

@@ -18,12 +18,12 @@ class AccountCard extends StatelessWidget {
   final bool interactive;
 
   AccountCard({super.key, required Account account, this.interactive = true})
-      : id = account.id,
+      : id = account.id.value,
         name = account.name,
         iban = account.iban,
         description = account.description,
         balance = account.balance,
-        currency = account.getCurrency();
+        currency = account.currencyId.get();
 
   const AccountCard.fromData(
       {super.key,

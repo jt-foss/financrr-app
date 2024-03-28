@@ -232,18 +232,18 @@ class TransactionCreatePageState extends State<TransactionCreatePage> {
   Future<void> _createTransaction(Account account, TransactionType type, {Account? secondary}) async {
     if (!_isValid) return;
     final (Id?, Id?) sourceAndDest = switch (_type) {
-      TransactionType.deposit => (null, account.id),
-      TransactionType.withdrawal => (account.id, null),
-      TransactionType.transfer => (account.id, secondary!.id),
+      TransactionType.deposit => (null, account.id.value),
+      TransactionType.withdrawal => (account.id.value, null),
+      TransactionType.transfer => (account.id.value, secondary!.id.value),
     };
     try {
       await _api.createTransaction(
-          source: sourceAndDest.$1,
-          destination: sourceAndDest.$2,
+          sourceId: sourceAndDest.$1,
+          destinationId: sourceAndDest.$2,
           amount: int.parse(_amountController.text),
           description: _descriptionController.text,
           executedAt: _executedAt,
-          currency: account.currency);
+          currencyId: account.currencyId.value);
       if (!mounted) return;
       context.showSnackBar('Successfully created transaction');
       context.pop();

@@ -52,7 +52,7 @@ class AccountEditPageState extends State<AccountEditPage> {
         _descriptionController = TextEditingController(text: account.description);
         _ibanController = TextEditingController(text: account.iban);
         _originalBalanceController = TextEditingController(text: account.originalBalance.toString());
-        _currency = account.getCurrency()!;
+        _currency = account.currencyId.get()!;
       }
     });
 
@@ -140,7 +140,7 @@ class AccountEditPageState extends State<AccountEditPage> {
         description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
         iban: _ibanController.text.isEmpty ? null : _ibanController.text,
         originalBalance: int.tryParse(_originalBalanceController.text) ?? 0,
-        currency: _currency!.id,
+        currencyId: _currency!.id.value,
       );
       if (!mounted) return;
       context.showSnackBar('Successfully edited "${_nameController.text}"');

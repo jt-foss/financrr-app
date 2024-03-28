@@ -21,14 +21,14 @@ class TransactionCard extends StatelessWidget {
   final bool interactive;
 
   TransactionCard({super.key, required Transaction transaction, this.interactive = true})
-      : id = transaction.id,
-        source = transaction.source,
-        destination = transaction.destination,
+      : id = transaction.id.value,
+        source = transaction.sourceId?.value,
+        destination = transaction.destinationId?.value,
         amount = transaction.amount,
         description = transaction.description,
         executedAt = transaction.executedAt,
         createdAt = transaction.createdAt,
-        account = transaction.getSourceAccount() ?? transaction.getDestinationAccount()!,
+        account = (transaction.sourceId ?? transaction.destinationId)!.get()!,
         type = transaction.type;
 
   const TransactionCard.fromData(
@@ -46,7 +46,7 @@ class TransactionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String amountStr = TextUtils.formatCurrency(amount, account.getCurrency()!);
+    final String amountStr = TextUtils.formatCurrency(amount, account.currencyId.get()!);
     return GestureDetector(
       onTap: !interactive
           ? null

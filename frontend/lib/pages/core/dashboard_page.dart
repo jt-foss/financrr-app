@@ -54,33 +54,31 @@ class _DashboardPageState extends State<DashboardPage> {
         child: SizedBox(
             width: size.width / 1.1,
             child: ListView(children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Account and Cards', style: context.textTheme.titleMedium),
-                    PopupMenuButton(
-                        icon: const Icon(Icons.more_horiz),
-                        itemBuilder: (context) {
-                          return [
-                            PopupMenuItem(
-                                child: ListTile(
-                              title: const Text('Manage Accounts'),
-                              leading: const Icon(Icons.manage_accounts_rounded),
-                              onTap: () => context.goPath(AccountsOverviewPage.pagePath.build()),
-                            )),
-                            PopupMenuItem(
-                                child: ListTile(
-                              title: const Text('Create Account'),
-                              leading: const Icon(Icons.add),
-                              onTap: () => context.goPath(AccountCreatePage.pagePath.build()),
-                            ))
-                          ];
-                        })
-                  ],
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Account and Cards', style: context.textTheme.titleSmall),
+                  PopupMenuButton(
+                      icon: const Icon(Icons.more_horiz),
+                      itemBuilder: (context) {
+                        return [
+                          PopupMenuItem(
+                              child: ListTile(
+                            title: const Text('Manage Accounts'),
+                            leading: const Icon(Icons.manage_accounts_rounded),
+                            onTap: () => context.goPath(AccountsOverviewPage.pagePath.build()),
+                          )),
+                          PopupMenuItem(
+                              child: ListTile(
+                            title: const Text('Create Account'),
+                            leading: const Icon(Icons.add),
+                            onTap: () => context.goPath(AccountCreatePage.pagePath.build()),
+                          ))
+                        ];
+                      })
+                ],
               ),
+              const Divider(),
               for (Account a in _api.getAccounts()) AccountCard(account: a),
               if (_api.getAccounts().isEmpty)
                 Padding(
@@ -111,8 +109,9 @@ class _DashboardPageState extends State<DashboardPage> {
       children: [
         Padding(
           padding: const EdgeInsets.only(top: 20),
-          child: Text('Latest Transactions', style: context.textTheme.titleMedium),
+          child: Text('Latest Transactions', style: context.textTheme.titleSmall),
         ),
+        const Divider(),
         StreamWrapper(
             stream: _transactionStreamController.stream,
             onError: (context, snap) => const Text('Error'),

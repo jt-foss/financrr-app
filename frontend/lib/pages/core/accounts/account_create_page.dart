@@ -1,6 +1,7 @@
 import 'package:financrr_frontend/pages/core/accounts/accounts_overview_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/input_utils.dart';
+import 'package:financrr_frontend/util/text_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -143,7 +144,9 @@ class AccountCreatePageState extends State<AccountCreatePage> {
           controller: ibanController,
           readOnly: readOnly,
           decoration: const InputDecoration(labelText: 'IBAN'),
+          validator: (value) => TextUtils.formatIBAN(value) == null ? 'Invalid IBAN' : null,
           inputFormatters: [
+            FilteringTextInputFormatter.deny(RegExp(r'\s')),
             LengthLimitingTextInputFormatter(22),
           ],
         ),
@@ -183,9 +186,9 @@ class AccountCreatePageState extends State<AccountCreatePage> {
       await _api.createAccount(
         name: _nameController.text,
         description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
-        iban: _ibanController.text.isEmpty ? null : _ibanController.text,
+        iban: _ibanController.text.isEmpty ? null : TextUtils.formatIBAN(_ibanController.text),
         originalBalance: int.tryParse(_originalBalanceController.text) ?? 0,
-        currency: _currency!.id,
+        currencyId: _currency!.id.value,
       );
       if (!mounted) return;
       context.showSnackBar('Successfully created "${_nameController.text}"');
