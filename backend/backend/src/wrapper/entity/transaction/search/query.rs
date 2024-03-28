@@ -3,7 +3,7 @@ use utoipa::IntoParams;
 
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, IntoParams)]
 pub(crate) struct TransactionQuery {
-    pub(crate) fts: String,
+    pub(crate) fts: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

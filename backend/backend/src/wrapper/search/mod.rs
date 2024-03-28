@@ -5,6 +5,7 @@ use actix_web::dev::Payload;
 use actix_web::web::Query;
 use actix_web::{FromRequest, HttpRequest};
 use futures_util::future::LocalBoxFuture;
+use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use utoipa::openapi::path::{Parameter, ParameterBuilder, ParameterIn};
@@ -16,12 +17,16 @@ use crate::api::error::validation::ValidationError;
 use crate::api::pagination::PageSizeParam;
 
 pub(crate) trait Searchable {
+    type Query: DeserializeOwned;
+
+    fn get_id(&self) -> String;
+
     fn get_index_name() -> &'static str;
 
     fn create_index() -> impl Future<Output = ()>;
     fn index() -> impl Future<Output = Result<(), ApiError>>;
     fn search(
-        query: String,
+        query: Self::Query,
         user_id: i32,
         page_size: PageSizeParam,
     ) -> impl Future<Output = Result<Vec<Self>, ApiError>>

@@ -20,6 +20,7 @@ use crate::wrapper::entity::budget::Budget;
 use crate::wrapper::entity::currency::Currency;
 use crate::wrapper::entity::transaction::dto::TransactionDTO;
 use crate::wrapper::entity::transaction::search::index::TransactionIndex;
+use crate::wrapper::entity::transaction::search::query::TransactionQuery;
 use crate::wrapper::entity::{TableName, WrapperEntity};
 use crate::wrapper::permission::{
     HasPermissionByIdOrError, HasPermissionOrError, Permission, PermissionByIds, Permissions,
@@ -134,7 +135,11 @@ impl Transaction {
         count(transaction::Entity::find()).await
     }
 
-    pub(crate) async fn search(user_id: i32, page_size: PageSizeParam, query: String) -> Result<Vec<Self>, ApiError> {
+    pub(crate) async fn search(
+        user_id: i32,
+        page_size: PageSizeParam,
+        query: TransactionQuery,
+    ) -> Result<Vec<Self>, ApiError> {
         let indices = TransactionIndex::search(query, user_id, page_size).await?;
         let transactions = stream::iter(indices)
             .then(|index| async move {

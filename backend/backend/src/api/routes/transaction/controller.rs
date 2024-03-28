@@ -76,7 +76,7 @@ ValidationError,
 Unauthorized,
 InternalServerError,
 ),
-params(PageSizeParam),
+params(PageSizeParam, TransactionQuery),
 security(
 ("bearer_token" = [])
 ),
@@ -86,13 +86,13 @@ tag = "Transaction")]
 pub(crate) async fn search(
     user: Phantom<User>,
     search_query: Query<TransactionQuery>,
-    //page_size: PageSizeParam,
+    page_size: PageSizeParam,
     uri: Uri,
 ) -> Result<impl Responder, ApiError> {
-    let page_size = PageSizeParam::default();
-    let transactions = Transaction::search(user.get_id(), page_size.clone(), search_query.into_inner().fts).await?;
+    let transactions = Transaction::search(user.get_id(), page_size.clone(), search_query.into_inner()).await?;
+    let total = transactions.len() as u64;
 
-    Ok(HttpResponse::Ok().json(Pagination::new(transactions, &page_size, 0, uri)))
+    Ok(HttpResponse::Ok().json(Pagination::new(transactions, &page_size, total, uri)))
 }
 
 #[utoipa::path(post,

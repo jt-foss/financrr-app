@@ -1,12 +1,12 @@
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
-use tracing::error;
 use utoipa::ToSchema;
 
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
 use crate::search::index::{IndexBuilder, IndexType, Indexer};
 use crate::search::query::BooleanQuery;
+use crate::wrapper::entity::transaction::search::query::TransactionQuery;
 use crate::wrapper::entity::transaction::Transaction;
 use crate::wrapper::entity::TableName;
 use crate::wrapper::permission::{Permissions, PermissionsEntity};
@@ -45,6 +45,12 @@ impl TransactionIndex {
 }
 
 impl Searchable for TransactionIndex {
+    type Query = TransactionQuery;
+
+    fn get_id(&self) -> String {
+        self.id.to_string()
+    }
+
     fn get_index_name() -> &'static str {
         INDEX_NAME
     }
@@ -87,22 +93,16 @@ impl Searchable for TransactionIndex {
                         continue;
                     }
 
-                    let index = Self::from_transaction(transaction, user_ids);
-                    match serde_json::to_value(index) {
-                        Ok(doc) => docs.push(doc),
-                        Err(e) => {
-                            error!("Error serializing transaction index: {}", e);
-                        }
-                    }
+                    docs.push(Self::from_transaction(transaction, user_ids));
                 }
-                Indexer::index_documents(INDEX_NAME, docs).await;
+                Indexer::index_documents(docs).await;
             });
         }
 
         Ok(())
     }
 
-    async fn search(query: String, user_id: i32, page_size: PageSizeParam) -> Result<Vec<Self>, ApiError> {
-        BooleanQuery::new().add_fts(Some(query)).paginate(page_size).user_restriction(user_id).send().await
+    async fn search(query: TransactionQuery, user_id: i32, page_size: PageSizeParam) -> Result<Vec<Self>, ApiError> {
+        BooleanQuery::new().add_fts(query.fts).paginate(page_size).user_restriction(user_id).send().await
     }
 }

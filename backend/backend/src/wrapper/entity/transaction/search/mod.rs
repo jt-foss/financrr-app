@@ -11,7 +11,5 @@ pub(crate) async fn init_transactions_search() {
     TransactionIndex::create_index().await;
 
     info!("(Starting task) Indexing transactions...");
-    tokio::spawn(async move {
-        TransactionIndex::index().await.expect("Failed to index transactions");
-    });
+    TransactionIndex::index().await.expect("Failed to index transactions");
 }
