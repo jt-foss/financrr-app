@@ -1,12 +1,12 @@
 use std::collections::HashMap;
 
+use crate::api::error::api::ApiError;
 use opensearch::http::request::JsonBody;
 use opensearch::indices::IndicesCreateParts;
 use opensearch::{BulkParts, DeleteParts, IndexParts};
 use serde::Serialize;
 use serde_json::{json, Value};
 use tracing::error;
-use crate::api::error::api::ApiError;
 
 use crate::databases::connections::search::get_open_search_client;
 use crate::search::Searchable;
@@ -64,11 +64,7 @@ pub(crate) struct Indexer;
 impl Indexer {
     pub(crate) async fn index_document<T: Searchable + Serialize>(doc: T) -> Result<(), ApiError> {
         let client = get_open_search_client();
-        let response = client
-            .index(IndexParts::Index(T::get_index_name()))
-            .body(doc)
-            .send()
-            .await?;
+        let response = client.index(IndexParts::Index(T::get_index_name())).body(doc).send().await?;
 
         let status = &response.status_code();
         if !status.is_success() {
@@ -87,11 +83,7 @@ impl Indexer {
         }
 
         let client = get_open_search_client();
-        let response = client
-            .bulk(BulkParts::Index(T::get_index_name()))
-            .body(body)
-            .send()
-            .await?;
+        let response = client.bulk(BulkParts::Index(T::get_index_name())).body(body).send().await?;
 
         let status = &response.status_code();
         if !status.is_success() {
@@ -102,12 +94,9 @@ impl Indexer {
         Ok(())
     }
 
-    pub(crate) async fn remove_document<T: Searchable>(id: String) -> Result<(), ApiError>{
+    pub(crate) async fn remove_document<T: Searchable>(id: String) -> Result<(), ApiError> {
         let client = get_open_search_client();
-        let response = client
-            .delete(DeleteParts::IndexId(T::get_index_name(), id.as_str()))
-            .send()
-            .await?;
+        let response = client.delete(DeleteParts::IndexId(T::get_index_name(), id.as_str())).send().await?;
 
         let status = &response.status_code();
         if !status.is_success() {

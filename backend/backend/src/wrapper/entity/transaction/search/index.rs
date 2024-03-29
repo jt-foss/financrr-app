@@ -5,14 +5,14 @@ use utoipa::ToSchema;
 
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
-use crate::event::GenericEvent;
 use crate::event::lifecycle::transaction::{TransactionCreation, TransactionDeletion, TransactionUpdate};
-use crate::search::{Searchable, SearchResponse};
-use crate::search::index::{IndexBuilder, Indexer, IndexType};
+use crate::event::GenericEvent;
+use crate::search::index::{IndexBuilder, IndexType, Indexer};
 use crate::search::query::BooleanQuery;
-use crate::wrapper::entity::TableName;
+use crate::search::{SearchResponse, Searchable};
 use crate::wrapper::entity::transaction::search::query::TransactionQuery;
 use crate::wrapper::entity::transaction::Transaction;
+use crate::wrapper::entity::TableName;
 use crate::wrapper::permission::{Permissions, PermissionsEntity};
 
 pub const INDEX_NAME: &str = "transaction";
@@ -155,7 +155,7 @@ async fn update_transaction(event: TransactionUpdate) -> Result<(), ApiError> {
         event.new_transaction.id,
         Permissions::READ,
     )
-        .await?;
+    .await?;
     if user_ids.is_empty() {
         return Ok(());
     }

@@ -203,17 +203,6 @@ impl From<value::Error> for ApiError {
     }
 }
 
-impl From<serde_qs::Error> for ApiError {
-    fn from(value: serde_qs::Error) -> Self {
-        Self {
-            status_code: StatusCode::BAD_REQUEST,
-            api_code: ApiCode::SERIALIZATION_ERROR,
-            details: value.to_string(),
-            reference: None,
-        }
-    }
-}
-
 impl From<actix_web::Error> for ApiError {
     fn from(error: actix_web::Error) -> Self {
         Self {
