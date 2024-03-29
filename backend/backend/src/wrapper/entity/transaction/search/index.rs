@@ -1,17 +1,18 @@
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
+use tracing::error;
 use utoipa::ToSchema;
 
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
-use crate::event::lifecycle::transaction::TransactionCreation;
 use crate::event::GenericEvent;
-use crate::search::index::{IndexBuilder, IndexType, Indexer};
+use crate::event::lifecycle::transaction::{TransactionCreation, TransactionDeletion, TransactionUpdate};
+use crate::search::{Searchable, SearchResponse};
+use crate::search::index::{IndexBuilder, Indexer, IndexType};
 use crate::search::query::BooleanQuery;
-use crate::search::{SearchResponse, Searchable};
+use crate::wrapper::entity::TableName;
 use crate::wrapper::entity::transaction::search::query::TransactionQuery;
 use crate::wrapper::entity::transaction::Transaction;
-use crate::wrapper::entity::TableName;
 use crate::wrapper::permission::{Permissions, PermissionsEntity};
 
 pub const INDEX_NAME: &str = "transaction";
@@ -97,7 +98,9 @@ impl Searchable for TransactionIndex {
 
                     docs.push(Self::from_transaction(transaction, user_ids));
                 }
-                Indexer::index_documents(docs).await;
+                if let Err(e) = Indexer::index_documents(docs).await {
+                    error!("Error indexing transactions: {}", e);
+                }
             });
         }
 
@@ -121,6 +124,8 @@ impl Searchable for TransactionIndex {
 
 pub(crate) fn register_transaction_search_listener() {
     TransactionCreation::subscribe(insert_transaction);
+    TransactionDeletion::subscribe(delete_transaction);
+    TransactionUpdate::subscribe(update_transaction);
 }
 
 async fn insert_transaction(event: TransactionCreation) -> Result<(), ApiError> {
@@ -135,7 +140,28 @@ async fn insert_transaction(event: TransactionCreation) -> Result<(), ApiError> 
     }
 
     let transaction_index = TransactionIndex::from_transaction(event.transaction, user_ids);
-    Indexer::index_document(transaction_index).await;
+    Indexer::index_document(transaction_index).await?;
+
+    Ok(())
+}
+
+async fn delete_transaction(event: TransactionDeletion) -> Result<(), ApiError> {
+    Indexer::remove_document::<TransactionIndex>(event.transaction.id.to_string()).await
+}
+
+async fn update_transaction(event: TransactionUpdate) -> Result<(), ApiError> {
+    let user_ids = PermissionsEntity::find_users_with_permissions(
+        Transaction::table_name(),
+        event.new_transaction.id,
+        Permissions::READ,
+    )
+        .await?;
+    if user_ids.is_empty() {
+        return Ok(());
+    }
+
+    let transaction_index = TransactionIndex::from_transaction(event.new_transaction, user_ids);
+    Indexer::index_document(transaction_index).await?;
 
     Ok(())
 }
