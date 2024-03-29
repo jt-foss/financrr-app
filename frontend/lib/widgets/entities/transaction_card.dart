@@ -12,6 +12,7 @@ class TransactionCard extends StatelessWidget {
   final Id? source;
   final Id? destination;
   final int amount;
+  final String name;
   final String? description;
   final DateTime executedAt;
   final DateTime createdAt;
@@ -25,6 +26,7 @@ class TransactionCard extends StatelessWidget {
         source = transaction.sourceId?.value,
         destination = transaction.destinationId?.value,
         amount = transaction.amount,
+        name = transaction.name,
         description = transaction.description,
         executedAt = transaction.executedAt,
         createdAt = transaction.createdAt,
@@ -37,6 +39,7 @@ class TransactionCard extends StatelessWidget {
       this.source,
       this.destination,
       required this.amount,
+      required this.name,
       required this.description,
       required this.executedAt,
       required this.createdAt,
@@ -51,14 +54,15 @@ class TransactionCard extends StatelessWidget {
       onTap: !interactive
           ? null
           : () => context.goPath(TransactionPage.pagePath
-              .build(pathParams: {'accountId': account.id.toString(), 'transactionId': id.toString()})),
+              .build(pathParams: {'accountId': account.id.value.toString(), 'transactionId': id.toString()})),
       child: Card(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(description ?? 'Transaction', style: context.textTheme.titleSmall),
+              Text(name, style: context.textTheme.titleSmall),
+              if (description != null) Text(description!, style: context.textTheme.bodyMedium),
               Text(TextUtils.formatIBAN(account.iban) ?? account.name),
               const SizedBox(height: 10),
               Row(

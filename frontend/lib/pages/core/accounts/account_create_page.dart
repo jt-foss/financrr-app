@@ -144,7 +144,7 @@ class AccountCreatePageState extends State<AccountCreatePage> {
           controller: ibanController,
           readOnly: readOnly,
           decoration: const InputDecoration(labelText: 'IBAN'),
-          validator: (value) => TextUtils.formatIBAN(value) == null ? 'Invalid IBAN' : null,
+          validator: (value) => value == null || value.trim().isEmpty || TextUtils.formatIBAN(value) != null ? null : 'Invalid IBAN',
           inputFormatters: [
             FilteringTextInputFormatter.deny(RegExp(r'\s')),
             LengthLimitingTextInputFormatter(22),
@@ -167,7 +167,7 @@ class AccountCreatePageState extends State<AccountCreatePage> {
         padding: const EdgeInsets.only(bottom: 10),
         child: DropdownButtonFormField(
             decoration: const InputDecoration(labelText: 'Currency'),
-            validator: (value) => InputValidators.nonNull('Currency', value?.id.toString()),
+            validator: (value) => InputValidators.nonNull('Currency', value?.id.value.toString()),
             value: initialCurrency,
             items: api.getCurrencies().map((currency) {
               return DropdownMenuItem(

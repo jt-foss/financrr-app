@@ -1,5 +1,4 @@
 import 'package:financrr_frontend/util/extensions.dart';
-import 'package:financrr_frontend/widgets/paginated_table.dart';
 import 'package:flutter/material.dart';
 import 'package:restrr/restrr.dart';
 
@@ -7,9 +6,6 @@ import '../../../layout/adaptive_scaffold.dart';
 import '../../../router.dart';
 import '../../../util/text_utils.dart';
 import '../../../widgets/entities/account_card.dart';
-import '../settings_page.dart';
-import '../settings/currency/currency_create_page.dart';
-import '../settings/currency/currency_edit_page.dart';
 import 'account_create_page.dart';
 import 'account_edit_page.dart';
 
@@ -89,7 +85,7 @@ class _AccountsOverviewPageState extends State<AccountsOverviewPage> {
                                   title: const Text('Edit Account'),
                                   leading: const Icon(Icons.edit_rounded),
                                   onTap: () => context.goPath(
-                                      AccountEditPage.pagePath.build(pathParams: {'accountId': account.id.toString()})),
+                                      AccountEditPage.pagePath.build(pathParams: {'accountId': account.id.value.toString()})),
                                 )),
                                 PopupMenuItem(
                                     child: ListTile(

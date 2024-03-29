@@ -9,6 +9,7 @@ import 'package:restrr/restrr.dart';
 
 import '../../../../../layout/adaptive_scaffold.dart';
 import '../../../../../router.dart';
+import '../../../../data/l10n_repository.dart';
 import '../../../../widgets/async_wrapper.dart';
 
 class TransactionEditPage extends StatefulWidget {
@@ -30,8 +31,10 @@ class TransactionEditPageState extends State<TransactionEditPage> {
 
   late final Restrr _api = context.api!;
 
+  late final TextEditingController _nameController;
   late final TextEditingController _amountController;
   late final TextEditingController _descriptionController;
+  late final TextEditingController _executedAtController;
 
   bool _isValid = false;
   TransactionType _type = TransactionType.deposit;
@@ -56,8 +59,10 @@ class TransactionEditPageState extends State<TransactionEditPage> {
           const Duration(milliseconds: 100),
           () => _fetchTransaction().then((transaction) {
                 if (transaction != null) {
+                  _nameController = TextEditingController(text: transaction.name);
                   _amountController = TextEditingController(text: transaction.amount.toString());
                   _descriptionController = TextEditingController(text: transaction.description);
+                  _executedAtController = TextEditingController(text: dateTimeFormat.format(transaction.executedAt));
                   _isValid = _formKey.currentState?.validate() ?? false;
                   _type = transaction.type;
                   _executedAt = transaction.executedAt;
@@ -70,8 +75,11 @@ class TransactionEditPageState extends State<TransactionEditPage> {
   void dispose() {
     _accountStreamController.close();
     _transactionStreamController.close();
+
+    _nameController.dispose();
     _amountController.dispose();
     _descriptionController.dispose();
+    _executedAtController.dispose();
     super.dispose();
   }
 
@@ -112,6 +120,7 @@ class TransactionEditPageState extends State<TransactionEditPage> {
             child: Column(
               children: [
                 TransactionCreatePageState.buildTransactionPreview(
+                  _nameController.text,
                   _amountController.text,
                   _descriptionController.text,
                   account,
@@ -121,8 +130,10 @@ class TransactionEditPageState extends State<TransactionEditPage> {
                 ...TransactionCreatePageState.buildFormFields(
                   context,
                   account,
+                  _nameController,
                   _amountController,
                   _descriptionController,
+                  _executedAtController,
                   _type,
                   false,
                   executedAt: _executedAt,

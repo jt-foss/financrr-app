@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:financrr_frontend/data/l10n_repository.dart';
 import 'package:financrr_frontend/data/session_repository.dart';
 import 'package:financrr_frontend/util/extensions.dart';
@@ -42,7 +41,7 @@ class _SessionSettingsPageState extends State<SessionSettingsPage> {
               Card(
                 child: ListTile(
                   title: const Text('Current Session'),
-                  trailing: Text('Id: ${_api.session.id}'),
+                  trailing: Text('Id: ${_api.session.id.value}'),
                   subtitle: _api.session.name == null ? null : Text(_api.session.name!),
                 ),
               ),
@@ -78,9 +77,9 @@ class _SessionSettingsPageState extends State<SessionSettingsPage> {
                     DataColumn(label: Text('Actions')),
                   ],
                   rowBuilder: (session) {
-                    final bool isCurrentSession = session.id == _api.session.id;
+                    final bool isCurrentSession = session.id.value == _api.session.id.value;
                     return DataRow(cells: [
-                      DataCell(Text(session.id.toString())),
+                      DataCell(Text(session.id.value.toString())),
                       DataCell(Text(session.name ?? 'N/A')),
                       DataCell(Text(dateTimeFormat.format(session.createdAt))),
                       DataCell(Text(dateTimeFormat.format(session.expiresAt))),
@@ -108,7 +107,7 @@ class _SessionSettingsPageState extends State<SessionSettingsPage> {
     try {
       await session.delete();
       if (!mounted) return;
-      context.showSnackBar('Successfully deleted "${session.name ?? 'Session ${session.id}'}"');
+      context.showSnackBar('Successfully deleted "${session.name ?? 'Session ${session.id.value}'}"');
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);
     }

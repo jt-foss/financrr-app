@@ -31,8 +31,10 @@ class TransactionCreatePageState extends State<TransactionCreatePage> {
   final GlobalKey<FormState> _formKey = GlobalKey();
   late final Restrr _api = context.api!;
 
+  late final TextEditingController _nameController = TextEditingController(text: 'Transaction');
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  late final TextEditingController _executedAtController = TextEditingController(text: dateTimeFormat.format(_executedAt));
 
   bool _isValid = false;
   TransactionType _type = TransactionType.deposit;
@@ -52,8 +54,10 @@ class TransactionCreatePageState extends State<TransactionCreatePage> {
 
   @override
   void dispose() {
+    _nameController.dispose();
     _amountController.dispose();
     _descriptionController.dispose();
+    _executedAtController.dispose();
     super.dispose();
   }
 
@@ -91,6 +95,7 @@ class TransactionCreatePageState extends State<TransactionCreatePage> {
             child: Column(
               children: [
                 buildTransactionPreview(
+                  _nameController.text,
                   _amountController.text,
                   _descriptionController.text,
                   account,
@@ -100,8 +105,10 @@ class TransactionCreatePageState extends State<TransactionCreatePage> {
                 ...buildFormFields(
                   context,
                   account,
+                  _nameController,
                   _amountController,
                   _descriptionController,
+                  _executedAtController,
                   _type,
                   false,
                   onSelectionChanged: (types) {
@@ -125,11 +132,12 @@ class TransactionCreatePageState extends State<TransactionCreatePage> {
     );
   }
 
-  static Widget buildTransactionPreview(String amount, String description, Account account, TransactionType type) {
+  static Widget buildTransactionPreview(String name, String amount, String description, Account account, TransactionType type) {
     return TransactionCard.fromData(
       id: 0,
       amount: int.tryParse(amount) ?? 0,
       account: account,
+      name: name,
       description: description.isEmpty ? null : description,
       type: type,
       createdAt: DateTime.now(),
@@ -141,8 +149,10 @@ class TransactionCreatePageState extends State<TransactionCreatePage> {
   static List<Widget> buildFormFields(
       BuildContext context,
       Account currentAccount,
+      TextEditingController nameController,
       TextEditingController amountController,
       TextEditingController descriptionController,
+      TextEditingController executedAtController,
       TransactionType selected,
       bool readOnly,
       {DateTime? executedAt,
@@ -170,9 +180,9 @@ class TransactionCreatePageState extends State<TransactionCreatePage> {
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: DropdownButtonFormField(
               decoration: const InputDecoration(labelText: 'Transfer To'),
-              validator: (value) => InputValidators.nonNull('Transfer To', value?.id.toString()),
+              validator: (value) => InputValidators.nonNull('Transfer To', value?.id.value.toString()),
               items:
-                  currentAccount.api.getAccounts().where((account) => account.id != currentAccount.id).map((account) {
+                  currentAccount.api.getAccounts().where((account) => account.id.value != currentAccount.id.value).map((account) {
                 return DropdownMenuItem(
                   value: account,
                   child: Text(account.name, style: context.textTheme.bodyMedium),
@@ -196,10 +206,21 @@ class TransactionCreatePageState extends State<TransactionCreatePage> {
       Padding(
         padding: const EdgeInsets.only(bottom: 10),
         child: TextFormField(
+          controller: nameController,
+          readOnly: readOnly,
+          decoration: const InputDecoration(labelText: 'Name'),
+          validator: (value) => InputValidators.nonNull('Name', value),
+          inputFormatters: [
+            LengthLimitingTextInputFormatter(32),
+          ],
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: TextFormField(
           controller: descriptionController,
           readOnly: readOnly,
           decoration: const InputDecoration(labelText: 'Description'),
-          validator: (value) => InputValidators.nonNull('Description', value),
           inputFormatters: [
             LengthLimitingTextInputFormatter(32),
           ],
@@ -241,6 +262,7 @@ class TransactionCreatePageState extends State<TransactionCreatePage> {
           sourceId: sourceAndDest.$1,
           destinationId: sourceAndDest.$2,
           amount: int.parse(_amountController.text),
+          name: _nameController.text,
           description: _descriptionController.text,
           executedAt: _executedAt,
           currencyId: account.currencyId.value);

@@ -111,8 +111,8 @@ class TransactionPageState extends State<TransactionPage> {
                       label: const Text('Delete Transaction')),
                   TextButton.icon(
                       onPressed: () => context.goPath(TransactionEditPage.pagePath.build(pathParams: {
-                            'accountId': account.id.toString(),
-                            'transactionId': transaction.id.toString()
+                            'accountId': account.id.value.toString(),
+                            'transactionId': transaction.id.value.toString()
                           })),
                       icon: const Icon(Icons.create_rounded, size: 17),
                       label: const Text('Edit Transaction'))

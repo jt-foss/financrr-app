@@ -86,7 +86,7 @@ class _CurrencySettingsPageState extends State<CurrencySettingsPage> {
                             onPressed: currency is! CustomCurrency
                                 ? null
                                 : () => context.goPath(CurrencyEditPage.pagePath
-                                    .build(pathParams: {'currencyId': currency.id.toString()})),
+                                    .build(pathParams: {'currencyId': currency.id.value.toString()})),
                           ),
                           IconButton(
                             icon: const Icon(Icons.delete),

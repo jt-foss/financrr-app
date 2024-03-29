@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:financrr_frontend/pages/core/accounts/accounts_overview_page.dart';
 import 'package:financrr_frontend/pages/core/accounts/account_create_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
