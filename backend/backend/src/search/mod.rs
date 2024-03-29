@@ -2,10 +2,11 @@ use std::fmt;
 use std::fmt::{Display, Formatter};
 use std::future::Future;
 
-use crate::api::error::api::ApiError;
-use crate::api::pagination::PageSizeParam;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
+
+use crate::api::error::api::ApiError;
+use crate::api::pagination::PageSizeParam;
 
 pub(crate) mod index;
 pub(crate) mod query;
@@ -26,6 +27,21 @@ impl Display for Sort {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct SearchResponse<T> {
+    pub(crate) data: Vec<T>,
+    pub(crate) total: u64,
+}
+
+impl<T> SearchResponse<T> {
+    pub(crate) fn new(data: Vec<T>, total: u64) -> Self {
+        Self {
+            data,
+            total,
+        }
+    }
+}
+
 pub(crate) trait Searchable {
     type Query: DeserializeOwned;
 
@@ -39,7 +55,7 @@ pub(crate) trait Searchable {
         query: Self::Query,
         user_id: i32,
         page_size: PageSizeParam,
-    ) -> impl Future<Output = Result<Vec<Self>, ApiError>>
+    ) -> impl Future<Output = Result<SearchResponse<Self>, ApiError>>
     where
         Self: Sized;
 }

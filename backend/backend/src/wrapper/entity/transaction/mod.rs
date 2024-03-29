@@ -15,7 +15,7 @@ use crate::api::pagination::PageSizeParam;
 use crate::databases::entity::{count, delete, find_all_paginated, find_one_or_error, insert, update};
 use crate::event::lifecycle::transaction::{TransactionCreation, TransactionDeletion, TransactionUpdate};
 use crate::event::GenericEvent;
-use crate::search::Searchable;
+use crate::search::{SearchResponse, Searchable};
 use crate::wrapper::entity::account::Account;
 use crate::wrapper::entity::budget::Budget;
 use crate::wrapper::entity::currency::Currency;
@@ -139,9 +139,9 @@ impl Transaction {
         user_id: i32,
         page_size: PageSizeParam,
         query: TransactionQuery,
-    ) -> Result<Vec<Self>, ApiError> {
-        let indices = TransactionIndex::search(query, user_id, page_size).await?;
-        let transactions = stream::iter(indices)
+    ) -> Result<SearchResponse<Self>, ApiError> {
+        let response = TransactionIndex::search(query, user_id, page_size).await?;
+        let transactions = stream::iter(response.data)
             .then(|index| async move {
                 match Self::find_by_id(index.id).await {
                     Ok(transaction) => Some(transaction),
@@ -151,7 +151,8 @@ impl Transaction {
             .filter_map(|x| async move { x })
             .collect::<Vec<_>>()
             .await;
-        Ok(transactions)
+
+        Ok(SearchResponse::new(transactions, response.total))
     }
 }
 

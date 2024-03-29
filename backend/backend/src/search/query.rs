@@ -6,7 +6,7 @@ use tracing::error;
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
 use crate::databases::connections::search::get_open_search_client;
-use crate::search::{Searchable, Sortable};
+use crate::search::{SearchResponse, Searchable, Sortable};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct BooleanQuery {
@@ -86,7 +86,7 @@ impl BooleanQuery {
         self
     }
 
-    pub(crate) async fn send<T: DeserializeOwned + Searchable>(self) -> Result<Vec<T>, ApiError> {
+    pub(crate) async fn send<T: DeserializeOwned + Searchable>(self) -> Result<SearchResponse<T>, ApiError> {
         let client = get_open_search_client();
         let index_names = &[T::get_index_name()];
         let mut search = client.search(SearchParts::Index(index_names));
@@ -101,21 +101,22 @@ impl BooleanQuery {
         }
 
         let response_body = response.json::<Value>().await?;
+        let total = response_body["hits"]["total"]["value"].as_u64().unwrap_or(0);
         let response_body = response_body["hits"]["hits"].as_array();
 
-        let mut results = vec![];
+        let mut data = vec![];
         if let Some(value) = response_body {
             for hit in value {
                 // print the source document
                 let json = &hit["_source"];
                 let serde_rs: Result<T, serde_json::Error> = serde_json::from_value(json.to_owned());
                 match serde_rs {
-                    Ok(value) => results.push(value),
+                    Ok(value) => data.push(value),
                     Err(err) => error!("Error trying to parse search-json. {}", err),
                 }
             }
         }
 
-        Ok(results)
+        Ok(SearchResponse::new(data, total))
     }
 }

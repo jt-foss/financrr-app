@@ -10,6 +10,7 @@ use tracing::error;
 use crate::api::error::api::ApiError;
 use crate::wrapper::entity::account::event_listener::account_listener;
 use crate::wrapper::entity::budget::event_listener::budget_listener;
+use crate::wrapper::entity::transaction::search::index::register_transaction_search_listener;
 
 pub(crate) mod lifecycle;
 pub(crate) mod macros;
@@ -17,6 +18,8 @@ pub(crate) mod macros;
 pub(crate) fn init() {
     account_listener();
     budget_listener();
+
+    register_transaction_search_listener();
 }
 
 pub(crate) trait GenericEvent

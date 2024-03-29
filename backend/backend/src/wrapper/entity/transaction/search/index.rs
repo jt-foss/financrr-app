@@ -4,9 +4,11 @@ use utoipa::ToSchema;
 
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
+use crate::event::lifecycle::transaction::TransactionCreation;
+use crate::event::GenericEvent;
 use crate::search::index::{IndexBuilder, IndexType, Indexer};
 use crate::search::query::BooleanQuery;
-use crate::search::Searchable;
+use crate::search::{SearchResponse, Searchable};
 use crate::wrapper::entity::transaction::search::query::TransactionQuery;
 use crate::wrapper::entity::transaction::Transaction;
 use crate::wrapper::entity::TableName;
@@ -102,7 +104,11 @@ impl Searchable for TransactionIndex {
         Ok(())
     }
 
-    async fn search(query: TransactionQuery, user_id: i32, page_size: PageSizeParam) -> Result<Vec<Self>, ApiError> {
+    async fn search(
+        query: TransactionQuery,
+        user_id: i32,
+        page_size: PageSizeParam,
+    ) -> Result<SearchResponse<Self>, ApiError> {
         BooleanQuery::new()
             .add_fts(query.fts)
             .add_sort(query.sort_by)
@@ -111,4 +117,25 @@ impl Searchable for TransactionIndex {
             .send()
             .await
     }
+}
+
+pub(crate) fn register_transaction_search_listener() {
+    TransactionCreation::subscribe(insert_transaction);
+}
+
+async fn insert_transaction(event: TransactionCreation) -> Result<(), ApiError> {
+    let user_ids = PermissionsEntity::find_users_with_permissions(
+        Transaction::table_name(),
+        event.transaction.id,
+        Permissions::READ,
+    )
+    .await?;
+    if user_ids.is_empty() {
+        return Ok(());
+    }
+
+    let transaction_index = TransactionIndex::from_transaction(event.transaction, user_ids);
+    Indexer::index_document(transaction_index).await;
+
+    Ok(())
 }

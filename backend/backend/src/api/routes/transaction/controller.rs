@@ -90,9 +90,8 @@ pub(crate) async fn search(
     uri: Uri,
 ) -> Result<impl Responder, ApiError> {
     let transactions = Transaction::search(user.get_id(), page_size.clone(), search_query.into_inner()).await?;
-    let total = transactions.len() as u64;
 
-    Ok(HttpResponse::Ok().json(Pagination::new(transactions, &page_size, total, uri)))
+    Ok(HttpResponse::Ok().json(Pagination::new(transactions.data, &page_size, transactions.total, uri)))
 }
 
 #[utoipa::path(post,
