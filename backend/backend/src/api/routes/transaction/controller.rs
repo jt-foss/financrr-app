@@ -16,7 +16,7 @@ pub(crate) fn transaction_controller(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/transaction")
             .service(search)
-            //.service(get_one)
+            .service(get_one)
             .service(get_all)
             .service(create)
             .service(delete)
