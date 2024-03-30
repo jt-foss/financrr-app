@@ -107,7 +107,6 @@ impl BooleanQuery {
         let mut data = vec![];
         if let Some(value) = response_body {
             for hit in value {
-                // print the source document
                 let json = &hit["_source"];
                 let serde_rs: Result<T, serde_json::Error> = serde_json::from_value(json.to_owned());
                 match serde_rs {
