@@ -7,7 +7,6 @@ import 'package:financrr_frontend/util/text_utils.dart';
 import 'package:financrr_frontend/widgets/async_wrapper.dart';
 import 'package:financrr_frontend/widgets/entities/transaction_card.dart';
 import 'package:financrr_frontend/widgets/paginated_wrapper.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:restrr/restrr.dart';
 
@@ -93,8 +92,8 @@ class _AccountPageState extends State<AccountPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       TextButton.icon(
-                          onPressed: () => context.goPath(
-                              TransactionCreatePage.pagePath.build(pathParams: {'accountId': account.id.value.toString()})),
+                          onPressed: () => context.goPath(TransactionCreatePage.pagePath
+                              .build(pathParams: {'accountId': account.id.value.toString()})),
                           icon: const Icon(Icons.add, size: 17),
                           label: const Text('Create Transaction')),
                       const Spacer(),
@@ -103,8 +102,8 @@ class _AccountPageState extends State<AccountPage> {
                           icon: const Icon(Icons.delete_rounded, size: 17),
                           label: const Text('Delete Account')),
                       TextButton.icon(
-                          onPressed: () => context
-                              .goPath(AccountEditPage.pagePath.build(pathParams: {'accountId': account.id.value.toString()})),
+                          onPressed: () => context.goPath(
+                              AccountEditPage.pagePath.build(pathParams: {'accountId': account.id.value.toString()})),
                           icon: const Icon(Icons.create, size: 17),
                           label: const Text('Edit Account'))
                     ],

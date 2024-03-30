@@ -10,6 +10,7 @@ import 'package:restrr/restrr.dart';
 
 import '../../../../layout/adaptive_scaffold.dart';
 import '../../../../router.dart';
+import '../../../../util/form_fields.dart';
 import '../../../../widgets/async_wrapper.dart';
 
 class CurrencyEditPage extends StatefulWidget {
@@ -105,11 +106,20 @@ class _CurrencyEditPageState extends State<CurrencyEditPage> {
             onChanged: () => setState(() => _isValid = _formKey.currentState?.validate() ?? false),
             child: Column(
               children: [
-                ...CurrencyCreatePageState.buildCurrencyPreview(size, _symbolController.text, _nameController.text,
-                    _isoCodeController.text, _decimalPlacesController.text, _randomNumber),
+                ...CurrencyCreatePage.buildCurrencyPreview(
+                    size: size,
+                    symbol: _symbolController.text,
+                    name: _nameController.text,
+                    isoCode: _isoCodeController.text,
+                    decimalPlaces: _decimalPlacesController.text,
+                    previewAmount: _randomNumber),
                 const Divider(),
-                ...CurrencyCreatePageState.buildFormFields(
-                    _nameController, _symbolController, _isoCodeController, _decimalPlacesController, !_isCustom),
+                ...FormFields.currency(
+                    nameController: _nameController,
+                    symbolController: _symbolController,
+                    isoCodeController: _isoCodeController,
+                    decimalPlacesController: _decimalPlacesController,
+                    readOnly: !_isCustom),
                 SizedBox(
                   width: double.infinity,
                   height: 50,

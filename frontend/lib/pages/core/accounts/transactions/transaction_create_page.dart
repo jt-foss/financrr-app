@@ -2,9 +2,8 @@ import 'dart:async';
 
 import 'package:financrr_frontend/pages/core/accounts/account_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
-import 'package:financrr_frontend/util/input_utils.dart';
+import 'package:financrr_frontend/util/form_fields.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:restrr/restrr.dart';
 
@@ -23,10 +22,10 @@ class TransactionCreatePage extends StatefulWidget {
   const TransactionCreatePage({super.key, required this.accountId});
 
   @override
-  State<StatefulWidget> createState() => TransactionCreatePageState();
+  State<StatefulWidget> createState() => _TransactionCreatePageState();
 }
 
-class TransactionCreatePageState extends State<TransactionCreatePage> {
+class _TransactionCreatePageState extends State<TransactionCreatePage> {
   final StreamController<Account> _accountStreamController = StreamController.broadcast();
   final GlobalKey<FormState> _formKey = GlobalKey();
   late final Restrr _api = context.api!;
@@ -34,7 +33,8 @@ class TransactionCreatePageState extends State<TransactionCreatePage> {
   late final TextEditingController _nameController = TextEditingController(text: 'Transaction');
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  late final TextEditingController _executedAtController = TextEditingController(text: dateTimeFormat.format(_executedAt));
+  late final TextEditingController _executedAtController =
+      TextEditingController(text: dateTimeFormat.format(_executedAt));
 
   bool _isValid = false;
   TransactionType _type = TransactionType.deposit;
@@ -94,23 +94,26 @@ class TransactionCreatePageState extends State<TransactionCreatePage> {
             onChanged: () => setState(() => _isValid = _formKey.currentState?.validate() ?? false),
             child: Column(
               children: [
-                buildTransactionPreview(
-                  _nameController.text,
-                  _amountController.text,
-                  _descriptionController.text,
-                  account,
-                  _type,
+                TransactionCard.fromData(
+                  id: 0,
+                  amount: int.tryParse(_amountController.text) ?? 0,
+                  account: account,
+                  name: _nameController.text,
+                  description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
+                  type: _type,
+                  createdAt: DateTime.now(),
+                  executedAt: _executedAt,
+                  interactive: false,
                 ),
                 const Divider(),
-                ...buildFormFields(
+                ...FormFields.transaction(
                   context,
-                  account,
-                  _nameController,
-                  _amountController,
-                  _descriptionController,
-                  _executedAtController,
-                  _type,
-                  false,
+                  currentAccount: account,
+                  nameController: _nameController,
+                  amountController: _amountController,
+                  descriptionController: _descriptionController,
+                  executedAtController: _executedAtController,
+                  selectedType: _type,
                   onSelectionChanged: (types) {
                     setState(() => _type = types.first);
                   },
@@ -130,124 +133,6 @@ class TransactionCreatePageState extends State<TransactionCreatePage> {
         ),
       ),
     );
-  }
-
-  static Widget buildTransactionPreview(String name, String amount, String description, Account account, TransactionType type) {
-    return TransactionCard.fromData(
-      id: 0,
-      amount: int.tryParse(amount) ?? 0,
-      account: account,
-      name: name,
-      description: description.isEmpty ? null : description,
-      type: type,
-      createdAt: DateTime.now(),
-      executedAt: DateTime.now(),
-      interactive: false,
-    );
-  }
-
-  static List<Widget> buildFormFields(
-      BuildContext context,
-      Account currentAccount,
-      TextEditingController nameController,
-      TextEditingController amountController,
-      TextEditingController descriptionController,
-      TextEditingController executedAtController,
-      TransactionType selected,
-      bool readOnly,
-      {DateTime? executedAt,
-      Function(Set<TransactionType>)? onSelectionChanged,
-      Function(Account?)? onSecondaryChanged,
-      Function(DateTime)? onExecutedAtChanged}) {
-    return [
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        child: SizedBox(
-          width: double.infinity,
-          child: SegmentedButton(
-            onSelectionChanged: onSelectionChanged,
-            segments: const [
-              ButtonSegment(label: Text('Deposit'), value: TransactionType.deposit),
-              ButtonSegment(label: Text('Withdrawal'), value: TransactionType.withdrawal),
-              ButtonSegment(label: Text('Transfer'), value: TransactionType.transfer),
-            ],
-            selected: {selected},
-          ),
-        ),
-      ),
-      if (selected == TransactionType.transfer)
-        Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: DropdownButtonFormField(
-              decoration: const InputDecoration(labelText: 'Transfer To'),
-              validator: (value) => InputValidators.nonNull('Transfer To', value?.id.value.toString()),
-              items:
-                  currentAccount.api.getAccounts().where((account) => account.id.value != currentAccount.id.value).map((account) {
-                return DropdownMenuItem(
-                  value: account,
-                  child: Text(account.name, style: context.textTheme.bodyMedium),
-                );
-              }).toList(),
-              onChanged: onSecondaryChanged,
-            )),
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        child: TextFormField(
-          controller: amountController,
-          readOnly: readOnly,
-          decoration: const InputDecoration(labelText: 'Amount'),
-          validator: (value) => InputValidators.nonNull('Amount', value),
-          inputFormatters: [
-            FilteringTextInputFormatter.digitsOnly,
-            LengthLimitingTextInputFormatter(6),
-          ],
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.only(bottom: 10),
-        child: TextFormField(
-          controller: nameController,
-          readOnly: readOnly,
-          decoration: const InputDecoration(labelText: 'Name'),
-          validator: (value) => InputValidators.nonNull('Name', value),
-          inputFormatters: [
-            LengthLimitingTextInputFormatter(32),
-          ],
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.only(bottom: 10),
-        child: TextFormField(
-          controller: descriptionController,
-          readOnly: readOnly,
-          decoration: const InputDecoration(labelText: 'Description'),
-          inputFormatters: [
-            LengthLimitingTextInputFormatter(32),
-          ],
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.only(bottom: 10),
-        child: TextFormField(
-          onTap: () async {
-            final DateTime? date = await showDatePicker(
-              context: context,
-              firstDate: (executedAt ?? DateTime.now()).subtract(const Duration(days: 365)),
-              lastDate: (executedAt ?? DateTime.now()).add(const Duration(days: 365)),
-            );
-            if (date == null) return;
-            final TimeOfDay? time = await showTimePicker(
-                context: context,
-                initialTime: executedAt != null ? TimeOfDay.fromDateTime(executedAt) : TimeOfDay.now());
-            if (time == null) return;
-            onExecutedAtChanged?.call(date.copyWith(hour: time.hour, minute: time.minute));
-          },
-          initialValue: dateTimeFormat.format(executedAt ?? DateTime.now()),
-          readOnly: true,
-          decoration: const InputDecoration(labelText: 'Executed At'),
-        ),
-      ),
-    ];
   }
 
   Future<void> _createTransaction(Account account, TransactionType type, {Account? secondary}) async {

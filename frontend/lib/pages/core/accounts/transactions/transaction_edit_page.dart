@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:financrr_frontend/pages/core/accounts/transactions/transaction_create_page.dart';
 import 'package:financrr_frontend/pages/core/accounts/transactions/transaction_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
+import 'package:financrr_frontend/util/form_fields.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:restrr/restrr.dart';
@@ -11,6 +11,7 @@ import '../../../../../layout/adaptive_scaffold.dart';
 import '../../../../../router.dart';
 import '../../../../data/l10n_repository.dart';
 import '../../../../widgets/async_wrapper.dart';
+import '../../../../widgets/entities/transaction_card.dart';
 
 class TransactionEditPage extends StatefulWidget {
   static const PagePathBuilder pagePath = PagePathBuilder.child(parent: TransactionPage.pagePath, path: 'edit');
@@ -119,23 +120,26 @@ class TransactionEditPageState extends State<TransactionEditPage> {
             onChanged: () => setState(() => _isValid = _formKey.currentState?.validate() ?? false),
             child: Column(
               children: [
-                TransactionCreatePageState.buildTransactionPreview(
-                  _nameController.text,
-                  _amountController.text,
-                  _descriptionController.text,
-                  account,
-                  _type,
+                TransactionCard.fromData(
+                  id: 0,
+                  amount: int.tryParse(_amountController.text) ?? 0,
+                  account: account,
+                  name: _nameController.text,
+                  description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
+                  type: _type,
+                  createdAt: DateTime.now(),
+                  executedAt: _executedAt,
+                  interactive: false,
                 ),
                 const Divider(),
-                ...TransactionCreatePageState.buildFormFields(
+                ...FormFields.transaction(
                   context,
-                  account,
-                  _nameController,
-                  _amountController,
-                  _descriptionController,
-                  _executedAtController,
-                  _type,
-                  false,
+                  currentAccount: account,
+                  nameController: _nameController,
+                  amountController: _amountController,
+                  descriptionController: _descriptionController,
+                  executedAtController: _executedAtController,
+                  selectedType: _type,
                   executedAt: _executedAt,
                   onSelectionChanged: (types) {
                     setState(() => _type = types.first);

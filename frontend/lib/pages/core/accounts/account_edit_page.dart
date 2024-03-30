@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:financrr_frontend/pages/core/accounts/account_create_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -8,7 +7,9 @@ import 'package:restrr/restrr.dart';
 
 import '../../../../layout/adaptive_scaffold.dart';
 import '../../../../router.dart';
+import '../../../util/form_fields.dart';
 import '../../../widgets/async_wrapper.dart';
+import '../../../widgets/entities/account_card.dart';
 import 'account_page.dart';
 
 class AccountEditPage extends StatefulWidget {
@@ -103,18 +104,23 @@ class AccountEditPageState extends State<AccountEditPage> {
             onChanged: () => setState(() => _isValid = _formKey.currentState?.validate() ?? false),
             child: Column(
               children: [
-                AccountCreatePageState.buildAccountPreview(
-                    context,
-                    size,
-                    _nameController.text,
-                    _descriptionController.text,
-                    _ibanController.text,
-                    _originalBalanceController.text,
-                    _currency ?? _api.getCurrencies().first),
+                AccountCard.fromData(
+                  id: 0,
+                  name: _nameController.text,
+                  iban: _ibanController.text,
+                  description: _descriptionController.text,
+                  balance: int.tryParse(_originalBalanceController.text) ?? 0,
+                  currency: _currency ?? _api.getCurrencies().first,
+                ),
                 const Divider(),
-                ...AccountCreatePageState.buildFormFields(context, _api, _nameController, _descriptionController,
-                    _ibanController, _originalBalanceController, false,
-                    onCurrencyChanged: (currency) => _currency = currency!, initialCurrency: _currency),
+                ...FormFields.account(context,
+                    api: _api,
+                    nameController: _nameController,
+                    descriptionController: _descriptionController,
+                    ibanController: _ibanController,
+                    originalBalanceController: _originalBalanceController,
+                    onCurrencyChanged: (currency) => _currency = currency!,
+                    initialCurrency: _currency),
                 SizedBox(
                   width: double.infinity,
                   height: 50,

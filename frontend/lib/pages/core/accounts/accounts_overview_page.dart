@@ -84,8 +84,8 @@ class _AccountsOverviewPageState extends State<AccountsOverviewPage> {
                                     child: ListTile(
                                   title: const Text('Edit Account'),
                                   leading: const Icon(Icons.edit_rounded),
-                                  onTap: () => context.goPath(
-                                      AccountEditPage.pagePath.build(pathParams: {'accountId': account.id.value.toString()})),
+                                  onTap: () => context.goPath(AccountEditPage.pagePath
+                                      .build(pathParams: {'accountId': account.id.value.toString()})),
                                 )),
                                 PopupMenuItem(
                                     child: ListTile(

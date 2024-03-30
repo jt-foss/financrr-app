@@ -1,9 +1,8 @@
 import 'package:financrr_frontend/pages/core/accounts/accounts_overview_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
-import 'package:financrr_frontend/util/input_utils.dart';
+import 'package:financrr_frontend/util/form_fields.dart';
 import 'package:financrr_frontend/util/text_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:restrr/restrr.dart';
 
@@ -17,10 +16,10 @@ class AccountCreatePage extends StatefulWidget {
   const AccountCreatePage({super.key});
 
   @override
-  State<StatefulWidget> createState() => AccountCreatePageState();
+  State<StatefulWidget> createState() => _AccountCreatePageState();
 }
 
-class AccountCreatePageState extends State<AccountCreatePage> {
+class _AccountCreatePageState extends State<AccountCreatePage> {
   final GlobalKey<FormState> _formKey = GlobalKey();
 
   late final Restrr _api = context.api!;
@@ -70,11 +69,21 @@ class AccountCreatePageState extends State<AccountCreatePage> {
             onChanged: () => setState(() => _isValid = _formKey.currentState?.validate() ?? false),
             child: Column(
               children: [
-                buildAccountPreview(context, size, _nameController.text, _descriptionController.text,
-                    _ibanController.text, _originalBalanceController.text, _currency ?? _api.getCurrencies().first),
+                AccountCard.fromData(
+                  id: 0,
+                  name: _nameController.text,
+                  iban: _ibanController.text,
+                  description: _descriptionController.text,
+                  balance: int.tryParse(_originalBalanceController.text) ?? 0,
+                  currency: _currency ?? _api.getCurrencies().first,
+                ),
                 const Divider(),
-                ...buildFormFields(context, _api, _nameController, _descriptionController, _ibanController,
-                    _originalBalanceController, false,
+                ...FormFields.account(context,
+                    api: _api,
+                    nameController: _nameController,
+                    descriptionController: _descriptionController,
+                    ibanController: _ibanController,
+                    originalBalanceController: _originalBalanceController,
                     onCurrencyChanged: (currency) => _currency = currency!),
                 SizedBox(
                   width: double.infinity,
@@ -90,94 +99,6 @@ class AccountCreatePageState extends State<AccountCreatePage> {
         ),
       ),
     );
-  }
-
-  static Widget buildAccountPreview(BuildContext context, Size size, String name, String description, String iban,
-      String originalBalance, Currency currency) {
-    return AccountCard.fromData(
-      id: 0,
-      name: name,
-      iban: iban,
-      description: description,
-      balance: int.tryParse(originalBalance) ?? 0,
-      currency: currency,
-    );
-  }
-
-  static List<Widget> buildFormFields(
-      BuildContext context,
-      Restrr api,
-      TextEditingController nameController,
-      TextEditingController descriptionController,
-      TextEditingController ibanController,
-      TextEditingController decimalPlacesController,
-      bool readOnly,
-      {void Function(Currency?)? onCurrencyChanged,
-      Currency? initialCurrency}) {
-    return [
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        child: TextFormField(
-          controller: nameController,
-          readOnly: readOnly,
-          decoration: const InputDecoration(labelText: 'Name'),
-          validator: (value) => InputValidators.nonNull('Name', value),
-          inputFormatters: [
-            LengthLimitingTextInputFormatter(32),
-          ],
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.only(bottom: 10),
-        child: TextFormField(
-          controller: descriptionController,
-          readOnly: readOnly,
-          decoration: const InputDecoration(labelText: 'Description'),
-          inputFormatters: [
-            LengthLimitingTextInputFormatter(64),
-          ],
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.only(bottom: 10),
-        child: TextFormField(
-          controller: ibanController,
-          readOnly: readOnly,
-          decoration: const InputDecoration(labelText: 'IBAN'),
-          validator: (value) => value == null || value.trim().isEmpty || TextUtils.formatIBAN(value) != null ? null : 'Invalid IBAN',
-          inputFormatters: [
-            FilteringTextInputFormatter.deny(RegExp(r'\s')),
-            LengthLimitingTextInputFormatter(22),
-          ],
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.only(bottom: 10),
-        child: TextFormField(
-          controller: decimalPlacesController,
-          readOnly: readOnly,
-          decoration: const InputDecoration(labelText: 'Original Balance'),
-          validator: (value) => InputValidators.nonNull('Original Balance', value),
-          inputFormatters: [
-            FilteringTextInputFormatter.digitsOnly,
-          ],
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.only(bottom: 10),
-        child: DropdownButtonFormField(
-            decoration: const InputDecoration(labelText: 'Currency'),
-            validator: (value) => InputValidators.nonNull('Currency', value?.id.value.toString()),
-            value: initialCurrency,
-            items: api.getCurrencies().map((currency) {
-              return DropdownMenuItem(
-                value: currency,
-                child: Text('${currency.name} (${currency.symbol})', style: context.textTheme.bodyMedium),
-              );
-            }).toList(),
-            onChanged: onCurrencyChanged),
-      )
-    ];
   }
 
   Future<void> _createAccount() async {
