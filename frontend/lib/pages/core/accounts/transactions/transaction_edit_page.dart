@@ -177,7 +177,8 @@ class TransactionEditPageState extends State<TransactionEditPage> {
           sourceId: sourceAndDest.$1,
           destinationId: sourceAndDest.$2,
           amount: int.parse(_amountController.text),
-          description: _descriptionController.text,
+          name: _nameController.text,
+          description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
           executedAt: _executedAt,
           currencyId: account.currencyId.value);
       if (!mounted) return;

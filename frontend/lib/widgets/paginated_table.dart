@@ -4,7 +4,7 @@ import 'package:restrr/restrr.dart';
 
 class PaginatedTable<T> extends StatefulWidget {
   final Restrr api;
-  final Future<Paginated<T>> Function(Restrr) initialPageFunction;
+  final Future<Paginated<T>> Function(bool) initialPageFunction;
   final DataRow Function(T) rowBuilder;
   final List<DataColumn> columns;
   final bool fillWithEmptyRows;
@@ -30,7 +30,7 @@ class PaginatedTableState<T> extends State<PaginatedTable<T>> {
   Widget build(BuildContext context) {
     return PaginatedWrapper(
       key: _paginatedKey,
-      initialPageFunction: () => widget.initialPageFunction.call(widget.api),
+      initialPageFunction: (forceRetrieve) => widget.initialPageFunction.call(forceRetrieve),
       onLoading: (context, snap) => const Center(child: CircularProgressIndicator()),
       onSuccess: (context, snap) {
         final PaginatedDataResult<T> result = snap.data as PaginatedDataResult<T>;

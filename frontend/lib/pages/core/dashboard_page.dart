@@ -53,52 +53,55 @@ class _DashboardPageState extends State<DashboardPage> {
       child: Center(
         child: SizedBox(
             width: size.width / 1.1,
-            child: ListView(children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Account and Cards', style: context.textTheme.titleSmall),
-                  PopupMenuButton(
-                      icon: const Icon(Icons.more_horiz),
-                      itemBuilder: (context) {
-                        return [
-                          PopupMenuItem(
-                              child: ListTile(
-                            title: const Text('Manage Accounts'),
-                            leading: const Icon(Icons.manage_accounts_rounded),
-                            onTap: () => context.goPath(AccountsOverviewPage.pagePath.build()),
-                          )),
-                          PopupMenuItem(
-                              child: ListTile(
-                            title: const Text('Create Account'),
-                            leading: const Icon(Icons.add),
-                            onTap: () => context.goPath(AccountCreatePage.pagePath.build()),
-                          ))
-                        ];
-                      })
-                ],
-              ),
-              const Divider(),
-              for (Account a in _api.getAccounts()) AccountCard(account: a),
-              if (_api.getAccounts().isEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(top: 20),
-                  child: Center(
-                      child: Column(
-                    children: [
-                      Text('No accounts found',
-                          style: context.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-                      const Text('Create an account to get started'),
-                      TextButton.icon(
-                        onPressed: () => context.goPath(AccountCreatePage.pagePath.build()),
-                        icon: const Icon(Icons.add),
-                        label: const Text('Create Account'),
-                      )
-                    ],
-                  )),
+            child: RefreshIndicator(
+              onRefresh: () => _fetchLatestTransactions(forceRetrieve: true),
+              child: ListView(children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Account and Cards', style: context.textTheme.titleSmall),
+                    PopupMenuButton(
+                        icon: const Icon(Icons.more_horiz),
+                        itemBuilder: (context) {
+                          return [
+                            PopupMenuItem(
+                                child: ListTile(
+                              title: const Text('Manage Accounts'),
+                              leading: const Icon(Icons.manage_accounts_rounded),
+                              onTap: () => context.goPath(AccountsOverviewPage.pagePath.build()),
+                            )),
+                            PopupMenuItem(
+                                child: ListTile(
+                              title: const Text('Create Account'),
+                              leading: const Icon(Icons.add),
+                              onTap: () => context.goPath(AccountCreatePage.pagePath.build()),
+                            ))
+                          ];
+                        })
+                  ],
                 ),
-              if (_api.getAccounts().isNotEmpty) _buildTransactionSection()
-            ])),
+                const Divider(),
+                for (Account a in _api.getAccounts()) AccountCard(account: a),
+                if (_api.getAccounts().isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20),
+                    child: Center(
+                        child: Column(
+                      children: [
+                        Text('No accounts found',
+                            style: context.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                        const Text('Create an account to get started'),
+                        TextButton.icon(
+                          onPressed: () => context.goPath(AccountCreatePage.pagePath.build()),
+                          icon: const Icon(Icons.add),
+                          label: const Text('Create Account'),
+                        )
+                      ],
+                    )),
+                  ),
+                if (_api.getAccounts().isNotEmpty) _buildTransactionSection()
+              ]),
+            )),
       ),
     );
   }

@@ -65,7 +65,8 @@ class _CurrencySettingsPageState extends State<CurrencySettingsPage> {
                 child: PaginatedTable(
                   key: _tableKey,
                   api: _api,
-                  initialPageFunction: (api) => api.retrieveAllCurrencies(limit: 10),
+                  initialPageFunction: (forceRetrieve) =>
+                      _api.retrieveAllCurrencies(limit: 10, forceRetrieve: forceRetrieve),
                   fillWithEmptyRows: true,
                   width: size.width,
                   columns: const [

@@ -7,6 +7,7 @@ import 'package:financrr_frontend/util/text_utils.dart';
 import 'package:financrr_frontend/widgets/async_wrapper.dart';
 import 'package:financrr_frontend/widgets/entities/transaction_card.dart';
 import 'package:financrr_frontend/widgets/paginated_wrapper.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:restrr/restrr.dart';
 
@@ -28,6 +29,7 @@ class AccountPage extends StatefulWidget {
 
 class _AccountPageState extends State<AccountPage> {
   final StreamController<Account> _accountStreamController = StreamController.broadcast();
+  final GlobalKey<PaginatedWrapperState> _transactionPaginatedKey = GlobalKey();
   late final Restrr _api = context.api!;
 
   Future<Account?> _fetchAccount({bool forceRetrieve = false}) async {
@@ -74,47 +76,47 @@ class _AccountPageState extends State<AccountPage> {
         alignment: Alignment.topCenter,
         child: SizedBox(
           width: size.width / 1.1,
-          child: ListView(
-            children: [
-              Column(
-                children: [
-                  Text(TextUtils.formatCurrency(account.balance, account.currencyId.get()!),
-                      style: context.textTheme.titleLarge?.copyWith(color: context.theme.primaryColor)),
-                  Text(account.name),
-                ],
-              ),
-              const Divider(),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: SizedBox(
-                  width: size.width,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      TextButton.icon(
-                          onPressed: () => context.goPath(TransactionCreatePage.pagePath
-                              .build(pathParams: {'accountId': account.id.value.toString()})),
-                          icon: const Icon(Icons.add, size: 17),
-                          label: const Text('Create Transaction')),
-                      const Spacer(),
-                      TextButton.icon(
-                          onPressed: () => _deleteAccount(account),
-                          icon: const Icon(Icons.delete_rounded, size: 17),
-                          label: const Text('Delete Account')),
-                      TextButton.icon(
-                          onPressed: () => context.goPath(
-                              AccountEditPage.pagePath.build(pathParams: {'accountId': account.id.value.toString()})),
-                          icon: const Icon(Icons.create, size: 17),
-                          label: const Text('Edit Account'))
-                    ],
-                  ),
+          child: RefreshIndicator(
+            onRefresh: () async {
+              await _fetchAccount(forceRetrieve: true);
+              await _transactionPaginatedKey.currentState?.reset();
+            },
+            child: ListView(
+              children: [
+                Column(
+                  children: [
+                    Text(TextUtils.formatCurrency(account.balance, account.currencyId.get()!),
+                        style: context.textTheme.titleLarge?.copyWith(color: context.theme.primaryColor)),
+                    Text(account.name),
+                  ],
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: _buildTransactionSection(account),
-              )
-            ],
+                const Divider(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton.icon(
+                        onPressed: () => context.goPath(TransactionCreatePage.pagePath
+                            .build(pathParams: {'accountId': account.id.value.toString()})),
+                        icon: const Icon(Icons.add, size: 17),
+                        label: const Text('Create Transaction')),
+                    const Spacer(),
+                    IconButton(
+                        tooltip: 'Delete Account',
+                        onPressed: () => _deleteAccount(account),
+                        icon: const Icon(Icons.delete_rounded, size: 17)),
+                    IconButton(
+                        tooltip: 'Edit Account',
+                        onPressed: () => context.goPath(
+                            AccountEditPage.pagePath.build(pathParams: {'accountId': account.id.value.toString()})),
+                        icon: const Icon(Icons.create, size: 17))
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: _buildTransactionSection(account),
+                )
+              ],
+            ),
           ),
         ),
       ),
@@ -129,7 +131,8 @@ class _AccountPageState extends State<AccountPage> {
         Padding(
           padding: const EdgeInsets.only(top: 10),
           child: PaginatedWrapper(
-            initialPageFunction: () => account.retrieveAllTransactions(),
+            key: _transactionPaginatedKey,
+            initialPageFunction: (forceRetrieve) => account.retrieveAllTransactions(forceRetrieve: forceRetrieve),
             onLoading: (_, __) => const Center(child: CircularProgressIndicator()),
             onSuccess: (context, snap) {
               return Column(
