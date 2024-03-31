@@ -1,13 +1,10 @@
 import 'package:financrr_frontend/data/host_repository.dart';
 import 'package:financrr_frontend/data/repositories.dart';
-import 'package:financrr_frontend/pages/auth/server_info_page.dart';
 import 'package:financrr_frontend/pages/context_navigator.dart';
 import 'package:financrr_frontend/router.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:restrr/restrr.dart';
-
-import '../pages/core/dashboard_page.dart';
 
 class SessionRepository extends SecureStringRepository {
   const SessionRepository({required super.storage});

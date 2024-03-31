@@ -8,7 +8,6 @@ import 'package:financrr_frontend/widgets/async_wrapper.dart';
 import 'package:financrr_frontend/widgets/entities/transaction_card.dart';
 import 'package:financrr_frontend/widgets/notice_card.dart';
 import 'package:financrr_frontend/widgets/paginated_wrapper.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:restrr/restrr.dart';
 
@@ -139,13 +138,12 @@ class _AccountPageState extends State<AccountPage> {
               final List<Transaction> transactions = snap.data!.page.items;
               if (transactions.isEmpty) {
                 return Center(
-                  child: NoticeCard(
-                    title: 'No transactions found',
-                    description: 'Create a transaction to get started',
-                    onTap: () => context.goPath(TransactionCreatePage.pagePath
-                        .build(pathParams: {'accountId': account.id.value.toString()})),
-                  )
-                );
+                    child: NoticeCard(
+                  title: 'No transactions found',
+                  description: 'Create a transaction to get started',
+                  onTap: () => context.goPath(
+                      TransactionCreatePage.pagePath.build(pathParams: {'accountId': account.id.value.toString()})),
+                ));
               }
               return Column(
                 children: transactions.map((t) {

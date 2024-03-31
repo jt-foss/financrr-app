@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:easy_localization/easy_localization.dart';
 import 'package:financrr_frontend/pages/core/accounts/accounts_overview_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/widgets/async_wrapper.dart';
@@ -13,7 +12,6 @@ import 'package:restrr/restrr.dart';
 import '../../layout/adaptive_scaffold.dart';
 import '../../router.dart';
 import 'accounts/account_create_page.dart';
-import 'accounts/transactions/transaction_create_page.dart';
 
 class DashboardPage extends StatefulWidget {
   static const PagePathBuilder pagePath = PagePathBuilder('/@me/dashboard');

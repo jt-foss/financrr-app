@@ -1,10 +1,5 @@
-import 'dart:js';
-
 import 'package:financrr_frontend/util/extensions.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
-import 'package:flutter/widgets.dart';
 
 class NoticeCard extends StatelessWidget {
   final IconData iconData;
