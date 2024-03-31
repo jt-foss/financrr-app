@@ -1,6 +1,7 @@
 import 'package:financrr_frontend/data/host_repository.dart';
 import 'package:financrr_frontend/data/repositories.dart';
 import 'package:financrr_frontend/pages/auth/server_info_page.dart';
+import 'package:financrr_frontend/pages/context_navigator.dart';
 import 'package:financrr_frontend/router.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -38,7 +39,7 @@ class SessionService {
 
   static Future<void> login(BuildContext context, Restrr api) async {
     context.authNotifier.setApi(api);
-    context.pushPath(DashboardPage.pagePath.build());
+    context.pushPath(ContextNavigatorPage.pagePath.build());
     await Repositories.sessionRepository.write(api.session.token);
   }
 
@@ -49,7 +50,7 @@ class SessionService {
     }
     if (success) {
       context.authNotifier.setApi(null);
-      context.pushPath(ServerInfoPage.pagePath.build());
+      context.pushPath(ContextNavigatorPage.pagePath.build());
       await Repositories.sessionRepository.delete();
     }
     return success;

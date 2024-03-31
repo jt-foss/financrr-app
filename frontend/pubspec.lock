@@ -626,7 +626,7 @@ packages:
     description:
       path: "."
       ref: "feature/accounts-and-transactions"
-      resolved-ref: "2eb5e5938e79d09f17c36238f7b0df68e43e541d"
+      resolved-ref: "660d02cae9c6f71fff89691a377b5fb344b77841"
       url: "https://github.com/financrr/restrr.git"
     source: git
     version: "0.8.0"
