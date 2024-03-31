@@ -4,16 +4,22 @@ use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
 
 use crate::api::documentation::response::{InternalServerError, ResourceNotFound, Unauthorized, ValidationError};
 use crate::api::error::api::ApiError;
-use crate::api::pagination::{PageSizeParam, PaginatedAccount};
+use crate::api::pagination::{PageSizeParam, PaginatedAccount, Pagination};
 use crate::wrapper::entity::account::dto::AccountDTO;
 use crate::wrapper::entity::account::Account;
 use crate::wrapper::entity::user::User;
-use crate::wrapper::permission::{HasPermissionOrError, Permissions};
+use crate::wrapper::permission::{HasPermissionByIdOrError, HasPermissionOrError, Permissions};
 use crate::wrapper::types::phantom::Phantom;
 
 pub(crate) fn account_controller(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("/account").service(get_one).service(get_all).service(create).service(delete).service(update),
+        web::scope("/account")
+            .service(get_one)
+            .service(get_all)
+            .service(get_transactions)
+            .service(create)
+            .service(delete)
+            .service(update),
     );
 }
 
@@ -59,6 +65,36 @@ pub(crate) async fn get_one(user: Phantom<User>, account_id: Path<i32>) -> Resul
     account.has_permission_or_error(user.get_id(), Permissions::READ).await?;
 
     Ok(HttpResponse::Ok().json(account))
+}
+
+#[utoipa::path(get,
+responses(
+(status = 200, description = "Successfully retrieved all Transactions.", content_type = "application/json", body = PaginatedTransaction),
+Unauthorized,
+ResourceNotFound,
+InternalServerError,
+),
+params(PageSizeParam),
+security(
+("bearer_token" = [])
+),
+path = "/api/v1/account/{account_id}/transactions/?page={page}&size={size}",
+tag = "Account")]
+#[get("/{account_id}/transactions")]
+pub(crate) async fn get_transactions(
+    user: Phantom<User>,
+    account_id: Path<i32>,
+    page_size: PageSizeParam,
+    uri: Uri,
+) -> Result<impl Responder, ApiError> {
+    let account_id = account_id.into_inner();
+    Account::has_permission_by_id_or_error(account_id, user.get_id(), Permissions::READ).await?;
+
+    let transactions = Account::find_transactions_by_account_id_paginated(account_id, &page_size).await?;
+    let total = Account::count_transactions_by_account_id(account_id).await?;
+    let pagination = Pagination::new(transactions, &page_size, total, uri);
+
+    Ok(HttpResponse::Ok().json(pagination))
 }
 
 #[utoipa::path(post,

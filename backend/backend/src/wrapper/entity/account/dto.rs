@@ -1,6 +1,6 @@
 use actix_web::dev::Payload;
+use actix_web::web::Json;
 use actix_web::FromRequest;
-use actix_web_validator::Json;
 use futures_util::future::LocalBoxFuture;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
@@ -31,6 +31,7 @@ impl FromRequest for AccountDTO {
         Box::pin(async move {
             let fut = fut.await?;
             let dto = fut.into_inner();
+            dto.validate()?;
             validate_currency_exists(dto.currency_id).await?;
 
             Ok(dto)
@@ -45,7 +46,7 @@ impl From<Account> for AccountDTO {
             description: value.description,
             iban: value.iban,
             original_balance: value.original_balance,
-            currency_id: value.currency.get_id(),
+            currency_id: value.currency_id.get_id(),
         }
     }
 }

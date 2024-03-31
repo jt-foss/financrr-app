@@ -1,6 +1,6 @@
 use actix_web::dev::Payload;
+use actix_web::web::Json;
 use actix_web::{FromRequest, HttpRequest};
-use actix_web_validator::Json;
 use futures_util::future::LocalBoxFuture;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
@@ -38,9 +38,11 @@ impl FromRequest for UserRegistration {
         let registration = Json::<Self>::from_request(req, payload);
         Box::pin(async move {
             let registration = registration.await?;
-            validate_unique_username(registration.username.as_str()).await?;
+            let dto = registration.into_inner();
+            dto.validate()?;
+            validate_unique_username(dto.username.as_str()).await?;
 
-            Ok(registration.into_inner())
+            Ok(dto)
         })
     }
 }
