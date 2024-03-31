@@ -135,7 +135,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                     const Divider()
                   ],
-                  Card(child: Column(children: group.items.map((item) => item.child).toList()))
+                  Card.outlined(child: Column(children: group.items.map((item) => item.child).toList()))
                 ],
               );
             },

@@ -38,7 +38,7 @@ class _CurrencySettingsPageState extends State<CurrencySettingsPage> {
           width: size.width / 1.1,
           child: ListView(
             children: [
-              const Card(
+              const Card.outlined(
                 child: ListTile(
                   title: Text('Preferred Currency'),
                   trailing: Text('US\$'),

@@ -6,6 +6,7 @@ import '../../../layout/adaptive_scaffold.dart';
 import '../../../router.dart';
 import '../../../util/text_utils.dart';
 import '../../../widgets/entities/account_card.dart';
+import '../../../widgets/notice_card.dart';
 import 'account_create_page.dart';
 import 'account_edit_page.dart';
 
@@ -78,6 +79,14 @@ class _AccountsOverviewPageState extends State<AccountsOverviewPage> {
                   ],
                 ),
               ),
+              if (_api.getAccounts().isEmpty)
+                Center(
+                  child: NoticeCard(
+                    title: 'No accounts found',
+                    description: 'Create an account to get started',
+                    onTap: () => context.goPath(AccountCreatePage.pagePath.build()),
+                  ),
+                ),
               for (Account account in _api.getAccounts())
                 Padding(
                   padding: const EdgeInsets.only(bottom: 10),

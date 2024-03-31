@@ -26,7 +26,7 @@ class CurrencyCreatePage extends StatefulWidget {
       required String decimalPlaces,
       required double previewAmount}) {
     return [
-      Card(
+      Card.outlined(
         child: ListTile(
           leading: const Text('Preview'),
           title: Text('${previewAmount.toStringAsFixed(int.tryParse(decimalPlaces) ?? 0)} $symbol'),

@@ -6,6 +6,7 @@ import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/text_utils.dart';
 import 'package:financrr_frontend/widgets/async_wrapper.dart';
 import 'package:financrr_frontend/widgets/entities/transaction_card.dart';
+import 'package:financrr_frontend/widgets/notice_card.dart';
 import 'package:financrr_frontend/widgets/paginated_wrapper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -135,8 +136,19 @@ class _AccountPageState extends State<AccountPage> {
             initialPageFunction: (forceRetrieve) => account.retrieveAllTransactions(forceRetrieve: forceRetrieve),
             onLoading: (_, __) => const Center(child: CircularProgressIndicator()),
             onSuccess: (context, snap) {
+              final List<Transaction> transactions = snap.data!.page.items;
+              if (transactions.isEmpty) {
+                return Center(
+                  child: NoticeCard(
+                    title: 'No transactions found',
+                    description: 'Create a transaction to get started',
+                    onTap: () => context.goPath(TransactionCreatePage.pagePath
+                        .build(pathParams: {'accountId': account.id.value.toString()})),
+                  )
+                );
+              }
               return Column(
-                children: snap.data!.page.items.map((t) {
+                children: transactions.map((t) {
                   return TransactionCard(transaction: t);
                 }).toList(),
               );

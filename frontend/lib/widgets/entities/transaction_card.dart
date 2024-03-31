@@ -55,7 +55,7 @@ class TransactionCard extends StatelessWidget {
           ? null
           : () => context.goPath(TransactionPage.pagePath
               .build(pathParams: {'accountId': account.id.value.toString(), 'transactionId': id.toString()})),
-      child: Card(
+      child: Card.outlined(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: Column(

@@ -1,3 +1,4 @@
+import 'package:financrr_frontend/widgets/notice_card.dart';
 import 'package:flutter/material.dart';
 
 import '../../layout/adaptive_scaffold.dart';
@@ -24,7 +25,12 @@ class _DummyPageState extends State<DummyPage> {
         child: SizedBox(
           width: size.width / 1.1,
           child: ListView(
-            children: [Card(child: ListTile(title: Text(widget.text)))],
+            children: const [
+              NoticeCard(
+                  iconData: Icons.bar_chart_rounded,
+                  title: 'Statistics',
+                  description: 'There will be content here soon!'),
+            ],
           ),
         ),
       ),

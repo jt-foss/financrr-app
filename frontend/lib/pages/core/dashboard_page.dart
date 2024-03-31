@@ -1,16 +1,19 @@
 import 'dart:async';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:financrr_frontend/pages/core/accounts/accounts_overview_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/widgets/async_wrapper.dart';
 import 'package:financrr_frontend/widgets/entities/account_card.dart';
 import 'package:financrr_frontend/widgets/entities/transaction_card.dart';
+import 'package:financrr_frontend/widgets/notice_card.dart';
 import 'package:flutter/material.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../layout/adaptive_scaffold.dart';
 import '../../router.dart';
 import 'accounts/account_create_page.dart';
+import 'accounts/transactions/transaction_create_page.dart';
 
 class DashboardPage extends StatefulWidget {
   static const PagePathBuilder pagePath = PagePathBuilder('/@me/dashboard');
@@ -83,22 +86,11 @@ class _DashboardPageState extends State<DashboardPage> {
                 const Divider(),
                 for (Account a in _api.getAccounts()) AccountCard(account: a),
                 if (_api.getAccounts().isEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 20),
-                    child: Center(
-                        child: Column(
-                      children: [
-                        Text('No accounts found',
-                            style: context.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-                        const Text('Create an account to get started'),
-                        TextButton.icon(
-                          onPressed: () => context.goPath(AccountCreatePage.pagePath.build()),
-                          icon: const Icon(Icons.add),
-                          label: const Text('Create Account'),
-                        )
-                      ],
-                    )),
-                  ),
+                  Center(
+                      child: NoticeCard(
+                          title: 'No accounts found',
+                          description: 'Create an account to get started',
+                          onTap: () => context.goPath(AccountCreatePage.pagePath.build()))),
                 if (_api.getAccounts().isNotEmpty) _buildTransactionSection()
               ]),
             )),
@@ -120,9 +112,15 @@ class _DashboardPageState extends State<DashboardPage> {
             onError: (context, snap) => const Text('Error'),
             onLoading: (context, snap) => const Center(child: CircularProgressIndicator()),
             onSuccess: (context, snap) {
+              final List<Transaction> transactions = snap.data!.items;
+              if (transactions.isEmpty) {
+                return const Center(
+                    child:
+                        NoticeCard(title: 'No transactions found', description: 'Your transactions will appear here'));
+              }
               return Column(
                 children: [
-                  for (Transaction t in snap.data!.items)
+                  for (Transaction t in transactions)
                     SizedBox(width: double.infinity, child: TransactionCard(transaction: t))
                 ],
               );

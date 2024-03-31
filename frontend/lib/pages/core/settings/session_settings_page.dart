@@ -38,7 +38,7 @@ class _SessionSettingsPageState extends State<SessionSettingsPage> {
           width: size.width / 1.1,
           child: ListView(
             children: [
-              Card(
+              Card.outlined(
                 child: ListTile(
                   title: const Text('Current Session'),
                   trailing: Text('Id: ${_api.session.id.value}'),

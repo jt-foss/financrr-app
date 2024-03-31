@@ -41,7 +41,7 @@ class AccountCard extends StatelessWidget {
       onTap: !interactive
           ? null
           : () => context.goPath(AccountPage.pagePath.build(pathParams: {'accountId': id.toString()})),
-      child: Card(
+      child: Card.outlined(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: Row(
