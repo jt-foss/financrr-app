@@ -625,8 +625,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "feature/accounts-and-transactions"
-      resolved-ref: "660d02cae9c6f71fff89691a377b5fb344b77841"
+      ref: development
+      resolved-ref: "4289ab847ff1ac6c44af776f2fde33a8c0b09593"
       url: "https://github.com/financrr/restrr.git"
     source: git
     version: "0.8.0"
