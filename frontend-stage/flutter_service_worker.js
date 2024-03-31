@@ -3,8 +3,8 @@ const MANIFEST = 'flutter-app-manifest';
 const TEMP = 'flutter-temp-cache';
 const CACHE_NAME = 'flutter-app-cache';
 
-const RESOURCES = {"index.html": "9db140e5cd0f810d2c942685c1ce7df4",
-"/": "9db140e5cd0f810d2c942685c1ce7df4",
+const RESOURCES = {"index.html": "578a4d9a1f0e4efbb855c2534abb7eec",
+"/": "578a4d9a1f0e4efbb855c2534abb7eec",
 "canvaskit/canvaskit.js": "c86fbd9e7b17accae76e5ad116583dc4",
 "canvaskit/skwasm.js": "445e9e400085faead4493be2224d95aa",
 "canvaskit/skwasm.wasm": "e42815763c5d05bba43f9d0337fa7d84",
@@ -17,7 +17,7 @@ const RESOURCES = {"index.html": "9db140e5cd0f810d2c942685c1ce7df4",
 "canvaskit/canvaskit.js.symbols": "38cba9233b92472a36ff011dc21c2c9f",
 "favicon.png": "5acdb6cb3f089e099bf9739addce99a7",
 "assets/FontManifest.json": "be385c1942677e1e51b8b1aec8f8e40a",
-"assets/fonts/MaterialIcons-Regular.otf": "ebadfa4aa63b653bd80972bc4199bda1",
+"assets/fonts/MaterialIcons-Regular.otf": "6019361b58d453d6ba46f921060def84",
 "assets/AssetManifest.bin.json": "73dc1f48f3875209eff981d0b671122e",
 "assets/assets/fonts/Montserrat-LightItalic.ttf": "e70e5d8d5129f35418fe2cfaa6132c1d",
 "assets/assets/fonts/Montserrat-Black.ttf": "9c1278c56276b018109f295c1a751a69",
@@ -57,7 +57,7 @@ const RESOURCES = {"index.html": "9db140e5cd0f810d2c942685c1ce7df4",
 "icons/Icon-192.png": "1adb5f7d2bc2aabcc7b6905ce655f518",
 "manifest.json": "c4cc8f93fa92c487d0f9342362bfe4dd",
 "flutter.js": "c71a09214cb6f5f8996a531350400a9a",
-"main.dart.js": "279e9647787c0dbc2a1298c69794bc29"};
+"main.dart.js": "6dfca3d6f51da02b208356aa9775b3a8"};
 // The application shell files that are downloaded before a service worker can
 // start.
 const CORE = ["main.dart.js",
