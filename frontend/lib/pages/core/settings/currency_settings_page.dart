@@ -38,7 +38,7 @@ class _CurrencySettingsPageState extends State<CurrencySettingsPage> {
           width: size.width / 1.1,
           child: ListView(
             children: [
-              const Card(
+              const Card.outlined(
                 child: ListTile(
                   title: Text('Preferred Currency'),
                   trailing: Text('US\$'),
@@ -61,10 +61,12 @@ class _CurrencySettingsPageState extends State<CurrencySettingsPage> {
               ),
               const Divider(),
               SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
                 child: PaginatedTable(
                   key: _tableKey,
                   api: _api,
-                  initialPageFunction: (api) => api.retrieveAllCurrencies(limit: 10),
+                  initialPageFunction: (forceRetrieve) =>
+                      _api.retrieveAllCurrencies(limit: 10, forceRetrieve: forceRetrieve),
                   fillWithEmptyRows: true,
                   width: size.width,
                   columns: const [
@@ -84,8 +86,8 @@ class _CurrencySettingsPageState extends State<CurrencySettingsPage> {
                             icon: const Icon(Icons.edit),
                             onPressed: currency is! CustomCurrency
                                 ? null
-                                : () => context
-                                    .goPath(CurrencyEditPage.pagePath.build(queryParams: {'currencyId': currency.id})),
+                                : () => context.goPath(CurrencyEditPage.pagePath
+                                    .build(pathParams: {'currencyId': currency.id.value.toString()})),
                           ),
                           IconButton(
                             icon: const Icon(Icons.delete),
