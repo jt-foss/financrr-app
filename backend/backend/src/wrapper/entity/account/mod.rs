@@ -3,8 +3,8 @@ use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 use utoipa::ToSchema;
 
-use entity::account;
 use entity::utility::time::get_now;
+use entity::{account, transaction};
 
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
@@ -107,7 +107,7 @@ impl Account {
         account_id: i32,
         page_size: &PageSizeParam,
     ) -> Result<Vec<Transaction>, ApiError> {
-        let results = find_all_paginated(account::Entity::find_related_transactions(account_id), page_size)
+        let results = find_all_paginated(transaction::Entity::find_all_by_account_id(account_id), page_size)
             .await?
             .into_iter()
             .map(Transaction::from)
@@ -117,7 +117,7 @@ impl Account {
     }
 
     pub(crate) async fn count_transactions_by_account_id(account_id: i32) -> Result<u64, ApiError> {
-        count(account::Entity::count_related_transactions(account_id)).await
+        count(transaction::Entity::find_all_by_account_id(account_id)).await
     }
 }
 

@@ -79,9 +79,17 @@ impl Related<super::account::Entity> for Entity {
 impl ActiveModelBehavior for ActiveModel {}
 
 impl Entity {
-    pub fn find_all_by_user(user_id: i32) -> Select<Self> {
+    pub fn find_all_by_user_id(user_id: i32) -> Select<Self> {
         Self::find().left_join(super::account::Entity).filter(
             Condition::any().add(Expr::col(Column::Source).eq(user_id)).add(Expr::col(Column::Destination).eq(user_id)),
         )
+    }
+
+    pub fn find_all_by_account_id(account_id: i32) -> Select<Self> {
+        Self::find().filter(Condition::any().add(Column::Source.eq(account_id)).add(Column::Destination.eq(account_id)))
+    }
+
+    pub fn find_all_by_budget_id(budget_id: i32) -> Select<Self> {
+        Self::find().filter(Column::Budget.eq(budget_id))
     }
 }
