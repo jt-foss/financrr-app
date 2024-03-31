@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:financrr_frontend/pages/core/accounts/account_page.dart';
+import 'package:financrr_frontend/pages/login/bloc/auth_bloc.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/form_fields.dart';
 import 'package:flutter/material.dart';

@@ -1,13 +1,11 @@
 import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
-import 'package:financrr_frontend/data/session_repository.dart';
 import 'package:financrr_frontend/layout/templates/auth_page_template.dart';
+import 'package:financrr_frontend/pages/login/bloc/auth_bloc.dart';
 import 'package:financrr_frontend/util/extensions.dart';
-import 'package:financrr_frontend/util/platform_utils.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:restrr/restrr.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../layout/adaptive_scaffold.dart';
 
@@ -98,16 +96,8 @@ class LoginPageState extends State<LoginPage> {
       context.showSnackBar('common_password_required'.tr());
       return;
     }
-
-    late Restrr api;
-    try {
-      api = await RestrrBuilder(uri: widget.hostUri, options: const RestrrOptions(isWeb: kIsWeb))
-          .login(username: username, password: password, sessionName: await PlatformUtils.getPlatformDescription());
-      if (!mounted) return;
-    } on RestrrException catch (e) {
-      context.showSnackBar(e.message ?? 'err');
-      return;
-    }
-    SessionService.login(context, api);
+    context
+        .read<AuthenticationBloc>()
+        .add(AuthenticationLoginRequested(uri: widget.hostUri, username: username, password: password));
   }
 }

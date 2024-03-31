@@ -1,8 +1,9 @@
 import 'package:financrr_frontend/data/l10n_repository.dart';
-import 'package:financrr_frontend/data/session_repository.dart';
+import 'package:financrr_frontend/pages/login/bloc/auth_bloc.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/widgets/paginated_table.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../../layout/adaptive_scaffold.dart';
@@ -88,8 +89,9 @@ class _SessionSettingsPageState extends State<SessionSettingsPage> {
                         children: [
                           IconButton(
                             icon: Icon(isCurrentSession ? Icons.logout_rounded : Icons.delete_rounded),
-                            onPressed: () =>
-                                isCurrentSession ? SessionService.logout(context, _api) : _deleteSession(session),
+                            onPressed: () => isCurrentSession
+                                ? context.read<AuthenticationBloc>().add(AuthenticationLogoutRequested(api: _api))
+                                : _deleteSession(session),
                           ),
                         ],
                       )),
@@ -119,7 +121,7 @@ class _SessionSettingsPageState extends State<SessionSettingsPage> {
       await _api.deleteAllSessions();
       if (!mounted) return;
       context.showSnackBar('Successfully deleted all Sessions!');
-      SessionService.logout(context, _api, skipDeleteCurrent: true);
+      context.read<AuthenticationBloc>().add(AuthenticationLogoutRequested(api: _api));
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);
     }
