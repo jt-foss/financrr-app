@@ -2,7 +2,7 @@
 
 use sea_orm::entity::prelude::*;
 use sea_orm::ActiveValue::Set;
-use sea_orm::{Condition, QuerySelect};
+use sea_orm::{Condition, JoinType, QuerySelect};
 use serde::{Deserialize, Serialize};
 
 use crate::prelude::{Permissions, Transaction};
@@ -47,17 +47,21 @@ impl Related<super::currency::Entity> for Entity {
 impl ActiveModelBehavior for ActiveModel {}
 
 impl Entity {
-    pub fn find_all_for_user(user_id: &i32) -> Select<Permissions> {
-        let user_id = user_id.to_owned();
-
-        permissions::Entity::find_all_accounts_for_user(user_id)
-    }
-
     pub fn find_by_id_and_user(id: &i32, user_id: &i32) -> Select<Permissions> {
         let id = id.to_owned();
         let user_id = user_id.to_owned();
 
         permissions::Entity::find_account_by_id_and_user(id, user_id)
+    }
+
+    pub fn find_all_by_user_id(user_id: i32) -> Select<Self> {
+        Entity::find()
+            .join_rev(
+                JoinType::InnerJoin,
+                permissions::Entity::belongs_to(Self).from(permissions::Column::EntityId).to(Column::Id).into(),
+            )
+            .filter(permissions::Column::UserId.eq(user_id))
+            .filter(permissions::Column::EntityType.eq(Self.table_name()))
     }
 
     pub fn find_related_transactions(account_id: i32) -> Select<transaction::Entity> {

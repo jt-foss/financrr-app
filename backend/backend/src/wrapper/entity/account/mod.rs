@@ -1,4 +1,3 @@
-use futures_util::future::join_all;
 use sea_orm::{EntityName, EntityTrait, Set};
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
@@ -18,7 +17,6 @@ use crate::wrapper::permission::{
     HasPermissionByIdOrError, HasPermissionOrError, Permission, PermissionByIds, Permissions,
 };
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
-use crate::wrapper::util::handle_async_result_vec;
 
 pub mod dto;
 pub mod event_listener;
@@ -98,19 +96,11 @@ impl Account {
     }
 
     pub(crate) async fn find_all_by_user(user_id: i32) -> Result<Vec<Self>, ApiError> {
-        let results = join_all(
-            find_all(account::Entity::find_all_for_user(&user_id))
-                .await?
-                .into_iter()
-                .map(|model| Self::find_by_id(model.entity_id)),
-        )
-        .await;
-
-        handle_async_result_vec(results)
+        Ok(find_all(account::Entity::find_all_by_user_id(user_id)).await?.into_iter().map(Self::from).collect())
     }
 
     pub(crate) async fn count_all_by_user(user_id: i32) -> Result<u64, ApiError> {
-        count(account::Entity::find_all_for_user(&user_id)).await
+        count(account::Entity::find_all_by_user_id(user_id)).await
     }
 
     pub(crate) async fn find_transactions_by_account_id_paginated(
