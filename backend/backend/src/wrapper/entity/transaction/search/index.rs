@@ -15,8 +15,6 @@ use crate::wrapper::entity::transaction::Transaction;
 use crate::wrapper::entity::TableName;
 use crate::wrapper::permission::{Permissions, PermissionsEntity};
 
-pub const INDEX_NAME: &str = "transaction";
-
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub(crate) struct TransactionIndex {
     pub(crate) id: i32,
@@ -55,11 +53,11 @@ impl Searchable for TransactionIndex {
     }
 
     fn get_index_name() -> &'static str {
-        INDEX_NAME
+        "transaction"
     }
 
     async fn create_index() {
-        IndexBuilder::new(INDEX_NAME)
+        IndexBuilder::new(Self::get_index_name())
             .add_field("id", IndexType::INTEGER)
             .add_field("source", IndexType::INTEGER)
             .add_field("destination", IndexType::INTEGER)

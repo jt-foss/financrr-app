@@ -6,6 +6,6 @@ path = "/metrics",
 tag = "Metrics",
 )]
 #[allow(dead_code)]
-pub async fn metrics() {
+pub(crate) async fn metrics() {
     unreachable!("This function is used for documentation only and should never be called!")
 }
