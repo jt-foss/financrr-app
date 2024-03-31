@@ -7,8 +7,8 @@ import '../../../data/host_repository.dart';
 import '../../../data/repositories.dart';
 import '../../../data/session_repository.dart';
 
-part 'auth_event.dart';
-part 'auth_state.dart';
+part 'authentication_event.dart';
+part 'authentication_state.dart';
 
 extension AuthenticationBlocExtension on BuildContext {
   Restrr? get api => BlocProvider.of<AuthenticationBloc>(this).state.api;

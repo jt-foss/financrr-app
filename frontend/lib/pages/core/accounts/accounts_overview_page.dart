@@ -1,4 +1,4 @@
-import 'package:financrr_frontend/pages/login/bloc/auth_bloc.dart';
+import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:restrr/restrr.dart';

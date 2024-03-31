@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:financrr_frontend/pages/core/accounts/transactions/transaction_create_page.dart';
 import 'package:financrr_frontend/pages/core/accounts/account_edit_page.dart';
-import 'package:financrr_frontend/pages/login/bloc/auth_bloc.dart';
+import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/text_utils.dart';
 import 'package:financrr_frontend/widgets/async_wrapper.dart';

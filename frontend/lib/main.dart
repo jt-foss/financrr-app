@@ -3,7 +3,7 @@ import 'dart:ui';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:financrr_frontend/data/repositories.dart';
-import 'package:financrr_frontend/pages/login/bloc/auth_bloc.dart';
+import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
 import 'package:financrr_frontend/router.dart';
 import 'package:financrr_frontend/themes.dart';
 import 'package:flutter/foundation.dart';

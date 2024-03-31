@@ -1,7 +1,8 @@
 import 'package:financrr_frontend/layout/scaffold_navbar_shell.dart';
-import 'package:financrr_frontend/pages/login/bloc/auth_bloc.dart';
-import 'package:financrr_frontend/pages/login/login_page.dart';
-import 'package:financrr_frontend/pages/login/server_info_page.dart';
+import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
+import 'package:financrr_frontend/pages/authentication/login_page.dart';
+import 'package:financrr_frontend/pages/splash_page.dart';
+import 'package:financrr_frontend/pages/authentication/server_info_page.dart';
 import 'package:financrr_frontend/pages/core/accounts/account_page.dart';
 import 'package:financrr_frontend/pages/core/accounts/transactions/transaction_create_page.dart';
 import 'package:financrr_frontend/pages/core/accounts/transactions/transaction_edit_page.dart';
@@ -22,7 +23,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:restrr/restrr.dart';
 
 class AppRouter {
   const AppRouter._();
@@ -139,8 +139,11 @@ class AppRouter {
     ],
     redirect: (context, state) {
       final AuthenticationBloc authBloc = context.read<AuthenticationBloc>();
+      if (authBloc.state.status == AuthenticationStatus.authenticated) {
+        return null;
+      }
       return switch (authBloc.state.status) {
-        AuthenticationStatus.authenticated => DashboardPage.pagePath.build().fullPath,
+        AuthenticationStatus.unknown => SplashPage.pagePath.build().fullPath,
         _ => ServerInfoPage.pagePath.build().fullPath,
       };
     },
@@ -148,6 +151,11 @@ class AppRouter {
 
   static List<GoRoute> _noShellRoutes() {
     return [
+      GoRoute(
+        path: SplashPage.pagePath.path,
+        pageBuilder: (context, state) => _buildDefaultPageTransition(context, state, const SplashPage()),
+        redirect: authGuard,
+      ),
       GoRoute(
           path: ServerInfoPage.pagePath.path,
           pageBuilder: (context, state) =>

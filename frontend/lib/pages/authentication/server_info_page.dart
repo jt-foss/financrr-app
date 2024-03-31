@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:financrr_frontend/data/host_repository.dart';
 import 'package:financrr_frontend/layout/templates/auth_page_template.dart';
-import 'package:financrr_frontend/pages/login/login_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/input_utils.dart';
 import 'package:flutter/foundation.dart';
@@ -11,6 +10,7 @@ import 'package:restrr/restrr.dart';
 
 import '../../layout/adaptive_scaffold.dart';
 import '../../router.dart';
+import 'login_page.dart';
 
 class ServerInfoPage extends StatefulWidget {
   static const PagePathBuilder pagePath = PagePathBuilder('/login');
