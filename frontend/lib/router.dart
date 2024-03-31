@@ -2,7 +2,6 @@ import 'package:financrr_frontend/layout/scaffold_navbar_shell.dart';
 import 'package:financrr_frontend/pages/login/bloc/auth_bloc.dart';
 import 'package:financrr_frontend/pages/login/login_page.dart';
 import 'package:financrr_frontend/pages/login/server_info_page.dart';
-import 'package:financrr_frontend/pages/context_navigator.dart';
 import 'package:financrr_frontend/pages/core/accounts/account_page.dart';
 import 'package:financrr_frontend/pages/core/accounts/transactions/transaction_create_page.dart';
 import 'package:financrr_frontend/pages/core/accounts/transactions/transaction_edit_page.dart';
@@ -23,6 +22,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:restrr/restrr.dart';
 
 class AppRouter {
   const AppRouter._();
@@ -30,7 +30,7 @@ class AppRouter {
   static final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey(debugLabel: 'root');
   static final GlobalKey<NavigatorState> shellNavigatorKey = GlobalKey(debugLabel: 'shell');
 
-  static final goRouter = GoRouter(
+  static final GoRouter goRouter = GoRouter(
     initialLocation: '/',
     navigatorKey: rootNavigatorKey,
     routes: [
@@ -137,14 +137,17 @@ class AppRouter {
             ]),
           ]),
     ],
+    redirect: (context, state) {
+      final AuthenticationBloc authBloc = context.read<AuthenticationBloc>();
+      return switch (authBloc.state.status) {
+        AuthenticationStatus.authenticated => DashboardPage.pagePath.build().fullPath,
+        _ => ServerInfoPage.pagePath.build().fullPath,
+      };
+    },
   );
 
   static List<GoRoute> _noShellRoutes() {
     return [
-      GoRoute(
-        path: ContextNavigatorPage.pagePath.path,
-        pageBuilder: (context, state) => _buildDefaultPageTransition(context, state, const ContextNavigatorPage()),
-      ),
       GoRoute(
           path: ServerInfoPage.pagePath.path,
           pageBuilder: (context, state) =>
@@ -168,7 +171,7 @@ class AppRouter {
   /// the `redirectTo` queryParam for the page the user was initially going to visit
   static String? coreAuthGuard(BuildContext context, GoRouterState state) {
     return context.read<AuthenticationBloc>().state.status != AuthenticationStatus.authenticated
-        ? ContextNavigatorPage.pagePath.build().fullPath
+        ? ServerInfoPage.pagePath.build().fullPath
         : null;
   }
 

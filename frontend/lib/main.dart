@@ -85,18 +85,21 @@ class FinancrrAppState extends State<FinancrrApp> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => AuthenticationBloc(),
-      child: MaterialApp.router(
-          onGenerateTitle: (ctx) => 'brand_name'.tr(),
-          routerConfig: AppRouter.goRouter,
-          debugShowCheckedModeBanner: false,
-          scrollBehavior: CustomScrollBehavior(),
-          localizationsDelegates: context.localizationDelegates,
-          supportedLocales: context.supportedLocales,
-          locale: context.locale,
-          theme: _activeLightTheme.themeData,
-          darkTheme: _activeDarkTheme.themeData,
-          themeMode: _themeMode),
+      create: (_) => AuthenticationBloc()..add(const AuthenticationRecoveryRequested()),
+      child: BlocListener<AuthenticationBloc, AuthenticationState>(
+        listener: (context, state) => AppRouter.goRouter.refresh(),
+        child: MaterialApp.router(
+            onGenerateTitle: (ctx) => 'brand_name'.tr(),
+            routerConfig: AppRouter.goRouter,
+            debugShowCheckedModeBanner: false,
+            scrollBehavior: CustomScrollBehavior(),
+            localizationsDelegates: context.localizationDelegates,
+            supportedLocales: context.supportedLocales,
+            locale: context.locale,
+            theme: _activeLightTheme.themeData,
+            darkTheme: _activeDarkTheme.themeData,
+            themeMode: _themeMode),
+      ),
     );
   }
 
