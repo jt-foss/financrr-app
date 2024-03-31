@@ -4,14 +4,14 @@
 <h3 align="center">financrr — Know your money</h3>
 <br/>
 
+> [!IMPORTANT]
+> financrr is currently under major development, and there is **no official release yet**. None of the listed features below are available for use at the moment.
+> However, we are working diligently towards a 1.0 release!
+
 # What is financrr?
 
 financrr is an open-source financing manager app designed to help you gain better control and understanding of your finances. 
 With its intuitive interface and powerful features, Financrr empowers users to track expenses, set budgets, and achieve their financial goals.
-
-## ⚠️ Please note
-> financrr is currently under major development, and there is no official release yet. None of the listed features below are available for use at the moment.
-> However, we are working diligently towards a 1.0 release!
 
 ## ✨ (Planned) Features
 

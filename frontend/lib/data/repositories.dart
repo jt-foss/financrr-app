@@ -4,6 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'host_repository.dart';
+import 'l10n_repository.dart';
 
 class Repositories {
   const Repositories._();
@@ -12,11 +13,13 @@ class Repositories {
 
   static late final ThemeRepository themeRepository;
   static late final HostRepository hostRepository;
+  static late final L10nRepository l10nRepository;
 
   static Future init(FlutterSecureStorage storage, SharedPreferences preferences) async {
     sessionRepository = SessionRepository(storage: storage);
     themeRepository = ThemeRepository(preferences: preferences);
     hostRepository = HostRepository(preferences: preferences);
+    l10nRepository = L10nRepository(preferences: preferences);
   }
 }
 

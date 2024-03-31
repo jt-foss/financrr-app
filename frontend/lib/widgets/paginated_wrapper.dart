@@ -10,7 +10,7 @@ class PaginatedDataResult<T> {
 }
 
 class PaginatedWrapper<T> extends StatefulWidget {
-  final Future<Paginated<T>> Function() initialPageFunction;
+  final Future<Paginated<T>> Function(bool) initialPageFunction;
   final Widget Function(BuildContext, AsyncSnapshot<PaginatedDataResult<T>>) onSuccess;
   final Widget Function(BuildContext, AsyncSnapshot<PaginatedDataResult<T>>) onLoading;
 
@@ -29,14 +29,14 @@ class PaginatedWrapperState<T> extends State<PaginatedWrapper<T>> {
   @override
   void initState() {
     super.initState();
-    widget.initialPageFunction.call().then((page) {
+    widget.initialPageFunction.call(false).then((page) {
       _pages[page.pageNumber] = page;
       setState(() => _currentPage = page.pageNumber);
     });
   }
 
-  Future<void> _loadInitialPage() async {
-    final Paginated<T> page = await widget.initialPageFunction.call();
+  Future<void> _loadInitialPage({bool forceRetrieve = false}) async {
+    final Paginated<T> page = await widget.initialPageFunction.call(forceRetrieve);
     _pages[page.pageNumber] = page;
     setState(() => _currentPage = page.pageNumber);
   }
@@ -48,16 +48,20 @@ class PaginatedWrapperState<T> extends State<PaginatedWrapper<T>> {
         : widget.onSuccess.call(
             context,
             AsyncSnapshot<PaginatedDataResult<T>>.withData(
-                ConnectionState.done, PaginatedDataResult(_pages[_currentPage]!, hasNext, hasPrevious)));
+                ConnectionState.done,
+                PaginatedDataResult(
+                    _pages[_currentPage] ?? const Paginated(pageNumber: 0, limit: 0, total: 0, items: []),
+                    hasNext,
+                    hasPrevious)));
   }
 
   bool get hasNext => _pages[_currentPage]?.hasNext ?? false;
 
   bool get hasPrevious => _pages[_currentPage]?.hasPrevious ?? false;
 
-  void reset() {
+  Future<void> reset() {
     _pages.clear();
-    _loadInitialPage();
+    return _loadInitialPage(forceRetrieve: true);
   }
 
   Future<void>? nextPage(Restrr api) async {

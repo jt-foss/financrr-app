@@ -2,14 +2,13 @@ import 'dart:math';
 
 import 'package:financrr_frontend/pages/core/settings/currency_settings_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
-import 'package:financrr_frontend/util/input_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../../../layout/adaptive_scaffold.dart';
 import '../../../../router.dart';
+import '../../../../util/form_fields.dart';
 
 class CurrencyCreatePage extends StatefulWidget {
   static const PagePathBuilder pagePath = PagePathBuilder.child(parent: CurrencySettingsPage.pagePath, path: 'create');
@@ -17,10 +16,37 @@ class CurrencyCreatePage extends StatefulWidget {
   const CurrencyCreatePage({super.key});
 
   @override
-  State<StatefulWidget> createState() => CurrencyCreatePageState();
+  State<StatefulWidget> createState() => _CurrencyCreatePageState();
+
+  static List<Widget> buildCurrencyPreview(
+      {required Size size,
+      required String symbol,
+      required String name,
+      required String isoCode,
+      required String decimalPlaces,
+      required double previewAmount}) {
+    return [
+      Card.outlined(
+        child: ListTile(
+          leading: const Text('Preview'),
+          title: Text('${previewAmount.toStringAsFixed(int.tryParse(decimalPlaces) ?? 0)} $symbol'),
+        ),
+      ),
+      SizedBox(
+        width: size.width,
+        child: DataTable(columns: const [
+          DataColumn(label: Text('Symbol')),
+          DataColumn(label: Text('Name')),
+          DataColumn(label: Text('ISO')),
+        ], rows: [
+          DataRow(cells: [DataCell(Text(symbol)), DataCell(Text(name)), DataCell(Text(isoCode))])
+        ]),
+      ),
+    ];
+  }
 }
 
-class CurrencyCreatePageState extends State<CurrencyCreatePage> {
+class _CurrencyCreatePageState extends State<CurrencyCreatePage> {
   final GlobalKey<FormState> _formKey = GlobalKey();
 
   late final Restrr _api = context.api!;
@@ -76,11 +102,19 @@ class CurrencyCreatePageState extends State<CurrencyCreatePage> {
             onChanged: () => setState(() => _isValid = _formKey.currentState?.validate() ?? false),
             child: Column(
               children: [
-                ...buildCurrencyPreview(size, _symbolController.text, _nameController.text, _isoCodeController.text,
-                    _decimalPlacesController.text, _randomNumber),
+                ...CurrencyCreatePage.buildCurrencyPreview(
+                    size: size,
+                    symbol: _symbolController.text,
+                    name: _nameController.text,
+                    isoCode: _isoCodeController.text,
+                    decimalPlaces: _decimalPlacesController.text,
+                    previewAmount: _randomNumber),
                 const Divider(),
-                ...buildFormFields(
-                    _nameController, _symbolController, _isoCodeController, _decimalPlacesController, false),
+                ...FormFields.currency(
+                    nameController: _nameController,
+                    symbolController: _symbolController,
+                    isoCodeController: _isoCodeController,
+                    decimalPlacesController: _decimalPlacesController),
                 SizedBox(
                   width: double.infinity,
                   height: 50,
@@ -95,82 +129,6 @@ class CurrencyCreatePageState extends State<CurrencyCreatePage> {
         ),
       ),
     );
-  }
-
-  static List<Widget> buildCurrencyPreview(
-      Size size, String symbol, String name, String isoCode, String decimalPlaces, double previewAmount) {
-    return [
-      Card(
-        child: ListTile(
-          leading: const Text('Preview'),
-          title: Text('${previewAmount.toStringAsFixed(int.tryParse(decimalPlaces) ?? 0)} $symbol'),
-        ),
-      ),
-      SizedBox(
-        width: size.width,
-        child: DataTable(columns: const [
-          DataColumn(label: Text('Symbol')),
-          DataColumn(label: Text('Name')),
-          DataColumn(label: Text('ISO')),
-        ], rows: [
-          DataRow(cells: [DataCell(Text(symbol)), DataCell(Text(name)), DataCell(Text(isoCode))])
-        ]),
-      ),
-    ];
-  }
-
-  static List<Widget> buildFormFields(TextEditingController nameController, TextEditingController symbolController,
-      TextEditingController isoCodeController, TextEditingController decimalPlacesController, bool readOnly) {
-    return [
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        child: TextFormField(
-          controller: nameController,
-          readOnly: readOnly,
-          decoration: const InputDecoration(labelText: 'Name'),
-          validator: (value) => InputValidators.nonNull('Name', value),
-          inputFormatters: [
-            LengthLimitingTextInputFormatter(32),
-          ],
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.only(bottom: 10),
-        child: TextFormField(
-          controller: symbolController,
-          readOnly: readOnly,
-          decoration: const InputDecoration(labelText: 'Symbol'),
-          validator: (value) => InputValidators.nonNull('Symbol', value),
-          inputFormatters: [
-            LengthLimitingTextInputFormatter(6),
-          ],
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.only(bottom: 10),
-        child: TextFormField(
-          controller: isoCodeController,
-          readOnly: readOnly,
-          decoration: const InputDecoration(labelText: 'ISO Code'),
-          inputFormatters: [
-            LengthLimitingTextInputFormatter(3),
-          ],
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.only(bottom: 10),
-        child: TextFormField(
-          controller: decimalPlacesController,
-          readOnly: readOnly,
-          decoration: const InputDecoration(labelText: 'Decimal Places'),
-          validator: (value) => InputValidators.nonNull('Decimal Places', value),
-          inputFormatters: [
-            FilteringTextInputFormatter.digitsOnly,
-            LengthLimitingTextInputFormatter(1),
-          ],
-        ),
-      ),
-    ];
   }
 
   Future<void> _createCurrency() async {
