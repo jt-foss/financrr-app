@@ -51,7 +51,7 @@ jobs:
         with:
           context: ./backend
           file: ./backend/docker/rust/Dockerfile
-          platforms: linux/amd64,linux/arm64,windows/amd64,windows/arm64
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:nightly
@@ -90,7 +90,7 @@ jobs:
         with:
           context: ./backend
           file: ./backend/docker/rust/Dockerfile
-          platforms: linux/amd64,linux/arm64,windows/amd64,windows/arm64
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.ref }}
