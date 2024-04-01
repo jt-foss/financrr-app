@@ -154,7 +154,7 @@ impl Session {
         page_size: &PageSizeParam,
     ) -> Result<Vec<Self>, ApiError> {
         let results = join_all(
-            find_all_paginated(session::Entity::find_by_user(user_id), page_size)
+            find_all_paginated(session::Entity::find_by_user_id(user_id), page_size)
                 .await?
                 .into_iter()
                 .map(Self::from_model),
@@ -166,7 +166,7 @@ impl Session {
 
     pub(crate) async fn find_all_by_user(user_id: i32) -> Result<Vec<Self>, ApiError> {
         let results = join_all(
-            find_all_paginated(session::Entity::find_by_user(user_id), &PageSizeParam::default())
+            find_all_paginated(session::Entity::find_by_user_id(user_id), &PageSizeParam::default())
                 .await?
                 .into_iter()
                 .map(Self::from_model),
@@ -189,11 +189,11 @@ impl Session {
     }
 
     pub(crate) async fn count_all() -> Result<u64, ApiError> {
-        count(session::Entity::count()).await
+        count(session::Entity::find()).await
     }
 
     pub(crate) async fn count_all_by_user(user_id: i32) -> Result<u64, ApiError> {
-        count(session::Entity::count_by_user(user_id)).await
+        count(session::Entity::find_by_user_id(user_id)).await
     }
 
     pub(crate) async fn reached_session_limit(user_id: i32) -> Result<bool, ApiError> {
@@ -245,7 +245,7 @@ impl Session {
     }
 
     async fn delete_oldest_session(user_id: i32) -> Result<(), ApiError> {
-        let model = find_one_or_error(session::Entity::find_oldest_session_from_user(user_id), "Session").await?;
+        let model = find_one_or_error(session::Entity::find_oldest_session_from_user_id(user_id), "Session").await?;
         let session = Self::from_model(model).await?;
         session.delete().await?;
 

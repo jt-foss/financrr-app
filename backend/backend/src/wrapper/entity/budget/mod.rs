@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 use utoipa::ToSchema;
 
-use entity::budget;
+use entity::{budget, transaction};
 
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
@@ -86,7 +86,7 @@ impl Budget {
         budget_id: i32,
         page_size: &PageSizeParam,
     ) -> Result<Vec<Transaction>, ApiError> {
-        let transactions = find_all_paginated(budget::Entity::find_related_transactions(budget_id), page_size)
+        let transactions = find_all_paginated(transaction::Entity::find_all_by_budget_id(budget_id), page_size)
             .await?
             .into_iter()
             .map(Transaction::from)
@@ -96,7 +96,7 @@ impl Budget {
     }
 
     pub(crate) async fn count_related_transactions(budget_id: i32) -> Result<u64, ApiError> {
-        count(budget::Entity::find_related_transactions(budget_id)).await
+        count(transaction::Entity::find_all_by_budget_id(budget_id)).await
     }
 }
 

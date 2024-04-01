@@ -1,9 +1,10 @@
-import 'package:financrr_frontend/data/session_repository.dart';
 import 'package:financrr_frontend/pages/core/settings/currency_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings/session_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings/theme_settings_page.dart';
+import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../layout/adaptive_scaffold.dart';
@@ -92,13 +93,7 @@ class _SettingsPageState extends State<SettingsPage> {
       SettingsItem(
         showCategory: false,
         child: ListTile(
-          onTap: () async {
-            final bool success = await SessionService.logout(context, _api);
-            // this should never happen
-            if (!success && mounted) {
-              context.showSnackBar('Could not log out!');
-            }
-          },
+          onTap: () => context.read<AuthenticationBloc>().add(AuthenticationLogoutRequested(api: _api)),
           leading: const Icon(Icons.logout),
           title: const Text('Logout'),
         ),

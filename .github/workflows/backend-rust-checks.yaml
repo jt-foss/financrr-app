@@ -1,8 +1,7 @@
 name: (Backend) Rust checks (clippy, rustfmt)
 on:
   push:
-    branches:
-      - main
+    branches: [ 'main' ]
     paths:
       - 'backend/**'
   pull_request:
@@ -17,7 +16,6 @@ defaults:
 jobs:
   clippy:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
       - name: Run Clippy
@@ -26,7 +24,6 @@ jobs:
   formatting:
     runs-on: ubuntu-latest
     permissions: write-all
-
     steps:
       - uses: actions/checkout@v4
       - run: echo "date=$(date -d '1 month ago' +'%Y-%m-%d')" >> $GITHUB_ENV
@@ -41,5 +38,3 @@ jobs:
           flags: --all
           args: --config-path=./backend/rustfmt.toml
           working-directory: ./backend
-
-
