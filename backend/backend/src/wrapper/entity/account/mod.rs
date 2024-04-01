@@ -1,11 +1,10 @@
-use futures_util::future::join_all;
 use sea_orm::{EntityName, EntityTrait, Set};
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 use utoipa::ToSchema;
 
-use entity::account;
 use entity::utility::time::get_now;
+use entity::{account, transaction};
 
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
@@ -18,7 +17,6 @@ use crate::wrapper::permission::{
     HasPermissionByIdOrError, HasPermissionOrError, Permission, PermissionByIds, Permissions,
 };
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
-use crate::wrapper::util::handle_async_result_vec;
 
 pub mod dto;
 pub mod event_listener;
@@ -98,26 +96,18 @@ impl Account {
     }
 
     pub(crate) async fn find_all_by_user(user_id: i32) -> Result<Vec<Self>, ApiError> {
-        let results = join_all(
-            find_all(account::Entity::find_all_for_user(&user_id))
-                .await?
-                .into_iter()
-                .map(|model| Self::find_by_id(model.entity_id)),
-        )
-        .await;
-
-        handle_async_result_vec(results)
+        Ok(find_all(account::Entity::find_all_by_user_id(user_id)).await?.into_iter().map(Self::from).collect())
     }
 
     pub(crate) async fn count_all_by_user(user_id: i32) -> Result<u64, ApiError> {
-        count(account::Entity::find_all_for_user(&user_id)).await
+        count(account::Entity::find_all_by_user_id(user_id)).await
     }
 
     pub(crate) async fn find_transactions_by_account_id_paginated(
         account_id: i32,
         page_size: &PageSizeParam,
     ) -> Result<Vec<Transaction>, ApiError> {
-        let results = find_all_paginated(account::Entity::find_related_transactions(account_id), page_size)
+        let results = find_all_paginated(transaction::Entity::find_all_by_account_id(account_id), page_size)
             .await?
             .into_iter()
             .map(Transaction::from)
@@ -127,7 +117,7 @@ impl Account {
     }
 
     pub(crate) async fn count_transactions_by_account_id(account_id: i32) -> Result<u64, ApiError> {
-        count(account::Entity::count_related_transactions(account_id)).await
+        count(transaction::Entity::find_all_by_account_id(account_id)).await
     }
 }
 

@@ -40,28 +40,28 @@ impl ActiveModelBehavior for ActiveModel {}
 
 impl Entity {
     pub fn find_all() -> Select<Self> {
-        Entity::find()
+        Self::find()
     }
 
     pub fn count_all() -> Select<Self> {
-        Entity::find().column(Column::UserId)
+        Self::find().column(Column::UserId)
     }
 
     pub fn find_permission(user_id: i32, entity_type: &str, entity_id: i32) -> Select<Self> {
-        Entity::find()
+        Self::find()
             .filter(Column::UserId.eq(user_id))
             .filter(Column::EntityType.eq(entity_type))
             .filter(Column::EntityId.eq(entity_id))
     }
 
-    pub fn find_all_accounts_for_user(user_id: i32) -> Select<Self> {
-        Entity::find()
+    pub fn find_all_accounts_for_user_id(user_id: i32) -> Select<Self> {
+        Self::find()
             .filter(Column::UserId.eq(user_id))
             .filter(Column::EntityType.eq(account::Entity.table_name().to_string()))
     }
 
-    pub fn find_account_by_id_and_user(account_id: i32, user_id: i32) -> Select<Self> {
-        Entity::find()
+    pub fn find_account_by_id_and_user_id(account_id: i32, user_id: i32) -> Select<Self> {
+        Self::find()
             .filter(Column::UserId.eq(user_id))
             .filter(Column::EntityId.eq(account_id))
             .filter(Column::EntityType.eq(account::Entity.table_name().to_string()))

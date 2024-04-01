@@ -64,7 +64,7 @@ impl Currency {
     }
 
     pub(crate) async fn find_by_id_include_user(id: i32, user_id: i32) -> Result<Self, ApiError> {
-        Ok(Self::from(find_one_or_error(currency::Entity::find_by_id_include_user(id, user_id), "Currency").await?))
+        Ok(Self::from(find_one_or_error(currency::Entity::find_by_id_include_user_id(id, user_id), "Currency").await?))
     }
 
     pub(crate) async fn find_all_with_no_user_paginated(page_size: &PageSizeParam) -> Result<Vec<Self>, ApiError> {
@@ -83,7 +83,7 @@ impl Currency {
         user_id: i32,
         page_size: &PageSizeParam,
     ) -> Result<Vec<Self>, ApiError> {
-        Ok(find_all_paginated(currency::Entity::find_all_with_no_user_and_user(user_id), page_size)
+        Ok(find_all_paginated(currency::Entity::find_all_with_no_user_and_user_id(user_id), page_size)
             .await?
             .into_iter()
             .map(Self::from)
@@ -91,7 +91,7 @@ impl Currency {
     }
 
     pub(crate) async fn count_all_with_no_user_and_user(user_id: i32) -> Result<u64, ApiError> {
-        count(currency::Entity::count_all_with_no_user_and_user(user_id)).await
+        count(currency::Entity::find_all_with_no_user_and_user_id(user_id)).await
     }
 
     pub(crate) async fn update(self, update_dto: CurrencyDTO) -> Result<Self, ApiError> {
