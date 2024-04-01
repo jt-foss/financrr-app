@@ -55885,28 +55885,9 @@ break
 case 1:return A.D(q,r)}})
 return A.E($async$gNA,r)}}
 A.ajp.prototype={
-yz(){var s,r,q,p,o,n,m,l,k,j,i,h="hardwareConcurrency",g=this.a,f=g.appCodeName
-f.toString
-s=g.appName
-s.toString
-r=g.appVersion
-r.toString
-q=g.deviceMemory
-p=g.language||g.userLanguage
-p.toString
-o=g.languages
-n=g.platform
-m=g.product
-m.toString
-l=g.productSub
-k=g.userAgent
-k.toString
-j=g.vendor
-j.toString
-i=g.vendorSub
-i.toString
-g=A.aN(["appCodeName",f,"appName",s,"appVersion",r,"deviceMemory",q,"language",p,"languages",o,"platform",n,"product",m,"productSub",l,"userAgent",k,"vendor",j,"vendorSub",i,h,g.hardwareConcurrency,"maxTouchPoints",g.maxTouchPoints],t.N,t.z)
-return A.d_(new A.JA(g.i(0,"appCodeName"),g.i(0,"appName"),g.i(0,"appVersion"),g.i(0,"deviceMemory"),g.i(0,"language"),g.i(0,"languages"),g.i(0,"platform"),g.i(0,"product"),g.i(0,"productSub"),g.i(0,"userAgent"),g.i(0,"vendor"),g.i(0,"vendorSub"),g.i(0,h),g.i(0,"maxTouchPoints")),t.U2)}}
+yz(){var s="hardwareConcurrency",r=this.a
+r=A.aN(["appCodeName",r.appCodeName,"appName",r.appName,"appVersion",r.appVersion,"deviceMemory",r.deviceMemory,"language",r.language,"languages",r.languages,"platform",r.platform,"product",r.product,"productSub",r.productSub,"userAgent",r.userAgent,"vendor",r.vendor,"vendorSub",r.vendorSub,s,r.hardwareConcurrency,"maxTouchPoints",r.maxTouchPoints],t.N,t.z)
+return A.d_(new A.JA(r.i(0,"appCodeName"),r.i(0,"appName"),r.i(0,"appVersion"),r.i(0,"deviceMemory"),r.i(0,"language"),r.i(0,"languages"),r.i(0,"platform"),r.i(0,"product"),r.i(0,"productSub"),r.i(0,"userAgent"),r.i(0,"vendor"),r.i(0,"vendorSub"),r.i(0,s),r.i(0,"maxTouchPoints")),t.U2)}}
 A.lT.prototype={
 H(){return"BrowserName."+this.b}}
 A.JA.prototype={
@@ -118881,25 +118862,23 @@ A.aRu.prototype={
 $0(){return A.wm()},
 $S:0}
 A.aRt.prototype={
-$0(){var s,r,q=$.b8z(),p=window.navigator
-p.toString
-s=$.aWo()
-p=new A.ajp(p)
-r=$.af3()
-r.p(0,p,s)
-A.aU9(p,s,!1)
-$.baV=p
-p=$.aWp()
-s=new A.amx()
-r.p(0,s,p)
-A.aU9(s,p,!1)
-$.bc5=s
-s=$.aWt()
-p=new A.ayn()
-r.p(0,p,s)
-A.aU9(p,s,!0)
-$.bff=p
-$.b55=q.gaAT()},
+$0(){var s,r=$.b8z(),q=self.window.navigator,p=$.aWo()
+q=new A.ajp(q)
+s=$.af3()
+s.p(0,q,p)
+A.aU9(q,p,!1)
+$.baV=q
+q=$.aWp()
+p=new A.amx()
+s.p(0,p,q)
+A.aU9(p,q,!1)
+$.bc5=p
+p=$.aWt()
+q=new A.ayn()
+s.p(0,q,p)
+A.aU9(q,p,!0)
+$.bff=q
+$.b55=r.gaAT()},
 $S:0};(function aliases(){var s=A.aaz.prototype
 s.acJ=s.a5
 s.acP=s.cF
