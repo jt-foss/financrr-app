@@ -15,6 +15,6 @@ echo "Building containers."
 docker buildx create --use
 
 # Build for multiple platforms
-docker buildx build --platform linux/amd64,linux/arm64 -t backend:latest  .. -f docker/rust/Dockerfile
+docker buildx build --platform linux/amd64,linux/arm64 -t backend:latest  . -f docker/rust/Dockerfile
 
 cd "${WORK_DIR}"
