@@ -6,6 +6,7 @@ import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/text_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:restrr/restrr.dart';
 
@@ -13,6 +14,7 @@ import '../../../../../layout/adaptive_scaffold.dart';
 import '../../../../../router.dart';
 import '../../../../data/l10n_repository.dart';
 import '../../../../widgets/async_wrapper.dart';
+import '../../settings/l10n/bloc/l10n_bloc.dart';
 
 class TransactionPage extends StatefulWidget {
   static const PagePathBuilder pagePath =
@@ -82,8 +84,6 @@ class TransactionPageState extends State<TransactionPage> {
   }
 
   Widget _buildVerticalLayout(Account account, Transaction transaction, Size size) {
-    final String amountStr = (transaction.type == TransactionType.deposit ? '' : '-') +
-        TextUtils.formatBalanceWithCurrency(transaction.amount, account.currencyId.get()!);
     return Padding(
       padding: const EdgeInsets.only(top: 10, bottom: 20),
       child: Align(
@@ -95,52 +95,58 @@ class TransactionPageState extends State<TransactionPage> {
               await _fetchAccount(forceRetrieve: true);
               await _fetchTransaction(forceRetrieve: true);
             },
-            child: ListView(
-              children: [
-                Column(
+            child: BlocBuilder<L10nBloc, L10nState>(
+              builder: (context, state) {
+                final String amountStr = (transaction.type == TransactionType.deposit ? '' : '-') +
+                    TextUtils.formatBalanceWithCurrency(state, transaction.amount, account.currencyId.get()!);
+                return ListView(
                   children: [
-                    Text(amountStr,
-                        style: context.textTheme.titleLarge?.copyWith(
-                            color: transaction.type == TransactionType.deposit
-                                ? context.theme.primaryColor
-                                : context.theme.colorScheme.error)),
-                    Text(transaction.description ?? transaction.executedAt.toIso8601String()),
+                    Column(
+                      children: [
+                        Text(amountStr,
+                            style: context.textTheme.titleLarge?.copyWith(
+                                color: transaction.type == TransactionType.deposit
+                                    ? context.theme.primaryColor
+                                    : context.theme.colorScheme.error)),
+                        Text(transaction.description ?? transaction.executedAt.toIso8601String()),
+                      ],
+                    ),
+                    const Divider(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        TextButton.icon(
+                            onPressed: () => _deleteTransaction(transaction),
+                            icon: const Icon(Icons.delete_rounded, size: 17),
+                            label: const Text('Delete Transaction')),
+                        TextButton.icon(
+                            onPressed: () => context.goPath(TransactionEditPage.pagePath.build(pathParams: {
+                                  'accountId': account.id.value.toString(),
+                                  'transactionId': transaction.id.value.toString()
+                                })),
+                            icon: const Icon(Icons.create_rounded, size: 17),
+                            label: const Text('Edit Transaction'))
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Table(
+                        border: TableBorder.all(color: context.theme.dividerColor),
+                        children: [
+                          _buildTableRow('Type', transaction.type.name),
+                          _buildTableRow('Amount', amountStr),
+                          _buildTableRow('Name', transaction.name),
+                          _buildTableRow('Description', transaction.description ?? 'N/A'),
+                          _buildTableRow('From', transaction.sourceId?.get()?.name ?? 'N/A'),
+                          _buildTableRow('To', transaction.destinationId?.get()?.name ?? 'N/A'),
+                          _buildTableRow('Executed at', state.dateTimeFormat.format(transaction.executedAt)),
+                          _buildTableRow('Created at', state.dateTimeFormat.format(transaction.createdAt)),
+                        ],
+                      ),
+                    )
                   ],
-                ),
-                const Divider(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    TextButton.icon(
-                        onPressed: () => _deleteTransaction(transaction),
-                        icon: const Icon(Icons.delete_rounded, size: 17),
-                        label: const Text('Delete Transaction')),
-                    TextButton.icon(
-                        onPressed: () => context.goPath(TransactionEditPage.pagePath.build(pathParams: {
-                              'accountId': account.id.value.toString(),
-                              'transactionId': transaction.id.value.toString()
-                            })),
-                        icon: const Icon(Icons.create_rounded, size: 17),
-                        label: const Text('Edit Transaction'))
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: Table(
-                    border: TableBorder.all(color: context.theme.dividerColor),
-                    children: [
-                      _buildTableRow('Type', transaction.type.name),
-                      _buildTableRow('Amount', amountStr),
-                      _buildTableRow('Name', transaction.name),
-                      _buildTableRow('Description', transaction.description ?? 'N/A'),
-                      _buildTableRow('From', transaction.sourceId?.get()?.name ?? 'N/A'),
-                      _buildTableRow('To', transaction.destinationId?.get()?.name ?? 'N/A'),
-                      _buildTableRow('Executed at', dateTimeFormat.format(transaction.executedAt)),
-                      _buildTableRow('Created at', dateTimeFormat.format(transaction.createdAt)),
-                    ],
-                  ),
-                )
-              ],
+                );
+              },
             ),
           ),
         ),

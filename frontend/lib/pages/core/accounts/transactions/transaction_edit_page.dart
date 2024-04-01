@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:financrr_frontend/pages/core/accounts/transactions/transaction_page.dart';
 import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
+import 'package:financrr_frontend/pages/core/settings/l10n/bloc/l10n_bloc.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/form_fields.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:restrr/restrr.dart';
 
@@ -55,7 +57,7 @@ class TransactionEditPageState extends State<TransactionEditPage> {
   @override
   void initState() {
     super.initState();
-
+    final L10nState state = context.read<L10nBloc>().state;
     _fetchAccount().then((_) {
       Future.delayed(
           const Duration(milliseconds: 100),
@@ -64,7 +66,8 @@ class TransactionEditPageState extends State<TransactionEditPage> {
                   _nameController = TextEditingController(text: transaction.name);
                   _amountController = TextEditingController(text: transaction.amount.toString());
                   _descriptionController = TextEditingController(text: transaction.description);
-                  _executedAtController = TextEditingController(text: dateTimeFormat.format(transaction.executedAt));
+                  _executedAtController =
+                      TextEditingController(text: state.dateTimeFormat.format(transaction.executedAt));
                   _isValid = _formKey.currentState?.validate() ?? false;
                   _type = transaction.type;
                   _executedAt = transaction.executedAt;

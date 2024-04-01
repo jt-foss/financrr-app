@@ -10,10 +10,12 @@ import 'package:financrr_frontend/widgets/entities/transaction_card.dart';
 import 'package:financrr_frontend/widgets/notice_card.dart';
 import 'package:financrr_frontend/widgets/paginated_wrapper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../../layout/adaptive_scaffold.dart';
 import '../../../router.dart';
+import '../settings/l10n/bloc/l10n_bloc.dart';
 import 'accounts_overview_page.dart';
 
 class AccountPage extends StatefulWidget {
@@ -84,12 +86,16 @@ class _AccountPageState extends State<AccountPage> {
             },
             child: ListView(
               children: [
-                Column(
-                  children: [
-                    Text(TextUtils.formatBalanceWithCurrency(account.balance, account.currencyId.get()!),
-                        style: context.textTheme.titleLarge?.copyWith(color: context.theme.primaryColor)),
-                    Text(account.name),
-                  ],
+                BlocBuilder<L10nBloc, L10nState>(
+                  builder: (context, state) {
+                    return Column(
+                      children: [
+                        Text(TextUtils.formatBalanceWithCurrency(state, account.balance, account.currencyId.get()!),
+                            style: context.textTheme.titleLarge?.copyWith(color: context.theme.primaryColor)),
+                        Text(account.name),
+                      ],
+                    );
+                  },
                 ),
                 const Divider(),
                 Row(

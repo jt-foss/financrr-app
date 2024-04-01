@@ -1,16 +1,12 @@
 import 'package:financrr_frontend/data/repositories.dart';
-import 'package:intl/intl.dart';
-
-final DateFormat dateTimeFormat = DateFormat(L10nService.get().dateTimeFormat);
-final String decimalSeparator = L10nService.get().decimalSeparator;
-final String thousandsSeparator = L10nService.get().thousandsSeparator;
 
 class L10nPreferences {
   final String dateTimeFormat;
   final String decimalSeparator;
   final String thousandsSeparator;
 
-  const L10nPreferences({this.dateTimeFormat = 'yyyy-MM-dd HH:mm', this.decimalSeparator = '.', this.thousandsSeparator = ','});
+  const L10nPreferences(
+      {this.dateTimeFormat = 'yyyy-MM-dd HH:mm', this.decimalSeparator = '.', this.thousandsSeparator = ','});
 
   L10nPreferences copyWith({String? dateTimeFormat, String? decimalSeparator, String? thousandsSeparator}) {
     return L10nPreferences(
@@ -55,8 +51,8 @@ class L10nService {
 
   static Future<L10nPreferences> setL10nPreferences(
       {String? dateTimeFormat, String? decimalSeparator, String? thousandSeparator}) async {
-    final L10nPreferences preferences = get()
-        .copyWith(dateTimeFormat: dateTimeFormat, decimalSeparator: decimalSeparator, thousandsSeparator: thousandSeparator);
+    final L10nPreferences preferences = get().copyWith(
+        dateTimeFormat: dateTimeFormat, decimalSeparator: decimalSeparator, thousandsSeparator: thousandSeparator);
     await Repositories.l10nRepository.save(preferences);
     return preferences;
   }

@@ -1,12 +1,15 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:financrr_frontend/data/l10n_repository.dart';
+import 'package:financrr_frontend/pages/core/settings/l10n/bloc/l10n_bloc.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restrr/restrr.dart';
 
 class TextUtils {
   const TextUtils._();
 
-  static String formatBalanceWithCurrency(int amount, Currency currency) {
-    return '${formatBalance(amount, currency.decimalPlaces, decimalSeparator, thousandsSeparator)}${currency.symbol}';
+  static String formatBalanceWithCurrency(L10nState state, int amount, Currency currency) {
+    return '${formatBalance(amount, currency.decimalPlaces, state.decimalSeparator, state.thousandSeparator)}${currency.symbol}';
   }
 
   static String formatBalance(int amount, int decimalPlaces, String decimalSeparator, String thousandsSeparator) {

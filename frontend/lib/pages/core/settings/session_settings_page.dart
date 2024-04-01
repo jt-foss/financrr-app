@@ -9,6 +9,7 @@ import 'package:restrr/restrr.dart';
 import '../../../layout/adaptive_scaffold.dart';
 import '../../../router.dart';
 import '../settings_page.dart';
+import 'l10n/bloc/l10n_bloc.dart';
 
 class SessionSettingsPage extends StatefulWidget {
   static const PagePathBuilder pagePath = PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'sessions');
@@ -64,38 +65,42 @@ class _SessionSettingsPageState extends State<SessionSettingsPage> {
               const Divider(),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                child: PaginatedTable(
-                  key: _tableKey,
-                  api: _api,
-                  initialPageFunction: (forceRetrieve) =>
-                      _api.retrieveAllSessions(limit: 10, forceRetrieve: forceRetrieve),
-                  fillWithEmptyRows: true,
-                  width: size.width,
-                  columns: const [
-                    DataColumn(label: Text('Id')),
-                    DataColumn(label: Text('Name')),
-                    DataColumn(label: Text('Created')),
-                    DataColumn(label: Text('Expires')),
-                    DataColumn(label: Text('Actions')),
-                  ],
-                  rowBuilder: (session) {
-                    final bool isCurrentSession = session.id.value == _api.session.id.value;
-                    return DataRow(cells: [
-                      DataCell(Text(session.id.value.toString())),
-                      DataCell(Text(session.name ?? 'N/A')),
-                      DataCell(Text(dateTimeFormat.format(session.createdAt))),
-                      DataCell(Text(dateTimeFormat.format(session.expiresAt))),
-                      DataCell(Row(
-                        children: [
-                          IconButton(
-                            icon: Icon(isCurrentSession ? Icons.logout_rounded : Icons.delete_rounded),
-                            onPressed: () => isCurrentSession
-                                ? context.read<AuthenticationBloc>().add(AuthenticationLogoutRequested(api: _api))
-                                : _deleteSession(session),
-                          ),
-                        ],
-                      )),
-                    ]);
+                child: BlocBuilder<L10nBloc, L10nState>(
+                  builder: (context, state) {
+                    return PaginatedTable(
+                      key: _tableKey,
+                      api: _api,
+                      initialPageFunction: (forceRetrieve) =>
+                          _api.retrieveAllSessions(limit: 10, forceRetrieve: forceRetrieve),
+                      fillWithEmptyRows: true,
+                      width: size.width,
+                      columns: const [
+                        DataColumn(label: Text('Id')),
+                        DataColumn(label: Text('Name')),
+                        DataColumn(label: Text('Created')),
+                        DataColumn(label: Text('Expires')),
+                        DataColumn(label: Text('Actions')),
+                      ],
+                      rowBuilder: (session) {
+                        final bool isCurrentSession = session.id.value == _api.session.id.value;
+                        return DataRow(cells: [
+                          DataCell(Text(session.id.value.toString())),
+                          DataCell(Text(session.name ?? 'N/A')),
+                          DataCell(Text(state.dateTimeFormat.format(session.createdAt))),
+                          DataCell(Text(state.dateTimeFormat.format(session.expiresAt))),
+                          DataCell(Row(
+                            children: [
+                              IconButton(
+                                icon: Icon(isCurrentSession ? Icons.logout_rounded : Icons.delete_rounded),
+                                onPressed: () => isCurrentSession
+                                    ? context.read<AuthenticationBloc>().add(AuthenticationLogoutRequested(api: _api))
+                                    : _deleteSession(session),
+                              ),
+                            ],
+                          )),
+                        ]);
+                      },
+                    );
                   },
                 ),
               )
