@@ -10,8 +10,8 @@ readme.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 
-[lints.clippy]
-wildcard_imports = "allow"
+[lints]
+workspace = true
 
 [package.metadata.cargo-machete]
 ignored = ["rust-argon2"]

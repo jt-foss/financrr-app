@@ -42,23 +42,15 @@ impl Entity {
         Self::find().filter(Column::Token.eq(token))
     }
 
-    pub fn find_by_user(user_id: i32) -> Select<Self> {
+    pub fn find_by_user_id(user_id: i32) -> Select<Self> {
         Self::find().filter(Column::User.eq(user_id))
     }
 
-    pub fn find_oldest_session_from_user(user_id: i32) -> Select<Self> {
+    pub fn find_oldest_session_from_user_id(user_id: i32) -> Select<Self> {
         Self::find().filter(Column::User.eq(user_id)).order_by_asc(Column::CreatedAt).limit(1)
     }
 
-    pub fn count() -> Select<Self> {
-        Self::find().column(Column::Id)
-    }
-
-    pub fn count_by_user(user_id: i32) -> Select<Self> {
-        Self::find().filter(Column::User.eq(user_id)).column(Column::Id)
-    }
-
-    pub fn delete_by_token(session_token: String) -> DeleteMany<Entity> {
+    pub fn delete_by_token(session_token: String) -> DeleteMany<Self> {
         Self::delete_many().filter(Column::Token.contains(session_token))
     }
 }
