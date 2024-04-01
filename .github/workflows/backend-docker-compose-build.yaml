@@ -29,8 +29,8 @@ jobs:
       - name: Build Docker image
         uses: docker/build-push-action@v2
         with:
-          context: .
-          file: ./docker/rust/Dockerfile
+          context: ./backend
+          file: ./backend/docker/rust/Dockerfile
           platforms: linux/amd64
           load: true
 
@@ -47,7 +47,7 @@ jobs:
       - name: Build Docker image
         uses: docker/build-push-action@v2
         with:
-          context: .
-          file: ./docker/rust/Dockerfile
+          context: ./backend
+          file: ./backend/docker/rust/Dockerfile
           platforms: linux/arm64
           load: true
