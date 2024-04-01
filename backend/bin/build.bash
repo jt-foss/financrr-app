@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# This script exists due to Postgres creating directories with root permissions
-# We mount these directories to the docker container, so we need to change the permissions
 
 # prepare
 set -e
@@ -9,6 +7,14 @@ cd "$(dirname "$0")"
 cd ..
 
 echo "Building containers."
-docker compose build
+
+# Enable Docker's experimental features
+#export DOCKER_CLI_EXPERIMENTAL=enabled
+
+# Create a new builder which gives access to the new multi-architecture features
+docker buildx create --use
+
+# Build for multiple platforms
+docker buildx build --platform linux/amd64,linux/arm64,windows/amd64,windows/arm64 -t backend:latest  .. -f docker/rust/Dockerfile
 
 cd "${WORK_DIR}"
