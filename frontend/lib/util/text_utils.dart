@@ -14,7 +14,10 @@ class TextUtils {
     if (amountStr.length <= decimalPlaces) {
       return '0$decimalSeparator${amountStr.padLeft(decimalPlaces, '0')}';
     }
-    final String preDecimal = amountStr.substring(0, amountStr.length - decimalPlaces);
+    String preDecimal = amountStr.substring(0, amountStr.length - decimalPlaces);
+    for (int i = preDecimal.length - 3; i > 0; i -= 3) {
+      preDecimal = '${preDecimal.substring(0, i)}$thousandsSeparator${preDecimal.substring(i)}';
+    }
     return '${preDecimal.isEmpty ? '0' : preDecimal}'
         '$decimalSeparator${amountStr.substring(amountStr.length - decimalPlaces)}';
   }

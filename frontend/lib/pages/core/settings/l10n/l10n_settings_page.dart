@@ -40,7 +40,7 @@ class _L10nSettingsPageState extends State<L10nSettingsPage> {
                     child: ListTile(
                       leading: const Text('Preview'),
                       title:
-                          Text(TextUtils.formatBalance(12345678, 2, state.decimalSeparator, state.thousandSeparator)),
+                          Text(TextUtils.formatBalance(123456789, 2, state.decimalSeparator, state.thousandSeparator)),
                     ),
                   ),
                   Padding(
@@ -58,7 +58,7 @@ class _L10nSettingsPageState extends State<L10nSettingsPage> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(top: 10),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
                     child: TextFormField(
                       initialValue: state.thousandSeparator,
                       onChanged: (value) {
@@ -66,20 +66,23 @@ class _L10nSettingsPageState extends State<L10nSettingsPage> {
                         context.read<L10nBloc>().add(L10nThousandSeparatorChanged(value));
                       },
                       decoration: const InputDecoration(
-                        labelText: 'Thousands Separator',
+                        labelText: 'Thousand Separator',
                       ),
                       inputFormatters: [LengthLimitingTextInputFormatter(1)],
                     ),
                   ),
                   const Divider(),
-                  Card.outlined(
-                    child: ListTile(
-                      leading: const Text('Preview'),
-                      title: Text(state.dateTimeFormat.format(DateTime.now())),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: Card.outlined(
+                      child: ListTile(
+                        leading: const Text('Preview'),
+                        title: Text(state.dateTimeFormat.format(DateTime.now())),
+                      ),
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(top: 10),
+                    padding: const EdgeInsets.only(top: 20),
                     child: TextFormField(
                         initialValue: state.dateTimeFormat.pattern,
                         onChanged: (value) {
