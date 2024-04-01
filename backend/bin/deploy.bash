@@ -9,9 +9,8 @@ cd ..
 echo "Installing..."
 bin/install.bash
 
-
 echo "Building containers"
-bin/build.bash
+docker compose build
 
 echo "Stopping containers"
 docker compose down -v
