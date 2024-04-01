@@ -80,8 +80,8 @@ class _SettingsPageState extends State<SettingsPage> {
       SettingsItem(
         child: ListTile(
           onTap: () => context.goPath(L10nSettingsPage.pagePath.build()),
-          leading: Icon(Icons.language_rounded),
-          title: Text('Language'),
+          leading: const Icon(Icons.language_rounded),
+          title: const Text('Language'),
         ),
       ),
       const SettingsItem(

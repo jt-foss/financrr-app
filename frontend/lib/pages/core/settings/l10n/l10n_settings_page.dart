@@ -1,14 +1,10 @@
-import 'package:financrr_frontend/data/l10n_repository.dart';
-import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
 import 'package:financrr_frontend/util/text_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:restrr/restrr.dart';
 
 import '../../../../layout/adaptive_scaffold.dart';
 import '../../../../router.dart';
-import '../../../../util/input_utils.dart';
 import '../../settings_page.dart';
 import 'bloc/l10n_bloc.dart';
 

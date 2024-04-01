@@ -1,8 +1,4 @@
-import 'package:easy_localization/easy_localization.dart';
-import 'package:financrr_frontend/data/l10n_repository.dart';
 import 'package:financrr_frontend/pages/core/settings/l10n/bloc/l10n_bloc.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restrr/restrr.dart';
 
 class TextUtils {

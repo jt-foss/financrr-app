@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restrr/restrr.dart';
 
-import '../../data/l10n_repository.dart';
 import '../../pages/core/accounts/transactions/transaction_page.dart';
 import '../../pages/core/settings/l10n/bloc/l10n_bloc.dart';
 import '../../util/text_utils.dart';

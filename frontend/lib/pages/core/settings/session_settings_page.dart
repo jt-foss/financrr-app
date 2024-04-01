@@ -1,4 +1,3 @@
-import 'package:financrr_frontend/data/l10n_repository.dart';
 import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/widgets/paginated_table.dart';
