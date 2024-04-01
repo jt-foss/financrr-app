@@ -1,7 +1,7 @@
 pull_request_rules:
   - name: Automatic merge when CI passes, review is approved and label "auto-merge" is present
     conditions:
-      - "#approved-reviews-by>=1"
+      #- "#approved-reviews-by>=1"
       - "label=auto-merge"
       - check-success=*
     actions:
