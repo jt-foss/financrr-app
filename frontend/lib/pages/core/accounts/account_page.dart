@@ -86,7 +86,7 @@ class _AccountPageState extends State<AccountPage> {
               children: [
                 Column(
                   children: [
-                    Text(TextUtils.formatCurrency(account.balance, account.currencyId.get()!),
+                    Text(TextUtils.formatBalanceWithCurrency(account.balance, account.currencyId.get()!),
                         style: context.textTheme.titleLarge?.copyWith(color: context.theme.primaryColor)),
                     Text(account.name),
                   ],

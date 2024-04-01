@@ -83,7 +83,7 @@ class TransactionPageState extends State<TransactionPage> {
 
   Widget _buildVerticalLayout(Account account, Transaction transaction, Size size) {
     final String amountStr = (transaction.type == TransactionType.deposit ? '' : '-') +
-        TextUtils.formatCurrency(transaction.amount, account.currencyId.get()!);
+        TextUtils.formatBalanceWithCurrency(transaction.amount, account.currencyId.get()!);
     return Padding(
       padding: const EdgeInsets.only(top: 10, bottom: 20),
       child: Align(

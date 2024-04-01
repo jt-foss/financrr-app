@@ -1,19 +1,23 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:financrr_frontend/data/l10n_repository.dart';
 import 'package:restrr/restrr.dart';
 
 class TextUtils {
   const TextUtils._();
 
-  static String formatCurrency(int amount, Currency currency) {
-    if (currency.decimalPlaces == 0) return '$amount${currency.symbol}';
+  static String formatBalanceWithCurrency(int amount, Currency currency) {
+    return '${formatBalance(amount, currency.decimalPlaces, decimalSeparator, thousandsSeparator)}${currency.symbol}';
+  }
+
+  static String formatBalance(int amount, int decimalPlaces, String decimalSeparator, String thousandsSeparator) {
+    if (decimalPlaces == 0) return amount.toString();
     final String amountStr = amount.toString();
-    if (amountStr.length <= currency.decimalPlaces) {
-      return '0$decimalSeparator${amountStr.padLeft(currency.decimalPlaces, '0')}${currency.symbol}';
+    if (amountStr.length <= decimalPlaces) {
+      return '0$decimalSeparator${amountStr.padLeft(decimalPlaces, '0')}';
     }
-    final String preDecimal = amountStr.substring(0, amountStr.length - currency.decimalPlaces);
+    final String preDecimal = amountStr.substring(0, amountStr.length - decimalPlaces);
     return '${preDecimal.isEmpty ? '0' : preDecimal}'
-        '$decimalSeparator${amountStr.substring(amountStr.length - currency.decimalPlaces)}'
-        '${currency.symbol}';
+        '$decimalSeparator${amountStr.substring(amountStr.length - decimalPlaces)}';
   }
 
   static String? formatIBAN(String? iban) {

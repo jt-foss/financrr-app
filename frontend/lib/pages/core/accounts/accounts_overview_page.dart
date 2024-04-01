@@ -68,7 +68,7 @@ class _AccountsOverviewPageState extends State<AccountsOverviewPage> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: _currencies.entries.map((entry) {
-                        return Text(TextUtils.formatCurrency(entry.value, entry.key),
+                        return Text(TextUtils.formatBalanceWithCurrency(entry.value, entry.key),
                             style: context.textTheme.titleSmall?.copyWith(color: context.theme.primaryColor));
                       }).toList(),
                     ),

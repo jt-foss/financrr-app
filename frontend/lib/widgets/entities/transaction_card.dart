@@ -49,7 +49,7 @@ class TransactionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String amountStr = TextUtils.formatCurrency(amount, account.currencyId.get()!);
+    final String amountStr = TextUtils.formatBalanceWithCurrency(amount, account.currencyId.get()!);
     return GestureDetector(
       onTap: !interactive
           ? null
