@@ -90,7 +90,7 @@ class FinancrrAppState extends State<FinancrrApp> {
       providers: [
         BlocProvider(create: (_) => AuthenticationBloc()..add(const AuthenticationRecoveryRequested())),
         BlocProvider(
-            create: (_) => L10nBloc(L10nService.get().decimalSeparator, L10nService.get().thousandsSeparator,
+            create: (_) => L10nBloc(L10nService.get().decimalSeparator, L10nService.get().thousandSeparator,
                 DateFormat(L10nService.get().dateTimeFormat)))
       ],
       child: BlocListener<AuthenticationBloc, AuthenticationState>(

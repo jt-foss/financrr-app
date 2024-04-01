@@ -8,7 +8,7 @@ class TextUtils {
     return '${formatBalance(amount, currency.decimalPlaces, state.decimalSeparator, state.thousandSeparator)}${currency.symbol}';
   }
 
-  static String formatBalance(int amount, int decimalPlaces, String decimalSeparator, String thousandsSeparator) {
+  static String formatBalance(int amount, int decimalPlaces, String decimalSeparator, String thousandSeparator) {
     if (decimalPlaces == 0) return amount.toString();
     final String amountStr = amount.toString();
     if (amountStr.length <= decimalPlaces) {
@@ -16,7 +16,7 @@ class TextUtils {
     }
     String preDecimal = amountStr.substring(0, amountStr.length - decimalPlaces);
     for (int i = preDecimal.length - 3; i > 0; i -= 3) {
-      preDecimal = '${preDecimal.substring(0, i)}$thousandsSeparator${preDecimal.substring(i)}';
+      preDecimal = '${preDecimal.substring(0, i)}$thousandSeparator${preDecimal.substring(i)}';
     }
     return '${preDecimal.isEmpty ? '0' : preDecimal}'
         '$decimalSeparator${amountStr.substring(amountStr.length - decimalPlaces)}';
