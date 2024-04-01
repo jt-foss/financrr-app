@@ -3,29 +3,40 @@ import 'dart:ui';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:financrr_frontend/data/repositories.dart';
+import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
 import 'package:financrr_frontend/router.dart';
 import 'package:financrr_frontend/themes.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:logging/logging.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'app_bloc_observer.dart';
 import 'data/theme_repository.dart';
 
 void main() async {
   usePathUrlStrategy();
   SharedPreferences.setPrefix('financrr.');
   WidgetsFlutterBinding.ensureInitialized();
+  Bloc.observer = AppBlocObserver();
+
+  // init l10n
   await EasyLocalization.ensureInitialized();
+
+  // init data repositories
   final SharedPreferences preferences = await SharedPreferences.getInstance();
   const FlutterSecureStorage storage = FlutterSecureStorage();
   await Repositories.init(storage, preferences);
+
+  // init themes
   await AppThemeLoader.init();
   final EffectiveThemePreferences themePreferences = await ThemeService.getOrInsertEffective();
+
+  // init logging
   Logger.root.level = kDebugMode ? Level.ALL : Level.INFO;
   Logger.root.onRecord.listen((record) {
     if (kDebugMode) {
@@ -73,19 +84,22 @@ class FinancrrAppState extends State<FinancrrApp> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => AuthenticationNotifier(),
-      child: MaterialApp.router(
-          onGenerateTitle: (ctx) => 'brand_name'.tr(),
-          routerConfig: AppRouter.goRouter,
-          debugShowCheckedModeBanner: false,
-          scrollBehavior: CustomScrollBehavior(),
-          localizationsDelegates: context.localizationDelegates,
-          supportedLocales: context.supportedLocales,
-          locale: context.locale,
-          theme: _activeLightTheme.themeData,
-          darkTheme: _activeDarkTheme.themeData,
-          themeMode: _themeMode),
+    return BlocProvider(
+      create: (_) => AuthenticationBloc()..add(const AuthenticationRecoveryRequested()),
+      child: BlocListener<AuthenticationBloc, AuthenticationState>(
+        listener: (context, state) => AppRouter.goRouter.refresh(),
+        child: MaterialApp.router(
+            onGenerateTitle: (ctx) => 'brand_name'.tr(),
+            routerConfig: AppRouter.goRouter,
+            debugShowCheckedModeBanner: false,
+            scrollBehavior: CustomScrollBehavior(),
+            localizationsDelegates: context.localizationDelegates,
+            supportedLocales: context.supportedLocales,
+            locale: context.locale,
+            theme: _activeLightTheme.themeData,
+            darkTheme: _activeDarkTheme.themeData,
+            themeMode: _themeMode),
+      ),
     );
   }
 

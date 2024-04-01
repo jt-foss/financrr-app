@@ -1,7 +1,8 @@
 import 'package:financrr_frontend/layout/scaffold_navbar_shell.dart';
-import 'package:financrr_frontend/pages/auth/login_page.dart';
-import 'package:financrr_frontend/pages/auth/server_info_page.dart';
-import 'package:financrr_frontend/pages/context_navigator.dart';
+import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
+import 'package:financrr_frontend/pages/authentication/login_page.dart';
+import 'package:financrr_frontend/pages/splash_page.dart';
+import 'package:financrr_frontend/pages/authentication/server_info_page.dart';
 import 'package:financrr_frontend/pages/core/accounts/account_page.dart';
 import 'package:financrr_frontend/pages/core/accounts/transactions/transaction_create_page.dart';
 import 'package:financrr_frontend/pages/core/accounts/transactions/transaction_edit_page.dart';
@@ -19,9 +20,9 @@ import 'package:financrr_frontend/pages/core/dashboard_page.dart';
 import 'package:financrr_frontend/pages/core/dummy_page.dart';
 import 'package:financrr_frontend/util/constants.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:restrr/restrr.dart';
 
 class AppRouter {
   const AppRouter._();
@@ -29,7 +30,7 @@ class AppRouter {
   static final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey(debugLabel: 'root');
   static final GlobalKey<NavigatorState> shellNavigatorKey = GlobalKey(debugLabel: 'shell');
 
-  static final goRouter = GoRouter(
+  static final GoRouter goRouter = GoRouter(
     initialLocation: '/',
     navigatorKey: rootNavigatorKey,
     routes: [
@@ -136,13 +137,24 @@ class AppRouter {
             ]),
           ]),
     ],
+    redirect: (context, state) {
+      final AuthenticationBloc authBloc = context.read<AuthenticationBloc>();
+      if (authBloc.state.status == AuthenticationStatus.authenticated) {
+        return null;
+      }
+      return switch (authBloc.state.status) {
+        AuthenticationStatus.unknown => SplashPage.pagePath.build().fullPath,
+        _ => ServerInfoPage.pagePath.build().fullPath,
+      };
+    },
   );
 
   static List<GoRoute> _noShellRoutes() {
     return [
       GoRoute(
-        path: ContextNavigatorPage.pagePath.path,
-        pageBuilder: (context, state) => _buildDefaultPageTransition(context, state, const ContextNavigatorPage()),
+        path: SplashPage.pagePath.path,
+        pageBuilder: (context, state) => _buildDefaultPageTransition(context, state, const SplashPage()),
+        redirect: authGuard,
       ),
       GoRoute(
           path: ServerInfoPage.pagePath.path,
@@ -158,13 +170,17 @@ class AppRouter {
 
   /// Checks whether the current user is authenticated. If so, this will redirect to the [ContextNavigatorPage]
   static String? authGuard(BuildContext context, GoRouterState state) {
-    return !context.authNotifier.isAuthenticated ? null : DashboardPage.pagePath.build().fullPath;
+    return context.read<AuthenticationBloc>().state.status == AuthenticationStatus.authenticated
+        ? DashboardPage.pagePath.build().fullPath
+        : null;
   }
 
   /// Checks whether the current user is authenticated. If not, this will redirect to the [LoginPage], including
   /// the `redirectTo` queryParam for the page the user was initially going to visit
   static String? coreAuthGuard(BuildContext context, GoRouterState state) {
-    return context.authNotifier.isAuthenticated ? null : ContextNavigatorPage.pagePath.build().fullPath;
+    return context.read<AuthenticationBloc>().state.status != AuthenticationStatus.authenticated
+        ? ServerInfoPage.pagePath.build().fullPath
+        : null;
   }
 
   static Page<T> _buildDefaultPageTransition<T>(BuildContext context, GoRouterState state, Widget child) {
@@ -221,26 +237,7 @@ class PagePath {
   const PagePath._(this.fullPath);
 }
 
-class AuthenticationNotifier extends ChangeNotifier {
-  Restrr? _api;
-
-  bool get isAuthenticated => _api != null;
-
-  Restrr? get api => _api;
-
-  void setApi(Restrr? api) {
-    _api = api;
-    notifyListeners();
-  }
-}
-
 extension BuildContextExtension on BuildContext {
-  /// Provides the [AuthenticationNotifier] using [BuildContext.read].
-  AuthenticationNotifier get authNotifier => read<AuthenticationNotifier>();
-
-  /// Provides a nullable instance of [Restrr], being only null if the user **is not** logged in.
-  Restrr? get api => authNotifier.api;
-
   void goPath(PagePath path, {Object? extra}) {
     go(path.fullPath, extra: extra);
   }

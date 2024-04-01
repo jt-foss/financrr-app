@@ -32,23 +32,24 @@ dependencies:
     sdk: flutter
   flutter_web_plugins:
     sdk: flutter
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.2
-  intl: any
+  # API Wrapper
   restrr:
     git:
       url: https://github.com/financrr/restrr.git
       ref: development
+  # L10n
+  intl: any
+  easy_localization: ^3.0.5
+  # Routing
   go_router: ^13.2.1
-  provider: ^6.1.2
+  # Data
   flutter_secure_storage: ^9.0.0
   shared_preferences: ^2.2.2
+  # State Management
+  flutter_bloc: ^8.1.5
+  equatable: ^2.0.5
+  # Other
   flutter_svg: ^2.0.9
-  easy_localization: ^3.0.5
-
-  flutter_gen: any
   logging: ^1.2.0
   device_info_plus: ^10.0.1
 dev_dependencies:
