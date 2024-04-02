@@ -9,3 +9,6 @@
 # Rust
 /target
 
+# Python/e2e-tests
+e2e-tests/__pycache__
+
