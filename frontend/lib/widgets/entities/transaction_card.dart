@@ -1,10 +1,11 @@
 import 'package:financrr_frontend/router.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restrr/restrr.dart';
 
-import '../../data/l10n_repository.dart';
 import '../../pages/core/accounts/transactions/transaction_page.dart';
+import '../../pages/core/settings/l10n/bloc/l10n_bloc.dart';
 import '../../util/text_utils.dart';
 
 class TransactionCard extends StatelessWidget {
@@ -49,38 +50,42 @@ class TransactionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String amountStr = TextUtils.formatCurrency(amount, account.currencyId.get()!);
-    return GestureDetector(
-      onTap: !interactive
-          ? null
-          : () => context.goPath(TransactionPage.pagePath
-              .build(pathParams: {'accountId': account.id.value.toString(), 'transactionId': id.toString()})),
-      child: Card.outlined(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(name, style: context.textTheme.titleSmall),
-              if (description != null) Text(description!, style: context.textTheme.bodyMedium),
-              Text(TextUtils.formatIBAN(account.iban) ?? account.name),
-              const SizedBox(height: 10),
-              Row(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return BlocBuilder<L10nBloc, L10nState>(
+      builder: (context, state) {
+        return GestureDetector(
+          onTap: !interactive
+              ? null
+              : () => context.goPath(TransactionPage.pagePath
+                  .build(pathParams: {'accountId': account.id.value.toString(), 'transactionId': id.toString()})),
+          child: Card.outlined(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(dateTimeFormat.format(executedAt)),
-                  Text('${type == TransactionType.deposit ? '' : '-'}$amountStr',
-                      style: context.textTheme.titleMedium?.copyWith(
-                          color: type == TransactionType.deposit
-                              ? context.theme.primaryColor
-                              : context.theme.colorScheme.error)),
+                  Text(name, style: context.textTheme.titleSmall),
+                  if (description != null) Text(description!, style: context.textTheme.bodyMedium),
+                  Text(TextUtils.formatIBAN(account.iban) ?? account.name),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(state.dateTimeFormat.format(executedAt)),
+                      Text(
+                          '${type == TransactionType.deposit ? '' : '-'}${TextUtils.formatBalanceWithCurrency(state, amount, account.currencyId.get()!)}',
+                          style: context.textTheme.titleMedium?.copyWith(
+                              color: type == TransactionType.deposit
+                                  ? context.theme.primaryColor
+                                  : context.theme.colorScheme.error)),
+                    ],
+                  ),
                 ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

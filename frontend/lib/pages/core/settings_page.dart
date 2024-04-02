@@ -1,4 +1,5 @@
 import 'package:financrr_frontend/pages/core/settings/currency_settings_page.dart';
+import 'package:financrr_frontend/pages/core/settings/l10n/l10n_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings/session_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings/theme_settings_page.dart';
 import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
@@ -76,10 +77,11 @@ class _SettingsPageState extends State<SettingsPage> {
           title: const Text('Themes'),
         ),
       ),
-      const SettingsItem(
+      SettingsItem(
         child: ListTile(
-          leading: Icon(Icons.language_rounded),
-          title: Text('Language'),
+          onTap: () => context.goPath(L10nSettingsPage.pagePath.build()),
+          leading: const Icon(Icons.language_rounded),
+          title: const Text('Language'),
         ),
       ),
       const SettingsItem(

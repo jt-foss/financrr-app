@@ -1,6 +1,7 @@
 import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../../layout/adaptive_scaffold.dart';
@@ -8,6 +9,7 @@ import '../../../router.dart';
 import '../../../util/text_utils.dart';
 import '../../../widgets/entities/account_card.dart';
 import '../../../widgets/notice_card.dart';
+import '../settings/l10n/bloc/l10n_bloc.dart';
 import 'account_create_page.dart';
 import 'account_edit_page.dart';
 
@@ -65,12 +67,16 @@ class _AccountsOverviewPageState extends State<AccountsOverviewPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: _currencies.entries.map((entry) {
-                        return Text(TextUtils.formatCurrency(entry.value, entry.key),
-                            style: context.textTheme.titleSmall?.copyWith(color: context.theme.primaryColor));
-                      }).toList(),
+                    BlocBuilder<L10nBloc, L10nState>(
+                      builder: (context, state) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: _currencies.entries.map((entry) {
+                            return Text(TextUtils.formatBalanceWithCurrency(state, entry.value, entry.key),
+                                style: context.textTheme.titleSmall?.copyWith(color: context.theme.primaryColor));
+                          }).toList(),
+                        );
+                      },
                     ),
                     TextButton.icon(
                       label: const Text('Create Account'),
