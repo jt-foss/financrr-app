@@ -39,5 +39,5 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Run e2e tests
-        run: ./backend/bin/test-e2e.bash
+        run: ./bin/test-e2e.bash
 
