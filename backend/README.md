@@ -11,6 +11,7 @@ The backend for financrr - The most modern finance manager you've ever seen!
 - [Docker](https://www.docker.com/)
 - [Rust](https://www.rust-lang.org/)  (latest stable version)
 - [RustUp](https://rustup.rs/) (optional, but recommended)
+- [Python](https://www.python.org/) (latest stable version)
 
 **NOTE:** When deploying, it is highly recommended to use this in combination with
 a [reverse proxy](https://www.cloudflare.com/learning/cdn/glossary/reverse-proxy/#:~:text=A%20reverse%20proxy%20is%20a,security%2C%20performance%2C%20and%20reliability.).
