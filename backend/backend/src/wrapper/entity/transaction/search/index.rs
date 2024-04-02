@@ -25,6 +25,8 @@ pub(crate) struct TransactionIndex {
     pub(crate) currency: i32,
     pub(crate) budget: Option<i32>,
     #[serde(with = "time::serde::rfc3339")]
+    pub(crate) created_at: OffsetDateTime,
+    #[serde(with = "time::serde::rfc3339")]
     pub(crate) executed_at: OffsetDateTime,
     pub(crate) user_ids: Vec<i32>,
 }
@@ -39,6 +41,7 @@ impl TransactionIndex {
             description: transaction.description,
             currency: transaction.currency_id.get_id(),
             budget: transaction.budget_id.map(|b| b.get_id()),
+            created_at: transaction.created_at,
             executed_at: transaction.executed_at,
             user_ids,
         }
@@ -53,7 +56,7 @@ impl Searchable for TransactionIndex {
     }
 
     fn get_index_name() -> &'static str {
-        "transaction"
+        Transaction::table_name()
     }
 
     async fn create_index() {

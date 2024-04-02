@@ -1,8 +1,9 @@
-use crate::search::{Sort, Sortable};
 use serde::{Deserialize, Serialize};
+use utoipa::{IntoParams, ToSchema};
 use utoipa::openapi::path::{Parameter, ParameterBuilder, ParameterIn};
 use utoipa::openapi::Required;
-use utoipa::{IntoParams, ToSchema};
+
+use crate::search::{Sort, Sortable};
 
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, IntoParams)]
 pub(crate) struct TransactionQuery {
@@ -14,6 +15,8 @@ pub(crate) struct TransactionQuery {
 pub(crate) enum TransactionSort {
     ExecutedAtAsc,
     ExecutedAtDesc,
+    CreatedAtAsc,
+    CreatedAtDesc,
 }
 
 impl Sortable for TransactionSort {
@@ -21,6 +24,8 @@ impl Sortable for TransactionSort {
         match self {
             Self::ExecutedAtAsc => ("executed_at".to_string(), Sort::Asc),
             Self::ExecutedAtDesc => ("executed_at".to_string(), Sort::Desc),
+            Self::CreatedAtAsc => ("created_at".to_string(), Sort::Asc),
+            Self::CreatedAtDesc => ("created_at".to_string(), Sort::Desc),
         }
     }
 }

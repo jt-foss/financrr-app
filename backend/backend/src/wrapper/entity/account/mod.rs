@@ -3,16 +3,16 @@ use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 use utoipa::ToSchema;
 
-use entity::utility::time::get_now;
 use entity::{account, transaction};
+use entity::utility::time::get_now;
 
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
 use crate::databases::entity::{count, delete, find_all, find_all_paginated, find_one_or_error, insert, update};
+use crate::wrapper::entity::{TableName, WrapperEntity};
 use crate::wrapper::entity::account::dto::AccountDTO;
 use crate::wrapper::entity::currency::Currency;
 use crate::wrapper::entity::transaction::Transaction;
-use crate::wrapper::entity::{TableName, WrapperEntity};
 use crate::wrapper::permission::{
     HasPermissionByIdOrError, HasPermissionOrError, Permission, PermissionByIds, Permissions,
 };
@@ -78,8 +78,6 @@ impl Account {
         let model = update(active_model).await?;
         let account = Self::from(model);
 
-        //AccountUpdate::new(self.clone(), account.clone()).fire();
-
         Ok(account)
     }
 
@@ -119,6 +117,17 @@ impl Account {
     pub(crate) async fn count_transactions_by_account_id(account_id: i32) -> Result<u64, ApiError> {
         count(transaction::Entity::find_all_by_account_id(account_id)).await
     }
+
+    pub(crate) async fn count_all() -> Result<u64, ApiError> {
+        count(account::Entity::find()).await
+    }
+
+    pub(crate) async fn find_all_paginated(page_size: PageSizeParam) -> Result<Vec<Self>, ApiError> {
+        Ok(find_all_paginated(account::Entity::find(), &page_size).await?
+            .into_iter()
+            .map(Self::from)
+            .collect())
+    }
 }
 
 impl WrapperEntity for Account {
@@ -143,8 +152,8 @@ impl HasPermissionByIdOrError for Account {}
 
 impl Identifiable for Account {
     async fn from_id(id: i32) -> Result<Self, ApiError>
-    where
-        Self: Sized,
+        where
+            Self: Sized,
     {
         Self::find_by_id(id).await
     }
