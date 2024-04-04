@@ -4,6 +4,7 @@ use actix_web::http::Uri;
 use bitflags::bitflags;
 use sea_orm::{EntityTrait, Set};
 use serde::Serialize;
+use utoipa::openapi::{KnownFormat, ObjectBuilder, RefOr, Schema, SchemaFormat, SchemaType};
 use utoipa::ToSchema;
 
 use entity::permissions;
@@ -19,7 +20,7 @@ use crate::wrapper::entity::{TableName, WrapperEntity};
 pub(crate) mod cleanup;
 
 bitflags! {
-    #[derive(Debug, Clone, PartialEq, Eq, Serialize, ToSchema)]
+    #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
     pub(crate) struct Permissions: u32 {
         const READ = 0b001;
         const WRITE = 0b010;
@@ -27,6 +28,19 @@ bitflags! {
 
         const READ_WRITE = Self::READ.bits() | Self::WRITE.bits();
         const READ_DELETE = Self::READ.bits() | Self::DELETE.bits();
+    }
+}
+
+impl ToSchema<'static> for Permissions {
+    fn schema() -> (&'static str, RefOr<Schema>) {
+        (
+            "Permissions",
+            ObjectBuilder::new()
+                .schema_type(SchemaType::Integer)
+                .format(Some(SchemaFormat::KnownFormat(KnownFormat::UInt32)))
+                .build()
+                .into(),
+        )
     }
 }
 
