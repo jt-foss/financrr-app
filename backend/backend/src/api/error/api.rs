@@ -17,7 +17,7 @@ use crate::api::error::validation;
 use crate::util::validation::ValidationErrorJsonPayload;
 
 #[derive(Debug, Display, Error, Serialize, ToSchema)]
-#[display("{}", serde_json::to_string(self).unwrap())]
+#[display("{}", serde_json::to_string(self).expect("Failed to serialize ApiError"))]
 pub(crate) struct ApiError {
     #[serde(skip)]
     pub(crate) status_code: StatusCode,

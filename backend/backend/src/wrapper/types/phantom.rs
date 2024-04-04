@@ -1,4 +1,5 @@
 use std::future::Future;
+use std::sync::Arc;
 
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
@@ -13,7 +14,7 @@ pub(crate) trait Identifiable {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct Phantom<T: Identifiable + Send + 'static> {
     id: i32,
-    inner: Option<T>,
+    inner: Option<Arc<T>>,
 }
 
 impl<T: Identifiable + Send + 'static> Phantom<T> {
@@ -28,18 +29,24 @@ impl<T: Identifiable + Send + 'static> Phantom<T> {
         id.map(|id| Self::new(id))
     }
 
-    pub(crate) async fn get_inner(&mut self) -> Result<&T, ApiError> {
-        if self.inner.is_none() {
-            self.set_inner(T::from_id(self.id).await?);
+    pub(crate) async fn get_inner(&mut self) -> Result<Arc<T>, ApiError> {
+        match self.inner {
+            Some(ref inner) => Ok(inner.clone()),
+            None => {
+                let inner = T::from_id(self.id).await?;
+                let inner = Arc::new(inner);
+                self.set_inner(inner.clone());
+
+                Ok(inner)
+            }
         }
-        Ok(self.inner.as_ref().unwrap())
     }
 
     pub(crate) async fn fetch_inner(&self) -> Result<T, ApiError> {
         T::from_id(self.id).await
     }
 
-    pub(crate) fn set_inner(&mut self, inner: T) {
+    pub(crate) fn set_inner(&mut self, inner: Arc<T>) {
         self.inner = Some(inner);
     }
 

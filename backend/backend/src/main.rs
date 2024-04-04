@@ -74,7 +74,7 @@ pub(crate) struct BearerTokenAddon;
 
 impl Modify for BearerTokenAddon {
     fn modify(&self, openapi: &mut OpenApiStruct) {
-        let components = openapi.components.as_mut().unwrap(); // we can unwrap safely since there already are components registered.
+        let components = openapi.components.as_mut().expect("Components not found!");
         components.add_security_scheme("bearer_token", SecurityScheme::Http(Http::new(HttpAuthScheme::Bearer)))
     }
 }
@@ -204,9 +204,9 @@ fn build_rate_limiter() -> Limiter {
         .limit(Config::get_config().rate_limiter.limit as usize)
         .period(Duration::from_secs(Config::get_config().rate_limiter.duration_seconds)) // 60 minutes
         .build()
-        .unwrap()
+        .expect("Could not build rate limiter!")
 }
 
 fn build_prometheus_metrics() -> PrometheusMetrics {
-    PrometheusMetricsBuilder::new("api").endpoint("/metrics").build().unwrap()
+    PrometheusMetricsBuilder::new("api").endpoint("/metrics").build().expect("Could not build prometheus metrics!")
 }
