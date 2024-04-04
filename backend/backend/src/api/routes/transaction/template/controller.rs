@@ -14,11 +14,11 @@ use crate::wrapper::types::phantom::Phantom;
 pub(crate) fn transaction_template_controller(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/template")
-            .service(get_all_templates)
-            .service(get_one_template)
-            .service(create_template)
-            .service(delete_template)
-            .service(update_template),
+            .service(get_all_transaction_templates)
+            .service(get_one_transaction_template)
+            .service(create_transaction_template)
+            .service(delete_transaction_template)
+            .service(update_transaction_template),
     );
 }
 
@@ -36,7 +36,7 @@ security(
 path = "/api/v1/transaction/template",
 tag = "Transaction")]
 #[get("")]
-pub(crate) async fn get_all_templates(
+pub(crate) async fn get_all_transaction_templates(
     user: Phantom<User>,
     page_size: PageSizeParam,
     uri: Uri,
@@ -59,7 +59,10 @@ security(
 path = "/api/v1/transaction/template/{template_id}",
 tag = "Transaction")]
 #[get("/{template_id}")]
-pub(crate) async fn get_one_template(user: Phantom<User>, template_id: Path<i32>) -> Result<impl Responder, ApiError> {
+pub(crate) async fn get_one_transaction_template(
+    user: Phantom<User>,
+    template_id: Path<i32>,
+) -> Result<impl Responder, ApiError> {
     let transaction = TransactionTemplate::get_by_id(template_id.into_inner()).await?;
     transaction.has_permission_or_error(user.get_id(), Permissions::READ).await?;
 
@@ -80,7 +83,7 @@ path = "/api/v1/transaction/template",
 request_body = TransactionTemplateDTO,
 tag = "Transaction")]
 #[post("")]
-pub(crate) async fn create_template(
+pub(crate) async fn create_transaction_template(
     user: Phantom<User>,
     template: TransactionTemplateDTO,
 ) -> Result<impl Responder, ApiError> {
@@ -103,7 +106,10 @@ security(
 path = "/api/v1/transaction/template/{template_id}",
 tag = "Transaction")]
 #[delete("/{template_id}")]
-pub(crate) async fn delete_template(user: Phantom<User>, template_id: Path<i32>) -> Result<impl Responder, ApiError> {
+pub(crate) async fn delete_transaction_template(
+    user: Phantom<User>,
+    template_id: Path<i32>,
+) -> Result<impl Responder, ApiError> {
     let template = TransactionTemplate::get_by_id(template_id.into_inner()).await?;
     template.has_permission_or_error(user.get_id(), Permissions::READ_DELETE).await?;
 
@@ -125,7 +131,7 @@ path = "/api/v1/transaction/template/{template_id}",
 request_body = TransactionTemplateDTO,
 tag = "Transaction")]
 #[patch("/{template_id}")]
-pub(crate) async fn update_template(
+pub(crate) async fn update_transaction_template(
     user: Phantom<User>,
     update: TransactionTemplateDTO,
     template_id: Path<i32>,

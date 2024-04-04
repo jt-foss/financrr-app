@@ -14,7 +14,12 @@ use crate::wrapper::types::phantom::Phantom;
 
 pub(crate) fn currency_controller(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("/currency").service(get_all).service(get_one).service(create).service(delete).service(update),
+        web::scope("/currency")
+            .service(get_all_currencies)
+            .service(create_currency)
+            .service(delete_currency)
+            .service(update_currency)
+            .service(get_one_currency),
     );
 }
 
@@ -32,7 +37,7 @@ params(PageSizeParam),
 path = "/api/v1/currency",
 tag = "Currency")]
 #[get("")]
-pub(crate) async fn get_all(
+pub(crate) async fn get_all_currencies(
     user: Option<Phantom<User>>,
     page_size: PageSizeParam,
     uri: Uri,
@@ -63,7 +68,10 @@ security(
 path = "/api/v1/currency/{currency_id}",
 tag = "Currency")]
 #[get("/{currency_id}")]
-pub(crate) async fn get_one(user: Option<Phantom<User>>, currency_id: Path<i32>) -> Result<impl Responder, ApiError> {
+pub(crate) async fn get_one_currency(
+    user: Option<Phantom<User>>,
+    currency_id: Path<i32>,
+) -> Result<impl Responder, ApiError> {
     let currency_id = currency_id.into_inner();
     let user_id = user.map_or(-1, |user| user.get_id());
 
@@ -83,7 +91,10 @@ path = "/api/v1/currency",
 request_body = CurrencyDTO,
 tag = "Currency")]
 #[post("")]
-pub(crate) async fn create(user: Phantom<User>, currency: Json<CurrencyDTO>) -> Result<impl Responder, ApiError> {
+pub(crate) async fn create_currency(
+    user: Phantom<User>,
+    currency: Json<CurrencyDTO>,
+) -> Result<impl Responder, ApiError> {
     Ok(HttpResponse::Created().json(Currency::new(currency.into_inner(), user.get_id()).await?))
 }
 
@@ -100,7 +111,7 @@ security(
 path = "/api/v1/currency/{currency_id}",
 tag = "Currency")]
 #[delete("/{currency_id}")]
-pub(crate) async fn delete(user: Phantom<User>, currency_id: Path<i32>) -> Result<impl Responder, ApiError> {
+pub(crate) async fn delete_currency(user: Phantom<User>, currency_id: Path<i32>) -> Result<impl Responder, ApiError> {
     let currency = Currency::find_by_id(currency_id.into_inner()).await?;
     currency.has_permission_or_error(user.get_id(), Permissions::READ_DELETE).await?;
 
@@ -122,13 +133,13 @@ path = "/api/v1/currency/{currency_id}",
 request_body = CurrencyDTO,
 tag = "Currency")]
 #[patch("/{currency_id}")]
-pub(crate) async fn update(
+pub(crate) async fn update_currency(
     user: Phantom<User>,
-    update: CurrencyDTO,
+    update_currency: CurrencyDTO,
     currency_id: Path<i32>,
 ) -> Result<impl Responder, ApiError> {
     let currency = Currency::find_by_id(currency_id.into_inner()).await?;
     currency.has_permission_or_error(user.get_id(), Permissions::READ_WRITE).await?;
 
-    Ok(HttpResponse::Ok().json(currency.update(update).await?))
+    Ok(HttpResponse::Ok().json(currency.update(update_currency).await?))
 }

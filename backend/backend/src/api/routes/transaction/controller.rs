@@ -16,12 +16,12 @@ pub(crate) fn transaction_controller(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/transaction")
             .configure(transaction_template_controller)
-            .service(get_one)
-            .service(get_all)
-            .service(create)
-            .service(create_from_template)
-            .service(delete)
-            .service(update),
+            .service(get_all_transactions)
+            .service(create_transaction)
+            .service(create_from_transaction_template)
+            .service(delete_transaction)
+            .service(update_transaction)
+            .service(get_one_transaction),
     );
 }
 
@@ -39,7 +39,7 @@ security(
 path = "/api/v1/transaction",
 tag = "Transaction")]
 #[get("")]
-pub(crate) async fn get_all(
+pub(crate) async fn get_all_transactions(
     user: Phantom<User>,
     page_size: PageSizeParam,
     uri: Uri,
@@ -62,7 +62,10 @@ security(
 path = "/api/v1/transaction/{transaction_id}",
 tag = "Transaction")]
 #[get("/{transaction_id}")]
-pub(crate) async fn get_one(user: Phantom<User>, transaction_id: Path<i32>) -> Result<impl Responder, ApiError> {
+pub(crate) async fn get_one_transaction(
+    user: Phantom<User>,
+    transaction_id: Path<i32>,
+) -> Result<impl Responder, ApiError> {
     let transaction_id = transaction_id.into_inner();
     let transaction = Transaction::find_by_id(transaction_id).await?;
     transaction.has_permission_or_error(user.get_id(), Permissions::READ).await?;
@@ -83,7 +86,10 @@ path = "/api/v1/transaction",
 request_body = TransactionDTO,
 tag = "Transaction")]
 #[post("")]
-pub(crate) async fn create(user: Phantom<User>, transaction: TransactionDTO) -> Result<impl Responder, ApiError> {
+pub(crate) async fn create_transaction(
+    user: Phantom<User>,
+    transaction: TransactionDTO,
+) -> Result<impl Responder, ApiError> {
     if !transaction.check_permissions(user.get_id()).await? {
         return Err(ApiError::Unauthorized());
     }
@@ -104,7 +110,7 @@ path = "/api/v1/transaction/from-template",
 request_body = TransactionFromTemplate,
 tag = "Transaction")]
 #[post("/from-template")]
-pub(crate) async fn create_from_template(
+pub(crate) async fn create_from_transaction_template(
     user: Phantom<User>,
     mut transaction_from_template: TransactionFromTemplate,
 ) -> Result<impl Responder, ApiError> {
@@ -127,7 +133,10 @@ security(
 path = "/api/v1/transaction/{transaction_id}",
 tag = "Transaction")]
 #[delete("/{transaction_id}")]
-pub(crate) async fn delete(user: Phantom<User>, transaction_id: Path<i32>) -> Result<impl Responder, ApiError> {
+pub(crate) async fn delete_transaction(
+    user: Phantom<User>,
+    transaction_id: Path<i32>,
+) -> Result<impl Responder, ApiError> {
     let transaction_id = transaction_id.into_inner();
     let transaction = Transaction::find_by_id(transaction_id).await?;
     transaction.has_permission_or_error(user.get_id(), Permissions::READ_DELETE).await?;
@@ -150,7 +159,7 @@ path = "/api/v1/transaction/{transaction_id}",
 request_body = TransactionDTO,
 tag = "Transaction")]
 #[patch("/{transaction_id}")]
-pub(crate) async fn update(
+pub(crate) async fn update_transaction(
     user: Phantom<User>,
     transaction_dto: TransactionDTO,
     transaction_id: Path<i32>,

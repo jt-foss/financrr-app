@@ -15,12 +15,12 @@ use crate::wrapper::types::phantom::{Identifiable, Phantom};
 pub(crate) fn budget_controller(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/budget")
-            .service(get_one)
-            .service(get_all)
-            .service(get_transactions)
-            .service(create)
-            .service(delete)
-            .service(update),
+            .service(get_all_budgets)
+            .service(get_transactions_from_budget)
+            .service(create_budget)
+            .service(delete_budget)
+            .service(update_budget)
+            .service(get_one_budget),
     );
 }
 
@@ -39,7 +39,7 @@ path = "/api/v1/budget",
 tag = "Budget"
 )]
 #[get("")]
-pub(crate) async fn get_all(
+pub(crate) async fn get_all_budgets(
     user: Phantom<User>,
     page_size: PageSizeParam,
     uri: Uri,
@@ -64,7 +64,7 @@ path = "/api/v1/budget/{budget_id}",
 tag = "Budget"
 )]
 #[get("/{budget_id}")]
-pub(crate) async fn get_one(user: Phantom<User>, budget_id: Path<i32>) -> Result<impl Responder, ApiError> {
+pub(crate) async fn get_one_budget(user: Phantom<User>, budget_id: Path<i32>) -> Result<impl Responder, ApiError> {
     let budget = Budget::from_id(budget_id.into_inner()).await?;
     budget.has_permission_or_error(user.get_id(), Permissions::READ).await?;
 
@@ -86,7 +86,7 @@ path = "/api/v1/budget/{budget_id}/transactions",
 tag = "Budget"
 )]
 #[get("/{budget_id}/transactions")]
-pub(crate) async fn get_transactions(
+pub(crate) async fn get_transactions_from_budget(
     user: Phantom<User>,
     budget_id: Path<i32>,
     page_size: PageSizeParam,
@@ -115,7 +115,7 @@ path = "/api/v1/budget",
 tag = "Budget"
 )]
 #[post("")]
-pub(crate) async fn create(user: Phantom<User>, budget: Json<BudgetDTO>) -> Result<impl Responder, ApiError> {
+pub(crate) async fn create_budget(user: Phantom<User>, budget: Json<BudgetDTO>) -> Result<impl Responder, ApiError> {
     let budget = Budget::new(user.get_id(), budget.into_inner()).await?;
 
     Ok(HttpResponse::Created().json(budget))
@@ -135,7 +135,7 @@ path = "/api/v1/budget/{budget_id}",
 tag = "Budget"
 )]
 #[delete("/{budget_id}")]
-pub(crate) async fn delete(user: Phantom<User>, budget_id: Path<i32>) -> Result<impl Responder, ApiError> {
+pub(crate) async fn delete_budget(user: Phantom<User>, budget_id: Path<i32>) -> Result<impl Responder, ApiError> {
     let budget = Budget::from_id(budget_id.into_inner()).await?;
     budget.has_permission_or_error(user.get_id(), Permissions::READ_DELETE).await?;
 
@@ -159,7 +159,7 @@ path = "/api/v1/budget/{budget_id}",
 tag = "Budget"
 )]
 #[patch("/{budget_id}")]
-pub(crate) async fn update(
+pub(crate) async fn update_budget(
     user: Phantom<User>,
     budget_id: Path<i32>,
     budget_dto: Json<BudgetDTO>,
