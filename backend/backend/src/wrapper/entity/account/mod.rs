@@ -9,13 +9,12 @@ use entity::{account, transaction};
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
 use crate::database::entity::{count, delete, find_all, find_all_paginated, find_one_or_error, insert, update};
+use crate::permission_impl;
 use crate::wrapper::entity::account::dto::AccountDTO;
 use crate::wrapper::entity::currency::Currency;
 use crate::wrapper::entity::transaction::Transaction;
 use crate::wrapper::entity::{TableName, WrapperEntity};
-use crate::wrapper::permission::{
-    HasPermissionByIdOrError, HasPermissionOrError, Permission, PermissionByIds, Permissions,
-};
+use crate::wrapper::permission::{Permission, Permissions};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
 pub(crate) mod dto;
@@ -121,6 +120,8 @@ impl Account {
     }
 }
 
+permission_impl!(Account);
+
 impl WrapperEntity for Account {
     fn get_id(&self) -> i32 {
         self.id
@@ -132,14 +133,6 @@ impl TableName for Account {
         account::Entity.table_name()
     }
 }
-
-impl PermissionByIds for Account {}
-
-impl Permission for Account {}
-
-impl HasPermissionOrError for Account {}
-
-impl HasPermissionByIdOrError for Account {}
 
 impl Identifiable for Account {
     async fn from_id(id: i32) -> Result<Self, ApiError>

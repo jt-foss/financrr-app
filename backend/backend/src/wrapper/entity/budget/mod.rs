@@ -9,13 +9,12 @@ use entity::{budget, transaction};
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
 use crate::database::entity::{count, delete, find_all_paginated, find_one_or_error, insert, update};
+use crate::permission_impl;
 use crate::wrapper::entity::budget::dto::BudgetDTO;
 use crate::wrapper::entity::transaction::Transaction;
 use crate::wrapper::entity::user::User;
 use crate::wrapper::entity::{TableName, WrapperEntity};
-use crate::wrapper::permission::{
-    HasPermissionByIdOrError, HasPermissionOrError, Permission, PermissionByIds, Permissions,
-};
+use crate::wrapper::permission::{Permission, Permissions};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
 pub(crate) mod dto;
@@ -104,6 +103,8 @@ impl Budget {
     }
 }
 
+permission_impl!(Budget);
+
 impl Identifiable for Budget {
     async fn from_id(id: i32) -> Result<Self, ApiError> {
         Ok(Self::from(find_one_or_error(budget::Entity::find_by_id(id), "Budget").await?))
@@ -121,14 +122,6 @@ impl WrapperEntity for Budget {
         self.id
     }
 }
-
-impl PermissionByIds for Budget {}
-
-impl Permission for Budget {}
-
-impl HasPermissionOrError for Budget {}
-
-impl HasPermissionByIdOrError for Budget {}
 
 impl From<budget::Model> for Budget {
     fn from(model: budget::Model) -> Self {

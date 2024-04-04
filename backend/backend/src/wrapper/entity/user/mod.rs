@@ -13,11 +13,12 @@ use entity::user::Model;
 
 use crate::api::error::api::ApiError;
 use crate::database::entity::{count, find_one, find_one_or_error, insert};
+use crate::permission_impl;
 use crate::util::auth::extract_bearer_token;
 use crate::wrapper::entity::session::Session;
 use crate::wrapper::entity::user::dto::UserRegistration;
 use crate::wrapper::entity::{TableName, WrapperEntity};
-use crate::wrapper::permission::{HasPermissionOrError, Permission, PermissionByIds, Permissions};
+use crate::wrapper::permission::{Permission, Permissions};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
 pub(crate) mod dto;
@@ -75,6 +76,8 @@ impl User {
     }
 }
 
+permission_impl!(User);
+
 impl Identifiable for User {
     async fn from_id(id: i32) -> Result<Self, ApiError>
     where
@@ -95,12 +98,6 @@ impl WrapperEntity for User {
         self.id
     }
 }
-
-impl PermissionByIds for User {}
-
-impl Permission for User {}
-
-impl HasPermissionOrError for User {}
 
 impl FromRequest for User {
     type Error = ApiError;
