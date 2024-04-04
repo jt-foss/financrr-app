@@ -142,8 +142,11 @@ flutter:
           style: italic
 
 flutter_launcher_icons:
+  image_path_ios: assets/logo/logo_light_bg.png
   web:
     generate: true
     image_path: assets/logo/logo_light_bg.png
     background_color: '#FF0000'
     theme_color: '#FF0000'
+  ios:
+    generate: true
