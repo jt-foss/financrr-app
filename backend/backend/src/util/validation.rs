@@ -75,22 +75,22 @@ pub(crate) fn validate_password(password: &str) -> Result<(), ValidationError> {
         error.add_param(Cow::from("max"), &MAX_PASSWORD_LENGTH);
     }
 
-    let uppercase = Regex::new(r"[A-Z]").unwrap();
+    let uppercase = Regex::new(r"[A-Z]").expect("Failed to compile regex");
     if !uppercase.is_match(password) {
         error.add_param(Cow::from("uppercase"), &"Must contain at least one uppercase letter");
     }
 
-    let lowercase = Regex::new(r"[a-z]").unwrap();
+    let lowercase = Regex::new(r"[a-z]").expect("Failed to compile regex");
     if !lowercase.is_match(password) {
         error.add_param(Cow::from("lowercase"), &"Must contain at least one lowercase letter");
     }
 
-    let digit = Regex::new(r"\d").unwrap();
+    let digit = Regex::new(r"\d").expect("Failed to compile regex");
     if !digit.is_match(password) {
         error.add_param(Cow::from("digit"), &"Must contain at least one digit");
     }
 
-    let special_character = Regex::new("[€§!@#$%^&*(),.?\":{}|<>]").unwrap();
+    let special_character = Regex::new("[€§!@#$%^&*(),.?\":{}|<>]").expect("Failed to compile regex");
     if !special_character.is_match(password) {
         error.add_param(Cow::from("special_character"), &"Must contain at least one special character");
     }

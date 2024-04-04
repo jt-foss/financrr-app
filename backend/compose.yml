@@ -42,11 +42,11 @@ services:
       retries: 3
 
   cache:
-    image: redis:7.2.4-alpine3.19
+    image: ghcr.io/dragonflydb/dragonfly:v1.16.0
     init: true
     restart: unless-stopped
-    environment:
-      TZ: ${TIMEZONE}
+    ulimits:
+      memlock: -1
     ports:
       - "127.0.0.1:6379:6379"
     healthcheck:
@@ -55,8 +55,8 @@ services:
       timeout: 3s
       retries: 3
     volumes:
-      - redis-data:/data
+      - dragonflydata:/data
 
 volumes:
   postgres-data: ~
-  redis-data: ~
+  dragonflydata: ~

@@ -97,11 +97,11 @@ impl Session {
 
     pub(crate) async fn get_user_id(token: String) -> Result<i32, ApiError> {
         let user_id = Self::get_user_id_from_redis(token.to_owned()).await?;
-        if user_id.is_none() {
-            return Err(ApiError::InvalidSession());
-        }
 
-        Ok(user_id.unwrap())
+        match user_id {
+            Some(id) => Ok(id),
+            None => Err(ApiError::InvalidSession()),
+        }
     }
 
     async fn get_user_id_from_redis(token: String) -> Result<Option<i32>, ApiError> {

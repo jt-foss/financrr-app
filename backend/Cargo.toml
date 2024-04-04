@@ -15,11 +15,12 @@ repository = "https://github.com/financrr/backend"
 homepage = "https://github.com/financrr/backend"
 readme = "README.md"
 edition = "2021"
-rust-version = "1.76.0"
+rust-version = "1.77.1"
 
 [workspace.lints.clippy]
 # Restriction
 absolute_paths = "warn"
+unwrap_used = "warn"
 
 # Pedantic
 wildcard-imports = "deny"

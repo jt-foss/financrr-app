@@ -6,7 +6,7 @@ pub async fn load_schema(db: &impl ConnectionTrait) {
 
     for command in commands {
         if !command.trim().is_empty() {
-            db.execute_unprepared(command).await.unwrap();
+            db.execute_unprepared(command).await.expect("Failed to load schema!");
         }
     }
 }
