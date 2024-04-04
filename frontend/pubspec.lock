@@ -594,10 +594,10 @@ packages:
     description:
       path: "."
       ref: master
-      resolved-ref: "7cac9f1827606a1ee19acd4113997afed9ccd421"
+      resolved-ref: f233d373d28e8202ded37b72c7d1126cfba7b059
       url: "https://github.com/jasonlessenich/pub_increment.git"
     source: git
-    version: "1.0.0"
+    version: "1.0.3"
   pub_semver:
     dependency: transitive
     description:
