@@ -32,6 +32,3 @@ thiserror = "1.0.58"
 
 # Date/Time
 time.workspace = true
-
-# logging
-tracing.workspace = true

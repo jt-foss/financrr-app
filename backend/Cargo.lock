@@ -1107,7 +1107,6 @@ dependencies = [
  "serde",
  "thiserror",
  "time",
- "tracing",
 ]
 
 [[package]]
