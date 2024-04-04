@@ -33,7 +33,7 @@ params(PageSizeParam),
 security(
 ("bearer_token" = [])
 ),
-path = "/api/v1/account/?page={page}&size={size}",
+path = "/api/v1/account",
 tag = "Account")]
 #[get("")]
 pub(crate) async fn get_all(
@@ -78,7 +78,7 @@ params(PageSizeParam),
 security(
 ("bearer_token" = [])
 ),
-path = "/api/v1/account/{account_id}/transactions/?page={page}&size={size}",
+path = "/api/v1/account/{account_id}/transactions",
 tag = "Account")]
 #[get("/{account_id}/transactions")]
 pub(crate) async fn get_transactions(

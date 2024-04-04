@@ -35,7 +35,7 @@ params(PageSizeParam),
 security(
 ("bearer_token" = [])
 ),
-path = "/api/v1/budget/?page={page}&size={size}",
+path = "/api/v1/budget",
 tag = "Budget"
 )]
 #[get("")]
@@ -82,7 +82,7 @@ params(PageSizeParam),
 security(
 ("bearer_token" = [])
 ),
-path = "/api/v1/budget/{budget_id}/transactions/?page={page}&size={size}",
+path = "/api/v1/budget/{budget_id}/transactions",
 tag = "Budget"
 )]
 #[get("/{budget_id}/transactions")]

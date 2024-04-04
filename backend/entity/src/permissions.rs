@@ -67,3 +67,26 @@ impl Entity {
             .filter(Column::EntityType.eq(account::Entity.table_name().to_string()))
     }
 }
+
+macro_rules! find_all_by_user_id {
+    ($entity:ty) => {
+        impl $entity {
+            pub fn find_all_by_user_id(user_id: i32) -> Select<Self> {
+                use sea_orm::QuerySelect;
+
+                Self::find()
+                    .join_rev(
+                        sea_orm::JoinType::InnerJoin,
+                        crate::permissions::Entity::belongs_to(Self)
+                            .from(crate::permissions::Column::EntityId)
+                            .to(Column::Id)
+                            .into(),
+                    )
+                    .filter(crate::permissions::Column::UserId.eq(user_id))
+                    .filter(crate::permissions::Column::EntityType.eq(Self.table_name()))
+            }
+        }
+    };
+}
+
+pub(crate) use find_all_by_user_id;

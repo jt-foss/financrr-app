@@ -18,8 +18,8 @@ use crate::wrapper::permission::{
 };
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
-pub mod dto;
-pub mod event_listener;
+pub(crate) mod dto;
+pub(crate) mod event_listener;
 pub(crate) mod phantom;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]

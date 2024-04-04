@@ -97,6 +97,19 @@ impl From<Option<permissions::Model>> for Permissions {
     }
 }
 
+#[macro_export]
+macro_rules! permission_impl {
+    ($type:ty) => {
+        impl $crate::wrapper::permission::PermissionByIds for $type {}
+
+        impl $crate::wrapper::permission::Permission for $type {}
+
+        impl $crate::wrapper::permission::HasPermissionOrError for $type {}
+
+        impl $crate::wrapper::permission::HasPermissionByIdOrError for $type {}
+    };
+}
+
 pub(crate) trait Permission: PermissionByIds + WrapperEntity {
     fn get_permissions(&self, user_id: i32) -> impl Future<Output = Result<Permissions, ApiError>> {
         async move { Self::get_permissions_by_id(self.get_id(), user_id).await }

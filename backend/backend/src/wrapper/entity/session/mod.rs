@@ -29,7 +29,7 @@ use crate::wrapper::permission::{
 };
 use crate::wrapper::util::handle_async_result_vec;
 
-pub mod dto;
+pub(crate) mod dto;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub(crate) struct Session {

@@ -5,7 +5,8 @@ use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
 use crate::api::documentation::response::{InternalServerError, Unauthorized, ValidationError};
 use crate::api::error::api::ApiError;
 use crate::api::pagination::{PageSizeParam, Pagination};
-use crate::wrapper::entity::transaction::dto::TransactionDTO;
+use crate::api::routes::transaction::template::controller::transaction_template_controller;
+use crate::wrapper::entity::transaction::dto::{TransactionDTO, TransactionFromTemplate};
 use crate::wrapper::entity::transaction::Transaction;
 use crate::wrapper::entity::user::User;
 use crate::wrapper::permission::{HasPermissionOrError, Permissions};
@@ -13,7 +14,14 @@ use crate::wrapper::types::phantom::Phantom;
 
 pub(crate) fn transaction_controller(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("/transaction").service(get_one).service(get_all).service(create).service(delete).service(update),
+        web::scope("/transaction")
+            .configure(transaction_template_controller)
+            .service(get_one)
+            .service(get_all)
+            .service(create)
+            .service(create_from_template)
+            .service(delete)
+            .service(update),
     );
 }
 
@@ -28,7 +36,7 @@ params(PageSizeParam),
 security(
 ("bearer_token" = [])
 ),
-path = "/api/v1/transaction/?page={page}&size={size}",
+path = "/api/v1/transaction",
 tag = "Transaction")]
 #[get("")]
 pub(crate) async fn get_all(
@@ -76,13 +84,35 @@ request_body = TransactionDTO,
 tag = "Transaction")]
 #[post("")]
 pub(crate) async fn create(user: Phantom<User>, transaction: TransactionDTO) -> Result<impl Responder, ApiError> {
-    // TODO add permission checks for budget
-
-    if !transaction.check_account_access(user.get_id()).await? {
+    if !transaction.check_permissions(user.get_id()).await? {
         return Err(ApiError::Unauthorized());
     }
 
     Ok(HttpResponse::Created().json(Transaction::new(transaction, user.get_id()).await?))
+}
+
+#[utoipa::path(post,
+responses(
+(status = 201, description = "Successfully created Transaction from Template.", content_type = "application/json", body = Transaction),
+Unauthorized,
+InternalServerError,
+),
+security(
+("bearer_token" = [])
+),
+path = "/api/v1/transaction/from-template",
+request_body = TransactionFromTemplate,
+tag = "Transaction")]
+#[post("/from-template")]
+pub(crate) async fn create_from_template(
+    user: Phantom<User>,
+    mut transaction_from_template: TransactionFromTemplate,
+) -> Result<impl Responder, ApiError> {
+    let template = transaction_from_template.template.get_inner().await?;
+    template.has_permission_or_error(user.get_id(), Permissions::READ).await?;
+    let dto = TransactionDTO::from_template(template, transaction_from_template.executed_at).await?;
+
+    Ok(HttpResponse::Created().json(Transaction::new(dto, user.get_id()).await?))
 }
 
 #[utoipa::path(delete,

@@ -29,7 +29,7 @@ security(
 ("bearer_token" = [])
 ),
 params(PageSizeParam),
-path = "/api/v1/currency/?page={page}&limit={limit}",
+path = "/api/v1/currency",
 tag = "Currency")]
 #[get("")]
 pub(crate) async fn get_all(

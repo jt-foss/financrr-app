@@ -5,6 +5,7 @@ responses(
 path = "/metrics",
 tag = "Metrics",
 )]
-pub async fn metrics() {
+#[allow(dead_code)]
+pub(crate) async fn metrics() {
     unreachable!("This function is used for documentation only and should never be called!")
 }

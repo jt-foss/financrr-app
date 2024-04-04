@@ -14,17 +14,17 @@ use crate::api::pagination::PageSizeParam;
 use crate::database::entity::{count, delete, find_all_paginated, find_one_or_error, insert, update};
 use crate::event::lifecycle::transaction::{TransactionCreation, TransactionDeletion, TransactionUpdate};
 use crate::event::GenericEvent;
+use crate::permission_impl;
 use crate::wrapper::entity::account::Account;
 use crate::wrapper::entity::budget::Budget;
 use crate::wrapper::entity::currency::Currency;
 use crate::wrapper::entity::transaction::dto::TransactionDTO;
 use crate::wrapper::entity::{TableName, WrapperEntity};
-use crate::wrapper::permission::{
-    HasPermissionByIdOrError, HasPermissionOrError, Permission, PermissionByIds, Permissions,
-};
+use crate::wrapper::permission::{Permission, Permissions};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
-pub mod dto;
+pub(crate) mod dto;
+pub(crate) mod template;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub(crate) struct Transaction {
@@ -53,8 +53,8 @@ impl Transaction {
             name: Set(dto.name),
             description: Set(dto.description),
             budget: Set(dto.budget_id.map(|budget| budget.get_id())),
-            created_at: Set(get_now()),
             executed_at: Set(dto.executed_at),
+            created_at: Set(get_now()),
         };
         let model = insert(active_model).await?;
 
@@ -123,6 +123,8 @@ impl Transaction {
     }
 }
 
+permission_impl!(Transaction);
+
 impl TableName for Transaction {
     fn table_name() -> &'static str {
         transaction::Entity.table_name()
@@ -134,14 +136,6 @@ impl WrapperEntity for Transaction {
         self.id
     }
 }
-
-impl PermissionByIds for Transaction {}
-
-impl Permission for Transaction {}
-
-impl HasPermissionOrError for Transaction {}
-
-impl HasPermissionByIdOrError for Transaction {}
 
 impl Identifiable for Transaction {
     async fn from_id(id: i32) -> Result<Self, ApiError> {

@@ -70,7 +70,7 @@ pub(crate) struct EventBus<T: Clone> {
 
 impl<T: Debug + Clone + Send + 'static> EventBus<T> {
     pub(crate) fn new() -> Self {
-        let (sender, _) = channel(1_000);
+        let (sender, _) = channel(10_000);
         Self {
             sender,
         }

@@ -20,7 +20,7 @@ use crate::wrapper::permission::{
 };
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
-pub mod dto;
+pub(crate) mod dto;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub(crate) struct Currency {

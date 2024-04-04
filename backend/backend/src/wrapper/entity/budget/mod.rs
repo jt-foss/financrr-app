@@ -18,8 +18,8 @@ use crate::wrapper::permission::{
 };
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
-pub mod dto;
-pub mod event_listener;
+pub(crate) mod dto;
+pub(crate) mod event_listener;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub(crate) struct Budget {
@@ -48,6 +48,10 @@ impl Budget {
         budget.add_permission(user_id, Permissions::all()).await?;
 
         Ok(budget)
+    }
+
+    pub(crate) async fn exists(id: i32) -> Result<bool, ApiError> {
+        count(budget::Entity::find_by_id(id)).await.map(|count| count > 0)
     }
 
     pub(crate) async fn find_all_by_user_paginated(
