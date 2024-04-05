@@ -2,18 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:restrr/restrr.dart';
 
 class PaginatedDataResult<T> {
-  final Paginated<T> page;
-  final bool hasNext;
-  final bool hasPrevious;
+  final int total;
+  final List<T> items;
+  final Function(Restrr)? nextPage;
+  final Function(Restrr)? previousPage;
 
-  const PaginatedDataResult(this.page, this.hasNext, this.hasPrevious);
+  const PaginatedDataResult({required this.total, required this.items, this.nextPage, this.previousPage});
 }
 
 class PaginatedWrapper<T> extends StatefulWidget {
   final Future<Paginated<T>> Function(bool) initialPageFunction;
-  final Widget Function(BuildContext, AsyncSnapshot<List<T>>) onSuccess;
-  final Widget Function(BuildContext, AsyncSnapshot<List<T>>)? onLoading;
-  final Widget Function(BuildContext, AsyncSnapshot<List<T>>)? onError;
+  final Widget Function(BuildContext, AsyncSnapshot<PaginatedDataResult<T>>) onSuccess;
+  final Widget Function(BuildContext, AsyncSnapshot<PaginatedDataResult<T>>)? onLoading;
+  final Widget Function(BuildContext, AsyncSnapshot<PaginatedDataResult<T>>)? onError;
 
   const PaginatedWrapper({super.key, required this.initialPageFunction, required this.onSuccess, this.onLoading, this.onError});
 
@@ -46,14 +47,20 @@ class PaginatedWrapperState<T> extends State<PaginatedWrapper<T>> {
   @override
   Widget build(BuildContext context) {
     if (widget.onError != null && _error != null) {
-      return widget.onError!.call(context, AsyncSnapshot<List<T>>.withError(ConnectionState.done, _error!));
+      return widget.onError!.call(context, AsyncSnapshot.withError(ConnectionState.done, _error!));
     }
     return _currentPage == null
-        ? (widget.onLoading ?? (_, __) => const Center(child: CircularProgressIndicator())).call(context, AsyncSnapshot<List<T>>.waiting())
+        ? (widget.onLoading ?? (_, __) => const Center(child: CircularProgressIndicator()))
+            .call(context, const AsyncSnapshot.waiting())
         : widget.onSuccess.call(
             context,
-            AsyncSnapshot<List<T>>.withData(
-                ConnectionState.done, _pages.entries.map((e) => e.value.items).expand((e) => e).toList()));
+            AsyncSnapshot<PaginatedDataResult<T>>.withData(
+                ConnectionState.done,
+                PaginatedDataResult<T>(
+                    total: _pages[_currentPage]!.total,
+                    items: _pages.entries.map((e) => e.value.items).expand((e) => e).toList(),
+                    nextPage: hasNext ? nextPage : null,
+                    previousPage: hasPrevious ? previousPage : null)));
   }
 
   bool get hasNext => _pages[_currentPage]?.hasNext ?? false;

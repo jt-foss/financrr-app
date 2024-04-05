@@ -23,6 +23,8 @@ class _CurrencySettingsPageState extends State<CurrencySettingsPage> {
   final GlobalKey<PaginatedWrapperState<Currency>> _paginatedCurrencyKey = GlobalKey();
   late final Restrr _api = context.api!;
 
+  final ValueNotifier<int> _amount = ValueNotifier(0);
+
   @override
   Widget build(BuildContext context) {
     return AdaptiveScaffold(
@@ -42,12 +44,19 @@ class _CurrencySettingsPageState extends State<CurrencySettingsPage> {
             child: ListView(
               children: [
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     TextButton.icon(
                       onPressed: () => context.goPath(CurrencyCreatePage.pagePath.build()),
                       icon: const Icon(Icons.add),
                       label: const Text('Create'),
-                    )
+                    ),
+                    ValueListenableBuilder(
+                        valueListenable: _amount,
+                        builder: (context, value, child) {
+                          return Text('${_amount.value} currencies');
+                        },
+                    ),
                   ],
                 ),
                 const Divider(),
@@ -55,18 +64,20 @@ class _CurrencySettingsPageState extends State<CurrencySettingsPage> {
                   key: _paginatedCurrencyKey,
                   initialPageFunction: (forceRetrieve) => _api.retrieveAllCurrencies(limit: 10, forceRetrieve: forceRetrieve),
                   onSuccess: (context, snap) {
-                    final PaginatedWrapperState<Currency> state = _paginatedCurrencyKey.currentState!;
-                    final List<Currency> currencies = snap.data!;
+                    final PaginatedDataResult<Currency> currencies = snap.data!;
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      _amount.value = currencies.total;
+                    });
                     return Column(
                       children: [
-                        for (Currency c in currencies)
+                        for (Currency c in currencies.items)
                           Padding(
                             padding: const EdgeInsets.only(bottom: 10),
                             child: CurrencyCard(currency: c, onDelete: c is! CustomCurrency ? null : () => _deleteCurrency(c)),
                           ),
-                        if (state.hasNext)
+                        if (currencies.nextPage != null)
                           TextButton(
-                            onPressed: () => state.nextPage(_api),
+                            onPressed: () => currencies.nextPage!(_api),
                             child: const Text('Load more'),
                           ),
                       ],

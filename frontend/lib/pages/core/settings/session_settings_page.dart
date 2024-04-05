@@ -2,6 +2,7 @@ import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/widgets/entities/session_card.dart';
 import 'package:financrr_frontend/widgets/paginated_wrapper.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restrr/restrr.dart';
@@ -22,6 +23,8 @@ class SessionSettingsPage extends StatefulWidget {
 class _SessionSettingsPageState extends State<SessionSettingsPage> {
   final GlobalKey<PaginatedWrapperState<PartialSession>> _paginatedSessionKey = GlobalKey();
   late final Restrr _api = context.api!;
+
+  final ValueNotifier<int> _amount = ValueNotifier(0);
 
   @override
   Widget build(BuildContext context) {
@@ -45,12 +48,19 @@ class _SessionSettingsPageState extends State<SessionSettingsPage> {
                     session: _api.session,
                     onDelete: () => context.read<AuthenticationBloc>().add(AuthenticationLogoutRequested(api: _api))),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     TextButton.icon(
                       onPressed: () => _deleteAllSessions(),
                       label: const Text('Delete all'),
                       icon: const Icon(Icons.delete_sweep_rounded),
                     ),
+                    ValueListenableBuilder(
+                        valueListenable: _amount,
+                        builder: (context, value, child) {
+                          return Text('${_amount.value} session(s)');
+                        }
+                    )
                   ],
                 ),
                 const Divider(),
@@ -64,19 +74,21 @@ class _SessionSettingsPageState extends State<SessionSettingsPage> {
                     return Text(snap.error.toString());
                   },
                   onSuccess: (context, snap) {
-                    final PaginatedWrapperState<PartialSession> state = _paginatedSessionKey.currentState!;
-                    final List<PartialSession> sessions = snap.data!;
-                    sessions.removeWhere((s) => s.id.value == _api.session.id.value);
+                    final PaginatedDataResult<PartialSession> sessions = snap.data!;
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      _amount.value = sessions.total;
+                    });
+                    sessions.items.removeWhere((s) => s.id.value == _api.session.id.value);
                     return Column(
                       children: [
-                        for (PartialSession s in sessions)
+                        for (PartialSession s in sessions.items)
                           Padding(
                             padding: const EdgeInsets.only(bottom: 10),
                             child: SessionCard(session: s, onDelete: () => _deleteSession(s)),
                           ),
-                        if (state.hasNext)
+                        if (sessions.nextPage != null)
                           TextButton(
-                            onPressed: () => state.nextPage(_api),
+                            onPressed: () => sessions.nextPage!(_api),
                             child: const Text('Load more'),
                           ),
                       ],
