@@ -53,7 +53,8 @@ dependencies:
   logging: ^1.2.0
   device_info_plus: ^10.0.1
 dev_dependencies:
-  flutter_launcher_icons: "^0.13.1"
+  flutter_launcher_icons: ^0.13.1
+  flutter_native_splash: ^2.4.0
   pub_increment:
     git:
       url: https://github.com/jasonlessenich/pub_increment.git
@@ -142,11 +143,16 @@ flutter:
           style: italic
 
 flutter_launcher_icons:
-  image_path_ios: assets/logo/logo_light_bg.png
+  image_path: assets/logo/logo_light_bg.png
   web:
     generate: true
-    image_path: assets/logo/logo_light_bg.png
     background_color: '#FF0000'
     theme_color: '#FF0000'
-  ios:
-    generate: true
+  android: 'ic_launcher'
+  ios: true
+  remove_alpha_ios: true
+
+flutter_native_splash:
+  color: "#FFFFFF"
+  image: assets/logo/logo_blue.png
+  color_dark: "#000000"
