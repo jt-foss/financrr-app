@@ -5,10 +5,10 @@ import 'package:financrr_frontend/widgets/paginated_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:restrr/restrr.dart';
 
-import '../../../layout/adaptive_scaffold.dart';
-import '../../../router.dart';
-import '../settings_page.dart';
-import 'currency/currency_create_page.dart';
+import '../../../../layout/adaptive_scaffold.dart';
+import '../../../../router.dart';
+import '../../settings_page.dart';
+import 'currency_create_page.dart';
 
 class CurrencySettingsPage extends StatefulWidget {
   static const PagePathBuilder pagePath = PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'currencies');

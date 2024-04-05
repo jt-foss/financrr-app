@@ -1,6 +1,6 @@
-import 'package:financrr_frontend/pages/core/settings/currency_settings_page.dart';
+import 'package:financrr_frontend/pages/core/settings/currency/currency_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings/l10n/l10n_settings_page.dart';
-import 'package:financrr_frontend/pages/core/settings/session_settings_page.dart';
+import 'package:financrr_frontend/pages/core/settings/session/session_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings/theme_settings_page.dart';
 import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
 import 'package:financrr_frontend/util/extensions.dart';

@@ -6,12 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restrr/restrr.dart';
 
-import '../../../layout/adaptive_scaffold.dart';
-import '../../../router.dart';
-import '../settings_page.dart';
+import '../../../../layout/adaptive_scaffold.dart';
+import '../../../../router.dart';
+import '../../settings_page.dart';
 
 class SessionSettingsPage extends StatefulWidget {
-  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'sessions');
+  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'session');
 
   const SessionSettingsPage({super.key});
 

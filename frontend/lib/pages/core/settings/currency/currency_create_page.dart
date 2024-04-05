@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:financrr_frontend/pages/core/settings/currency_settings_page.dart';
+import 'package:financrr_frontend/pages/core/settings/currency/currency_settings_page.dart';
 import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/widgets/entities/currency_card.dart';
