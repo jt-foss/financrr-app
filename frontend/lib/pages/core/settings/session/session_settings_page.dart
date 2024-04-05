@@ -9,6 +9,7 @@ import 'package:restrr/restrr.dart';
 import '../../../../layout/adaptive_scaffold.dart';
 import '../../../../router.dart';
 import '../../settings_page.dart';
+import 'bloc/session_bloc.dart';
 
 class SessionSettingsPage extends StatefulWidget {
   static const PagePathBuilder pagePath = PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'session');
@@ -63,36 +64,40 @@ class _SessionSettingsPageState extends State<SessionSettingsPage> {
                   ],
                 ),
                 const Divider(),
-                PaginatedWrapper(
-                  key: _paginatedSessionKey,
-                  initialPageFunction: (forceRetrieve) => _api.retrieveAllSessions(limit: 10, forceRetrieve: forceRetrieve),
-                  onError: (context, snap) {
-                    if (snap.error is ServerException) {
-                      context.read<AuthenticationBloc>().add(AuthenticationLogoutRequested(api: _api));
-                    }
-                    return Text(snap.error.toString());
-                  },
-                  onSuccess: (context, snap) {
-                    final PaginatedDataResult<PartialSession> sessions = snap.data!;
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      _amount.value = sessions.total;
-                    });
-                    sessions.items.removeWhere((s) => s.id.value == _api.session.id.value);
-                    return Column(
-                      children: [
-                        for (PartialSession s in sessions.items)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: SessionCard(session: s, onDelete: () => _deleteSession(s)),
-                          ),
-                        if (sessions.nextPage != null)
-                          TextButton(
-                            onPressed: () => sessions.nextPage!(_api),
-                            child: const Text('Load more'),
-                          ),
-                      ],
-                    );
-                  },
+                BlocListener<SessionBloc, SessionState>(
+                  listener: (context, state) => _paginatedSessionKey.currentState?.reset(),
+                  child: PaginatedWrapper(
+                    key: _paginatedSessionKey,
+                    initialPageFunction: (forceRetrieve) =>
+                        _api.retrieveAllSessions(limit: 10, forceRetrieve: forceRetrieve),
+                    onError: (context, snap) {
+                      if (snap.error is ServerException) {
+                        context.read<AuthenticationBloc>().add(AuthenticationLogoutRequested(api: _api));
+                      }
+                      return Text(snap.error.toString());
+                    },
+                    onSuccess: (context, snap) {
+                      final PaginatedDataResult<PartialSession> sessions = snap.data!;
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        _amount.value = sessions.total;
+                      });
+                      sessions.items.removeWhere((s) => s.id.value == _api.session.id.value);
+                      return Column(
+                        children: [
+                          for (PartialSession s in sessions.items)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 10),
+                              child: SessionCard(session: s, onDelete: () => _deleteSession(s)),
+                            ),
+                          if (sessions.nextPage != null)
+                            TextButton(
+                              onPressed: () => sessions.nextPage!(_api),
+                              child: const Text('Load more'),
+                            ),
+                        ],
+                      );
+                    },
+                  ),
                 )
               ],
             ),
@@ -109,6 +114,8 @@ class _SessionSettingsPageState extends State<SessionSettingsPage> {
       context.showSnackBar('Successfully deleted "${session.name ?? 'Session ${session.id.value}'}"');
       if (session.id.value == _api.session.id.value) {
         context.read<AuthenticationBloc>().add(AuthenticationLogoutRequested(api: _api));
+      } else {
+        context.read<SessionBloc>().add(const SessionUpdateEvent());
       }
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);

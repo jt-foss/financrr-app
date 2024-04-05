@@ -3,11 +3,13 @@ import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/widgets/entities/currency_card.dart';
 import 'package:financrr_frontend/widgets/paginated_wrapper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../../../layout/adaptive_scaffold.dart';
 import '../../../../router.dart';
 import '../../settings_page.dart';
+import 'bloc/currency_bloc.dart';
 import 'currency_create_page.dart';
 
 class CurrencySettingsPage extends StatefulWidget {
@@ -52,37 +54,42 @@ class _CurrencySettingsPageState extends State<CurrencySettingsPage> {
                       label: const Text('Create'),
                     ),
                     ValueListenableBuilder(
-                        valueListenable: _amount,
-                        builder: (context, value, child) {
-                          return Text('${_amount.value} currencies');
-                        },
+                      valueListenable: _amount,
+                      builder: (context, value, child) {
+                        return Text('${_amount.value} currencies');
+                      },
                     ),
                   ],
                 ),
                 const Divider(),
-                PaginatedWrapper(
-                  key: _paginatedCurrencyKey,
-                  initialPageFunction: (forceRetrieve) => _api.retrieveAllCurrencies(limit: 10, forceRetrieve: forceRetrieve),
-                  onSuccess: (context, snap) {
-                    final PaginatedDataResult<Currency> currencies = snap.data!;
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      _amount.value = currencies.total;
-                    });
-                    return Column(
-                      children: [
-                        for (Currency c in currencies.items)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: CurrencyCard(currency: c, onDelete: c is! CustomCurrency ? null : () => _deleteCurrency(c)),
-                          ),
-                        if (currencies.nextPage != null)
-                          TextButton(
-                            onPressed: () => currencies.nextPage!(_api),
-                            child: const Text('Load more'),
-                          ),
-                      ],
-                    );
-                  },
+                BlocListener<CurrencyBloc, CurrencyState>(
+                  listener: (context, state) => _paginatedCurrencyKey.currentState?.reset(),
+                  child: PaginatedWrapper(
+                    key: _paginatedCurrencyKey,
+                    initialPageFunction: (forceRetrieve) =>
+                        _api.retrieveAllCurrencies(limit: 10, forceRetrieve: forceRetrieve),
+                    onSuccess: (context, snap) {
+                      final PaginatedDataResult<Currency> currencies = snap.data!;
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        _amount.value = currencies.total;
+                      });
+                      return Column(
+                        children: [
+                          for (Currency c in currencies.items)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 10),
+                              child: CurrencyCard(
+                                  currency: c, onDelete: c is! CustomCurrency ? null : () => _deleteCurrency(c)),
+                            ),
+                          if (currencies.nextPage != null)
+                            TextButton(
+                              onPressed: () => currencies.nextPage!(_api),
+                              child: const Text('Load more'),
+                            ),
+                        ],
+                      );
+                    },
+                  ),
                 )
               ],
             ),
@@ -97,6 +104,7 @@ class _CurrencySettingsPageState extends State<CurrencySettingsPage> {
       await currency.delete();
       if (!mounted) return;
       context.showSnackBar('Successfully deleted "${currency.name}"');
+      context.read<CurrencyBloc>().add(const CurrencyUpdateEvent());
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);
     }
