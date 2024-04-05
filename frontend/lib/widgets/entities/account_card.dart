@@ -1,8 +1,7 @@
-import 'dart:math';
-
 import 'package:financrr_frontend/pages/core/accounts/account_page.dart';
 import 'package:financrr_frontend/router.dart';
 import 'package:financrr_frontend/util/extensions.dart';
+import 'package:financrr_frontend/widgets/text_circle_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restrr/restrr.dart';
@@ -42,15 +41,14 @@ class AccountCard extends StatelessWidget {
     return BlocBuilder<L10nBloc, L10nState>(
       builder: (context, state) {
         return GestureDetector(
-          onTap: !interactive
-              ? null
-              : () => context.goPath(AccountPage.pagePath.build(pathParams: {'accountId': id.toString()})),
+          onTap:
+              !interactive ? null : () => context.goPath(AccountPage.pagePath.build(pathParams: {'accountId': id.toString()})),
           child: Card.outlined(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Row(
                 children: [
-                  _buildAccountAvatar(name),
+                  TextCircleAvatar(text: name, radius: 25),
                   const SizedBox(width: 20),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -68,13 +66,6 @@ class AccountCard extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-
-  Widget _buildAccountAvatar(String accountName) {
-    return CircleAvatar(
-      radius: 25,
-      child: Text(accountName.isEmpty ? '?' : accountName.substring(0, min(accountName.length, 2)).toUpperCase()),
     );
   }
 }

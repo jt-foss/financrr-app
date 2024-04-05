@@ -24,8 +24,7 @@ extension ThemeExtension on BuildContext {
 
   bool get darkMode => Theme.of(this).brightness == Brightness.dark;
 
-  SystemUiOverlayStyle get effectiveSystemUiOverlayStyle =>
-      lightMode ? SystemUiOverlayStyle.dark : SystemUiOverlayStyle.light;
+  SystemUiOverlayStyle get effectiveSystemUiOverlayStyle => lightMode ? SystemUiOverlayStyle.dark : SystemUiOverlayStyle.light;
 }
 
 extension SnackBarExtension on BuildContext {

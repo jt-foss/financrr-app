@@ -107,24 +107,24 @@ class TransactionPageState extends State<TransactionPage> {
                                 color: transaction.type == TransactionType.deposit
                                     ? context.theme.primaryColor
                                     : context.theme.colorScheme.error)),
-                        Text(transaction.description ?? transaction.executedAt.toIso8601String()),
+                        Text(transaction.description ?? state.dateTimeFormat.format(transaction.executedAt)),
                       ],
                     ),
                     const Divider(),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        TextButton.icon(
+                        IconButton(
+                            tooltip: 'Delete Transaction',
                             onPressed: () => _deleteTransaction(transaction),
-                            icon: const Icon(Icons.delete_rounded, size: 17),
-                            label: const Text('Delete Transaction')),
-                        TextButton.icon(
+                            icon: const Icon(Icons.delete_rounded, size: 17)),
+                        IconButton(
+                            tooltip: 'Edit Transaction',
                             onPressed: () => context.goPath(TransactionEditPage.pagePath.build(pathParams: {
                                   'accountId': account.id.value.toString(),
                                   'transactionId': transaction.id.value.toString()
                                 })),
-                            icon: const Icon(Icons.create_rounded, size: 17),
-                            label: const Text('Edit Transaction'))
+                            icon: const Icon(Icons.create_rounded, size: 17))
                       ],
                     ),
                     Padding(
