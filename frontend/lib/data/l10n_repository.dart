@@ -5,8 +5,7 @@ class L10nPreferences {
   final String decimalSeparator;
   final String thousandSeparator;
 
-  const L10nPreferences(
-      {this.dateTimeFormat = 'yyyy-MM-dd HH:mm', this.decimalSeparator = '.', this.thousandSeparator = ','});
+  const L10nPreferences({this.dateTimeFormat = 'yyyy-MM-dd HH:mm', this.decimalSeparator = '.', this.thousandSeparator = ','});
 
   L10nPreferences copyWith({String? dateTimeFormat, String? decimalSeparator, String? thousandSeparator}) {
     return L10nPreferences(
@@ -51,8 +50,8 @@ class L10nService {
 
   static Future<L10nPreferences> setL10nPreferences(
       {String? dateTimeFormat, String? decimalSeparator, String? thousandSeparator}) async {
-    final L10nPreferences preferences = get().copyWith(
-        dateTimeFormat: dateTimeFormat, decimalSeparator: decimalSeparator, thousandSeparator: thousandSeparator);
+    final L10nPreferences preferences = get()
+        .copyWith(dateTimeFormat: dateTimeFormat, decimalSeparator: decimalSeparator, thousandSeparator: thousandSeparator);
     await Repositories.l10nRepository.save(preferences);
     return preferences;
   }

@@ -53,8 +53,7 @@ class _AccountsOverviewPageState extends State<AccountsOverviewPage> {
                 _currencies = _api.getAccounts().fold(
                   {},
                   (map, account) {
-                    map.update(account.currencyId.get()!, (value) => value + account.balance,
-                        ifAbsent: () => account.balance);
+                    map.update(account.currencyId.get()!, (value) => value + account.balance, ifAbsent: () => account.balance);
                     return map;
                   },
                 );
@@ -114,8 +113,8 @@ class _AccountsOverviewPageState extends State<AccountsOverviewPage> {
                                       child: ListTile(
                                     title: const Text('Edit Account'),
                                     leading: const Icon(Icons.edit_rounded),
-                                    onTap: () => context.goPath(AccountEditPage.pagePath
-                                        .build(pathParams: {'accountId': account.id.value.toString()})),
+                                    onTap: () => context.goPath(
+                                        AccountEditPage.pagePath.build(pathParams: {'accountId': account.id.value.toString()})),
                                   )),
                                   PopupMenuItem(
                                       child: ListTile(

@@ -9,9 +9,8 @@ class AppThemeLoader {
   static Future<void> init() async {
     final String manifestContent = await rootBundle.loadString('AssetManifest.json');
     final Map<String, dynamic> manifest = jsonDecode(manifestContent);
-    final List<String> filtered = manifest.keys
-        .where((path) => path.startsWith('assets/themes/') && path.endsWith('.financrr-theme.json'))
-        .toList();
+    final List<String> filtered =
+        manifest.keys.where((path) => path.startsWith('assets/themes/') && path.endsWith('.financrr-theme.json')).toList();
     for (String path in filtered) {
       final Map<String, dynamic> json = jsonDecode(await rootBundle.loadString(path));
       final AppTheme? theme = AppTheme.tryFromJson(json);
@@ -92,8 +91,7 @@ class AppTheme {
         _tryNavigationRailThemeDataFromJson(fullJson, json['navigation_rail_theme_data']);
     final ElevatedButtonThemeData? elevatedButtonTheme =
         _tryElevatedButtonThemeDataFromJson(fullJson, json['elevated_button_theme_data']);
-    final TextButtonThemeData? textButtonTheme =
-        _tryTextButtonThemeDataFromJson(fullJson, json['text_button_theme_data']);
+    final TextButtonThemeData? textButtonTheme = _tryTextButtonThemeDataFromJson(fullJson, json['text_button_theme_data']);
     final TextSelectionThemeData? textSelectionTheme =
         _tryTextSelectionThemeDataFromJson(fullJson, json['text_selection_theme_data']);
     final SwitchThemeData? switchTheme = _trySwitchThemeDataFromJson(fullJson, json['switch_theme_data']);
@@ -213,8 +211,7 @@ class AppTheme {
         centerTitle: true);
   }
 
-  static NavigationBarThemeData? _tryNavigationBarThemeDataFromJson(
-      Map<String, dynamic> fullJson, Map<String, dynamic>? json) {
+  static NavigationBarThemeData? _tryNavigationBarThemeDataFromJson(Map<String, dynamic> fullJson, Map<String, dynamic>? json) {
     if (json == null) {
       return null;
     }
@@ -230,8 +227,8 @@ class AppTheme {
       iconTheme: MaterialStatePropertyAll(IconThemeData(color: iconColor.toColor(fullJson))),
       backgroundColor: backgroundColor.toColor(fullJson),
       surfaceTintColor: Colors.transparent,
-      labelTextStyle: MaterialStatePropertyAll(
-          TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: labelColor.toColor(fullJson))),
+      labelTextStyle:
+          MaterialStatePropertyAll(TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: labelColor.toColor(fullJson))),
     );
   }
 
@@ -289,8 +286,7 @@ class AppTheme {
     );
   }
 
-  static TextButtonThemeData? _tryTextButtonThemeDataFromJson(
-      Map<String, dynamic> fullJson, Map<String, dynamic>? json) {
+  static TextButtonThemeData? _tryTextButtonThemeDataFromJson(Map<String, dynamic> fullJson, Map<String, dynamic>? json) {
     if (json == null) {
       return null;
     }
@@ -305,8 +301,7 @@ class AppTheme {
     );
   }
 
-  static TextSelectionThemeData? _tryTextSelectionThemeDataFromJson(
-      Map<String, dynamic> fullJson, Map<String, dynamic>? json) {
+  static TextSelectionThemeData? _tryTextSelectionThemeDataFromJson(Map<String, dynamic> fullJson, Map<String, dynamic>? json) {
     if (json == null) {
       return null;
     }
@@ -384,8 +379,7 @@ class AppThemeColor {
     if (options == null) {
       return null;
     }
-    if ((options.hex == null && options.copyFromPath == null) ||
-        (options.hex != null && options.copyFromPath != null)) {
+    if ((options.hex == null && options.copyFromPath == null) || (options.hex != null && options.copyFromPath != null)) {
       throw StateError('Either hex or copy_from_path must be set!');
     }
     return AppThemeColor(options: options);
@@ -450,8 +444,7 @@ class AppThemeColorOptions {
         JsonUtils.isInvalidType(json, 'opacity', double, nullable: true)) {
       return null;
     }
-    if ((json['hex'] == null && json['copy_from_path'] == null) ||
-        (json['hex'] != null && json['copy_from_path'] != null)) {
+    if ((json['hex'] == null && json['copy_from_path'] == null) || (json['hex'] != null && json['copy_from_path'] != null)) {
       return null;
     }
     return AppThemeColorOptions(hex: json['hex'], copyFromPath: json['copy_from_path'], opacity: json['opacity']);

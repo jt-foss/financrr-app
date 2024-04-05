@@ -29,8 +29,7 @@ class _DashboardPageState extends State<DashboardPage> {
   final StreamController<Paginated<Transaction>> _transactionStreamController = StreamController.broadcast();
 
   Future<Paginated<Transaction>> _fetchLatestTransactions({bool forceRetrieve = false}) async {
-    final Paginated<Transaction> transactions =
-        await _api.retrieveAllTransactions(limit: 10, forceRetrieve: forceRetrieve);
+    final Paginated<Transaction> transactions = await _api.retrieveAllTransactions(limit: 10, forceRetrieve: forceRetrieve);
     _transactionStreamController.add(transactions);
     return transactions;
   }
@@ -114,13 +113,11 @@ class _DashboardPageState extends State<DashboardPage> {
               final List<Transaction> transactions = snap.data!.items;
               if (transactions.isEmpty) {
                 return const Center(
-                    child:
-                        NoticeCard(title: 'No transactions found', description: 'Your transactions will appear here'));
+                    child: NoticeCard(title: 'No transactions found', description: 'Your transactions will appear here'));
               }
               return Column(
                 children: [
-                  for (Transaction t in transactions)
-                    SizedBox(width: double.infinity, child: TransactionCard(transaction: t))
+                  for (Transaction t in transactions) SizedBox(width: double.infinity, child: TransactionCard(transaction: t))
                 ],
               );
             })

@@ -14,8 +14,7 @@ class PaginatedWrapper<T> extends StatefulWidget {
   final Widget Function(BuildContext, AsyncSnapshot<PaginatedDataResult<T>>) onSuccess;
   final Widget Function(BuildContext, AsyncSnapshot<PaginatedDataResult<T>>) onLoading;
 
-  const PaginatedWrapper(
-      {super.key, required this.initialPageFunction, required this.onSuccess, required this.onLoading});
+  const PaginatedWrapper({super.key, required this.initialPageFunction, required this.onSuccess, required this.onLoading});
 
   @override
   State<PaginatedWrapper<T>> createState() => PaginatedWrapperState<T>();
@@ -49,10 +48,8 @@ class PaginatedWrapperState<T> extends State<PaginatedWrapper<T>> {
             context,
             AsyncSnapshot<PaginatedDataResult<T>>.withData(
                 ConnectionState.done,
-                PaginatedDataResult(
-                    _pages[_currentPage] ?? const Paginated(pageNumber: 0, limit: 0, total: 0, items: []),
-                    hasNext,
-                    hasPrevious)));
+                PaginatedDataResult(_pages[_currentPage] ?? const Paginated(pageNumber: 0, limit: 0, total: 0, items: []),
+                    hasNext, hasPrevious)));
   }
 
   bool get hasNext => _pages[_currentPage]?.hasNext ?? false;

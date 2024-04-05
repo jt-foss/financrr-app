@@ -10,6 +10,7 @@ import 'package:restrr/restrr.dart';
 
 import '../../layout/adaptive_scaffold.dart';
 import '../../router.dart';
+import '../../widgets/text_circle_avatar.dart';
 
 class SettingsItemGroup {
   final String? title;
@@ -42,12 +43,7 @@ class _SettingsPageState extends State<SettingsPage> {
       SettingsItem(
         showCategory: false,
         child: ListTile(
-          leading: Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(color: context.theme.primaryColor.withOpacity(.5), shape: BoxShape.circle),
-            child: Center(child: Text(_api.selfUser.effectiveDisplayName.substring(0, 2))),
-          ),
+          leading: TextCircleAvatar(text: _api.selfUser.effectiveDisplayName, radius: 25),
           title: Text(_api.selfUser.effectiveDisplayName),
           subtitle: const Text('placeholder@financrr.app'),
         ),
