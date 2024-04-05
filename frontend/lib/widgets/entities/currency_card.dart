@@ -48,14 +48,15 @@ class CurrencyCard extends StatelessWidget {
               children: [
                 TextCircleAvatar(text: symbol, radius: 25),
                 const SizedBox(width: 20),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(name, style: context.textTheme.titleSmall),
-                    if (isoCode != null) Text(isoCode!),
-                  ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(name, style: context.textTheme.titleSmall),
+                      if (isoCode != null) Text(isoCode!),
+                    ],
+                  ),
                 ),
-                const Spacer(),
                 PopupMenuButton(
                   enabled: interactive && isCustom,
                   itemBuilder: (context) {

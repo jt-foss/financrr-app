@@ -50,14 +50,15 @@ class AccountCard extends StatelessWidget {
                 children: [
                   TextCircleAvatar(text: name, radius: 25),
                   const SizedBox(width: 20),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(name, style: context.textTheme.titleSmall),
-                      if (iban != null || description != null) Text(TextUtils.formatIBAN(iban) ?? description!),
-                    ],
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(name, style: context.textTheme.titleSmall),
+                        if (iban != null || description != null) Text(TextUtils.formatIBAN(iban) ?? description!),
+                      ],
+                    ),
                   ),
-                  const Spacer(),
                   Text(TextUtils.formatBalanceWithCurrency(state, balance, currency!),
                       style: context.textTheme.titleSmall?.copyWith(color: context.theme.primaryColor))
                 ],

@@ -2,7 +2,6 @@ import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/widgets/entities/session_card.dart';
 import 'package:financrr_frontend/widgets/paginated_wrapper.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restrr/restrr.dart';

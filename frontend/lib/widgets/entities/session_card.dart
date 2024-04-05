@@ -42,14 +42,15 @@ class SessionCard extends StatelessWidget {
               children: [
                 const Icon(Icons.devices_rounded),
                 const SizedBox(width: 20),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(name ?? '${isCurrent ? 'Current' : 'Unnamed'} Session', style: context.textTheme.titleSmall),
-                    Text('${state.dateTimeFormat.format(createdAt)} ($id)'),
-                  ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(name ?? '${isCurrent ? 'Current' : 'Unnamed'} Session', style: context.textTheme.titleSmall),
+                      Text('${state.dateTimeFormat.format(createdAt)} ($id)'),
+                    ],
+                  ),
                 ),
-                const Spacer(),
                 IconButton(
                     onPressed: onDelete,
                     icon: Icon(isCurrent ? Icons.logout_rounded : Icons.delete_rounded),
