@@ -22,8 +22,8 @@ class TextCircleAvatar extends StatelessWidget {
       radius: radius,
       backgroundColor: backgroundColor,
       child: Text(
-        text.isEmpty ? '?' : text.substring(0, min(text.length, 2)).toUpperCase(),
-        style: TextStyle(color: textColor),
+        text.isEmpty ? '?' : text.substring(0, min(text.length, 3)).toUpperCase(),
+        style: TextStyle(color: textColor, fontSize: radius! / 1.75),
       ),
     );
   }

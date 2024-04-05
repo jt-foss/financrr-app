@@ -11,10 +11,11 @@ class PaginatedDataResult<T> {
 
 class PaginatedWrapper<T> extends StatefulWidget {
   final Future<Paginated<T>> Function(bool) initialPageFunction;
-  final Widget Function(BuildContext, AsyncSnapshot<PaginatedDataResult<T>>) onSuccess;
-  final Widget Function(BuildContext, AsyncSnapshot<PaginatedDataResult<T>>) onLoading;
+  final Widget Function(BuildContext, AsyncSnapshot<List<T>>) onSuccess;
+  final Widget Function(BuildContext, AsyncSnapshot<List<T>>)? onLoading;
+  final Widget Function(BuildContext, AsyncSnapshot<List<T>>)? onError;
 
-  const PaginatedWrapper({super.key, required this.initialPageFunction, required this.onSuccess, required this.onLoading});
+  const PaginatedWrapper({super.key, required this.initialPageFunction, required this.onSuccess, this.onLoading, this.onError});
 
   @override
   State<PaginatedWrapper<T>> createState() => PaginatedWrapperState<T>();
@@ -24,32 +25,35 @@ class PaginatedWrapperState<T> extends State<PaginatedWrapper<T>> {
   final Map<int, Paginated<T>> _pages = {};
 
   int? _currentPage;
+  RestrrException? _error;
 
   @override
   void initState() {
     super.initState();
-    widget.initialPageFunction.call(false).then((page) {
-      _pages[page.pageNumber] = page;
-      setState(() => _currentPage = page.pageNumber);
-    });
+    _loadInitialPage();
   }
 
   Future<void> _loadInitialPage({bool forceRetrieve = false}) async {
-    final Paginated<T> page = await widget.initialPageFunction.call(forceRetrieve);
-    _pages[page.pageNumber] = page;
-    setState(() => _currentPage = page.pageNumber);
+    try {
+      final Paginated<T> page = await widget.initialPageFunction.call(forceRetrieve);
+      _pages[page.pageNumber] = page;
+      setState(() => _currentPage = page.pageNumber);
+    } on RestrrException catch (e) {
+      setState(() => _error = e);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (widget.onError != null && _error != null) {
+      return widget.onError!.call(context, AsyncSnapshot<List<T>>.withError(ConnectionState.done, _error!));
+    }
     return _currentPage == null
-        ? widget.onLoading.call(context, AsyncSnapshot<PaginatedDataResult<T>>.waiting())
+        ? (widget.onLoading ?? (_, __) => const Center(child: CircularProgressIndicator())).call(context, AsyncSnapshot<List<T>>.waiting())
         : widget.onSuccess.call(
             context,
-            AsyncSnapshot<PaginatedDataResult<T>>.withData(
-                ConnectionState.done,
-                PaginatedDataResult(_pages[_currentPage] ?? const Paginated(pageNumber: 0, limit: 0, total: 0, items: []),
-                    hasNext, hasPrevious)));
+            AsyncSnapshot<List<T>>.withData(
+                ConnectionState.done, _pages.entries.map((e) => e.value.items).expand((e) => e).toList()));
   }
 
   bool get hasNext => _pages[_currentPage]?.hasNext ?? false;

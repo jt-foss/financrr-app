@@ -44,7 +44,7 @@ class _SettingsPageState extends State<SettingsPage> {
         showCategory: false,
         child: ListTile(
           leading: TextCircleAvatar(text: _api.selfUser.effectiveDisplayName, radius: 25),
-          title: Text(_api.selfUser.effectiveDisplayName),
+          title: Text(_api.selfUser.effectiveDisplayName, style: context.textTheme.titleSmall),
           subtitle: const Text('placeholder@financrr.app'),
         ),
       ),

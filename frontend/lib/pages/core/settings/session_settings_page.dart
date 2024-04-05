@@ -1,6 +1,7 @@
 import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
 import 'package:financrr_frontend/util/extensions.dart';
-import 'package:financrr_frontend/widgets/paginated_table.dart';
+import 'package:financrr_frontend/widgets/entities/session_card.dart';
+import 'package:financrr_frontend/widgets/paginated_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restrr/restrr.dart';
@@ -8,7 +9,6 @@ import 'package:restrr/restrr.dart';
 import '../../../layout/adaptive_scaffold.dart';
 import '../../../router.dart';
 import '../settings_page.dart';
-import 'l10n/bloc/l10n_bloc.dart';
 
 class SessionSettingsPage extends StatefulWidget {
   static const PagePathBuilder pagePath = PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'sessions');
@@ -20,7 +20,7 @@ class SessionSettingsPage extends StatefulWidget {
 }
 
 class _SessionSettingsPageState extends State<SessionSettingsPage> {
-  final GlobalKey<PaginatedTableState<PartialSession>> _tableKey = GlobalKey();
+  final GlobalKey<PaginatedWrapperState<PartialSession>> _paginatedSessionKey = GlobalKey();
   late final Restrr _api = context.api!;
 
   @override
@@ -37,72 +37,54 @@ class _SessionSettingsPageState extends State<SessionSettingsPage> {
       child: Center(
         child: SizedBox(
           width: size.width / 1.1,
-          child: ListView(
-            children: [
-              Card.outlined(
-                child: ListTile(
-                  title: const Text('Current Session'),
-                  trailing: Text('Id: ${_api.session.id.value}'),
-                  subtitle: _api.session.name == null ? null : Text(_api.session.name!),
+          child: RefreshIndicator(
+            onRefresh: () async => _paginatedSessionKey.currentState?.reset(),
+            child: ListView(
+              children: [
+                SessionCard(
+                    session: _api.session,
+                    onDelete: () => context.read<AuthenticationBloc>().add(AuthenticationLogoutRequested(api: _api))),
+                Row(
+                  children: [
+                    TextButton.icon(
+                      onPressed: () => _deleteAllSessions(),
+                      label: const Text('Delete all'),
+                      icon: const Icon(Icons.delete_sweep_rounded),
+                    ),
+                  ],
                 ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TextButton.icon(
-                    onPressed: () => _deleteAllSessions(),
-                    label: const Text('Delete all & Log out'),
-                    icon: const Icon(Icons.delete_sweep_rounded),
-                  ),
-                  TextButton.icon(
-                    onPressed: () => _tableKey.currentState?.reset(),
-                    label: const Text('Refresh'),
-                    icon: const Icon(Icons.refresh),
-                  )
-                ],
-              ),
-              const Divider(),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: BlocBuilder<L10nBloc, L10nState>(
-                  builder: (context, state) {
-                    return PaginatedTable(
-                      key: _tableKey,
-                      api: _api,
-                      initialPageFunction: (forceRetrieve) => _api.retrieveAllSessions(limit: 10, forceRetrieve: forceRetrieve),
-                      fillWithEmptyRows: true,
-                      width: size.width,
-                      columns: const [
-                        DataColumn(label: Text('Id')),
-                        DataColumn(label: Text('Name')),
-                        DataColumn(label: Text('Created')),
-                        DataColumn(label: Text('Expires')),
-                        DataColumn(label: Text('Actions')),
+                const Divider(),
+                PaginatedWrapper(
+                  key: _paginatedSessionKey,
+                  initialPageFunction: (forceRetrieve) => _api.retrieveAllSessions(limit: 10, forceRetrieve: forceRetrieve),
+                  onError: (context, snap) {
+                    if (snap.error is ServerException) {
+                      context.read<AuthenticationBloc>().add(AuthenticationLogoutRequested(api: _api));
+                    }
+                    return Text(snap.error.toString());
+                  },
+                  onSuccess: (context, snap) {
+                    final PaginatedWrapperState<PartialSession> state = _paginatedSessionKey.currentState!;
+                    final List<PartialSession> sessions = snap.data!;
+                    sessions.removeWhere((s) => s.id.value == _api.session.id.value);
+                    return Column(
+                      children: [
+                        for (PartialSession s in sessions)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 10),
+                            child: SessionCard(session: s, onDelete: () => _deleteSession(s)),
+                          ),
+                        if (state.hasNext)
+                          TextButton(
+                            onPressed: () => state.nextPage(_api),
+                            child: const Text('Load more'),
+                          ),
                       ],
-                      rowBuilder: (session) {
-                        final bool isCurrentSession = session.id.value == _api.session.id.value;
-                        return DataRow(cells: [
-                          DataCell(Text(session.id.value.toString())),
-                          DataCell(Text(session.name ?? 'N/A')),
-                          DataCell(Text(state.dateTimeFormat.format(session.createdAt))),
-                          DataCell(Text(state.dateTimeFormat.format(session.expiresAt))),
-                          DataCell(Row(
-                            children: [
-                              IconButton(
-                                icon: Icon(isCurrentSession ? Icons.logout_rounded : Icons.delete_rounded),
-                                onPressed: () => isCurrentSession
-                                    ? context.read<AuthenticationBloc>().add(AuthenticationLogoutRequested(api: _api))
-                                    : _deleteSession(session),
-                              ),
-                            ],
-                          )),
-                        ]);
-                      },
                     );
                   },
-                ),
-              )
-            ],
+                )
+              ],
+            ),
           ),
         ),
       ),
@@ -114,6 +96,9 @@ class _SessionSettingsPageState extends State<SessionSettingsPage> {
       await session.delete();
       if (!mounted) return;
       context.showSnackBar('Successfully deleted "${session.name ?? 'Session ${session.id.value}'}"');
+      if (session.id.value == _api.session.id.value) {
+        context.read<AuthenticationBloc>().add(AuthenticationLogoutRequested(api: _api));
+      }
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);
     }

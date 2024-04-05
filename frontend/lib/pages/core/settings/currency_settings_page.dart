@@ -1,6 +1,7 @@
 import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
 import 'package:financrr_frontend/util/extensions.dart';
-import 'package:financrr_frontend/widgets/paginated_table.dart';
+import 'package:financrr_frontend/widgets/entities/currency_card.dart';
+import 'package:financrr_frontend/widgets/paginated_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:restrr/restrr.dart';
 
@@ -8,7 +9,6 @@ import '../../../layout/adaptive_scaffold.dart';
 import '../../../router.dart';
 import '../settings_page.dart';
 import 'currency/currency_create_page.dart';
-import 'currency/currency_edit_page.dart';
 
 class CurrencySettingsPage extends StatefulWidget {
   static const PagePathBuilder pagePath = PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'currencies');
@@ -20,7 +20,7 @@ class CurrencySettingsPage extends StatefulWidget {
 }
 
 class _CurrencySettingsPageState extends State<CurrencySettingsPage> {
-  final GlobalKey<PaginatedTableState<Currency>> _tableKey = GlobalKey();
+  final GlobalKey<PaginatedWrapperState<Currency>> _paginatedCurrencyKey = GlobalKey();
   late final Restrr _api = context.api!;
 
   @override
@@ -37,69 +37,44 @@ class _CurrencySettingsPageState extends State<CurrencySettingsPage> {
       child: Center(
         child: SizedBox(
           width: size.width / 1.1,
-          child: ListView(
-            children: [
-              const Card.outlined(
-                child: ListTile(
-                  title: Text('Preferred Currency'),
-                  trailing: Text('US\$'),
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TextButton.icon(
-                    onPressed: () => context.goPath(CurrencyCreatePage.pagePath.build()),
-                    icon: const Icon(Icons.add),
-                    label: const Text('Create Currency'),
-                  ),
-                  TextButton.icon(
-                    onPressed: () => _tableKey.currentState?.reset(),
-                    label: const Text('Refresh'),
-                    icon: const Icon(Icons.refresh),
-                  )
-                ],
-              ),
-              const Divider(),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: PaginatedTable(
-                  key: _tableKey,
-                  api: _api,
-                  initialPageFunction: (forceRetrieve) => _api.retrieveAllCurrencies(limit: 10, forceRetrieve: forceRetrieve),
-                  fillWithEmptyRows: true,
-                  width: size.width,
-                  columns: const [
-                    DataColumn(label: Text('Symbol')),
-                    DataColumn(label: Text('Name')),
-                    DataColumn(label: Text('ISO')),
-                    DataColumn(label: Text('Actions')),
+          child: RefreshIndicator(
+            onRefresh: () async => _paginatedCurrencyKey.currentState?.reset(),
+            child: ListView(
+              children: [
+                Row(
+                  children: [
+                    TextButton.icon(
+                      onPressed: () => context.goPath(CurrencyCreatePage.pagePath.build()),
+                      icon: const Icon(Icons.add),
+                      label: const Text('Create'),
+                    )
                   ],
-                  rowBuilder: (currency) {
-                    return DataRow(cells: [
-                      DataCell(Text(currency.symbol)),
-                      DataCell(Text(currency.name)),
-                      DataCell(Text(currency.isoCode ?? 'N/A')),
-                      DataCell(Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.edit),
-                            onPressed: currency is! CustomCurrency
-                                ? null
-                                : () => context.goPath(
-                                    CurrencyEditPage.pagePath.build(pathParams: {'currencyId': currency.id.value.toString()})),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.delete),
-                            onPressed: currency is! CustomCurrency ? null : () => _deleteCurrency(currency),
-                          ),
-                        ],
-                      )),
-                    ]);
-                  },
                 ),
-              )
-            ],
+                const Divider(),
+                PaginatedWrapper(
+                  key: _paginatedCurrencyKey,
+                  initialPageFunction: (forceRetrieve) => _api.retrieveAllCurrencies(limit: 10, forceRetrieve: forceRetrieve),
+                  onSuccess: (context, snap) {
+                    final PaginatedWrapperState<Currency> state = _paginatedCurrencyKey.currentState!;
+                    final List<Currency> currencies = snap.data!;
+                    return Column(
+                      children: [
+                        for (Currency c in currencies)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 10),
+                            child: CurrencyCard(currency: c, onDelete: c is! CustomCurrency ? null : () => _deleteCurrency(c)),
+                          ),
+                        if (state.hasNext)
+                          TextButton(
+                            onPressed: () => state.nextPage(_api),
+                            child: const Text('Load more'),
+                          ),
+                      ],
+                    );
+                  },
+                )
+              ],
+            ),
           ),
         ),
       ),
