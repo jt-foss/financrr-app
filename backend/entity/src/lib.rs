@@ -8,7 +8,7 @@ pub mod currency;
 pub mod error;
 pub mod permissions;
 pub mod prelude;
-pub mod repeatable_transaction;
+pub mod recurring_transaction;
 pub mod session;
 pub mod transaction;
 pub mod transaction_template;

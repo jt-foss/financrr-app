@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS transaction_template
     CHECK (source IS NOT NULL OR destination IS NOT NULL)
 );
 
-CREATE TABLE IF NOT EXISTS repeatable_transaction
+CREATE TABLE IF NOT EXISTS recurring_transaction
 (
     id                      SERIAL PRIMARY KEY,
     template                INTEGER REFERENCES transaction_template (id) ON UPDATE CASCADE ON DELETE CASCADE NOT NULL,

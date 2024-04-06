@@ -4,12 +4,12 @@ use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
-#[sea_orm(table_name = "repeatable_transaction")]
+#[sea_orm(table_name = "recurring_transaction")]
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
     pub template: i32,
-    pub repeat_interval_seconds: u32,
+    pub repeat_interval_seconds: i64,
     pub created_at: TimeDateTimeWithTimeZone,
 }
 
