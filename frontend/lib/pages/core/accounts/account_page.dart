@@ -19,8 +19,7 @@ import '../settings/l10n/bloc/l10n_bloc.dart';
 import 'accounts_overview_page.dart';
 
 class AccountPage extends StatefulWidget {
-  static const PagePathBuilder pagePath =
-      PagePathBuilder.child(parent: AccountsOverviewPage.pagePath, path: ':accountId');
+  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: AccountsOverviewPage.pagePath, path: ':accountId');
 
   final String? accountId;
 
@@ -102,8 +101,8 @@ class _AccountPageState extends State<AccountPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     TextButton.icon(
-                        onPressed: () => context.goPath(TransactionCreatePage.pagePath
-                            .build(pathParams: {'accountId': account.id.value.toString()})),
+                        onPressed: () => context.goPath(
+                            TransactionCreatePage.pagePath.build(pathParams: {'accountId': account.id.value.toString()})),
                         icon: const Icon(Icons.add, size: 17),
                         label: const Text('Create Transaction')),
                     const Spacer(),
@@ -113,8 +112,8 @@ class _AccountPageState extends State<AccountPage> {
                         icon: const Icon(Icons.delete_rounded, size: 17)),
                     IconButton(
                         tooltip: 'Edit Account',
-                        onPressed: () => context.goPath(
-                            AccountEditPage.pagePath.build(pathParams: {'accountId': account.id.value.toString()})),
+                        onPressed: () => context
+                            .goPath(AccountEditPage.pagePath.build(pathParams: {'accountId': account.id.value.toString()})),
                         icon: const Icon(Icons.create, size: 17))
                   ],
                 ),
@@ -148,8 +147,8 @@ class _AccountPageState extends State<AccountPage> {
                     child: NoticeCard(
                   title: 'No transactions found',
                   description: 'Create a transaction to get started',
-                  onTap: () => context.goPath(
-                      TransactionCreatePage.pagePath.build(pathParams: {'accountId': account.id.value.toString()})),
+                  onTap: () => context
+                      .goPath(TransactionCreatePage.pagePath.build(pathParams: {'accountId': account.id.value.toString()})),
                 ));
               }
               return Column(

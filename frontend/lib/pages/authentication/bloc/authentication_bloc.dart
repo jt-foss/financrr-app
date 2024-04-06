@@ -32,8 +32,7 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
     }
   }
 
-  void _onAuthenticationRecoveryRequested(
-      AuthenticationRecoveryRequested event, Emitter<AuthenticationState> emit) async {
+  void _onAuthenticationRecoveryRequested(AuthenticationRecoveryRequested event, Emitter<AuthenticationState> emit) async {
     final HostPreferences hostPrefs = HostService.get();
     if (!(await SessionService.hasSession()) || hostPrefs.hostUrl.isEmpty) {
       emit(const AuthenticationState.unauthenticated());

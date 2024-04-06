@@ -16,8 +16,7 @@ import '../../../../widgets/async_wrapper.dart';
 import '../../../../widgets/entities/transaction_card.dart';
 
 class TransactionCreatePage extends StatefulWidget {
-  static const PagePathBuilder pagePath =
-      PagePathBuilder.child(parent: AccountPage.pagePath, path: 'transactions/create');
+  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: AccountPage.pagePath, path: 'transactions/create');
 
   final String? accountId;
 

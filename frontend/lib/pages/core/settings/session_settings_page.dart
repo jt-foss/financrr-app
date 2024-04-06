@@ -69,8 +69,7 @@ class _SessionSettingsPageState extends State<SessionSettingsPage> {
                     return PaginatedTable(
                       key: _tableKey,
                       api: _api,
-                      initialPageFunction: (forceRetrieve) =>
-                          _api.retrieveAllSessions(limit: 10, forceRetrieve: forceRetrieve),
+                      initialPageFunction: (forceRetrieve) => _api.retrieveAllSessions(limit: 10, forceRetrieve: forceRetrieve),
                       fillWithEmptyRows: true,
                       width: size.width,
                       columns: const [

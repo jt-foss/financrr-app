@@ -65,8 +65,7 @@ class TransactionEditPageState extends State<TransactionEditPage> {
                   _nameController = TextEditingController(text: transaction.name);
                   _amountController = TextEditingController(text: transaction.amount.toString());
                   _descriptionController = TextEditingController(text: transaction.description);
-                  _executedAtController =
-                      TextEditingController(text: state.dateTimeFormat.format(transaction.executedAt));
+                  _executedAtController = TextEditingController(text: state.dateTimeFormat.format(transaction.executedAt));
                   _isValid = _formKey.currentState?.validate() ?? false;
                   _type = transaction.type;
                   _executedAt = transaction.executedAt;
@@ -167,8 +166,7 @@ class TransactionEditPageState extends State<TransactionEditPage> {
     );
   }
 
-  Future<void> _editTransaction(Account account, Transaction transaction, TransactionType type,
-      {Account? secondary}) async {
+  Future<void> _editTransaction(Account account, Transaction transaction, TransactionType type, {Account? secondary}) async {
     if (!_isValid) return;
     final (Id?, Id?) sourceAndDest = switch (_type) {
       TransactionType.deposit => (null, account.id.value),

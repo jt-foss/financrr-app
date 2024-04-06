@@ -66,8 +66,7 @@ class _CurrencySettingsPageState extends State<CurrencySettingsPage> {
                 child: PaginatedTable(
                   key: _tableKey,
                   api: _api,
-                  initialPageFunction: (forceRetrieve) =>
-                      _api.retrieveAllCurrencies(limit: 10, forceRetrieve: forceRetrieve),
+                  initialPageFunction: (forceRetrieve) => _api.retrieveAllCurrencies(limit: 10, forceRetrieve: forceRetrieve),
                   fillWithEmptyRows: true,
                   width: size.width,
                   columns: const [
@@ -87,8 +86,8 @@ class _CurrencySettingsPageState extends State<CurrencySettingsPage> {
                             icon: const Icon(Icons.edit),
                             onPressed: currency is! CustomCurrency
                                 ? null
-                                : () => context.goPath(CurrencyEditPage.pagePath
-                                    .build(pathParams: {'currencyId': currency.id.value.toString()})),
+                                : () => context.goPath(
+                                    CurrencyEditPage.pagePath.build(pathParams: {'currencyId': currency.id.value.toString()})),
                           ),
                           IconButton(
                             icon: const Icon(Icons.delete),
