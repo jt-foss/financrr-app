@@ -50,14 +50,10 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
 
   void _onAuthenticationLogoutRequested(AuthenticationLogoutRequested event, Emitter<AuthenticationState> emit) async {
     try {
-      final bool success = await event.api.session.delete();
-      if (success) {
-        await Repositories.sessionRepository.delete();
-        emit(const AuthenticationState.unauthenticated());
-        return;
-      }
-    } on RestrrException catch (_) {}
-    emit(AuthenticationState.authenticated(event.api));
+      await event.api.session.delete();
+    } catch (_) {}
+    await Repositories.sessionRepository.delete();
+    emit(const AuthenticationState.unauthenticated());
   }
 
   RestrrBuilder _getRestrrBuilder(Uri uri) => RestrrBuilder(uri: uri, options: const RestrrOptions(isWeb: kIsWeb));
