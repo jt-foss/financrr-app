@@ -509,6 +509,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.0"
+  package_info_plus:
+    dependency: "direct main"
+    description:
+      name: package_info_plus
+      sha256: cb44f49b6e690fa766f023d5b22cac6b9affe741dd792b6ac7ad4fabe0d7b097
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.0.0"
+  package_info_plus_platform_interface:
+    dependency: transitive
+    description:
+      name: package_info_plus_platform_interface
+      sha256: "9bc8ba46813a4cc42c66ab781470711781940780fd8beddd0c3da62506d3a6c6"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.1"
   path:
     dependency: transitive
     description:
@@ -642,8 +658,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: development
-      resolved-ref: "8f8b70102d844c3b8e0beea7da19e49818116d57"
+      ref: "feature/cache-control"
+      resolved-ref: "0a19a91b2b09df5a441001c506210a9481e1cac2"
       url: "https://github.com/financrr/restrr.git"
     source: git
     version: "0.8.1"
