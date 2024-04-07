@@ -1,6 +1,7 @@
 import 'package:financrr_frontend/layout/scaffold_navbar_shell.dart';
 import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
 import 'package:financrr_frontend/pages/authentication/login_page.dart';
+import 'package:financrr_frontend/pages/core/settings/developer/cache_stats_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings/l10n/l10n_settings_page.dart';
 import 'package:financrr_frontend/pages/splash_page.dart';
 import 'package:financrr_frontend/pages/authentication/server_info_page.dart';
@@ -128,6 +129,11 @@ class AppRouter {
                                   context, state, CurrencyEditPage(currencyId: state.pathParameters['currencyId'])),
                               redirect: coreAuthGuard)
                         ]),
+                    GoRoute(
+                      path: CacheStatsSettingsPage.pagePath.path,
+                      pageBuilder: _defaultBranchPageBuilder(const CacheStatsSettingsPage()),
+                      redirect: coreAuthGuard,
+                    ),
                     GoRoute(
                       path: L10nSettingsPage.pagePath.path,
                       pageBuilder: _defaultBranchPageBuilder(const L10nSettingsPage()),
