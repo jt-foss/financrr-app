@@ -9,7 +9,7 @@ pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
     pub template: i32,
-    pub repeat_interval_seconds: i64,
+    pub repeat_interval_seconds: u32,
     pub created_at: TimeDateTimeWithTimeZone,
 }
 

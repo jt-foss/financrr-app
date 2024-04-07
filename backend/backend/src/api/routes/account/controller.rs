@@ -9,7 +9,7 @@ use crate::wrapper::entity::account::dto::AccountDTO;
 use crate::wrapper::entity::account::Account;
 use crate::wrapper::entity::user::User;
 use crate::wrapper::permission::{HasPermissionByIdOrError, HasPermissionOrError, Permissions};
-use crate::wrapper::types::phantom::Phantom;
+use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
 pub(crate) fn account_controller(cfg: &mut web::ServiceConfig) {
     cfg.service(

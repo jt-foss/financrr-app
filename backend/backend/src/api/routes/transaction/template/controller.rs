@@ -9,7 +9,7 @@ use crate::wrapper::entity::transaction::template::dto::TransactionTemplateDTO;
 use crate::wrapper::entity::transaction::template::TransactionTemplate;
 use crate::wrapper::entity::user::User;
 use crate::wrapper::permission::{HasPermissionOrError, Permissions};
-use crate::wrapper::types::phantom::Phantom;
+use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
 pub(crate) fn transaction_template_controller(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -63,7 +63,7 @@ pub(crate) async fn get_one_transaction_template(
     user: Phantom<User>,
     template_id: Path<i32>,
 ) -> Result<impl Responder, ApiError> {
-    let transaction = TransactionTemplate::get_by_id(template_id.into_inner()).await?;
+    let transaction = TransactionTemplate::find_by_id(template_id.into_inner()).await?;
     transaction.has_permission_or_error(user.get_id(), Permissions::READ).await?;
 
     Ok(HttpResponse::Ok().json(transaction))
@@ -110,7 +110,7 @@ pub(crate) async fn delete_transaction_template(
     user: Phantom<User>,
     template_id: Path<i32>,
 ) -> Result<impl Responder, ApiError> {
-    let template = TransactionTemplate::get_by_id(template_id.into_inner()).await?;
+    let template = TransactionTemplate::find_by_id(template_id.into_inner()).await?;
     template.has_permission_or_error(user.get_id(), Permissions::READ_DELETE).await?;
 
     template.delete().await?;
@@ -136,7 +136,7 @@ pub(crate) async fn update_transaction_template(
     update: TransactionTemplateDTO,
     template_id: Path<i32>,
 ) -> Result<impl Responder, ApiError> {
-    let template = TransactionTemplate::get_by_id(template_id.into_inner()).await?;
+    let template = TransactionTemplate::find_by_id(template_id.into_inner()).await?;
     template.has_permission_or_error(user.get_id(), Permissions::READ_WRITE).await?;
 
     let template = template.update(update).await?;

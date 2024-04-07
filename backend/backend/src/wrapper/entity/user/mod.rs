@@ -35,10 +35,6 @@ pub(crate) struct User {
 }
 
 impl User {
-    pub(crate) async fn find_by_id(id: i32) -> Result<Self, ApiError> {
-        Ok(Self::from(find_one_or_error(user::Entity::find_by_id(id), "User").await?))
-    }
-
     pub(crate) async fn exists(id: i32) -> Result<bool, ApiError> {
         Ok(count(user::Entity::find_by_id(id)).await? > 0)
     }
@@ -79,11 +75,11 @@ impl User {
 permission_impl!(User);
 
 impl Identifiable for User {
-    async fn from_id(id: i32) -> Result<Self, ApiError>
+    async fn find_by_id(id: i32) -> Result<Self, ApiError>
     where
         Self: Sized,
     {
-        Self::find_by_id(id).await
+        find_one_or_error(user::Entity::find_by_id(id), "User").await.map(Self::from)
     }
 }
 
@@ -108,7 +104,7 @@ impl FromRequest for User {
         Box::pin(async move {
             // get bearer token from request
             let token = extract_bearer_token(&req)?;
-            let user_id = Session::get_user_id(token).await?;
+            let user_id = Session::find_user_id(token).await?;
 
             Self::find_by_id(user_id).await
         })
@@ -123,7 +119,7 @@ impl FromRequest for Phantom<User> {
         let req = req.clone();
         Box::pin(async move {
             let token = extract_bearer_token(&req)?;
-            let user_id = Session::get_user_id(token).await?;
+            let user_id = Session::find_user_id(token).await?;
             User::exists(user_id).await?;
 
             Ok(Self::new(user_id))

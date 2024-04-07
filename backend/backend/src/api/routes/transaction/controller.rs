@@ -10,7 +10,7 @@ use crate::wrapper::entity::transaction::dto::{TransactionDTO, TransactionFromTe
 use crate::wrapper::entity::transaction::Transaction;
 use crate::wrapper::entity::user::User;
 use crate::wrapper::permission::{HasPermissionOrError, Permissions};
-use crate::wrapper::types::phantom::Phantom;
+use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
 pub(crate) fn transaction_controller(cfg: &mut web::ServiceConfig) {
     cfg.service(

@@ -58,10 +58,6 @@ impl Currency {
         Ok(())
     }
 
-    pub(crate) async fn find_by_id(id: i32) -> Result<Self, ApiError> {
-        Ok(Self::from(find_one_or_error(currency::Entity::find_by_id(id), "Currency").await?))
-    }
-
     pub(crate) async fn find_by_id_include_user(id: i32, user_id: i32) -> Result<Self, ApiError> {
         Ok(Self::from(find_one_or_error(currency::Entity::find_by_id_include_user_id(id, user_id), "Currency").await?))
     }
@@ -124,11 +120,11 @@ impl WrapperEntity for Currency {
 }
 
 impl Identifiable for Currency {
-    async fn from_id(id: i32) -> Result<Self, ApiError>
+    async fn find_by_id(id: i32) -> Result<Self, ApiError>
     where
         Self: Sized,
     {
-        Self::find_by_id(id).await
+        find_one_or_error(currency::Entity::find_by_id(id), "Currency").await.map(Self::from)
     }
 }
 

@@ -5,6 +5,7 @@ use crate::wrapper::permission::{Permission, Permissions};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
 pub(crate) mod controller;
+pub(crate) mod recurring;
 pub(crate) mod template;
 pub(crate) mod validation;
 
@@ -15,7 +16,7 @@ pub(crate) async fn check_transaction_permissions(
     user_id: i32,
 ) -> Result<bool, ApiError> {
     if let Some(budget) = budget_id {
-        let budget = Budget::from_id(budget.get_id()).await?;
+        let budget = Budget::find_by_id(budget.get_id()).await?;
         budget.has_permission(user_id, Permissions::READ_WRITE).await?;
     }
 

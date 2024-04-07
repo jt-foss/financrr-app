@@ -65,7 +65,7 @@ tag = "Budget"
 )]
 #[get("/{budget_id}")]
 pub(crate) async fn get_one_budget(user: Phantom<User>, budget_id: Path<i32>) -> Result<impl Responder, ApiError> {
-    let budget = Budget::from_id(budget_id.into_inner()).await?;
+    let budget = Budget::find_by_id(budget_id.into_inner()).await?;
     budget.has_permission_or_error(user.get_id(), Permissions::READ).await?;
 
     Ok(HttpResponse::Ok().json(budget))
@@ -136,7 +136,7 @@ tag = "Budget"
 )]
 #[delete("/{budget_id}")]
 pub(crate) async fn delete_budget(user: Phantom<User>, budget_id: Path<i32>) -> Result<impl Responder, ApiError> {
-    let budget = Budget::from_id(budget_id.into_inner()).await?;
+    let budget = Budget::find_by_id(budget_id.into_inner()).await?;
     budget.has_permission_or_error(user.get_id(), Permissions::READ_DELETE).await?;
 
     budget.delete().await?;
@@ -164,7 +164,7 @@ pub(crate) async fn update_budget(
     budget_id: Path<i32>,
     budget_dto: Json<BudgetDTO>,
 ) -> Result<impl Responder, ApiError> {
-    let budget = Budget::from_id(budget_id.into_inner()).await?;
+    let budget = Budget::find_by_id(budget_id.into_inner()).await?;
     budget.has_permission_or_error(user.get_id(), Permissions::READ_WRITE).await?;
 
     let budget = budget.update(budget_dto.into_inner()).await?;

@@ -56,10 +56,6 @@ impl TransactionTemplate {
         Ok(template)
     }
 
-    pub(crate) async fn get_by_id(id: i32) -> Result<Self, ApiError> {
-        find_one_or_error(transaction_template::Entity::find_by_id(id), "TransactionTemplate").await.map(Self::from)
-    }
-
     pub(crate) async fn count_all_by_user_id(user_id: i32) -> Result<u64, ApiError> {
         count(transaction_template::Entity::find_all_by_user_id(user_id)).await
     }
@@ -117,8 +113,8 @@ impl From<transaction_template::Model> for TransactionTemplate {
 }
 
 impl Identifiable for TransactionTemplate {
-    async fn from_id(id: i32) -> Result<Self, ApiError> {
-        Self::get_by_id(id).await
+    async fn find_by_id(id: i32) -> Result<Self, ApiError> {
+        find_one_or_error(transaction_template::Entity::find_by_id(id), "TransactionTemplate").await.map(Self::from)
     }
 }
 

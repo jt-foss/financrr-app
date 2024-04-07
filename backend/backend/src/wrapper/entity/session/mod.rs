@@ -26,6 +26,7 @@ use crate::util::auth::extract_bearer_token;
 use crate::wrapper::entity::user::User;
 use crate::wrapper::entity::{TableName, WrapperEntity};
 use crate::wrapper::permission::{Permission, Permissions};
+use crate::wrapper::types::phantom::Identifiable;
 use crate::wrapper::util::handle_async_result_vec;
 
 pub(crate) mod dto;
@@ -94,8 +95,8 @@ impl Session {
         Self::from_model(model).await
     }
 
-    pub(crate) async fn get_user_id(token: String) -> Result<i32, ApiError> {
-        let user_id = Self::get_user_id_from_redis(token.to_owned()).await?;
+    pub(crate) async fn find_user_id(token: String) -> Result<i32, ApiError> {
+        let user_id = Self::find_user_id_from_redis(token.to_owned()).await?;
 
         match user_id {
             Some(id) => Ok(id),
@@ -103,7 +104,7 @@ impl Session {
         }
     }
 
-    async fn get_user_id_from_redis(token: String) -> Result<Option<i32>, ApiError> {
+    async fn find_user_id_from_redis(token: String) -> Result<Option<i32>, ApiError> {
         let user_id = get::<Option<i32>>(token.to_owned()).await?;
 
         match user_id {
