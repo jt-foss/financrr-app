@@ -1,8 +1,9 @@
 import 'dart:math';
 
-import 'package:financrr_frontend/pages/core/settings/currency_settings_page.dart';
+import 'package:financrr_frontend/pages/core/settings/currency/currency_settings_page.dart';
 import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
 import 'package:financrr_frontend/util/extensions.dart';
+import 'package:financrr_frontend/widgets/entities/currency_card.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:restrr/restrr.dart';
@@ -33,16 +34,15 @@ class CurrencyCreatePage extends StatefulWidget {
           title: Text('${previewAmount.toStringAsFixed(int.tryParse(decimalPlaces) ?? 0)} $symbol'),
         ),
       ),
-      SizedBox(
-        width: size.width,
-        child: DataTable(columns: const [
-          DataColumn(label: Text('Symbol')),
-          DataColumn(label: Text('Name')),
-          DataColumn(label: Text('ISO')),
-        ], rows: [
-          DataRow(cells: [DataCell(Text(symbol)), DataCell(Text(name)), DataCell(Text(isoCode))])
-        ]),
-      ),
+      CurrencyCard.fromData(
+        id: -1,
+        name: name,
+        symbol: symbol,
+        decimalPlaces: int.tryParse(decimalPlaces) ?? 0,
+        isoCode: isoCode.isEmpty ? null : isoCode,
+        isCustom: true,
+        interactive: false,
+      )
     ];
   }
 }

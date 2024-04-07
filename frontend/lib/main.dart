@@ -5,7 +5,9 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:financrr_frontend/data/l10n_repository.dart';
 import 'package:financrr_frontend/data/repositories.dart';
 import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
+import 'package:financrr_frontend/pages/core/settings/currency/bloc/currency_bloc.dart';
 import 'package:financrr_frontend/pages/core/settings/l10n/bloc/l10n_bloc.dart';
+import 'package:financrr_frontend/pages/core/settings/session/bloc/session_bloc.dart';
 import 'package:financrr_frontend/router.dart';
 import 'package:financrr_frontend/themes.dart';
 import 'package:flutter/foundation.dart';
@@ -91,7 +93,9 @@ class FinancrrAppState extends State<FinancrrApp> {
         BlocProvider(create: (_) => AuthenticationBloc()..add(const AuthenticationRecoveryRequested())),
         BlocProvider(
             create: (_) => L10nBloc(L10nService.get().decimalSeparator, L10nService.get().thousandSeparator,
-                DateFormat(L10nService.get().dateTimeFormat)))
+                DateFormat(L10nService.get().dateTimeFormat))),
+        BlocProvider(create: (_) => CurrencyBloc()),
+        BlocProvider(create: (_) => SessionBloc()),
       ],
       child: BlocListener<AuthenticationBloc, AuthenticationState>(
         listener: (context, state) => AppRouter.goRouter.refresh(),

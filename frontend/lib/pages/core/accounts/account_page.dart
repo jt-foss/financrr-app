@@ -141,7 +141,7 @@ class _AccountPageState extends State<AccountPage> {
             initialPageFunction: (forceRetrieve) => account.retrieveAllTransactions(forceRetrieve: forceRetrieve),
             onLoading: (_, __) => const Center(child: CircularProgressIndicator()),
             onSuccess: (context, snap) {
-              final List<Transaction> transactions = snap.data!.page.items;
+              final List<Transaction> transactions = snap.data!.items;
               if (transactions.isEmpty) {
                 return Center(
                     child: NoticeCard(
