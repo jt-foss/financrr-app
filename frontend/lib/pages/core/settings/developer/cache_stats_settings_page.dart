@@ -74,7 +74,8 @@ class _CacheStatsPageState extends State<CacheStatsPage> {
             ],
           ),
           const Divider(),
-          Table(
+          if (cache.pageCache.isNotEmpty)
+            Table(
             border: TableBorder.all(color: context.theme.dividerColor),
             children: [
               const TableRow(children: [
