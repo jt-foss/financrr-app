@@ -6,17 +6,18 @@ import 'package:restrr/restrr.dart';
 import '../../../../layout/adaptive_scaffold.dart';
 import '../../../../router.dart';
 import '../../settings_page.dart';
+import 'cache_stats_inspect_page.dart';
 
-class CacheStatsSettingsPage extends StatefulWidget {
+class CacheStatsPage extends StatefulWidget {
   static const PagePathBuilder pagePath = PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'cache-stats');
 
-  const CacheStatsSettingsPage({super.key});
+  const CacheStatsPage({super.key});
 
   @override
-  State<StatefulWidget> createState() => _CacheStatsSettingsPageState();
+  State<StatefulWidget> createState() => _CacheStatsPageState();
 }
 
-class _CacheStatsSettingsPageState extends State<CacheStatsSettingsPage> {
+class _CacheStatsPageState extends State<CacheStatsPage> {
   @override
   Widget build(BuildContext context) {
     return AdaptiveScaffold(
@@ -35,6 +36,8 @@ class _CacheStatsSettingsPageState extends State<CacheStatsSettingsPage> {
             children: [
               _buildCacheStats('Accounts', CacheService.accountCache),
               _buildCacheStats('Transactions', CacheService.transactionCache),
+              _buildCacheStats('Users', CacheService.userCache),
+              _buildCacheStats('Sessions', CacheService.sessionCache),
               _buildCacheStats('Currencies', CacheService.currencyCache),
             ],
           ),
@@ -55,18 +58,19 @@ class _CacheStatsSettingsPageState extends State<CacheStatsSettingsPage> {
               Text(title, style: context.textTheme.titleSmall),
               const Spacer(),
               Text('${cache.getAll().length.toString()} cached'),
-              PopupMenuButton(
-                  itemBuilder: (context) => [
-                        PopupMenuItem(
-                          child: ListTile(
-                            title: const Text('Invalidate Cache'),
-                            onTap: () {
-                              cache.invalidate();
-                              setState(() {});
-                            },
-                          ),
-                        )
-                      ])
+              PopupMenuButton(itemBuilder: (context) {
+                return [
+                  PopupMenuItem(
+                      onTap: () {
+                        cache.invalidate();
+                        setState(() {});
+                      },
+                      child: const Text('Invalidate Cache')),
+                  PopupMenuItem(
+                      onTap: () => context.goPath(CacheStatsInspectPage.pagePath.build(), extra: cache),
+                      child: Text('Inspect "$title"'))
+                ];
+              })
             ],
           ),
           const Divider(),

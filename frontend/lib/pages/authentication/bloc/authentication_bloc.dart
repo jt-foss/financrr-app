@@ -63,6 +63,8 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
         isWeb: kIsWeb,
         accountCacheStrategy: CacheService.accountCache,
         transactionCacheStrategy: CacheService.transactionCache,
+        userCacheStrategy: CacheService.userCache,
+        sessionCacheStrategy: CacheService.sessionCache,
         currencyCacheStrategy: CacheService.currencyCache,
       ));
 }

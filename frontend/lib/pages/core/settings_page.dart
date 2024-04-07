@@ -93,7 +93,7 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
       SettingsItem(
         child: ListTile(
-          onTap: () => context.goPath(CacheStatsSettingsPage.pagePath.build()),
+          onTap: () => context.goPath(CacheStatsPage.pagePath.build()),
           leading: const Icon(Icons.cached),
           title: const Text('Cache'),
         ),
