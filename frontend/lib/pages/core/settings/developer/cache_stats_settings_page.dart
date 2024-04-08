@@ -48,6 +48,8 @@ class _CacheStatsPageState extends State<CacheStatsPage> {
 
   Widget _buildCacheStats<E extends RestrrEntity<E, ID>, ID extends EntityId<E>>(
       String title, DefaultEntityCacheStrategy<E, ID> cache) {
+    final List<IdPage> idPages = cache.pageCache.toList();
+    final Set<int> distinctPageSizes = idPages.map((e) => e.pageSize).toSet();
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
       child: Column(
@@ -76,41 +78,40 @@ class _CacheStatsPageState extends State<CacheStatsPage> {
           const Divider(),
           if (cache.pageCache.isNotEmpty)
             Table(
-            border: TableBorder.all(color: context.theme.dividerColor),
-            children: [
-              const TableRow(children: [
-                Padding(
-                  padding: EdgeInsets.all(10),
-                  child: Text('Page'),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(10),
-                  child: Text('Size'),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(10),
-                  child: Text('Amount'),
-                ),
-              ]),
-              for (MapEntry<(int, int), List<Id>> entry in cache.pageCache.entries)
+              border: TableBorder.all(color: context.theme.dividerColor),
+              children: [
                 TableRow(children: [
-                  Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Text(entry.key.$1.toString()),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Text(entry.key.$2.toString()),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Text('${entry.value.length}'),
-                  ),
+                  _buildTableRow('Page'),
+                  _buildTableRow('Size'),
+                  _buildTableRow('Amount'),
+                  _buildTableRow('Split?'),
                 ]),
-            ],
-          ),
+                for (IdPage page in cache.pageCache.toList())
+                  TableRow(children: [
+                    _buildTableRow(page.pageNumber),
+                    _buildTableRow(page.pageSize),
+                    _buildTableRow(page.ids.length),
+                    Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Icon(page.fromSplit ? Icons.check : Icons.close, size: 17)
+                    )
+                  ]),
+              ],
+            ),
+          for (int pageSize in distinctPageSizes)
+            Padding(
+              padding: const EdgeInsets.only(top: 5),
+              child: Text('[$pageSize]: Next Page: ${cache.getNextPageNumber(pageSize)}'),
+            ),
         ],
       ),
+    );
+  }
+
+  Widget _buildTableRow(dynamic value) {
+    return Padding(
+      padding: const EdgeInsets.all(10),
+      child: Text(value.toString()),
     );
   }
 }
