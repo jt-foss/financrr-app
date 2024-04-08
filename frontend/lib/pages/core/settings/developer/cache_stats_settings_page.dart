@@ -34,11 +34,11 @@ class _CacheStatsPageState extends State<CacheStatsPage> {
           width: size.width / 1.1,
           child: ListView(
             children: [
+              _buildCacheStats('Currencies', CacheService.currencyCache),
+              _buildCacheStats('Sessions', CacheService.sessionCache),
               _buildCacheStats('Accounts', CacheService.accountCache),
               _buildCacheStats('Transactions', CacheService.transactionCache),
               _buildCacheStats('Users', CacheService.userCache),
-              _buildCacheStats('Sessions', CacheService.sessionCache),
-              _buildCacheStats('Currencies', CacheService.currencyCache),
             ],
           ),
         ),

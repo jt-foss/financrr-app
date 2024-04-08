@@ -49,13 +49,12 @@ class _CacheStatsInspectPageState extends State<CacheStatsInspectPage> {
             itemBuilder: (_, index) {
               final dynamic entity = widget.cacheStrategy!.getAll()[index];
               final String s = entity.toString();
-              return ListTile(
-                title: Text(entity.runtimeType.toString(), style: context.textTheme.titleSmall),
-                subtitle: Text(s.replaceAll(entity.runtimeType.toString(), '')),
+              return GestureDetector(
                 onTap: () async {
                   context.showSnackBar('Copied to clipboard!');
                   await Clipboard.setData(ClipboardData(text: s));
                 },
+                child: Text(s)
               );
             },
           ),

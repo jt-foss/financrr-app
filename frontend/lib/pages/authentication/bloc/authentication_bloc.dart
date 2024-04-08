@@ -61,10 +61,10 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
       uri: uri,
       options: RestrrOptions(
         isWeb: kIsWeb,
+        currencyCacheStrategy: CacheService.currencyCache,
+        sessionCacheStrategy: CacheService.sessionCache,
         accountCacheStrategy: CacheService.accountCache,
         transactionCacheStrategy: CacheService.transactionCache,
         userCacheStrategy: CacheService.userCache,
-        sessionCacheStrategy: CacheService.sessionCache,
-        currencyCacheStrategy: CacheService.currencyCache,
       ));
 }
