@@ -659,7 +659,7 @@ packages:
     description:
       path: "."
       ref: "feature/cache-control"
-      resolved-ref: "8cf28324b0cc496e08b41961c06234b3fd42bda7"
+      resolved-ref: d5779eb24a5a1a52f942361f619a1264b93b90ff
       url: "https://github.com/financrr/restrr.git"
     source: git
     version: "0.8.1"
