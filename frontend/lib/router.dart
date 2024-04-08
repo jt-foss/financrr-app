@@ -56,7 +56,7 @@ class AppRouter {
               routes: [
                 GoRoute(
                     path: AccountCreatePage.pagePath.path,
-                    pageBuilder: _defaultBranchPageBuilder(const AccountCreatePage()),
+                    pageBuilder: _defaultPageBuilder(const AccountCreatePage()),
                     redirect: coreAuthGuard),
                 GoRoute(
                     path: AccountPage.pagePath.path,
@@ -113,16 +113,16 @@ class AppRouter {
               routes: [
                 GoRoute(
                     path: ThemeSettingsPage.pagePath.path,
-                    pageBuilder: _defaultBranchPageBuilder(const ThemeSettingsPage()),
+                    pageBuilder: _defaultPageBuilder(const ThemeSettingsPage()),
                     redirect: coreAuthGuard),
                 GoRoute(
                     path: CurrencySettingsPage.pagePath.path,
-                    pageBuilder: _defaultBranchPageBuilder(const CurrencySettingsPage()),
+                    pageBuilder: _defaultPageBuilder(const CurrencySettingsPage()),
                     redirect: coreAuthGuard,
                     routes: [
                       GoRoute(
                           path: CurrencyCreatePage.pagePath.path,
-                          pageBuilder: _defaultBranchPageBuilder(const CurrencyCreatePage()),
+                          pageBuilder: _defaultPageBuilder(const CurrencyCreatePage()),
                           redirect: coreAuthGuard),
                       GoRoute(
                           path: CurrencyEditPage.pagePath.path,
@@ -132,7 +132,7 @@ class AppRouter {
                     ]),
                 GoRoute(
                   path: CacheStatsPage.pagePath.path,
-                  pageBuilder: _defaultBranchPageBuilder(const CacheStatsPage()),
+                  pageBuilder: _defaultPageBuilder(const CacheStatsPage()),
                   redirect: coreAuthGuard,
                   routes: [
                     GoRoute(
@@ -147,12 +147,12 @@ class AppRouter {
                 ),
                 GoRoute(
                   path: L10nSettingsPage.pagePath.path,
-                  pageBuilder: _defaultBranchPageBuilder(const L10nSettingsPage()),
+                  pageBuilder: _defaultPageBuilder(const L10nSettingsPage()),
                   redirect: coreAuthGuard,
                 ),
                 GoRoute(
                     path: SessionSettingsPage.pagePath.path,
-                    pageBuilder: _defaultBranchPageBuilder(const SessionSettingsPage()),
+                    pageBuilder: _defaultPageBuilder(const SessionSettingsPage()),
                     redirect: coreAuthGuard),
               ]),
           ..._shellRoutes(),
@@ -206,7 +206,15 @@ class AppRouter {
   }
 
   static Page<T> _buildDefaultPageTransition<T>(BuildContext context, GoRouterState state, Widget child) {
-    return CustomTransitionPage(
+    return CupertinoPage(child: child);
+  }
+
+  static Page<T> Function(BuildContext, GoRouterState) _defaultPageBuilder<T>(Widget child) {
+    return (context, state) => _buildDefaultPageTransition(context, state, child);
+  }
+
+  static Page<T> Function(BuildContext, GoRouterState) _defaultBranchPageBuilder<T>(Widget child) {
+    return (context, state) => CustomTransitionPage(
         child: child,
         transitionsBuilder: (context, animation, _, child) {
           return FadeTransition(
@@ -215,9 +223,6 @@ class AppRouter {
           );
         });
   }
-
-  static Page<T> Function(BuildContext, GoRouterState) _defaultBranchPageBuilder<T>(Widget child) =>
-      (context, state) => _buildDefaultPageTransition(context, state, child);
 }
 
 class PagePathBuilder {
