@@ -51,7 +51,7 @@ dependencies:
   # Other
   flutter_svg: ^2.0.9
   logging: ^1.2.0
-  device_info_plus: ^10.0.1
+  device_info_plus: ^10.1.0
   package_info_plus: ^6.0.0
 dev_dependencies:
   flutter_launcher_icons: ^0.13.1
