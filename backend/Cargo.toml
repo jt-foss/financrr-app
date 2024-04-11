@@ -44,7 +44,7 @@ serde = { version = "1.0.197", features = ["derive"] }
 sea-orm = { version = "1.0.0-rc.3", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros", "mock"] }
 
 # Date/Time
-time = { version = "0.3.35", features = ["serde-human-readable", "local-offset"] }
+time = { version = "0.3.36", features = ["serde-human-readable", "local-offset"] }
 
 # Logging
 tracing = "0.1.40"
