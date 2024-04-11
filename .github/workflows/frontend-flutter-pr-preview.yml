@@ -2,14 +2,14 @@ name: (Frontend) Deploy PR previews
 concurrency: preview-${{ github.ref }}
 on:
   pull_request:
+    branches: ['main']
     types:
       - opened
       - reopened
       - synchronize
       - closed
     paths:
-      - 'frontend/lib'
-      - '**.dart'
+      - 'frontend/**'
 
 # Set default working directory
 defaults:
@@ -32,7 +32,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.0'
+          channel: 'stable'
 
       - name: Flutter Clean and Upgrade Packages
         run: |
@@ -45,7 +45,7 @@ jobs:
 
       - uses: rossjrw/pr-preview-action@v1
         with:
-          source-dir: ./build/web
+          source-dir: ./frontend/build/web
           preview-branch: gh-pages
           umbrella-dir: pr-preview
           action: auto
