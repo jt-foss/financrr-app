@@ -27,8 +27,10 @@ enum RepositoryKey<T> {
   final T? Function(String?)? fromValue;
   final String? Function(T?)? toValue;
 
-  const RepositoryKey(this.key, {required this.type, this.defaultValue, this.defaultFactory, this.secure = false, this.fromValue, this.toValue})
-      : assert(!secure || (type == String), 'Secure keys must be of type String!'), assert(defaultValue == null || defaultFactory == null);
+  const RepositoryKey(this.key,
+      {required this.type, this.defaultValue, this.defaultFactory, this.secure = false, this.fromValue, this.toValue})
+      : assert(!secure || (type == String), 'Secure keys must be of type String!'),
+        assert(defaultValue == null || defaultFactory == null);
 
   T? readSync() => Repository().readSync(this);
   String? readSyncAsString() => Repository().readSyncAsString(this);

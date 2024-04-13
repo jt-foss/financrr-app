@@ -59,8 +59,7 @@ class _SessionSettingsPageState extends State<SessionSettingsPage> {
                         valueListenable: _amount,
                         builder: (context, value, child) {
                           return Text('${_amount.value} session(s)');
-                        }
-                    )
+                        })
                   ],
                 ),
                 const Divider(),
@@ -68,8 +67,7 @@ class _SessionSettingsPageState extends State<SessionSettingsPage> {
                   listener: (context, state) => _paginatedSessionKey.currentState?.reset(),
                   child: PaginatedWrapper(
                     key: _paginatedSessionKey,
-                    initialPageFunction: (forceRetrieve) =>
-                        _api.retrieveAllSessions(limit: 10, forceRetrieve: forceRetrieve),
+                    initialPageFunction: (forceRetrieve) => _api.retrieveAllSessions(limit: 10, forceRetrieve: forceRetrieve),
                     onError: (context, snap) {
                       if (snap.error is ServerException) {
                         context.read<AuthenticationBloc>().add(AuthenticationLogoutRequested(api: _api));

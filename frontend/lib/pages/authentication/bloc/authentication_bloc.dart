@@ -55,6 +55,5 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
     emit(const AuthenticationState.unauthenticated());
   }
 
-  RestrrBuilder _getRestrrBuilder(Uri uri) => RestrrBuilder(uri: uri)
-      ..options = (RestrrOptions()..isWeb = kIsWeb);
+  RestrrBuilder _getRestrrBuilder(Uri uri) => RestrrBuilder(uri: uri)..options = (RestrrOptions()..isWeb = kIsWeb);
 }

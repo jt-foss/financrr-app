@@ -108,7 +108,8 @@ class TransactionPageState extends State<TransactionPage> {
                                 color: transaction.type == TransactionType.deposit
                                     ? context.theme.primaryColor
                                     : context.theme.colorScheme.error)),
-                        Text(transaction.description ?? RepositoryKey.dateTimeFormat.readSync()!.format(transaction.executedAt)),
+                        Text(
+                            transaction.description ?? RepositoryKey.dateTimeFormat.readSync()!.format(transaction.executedAt)),
                       ],
                     ),
                     const Divider(),
@@ -139,7 +140,8 @@ class TransactionPageState extends State<TransactionPage> {
                           _buildTableRow('Description', transaction.description ?? 'N/A'),
                           _buildTableRow('From', transaction.sourceId?.get()?.name ?? 'N/A'),
                           _buildTableRow('To', transaction.destinationId?.get()?.name ?? 'N/A'),
-                          _buildTableRow('Executed at', RepositoryKey.dateTimeFormat.readSync()!.format(transaction.executedAt)),
+                          _buildTableRow(
+                              'Executed at', RepositoryKey.dateTimeFormat.readSync()!.format(transaction.executedAt)),
                           _buildTableRow('Created at', RepositoryKey.dateTimeFormat.readSync()!.format(transaction.createdAt)),
                         ],
                       ),

@@ -53,8 +53,8 @@ class SessionCard extends StatelessWidget {
                   ),
                 ),
                 IconButton(
-                    onPressed: onDelete,
-                    icon: Icon(isCurrent ? Icons.logout_rounded : Icons.delete_rounded),
+                  onPressed: onDelete,
+                  icon: Icon(isCurrent ? Icons.logout_rounded : Icons.delete_rounded),
                 )
               ],
             ),

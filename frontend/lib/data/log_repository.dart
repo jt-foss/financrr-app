@@ -1,13 +1,4 @@
-enum LogLevel {
-  finest,
-  finer,
-  fine,
-  config,
-  info,
-  warning,
-  severe,
-  shout
-}
+enum LogLevel { finest, finer, fine, config, info, warning, severe, shout }
 
 class LogEntry {
   final String message;

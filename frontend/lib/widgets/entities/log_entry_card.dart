@@ -31,7 +31,9 @@ class LogEntryCard extends StatelessWidget {
                       padding: const EdgeInsets.only(right: 5),
                       child: Icon(_getIcon(logEntry.level), color: _getColorTint(logEntry.level), size: 17),
                     ),
-                    Expanded(child: Text('${logEntry.level.name}, ${RepositoryKey.dateTimeFormat.readSync()!.format(logEntry.timestamp)}')),
+                    Expanded(
+                        child: Text(
+                            '${logEntry.level.name}, ${RepositoryKey.dateTimeFormat.readSync()!.format(logEntry.timestamp)}')),
                   ],
                 ),
               ],
