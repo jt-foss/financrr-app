@@ -20,4 +20,9 @@ class LogEntry {
 }
 
 class LogEntryRepository extends InMemoryRepository<LogEntry> {
+  static final LogEntryRepository _instance = LogEntryRepository._();
+
+  factory LogEntryRepository() => _instance;
+
+  LogEntryRepository._();
 }

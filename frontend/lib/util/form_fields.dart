@@ -1,3 +1,4 @@
+import 'package:financrr_frontend/data/bloc/repository_bloc.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/text_utils.dart';
 import 'package:flutter/material.dart';
@@ -5,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restrr/restrr.dart';
 
-import '../pages/core/settings/l10n/bloc/l10n_bloc.dart';
 import 'input_utils.dart';
 
 /// A collection of form fields used throughout the application.
@@ -90,7 +90,7 @@ class FormFields {
           ],
         ),
       ),
-      BlocBuilder<L10nBloc, L10nState>(
+      BlocBuilder<RepositoryBloc, RepositoryState>(
         builder: (context, state) {
           return Padding(
             padding: const EdgeInsets.only(bottom: 10),

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../data/log_repository.dart';
-import '../../../../data/repositories.dart';
 import '../../../../layout/adaptive_scaffold.dart';
 import '../../../../router.dart';
 import '../../../../widgets/notice_card.dart';
@@ -27,7 +26,7 @@ class _LogSettingsPageState extends State<LogSettingsPage> {
   @override
   void initState() {
     super.initState();
-    _entries = Repositories.logEntryRepository.getAsList();
+    _entries = LogEntryRepository().getAsList();
     sortEntries();
   }
 
@@ -103,7 +102,7 @@ class _LogSettingsPageState extends State<LogSettingsPage> {
             Text('${_entries.length} entries'),
             IconButton(
                 onPressed: () => setState(() {
-                  Repositories.logEntryRepository.clear();
+                  LogEntryRepository().clear();
                   _entries.clear();
                 }),
                 icon: const Icon(Icons.delete_sweep_outlined)
