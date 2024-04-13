@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:financrr_frontend/data/l10n_repository.dart';
+import 'package:financrr_frontend/data/log_repository.dart';
 import 'package:financrr_frontend/data/repositories.dart';
 import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
 import 'package:financrr_frontend/pages/core/settings/currency/bloc/currency_bloc.dart';
@@ -22,6 +23,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'app_bloc_observer.dart';
 import 'data/theme_repository.dart';
 
+Logger log = Logger('FinancrrLogger');
+
 void main() async {
   usePathUrlStrategy();
   SharedPreferences.setPrefix('financrr.');
@@ -35,6 +38,17 @@ void main() async {
   final SharedPreferences preferences = await SharedPreferences.getInstance();
   const FlutterSecureStorage storage = FlutterSecureStorage();
   await Repositories.init(storage, preferences);
+
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details);
+    log.severe(
+        'FlutterError: ${details.exceptionAsString()}\n\nLibrary: ${details.library}\n\nContext: ${details.context}\n\nStackTrace: ${details.stack}');
+  };
+
+  Logger.root.onRecord.listen((event) {
+    Repositories.logEntryRepository.add(
+        LogEntry(level: LogLevel.values.byName(event.level.name.toLowerCase()), message: event.message, timestamp: event.time));
+  });
 
   // init themes
   await AppThemeLoader.init();

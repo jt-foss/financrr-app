@@ -1,8 +1,7 @@
 import 'package:financrr_frontend/layout/scaffold_navbar_shell.dart';
 import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
 import 'package:financrr_frontend/pages/authentication/login_page.dart';
-import 'package:financrr_frontend/pages/core/settings/developer/cache_stats_inspect_page.dart';
-import 'package:financrr_frontend/pages/core/settings/developer/cache_stats_settings_page.dart';
+import 'package:financrr_frontend/pages/core/settings/dev/log_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings/l10n/l10n_settings_page.dart';
 import 'package:financrr_frontend/pages/splash_page.dart';
 import 'package:financrr_frontend/pages/authentication/server_info_page.dart';
@@ -25,7 +24,6 @@ import 'package:financrr_frontend/util/constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:restrr/restrr.dart';
 
 class AppRouter {
   const AppRouter._();
@@ -131,19 +129,9 @@ class AppRouter {
                           redirect: coreAuthGuard)
                     ]),
                 GoRoute(
-                  path: CacheStatsPage.pagePath.path,
-                  pageBuilder: _defaultPageBuilder(const CacheStatsPage()),
+                  path: LogSettingsPage.pagePath.path,
+                  pageBuilder: _defaultPageBuilder(const LogSettingsPage()),
                   redirect: coreAuthGuard,
-                  routes: [
-                    GoRoute(
-                        path: CacheStatsInspectPage.pagePath.path,
-                        pageBuilder: (context, state) => _buildDefaultPageTransition(
-                            context,
-                            state,
-                            CacheStatsInspectPage(
-                                cacheStrategy: state.extra is EntityCacheStrategy ? state.extra as EntityCacheStrategy : null)),
-                        redirect: coreAuthGuard)
-                  ],
                 ),
                 GoRoute(
                   path: L10nSettingsPage.pagePath.path,

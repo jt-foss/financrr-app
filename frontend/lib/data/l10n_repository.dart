@@ -15,7 +15,7 @@ class L10nPreferences {
   }
 }
 
-class L10nRepository extends Repository<L10nPreferences> {
+class L10nRepository extends SharedPreferencesRepository<L10nPreferences> {
   L10nRepository({required super.preferences});
 
   @override

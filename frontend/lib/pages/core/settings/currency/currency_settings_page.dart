@@ -104,7 +104,6 @@ class _CurrencySettingsPageState extends State<CurrencySettingsPage> {
       await currency.delete();
       if (!mounted) return;
       context.showSnackBar('Successfully deleted "${currency.name}"');
-      context.read<CurrencyBloc>().add(const CurrencyUpdateEvent());
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);
     }

@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:financrr_frontend/cache/cache_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -57,14 +56,6 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
     emit(const AuthenticationState.unauthenticated());
   }
 
-  RestrrBuilder _getRestrrBuilder(Uri uri) => RestrrBuilder(
-      uri: uri,
-      options: RestrrOptions(
-        isWeb: kIsWeb,
-        currencyCacheStrategy: CacheService.currencyCache,
-        sessionCacheStrategy: CacheService.sessionCache,
-        accountCacheStrategy: CacheService.accountCache,
-        transactionCacheStrategy: CacheService.transactionCache,
-        userCacheStrategy: CacheService.userCache,
-      ));
+  RestrrBuilder _getRestrrBuilder(Uri uri) => RestrrBuilder(uri: uri)
+      ..options = (RestrrOptions()..isWeb = kIsWeb);
 }

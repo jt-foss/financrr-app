@@ -114,8 +114,6 @@ class _SessionSettingsPageState extends State<SessionSettingsPage> {
       context.showSnackBar('Successfully deleted "${session.name ?? 'Session ${session.id.value}'}"');
       if (session.id.value == _api.session.id.value) {
         context.read<AuthenticationBloc>().add(AuthenticationLogoutRequested(api: _api));
-      } else {
-        context.read<SessionBloc>().add(const SessionUpdateEvent());
       }
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);

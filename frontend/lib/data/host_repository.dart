@@ -10,7 +10,7 @@ class HostPreferences {
   }
 }
 
-class HostRepository extends Repository<HostPreferences> {
+class HostRepository extends SharedPreferencesRepository<HostPreferences> {
   HostRepository({required super.preferences});
 
   @override

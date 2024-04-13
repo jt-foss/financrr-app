@@ -24,7 +24,7 @@ class ThemePreferences {
   }
 }
 
-class ThemeRepository extends Repository<ThemePreferences> {
+class ThemeRepository extends SharedPreferencesRepository<ThemePreferences> {
   ThemeRepository({required super.preferences});
 
   @override

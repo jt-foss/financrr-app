@@ -1,5 +1,5 @@
 import 'package:financrr_frontend/pages/core/settings/currency/currency_settings_page.dart';
-import 'package:financrr_frontend/pages/core/settings/developer/cache_stats_settings_page.dart';
+import 'package:financrr_frontend/pages/core/settings/dev/log_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings/l10n/l10n_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings/session/session_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings/theme_settings_page.dart';
@@ -85,17 +85,11 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     ]),
     SettingsItemGroup(title: 'Developer', items: [
-      const SettingsItem(
-        child: ListTile(
-          leading: Icon(Icons.format_align_left_rounded),
-          title: Text('Logs'),
-        ),
-      ),
       SettingsItem(
         child: ListTile(
-          onTap: () => context.goPath(CacheStatsPage.pagePath.build()),
-          leading: const Icon(Icons.cached),
-          title: const Text('Cache'),
+          onTap: () => context.goPath(LogSettingsPage.pagePath.build()),
+          leading: const Icon(Icons.format_align_left_rounded),
+          title: const Text('Logs'),
         ),
       ),
     ]),

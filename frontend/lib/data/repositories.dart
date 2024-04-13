@@ -1,3 +1,4 @@
+import 'package:financrr_frontend/data/log_repository.dart';
 import 'package:financrr_frontend/data/session_repository.dart';
 import 'package:financrr_frontend/data/theme_repository.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -15,12 +16,27 @@ class Repositories {
   static late final HostRepository hostRepository;
   static late final L10nRepository l10nRepository;
 
+  static late final LogEntryRepository logEntryRepository;
+
   static Future init(FlutterSecureStorage storage, SharedPreferences preferences) async {
     sessionRepository = SessionRepository(storage: storage);
     themeRepository = ThemeRepository(preferences: preferences);
     hostRepository = HostRepository(preferences: preferences);
     l10nRepository = L10nRepository(preferences: preferences);
+    logEntryRepository = LogEntryRepository();
   }
+}
+
+abstract class InMemoryRepository<T> {
+  final List<T> _items = [];
+
+  int get length => _items.length;
+
+  T operator [](int index) => _items[index];
+  void add(T item) => _items.add(item);
+  bool remove(T item) => _items.remove(item);
+  void clear() => _items.clear();
+  List<T> getAsList() => List.from(_items);
 }
 
 abstract class SecureStringRepository {
@@ -63,10 +79,10 @@ abstract class SecureStringRepository {
   }
 }
 
-abstract class Repository<T> {
+abstract class SharedPreferencesRepository<T> {
   final SharedPreferences preferences;
 
-  Repository({required this.preferences}) {
+  SharedPreferencesRepository({required this.preferences}) {
     // initializes all default values for keys that do not exist
     save(toData({}), onlyNonExistentKeys: true);
   }
