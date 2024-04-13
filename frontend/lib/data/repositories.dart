@@ -8,11 +8,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 enum RepositoryKey<T> {
   hostUrl<String>('host_url', type: String),
-  dateTimeFormat<DateFormat>('date_time_format', type: DateFormat, fromValue: _dateFormatFromValue, toValue: _dateFormatToValue),
+  dateTimeFormat<DateFormat>('date_time_format',
+      type: DateFormat, defaultFactory: _defaultDateFormat, fromValue: _dateFormatFromValue, toValue: _dateFormatToValue),
   decimalSeparator<String>('decimal_separator', type: String, defaultValue: '.'),
   thousandSeparator<String>('thousand_separator', type: String, defaultValue: ','),
   sessionToken<String>('session_token', type: String, secure: true),
-  themeMode<ThemeMode>('theme_mode', type: ThemeMode, defaultValue: ThemeMode.system, fromValue: _themeModeFromValue, toValue: _enumToValue),
+  themeMode<ThemeMode>('theme_mode',
+      type: ThemeMode, defaultValue: ThemeMode.system, fromValue: _themeModeFromValue, toValue: _enumToValue),
   currentLightThemeId<String>('current_light_theme_id', type: String, defaultValue: 'LIGHT'),
   currentDarkThemeId<String>('current_dark_theme_id', type: String, defaultValue: 'DARK'),
   ;
@@ -20,25 +22,30 @@ enum RepositoryKey<T> {
   final String key;
   final Type type;
   final T? defaultValue;
+  final T Function()? defaultFactory;
   final bool secure;
-  final T Function(String)? fromValue;
-  final String Function(T)? toValue;
+  final T? Function(String?)? fromValue;
+  final String? Function(T?)? toValue;
 
-  const RepositoryKey(this.key, {required this.type, this.defaultValue, this.secure = false, this.fromValue, this.toValue})
-      : assert(!secure || (type == String), 'Secure keys must be of type String!');
+  const RepositoryKey(this.key, {required this.type, this.defaultValue, this.defaultFactory, this.secure = false, this.fromValue, this.toValue})
+      : assert(!secure || (type == String), 'Secure keys must be of type String!'), assert(defaultValue == null || defaultFactory == null);
 
   T? readSync() => Repository().readSync(this);
+  String? readSyncAsString() => Repository().readSyncAsString(this);
   Future<T?> readAsync() => Repository().readAsync(this);
+  Future<String?> readAsyncAsString() => Repository().readAsyncAsString(this);
   void write(T value) => RepositoryBloc().write(this, value);
   Future<void> delete() => Repository().delete(this);
 
-  static DateFormat _dateFormatFromValue(String value) => DateFormat(value);
-  static String _dateFormatToValue(DateFormat format) => format.pattern!;
+  static DateFormat _defaultDateFormat() => DateFormat.yMd();
+  static DateFormat? _dateFormatFromValue(String? value) => value == null ? null : DateFormat(value);
+  static String? _dateFormatToValue(DateFormat? format) => format?.pattern;
 
   // Enums
-  static T _enumFromValue<T extends Enum>(String value, List<T> values) => values.firstWhere((element) => element.name == value);
-  static String _enumToValue<T extends Enum>(T value) => value.name;
-  static ThemeMode _themeModeFromValue(String value) => _enumFromValue(value, ThemeMode.values);
+  static T? _enumFromValue<T extends Enum>(String? value, List<T> values) =>
+      value == null ? null : values.firstWhere((element) => element.name == value);
+  static String? _enumToValue<T extends Enum>(T? value) => value?.name;
+  static ThemeMode? _themeModeFromValue(String? value) => _enumFromValue(value, ThemeMode.values);
 }
 
 class Repository {
@@ -65,12 +72,16 @@ class Repository {
       // populate local cache
       _localCache[key.key] = await key.readAsync();
     }
+    print(_localCache);
   }
 
   T? readSync<T>(RepositoryKey<T> key) {
     _checkInitialized();
-    final dynamic value = _localCache[key.key];
-    return value == null ? null : _fromStringOrValue(value, key);
+    return _localCache[key.key];
+  }
+
+  String? readSyncAsString<T>(RepositoryKey<T> key) {
+    return _toStringOrValue(readSync(key), key);
   }
 
   Future<T?> readAsync<T>(RepositoryKey<T> key) async {
@@ -81,9 +92,14 @@ class Repository {
     return await _readOrInitSharedPrefsKey(key);
   }
 
+  Future<String?> readAsyncAsString<T>(RepositoryKey<T> key) async {
+    return _toStringOrValue(await readAsync(key), key);
+  }
+
   Future<void> write<T>(RepositoryKey<T> key, T value) async {
     _checkInitialized();
     final dynamic effectiveValue = _toStringOrValue(value, key);
+    print('Writing $effectiveValue to ${key.key}');
     _localCache[key.key] = effectiveValue;
     if (key.secure) {
       return await _storage.write(key: key.key, value: effectiveValue);
@@ -116,7 +132,7 @@ class Repository {
     if (effectiveValue != null) {
       return effectiveValue;
     }
-    String? defaultValue = key.defaultValue as String?;
+    T? defaultValue = _getDefault(key);
     if (defaultValue == null) {
       return null;
     }
@@ -129,12 +145,11 @@ class Repository {
       final dynamic value = _preferences.get(key.key);
       return _fromStringOrValue(value, key);
     }
-    final T? defaultValue = key.defaultValue;
-    final dynamic effectiveValue = _toStringOrValue(defaultValue, key);
+    final T? defaultValue = _getDefault(key);
     if (defaultValue == null) {
       return null;
     }
-    return write(key, effectiveValue).then((_) => defaultValue);
+    return write(key, defaultValue).then((_) => defaultValue);
   }
 
   void _checkInitialized() {
@@ -143,17 +158,24 @@ class Repository {
     }
   }
 
-  dynamic _toStringOrValue<T>(T value, RepositoryKey<T> key) {
+  T? _getDefault<T>(RepositoryKey<T> key) {
+    if (key.defaultFactory != null) {
+      return key.defaultFactory!();
+    }
+    return key.defaultValue;
+  }
+
+  static dynamic _toStringOrValue<T>(T value, RepositoryKey<T> key) {
     if (key.toValue != null) {
       return key.toValue!(value);
     }
     return value;
   }
 
-  T _fromStringOrValue<T>(dynamic value, RepositoryKey<T> key) {
+  static T? _fromStringOrValue<T>(dynamic value, RepositoryKey<T> key) {
     if (key.fromValue != null) {
       return key.fromValue!(value);
     }
-    return value as T;
+    return value as T?;
   }
 }

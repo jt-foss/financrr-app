@@ -1,6 +1,7 @@
 import 'package:financrr_frontend/layout/scaffold_navbar_shell.dart';
 import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
 import 'package:financrr_frontend/pages/authentication/login_page.dart';
+import 'package:financrr_frontend/pages/core/settings/dev/local_storage_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings/dev/log_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings/l10n/l10n_settings_page.dart';
 import 'package:financrr_frontend/pages/splash_page.dart';
@@ -128,6 +129,11 @@ class AppRouter {
                               context, state, CurrencyEditPage(currencyId: state.pathParameters['currencyId'])),
                           redirect: coreAuthGuard)
                     ]),
+                GoRoute(
+                  path: LocalStorageSettingsPage.pagePath.path,
+                  pageBuilder: _defaultPageBuilder(const LocalStorageSettingsPage()),
+                  redirect: coreAuthGuard,
+                ),
                 GoRoute(
                   path: LogSettingsPage.pagePath.path,
                   pageBuilder: _defaultPageBuilder(const LogSettingsPage()),
