@@ -124,9 +124,15 @@ class _L10nSettingsPageState extends State<L10nSettingsPage> {
   }
 
   void _save() {
-    RepositoryKey.decimalSeparator.write(_decimalSeparatorController.text);
-    RepositoryKey.thousandSeparator.write(_thousandSeparatorController.text);
-    RepositoryKey.dateTimeFormat.write(DateFormat(_dateTimeFormatController.text));
+    if (_decimalSeparatorController.text != _decimalSeparator) {
+      RepositoryKey.decimalSeparator.write(_decimalSeparatorController.text);
+    }
+    if (_thousandSeparatorController.text != _thousandSeparator) {
+      RepositoryKey.thousandSeparator.write(_thousandSeparatorController.text);
+    }
+    if (_dateTimeFormatController.text != _dateTimeFormat) {
+      RepositoryKey.dateTimeFormat.write(DateFormat(_dateTimeFormatController.text));
+    }
     setState(() {
       _decimalSeparator = _decimalSeparatorController.text;
       _thousandSeparator = _thousandSeparatorController.text;

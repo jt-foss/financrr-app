@@ -39,12 +39,12 @@ enum RepositoryKey<T> {
 
   static DateFormat _defaultDateFormat() => DateFormat.yMd();
   static DateFormat? _dateFormatFromValue(String? value) => value == null ? null : DateFormat(value);
-  static String? _dateFormatToValue(DateFormat? format) => format?.pattern;
+  static String? _dateFormatToValue(dynamic format) => format is DateFormat? ? format?.pattern : null;
 
   // Enums
   static T? _enumFromValue<T extends Enum>(String? value, List<T> values) =>
       value == null ? null : values.firstWhere((element) => element.name == value);
-  static String? _enumToValue<T extends Enum>(T? value) => value?.name;
+  static String? _enumToValue<T extends Enum>(dynamic value) => value is T? ? value?.name : null;
   static ThemeMode? _themeModeFromValue(String? value) => _enumFromValue(value, ThemeMode.values);
 }
 
@@ -72,7 +72,6 @@ class Repository {
       // populate local cache
       _localCache[key.key] = await key.readAsync();
     }
-    print(_localCache);
   }
 
   T? readSync<T>(RepositoryKey<T> key) {
@@ -81,7 +80,7 @@ class Repository {
   }
 
   String? readSyncAsString<T>(RepositoryKey<T> key) {
-    return _toStringOrValue(readSync(key), key);
+    return _toStringOrValue<T?>(readSync(key), key);
   }
 
   Future<T?> readAsync<T>(RepositoryKey<T> key) async {
@@ -93,14 +92,13 @@ class Repository {
   }
 
   Future<String?> readAsyncAsString<T>(RepositoryKey<T> key) async {
-    return _toStringOrValue(await readAsync(key), key);
+    return _toStringOrValue<T?>(await readAsync(key), key);
   }
 
   Future<void> write<T>(RepositoryKey<T> key, T value) async {
     _checkInitialized();
-    final dynamic effectiveValue = _toStringOrValue(value, key);
-    print('Writing $effectiveValue to ${key.key}');
-    _localCache[key.key] = effectiveValue;
+    _localCache[key.key] = value;
+    final dynamic effectiveValue = _toStringOrValue<T?>(value, key);
     if (key.secure) {
       return await _storage.write(key: key.key, value: effectiveValue);
     }
@@ -166,16 +164,10 @@ class Repository {
   }
 
   static dynamic _toStringOrValue<T>(T value, RepositoryKey<T> key) {
-    if (key.toValue != null) {
-      return key.toValue!(value);
-    }
-    return value;
+    return key.toValue?.call(value) ?? value;
   }
 
   static T? _fromStringOrValue<T>(dynamic value, RepositoryKey<T> key) {
-    if (key.fromValue != null) {
-      return key.fromValue!(value);
-    }
-    return value as T?;
+    return key.fromValue?.call(value) ?? value as T?;
   }
 }
