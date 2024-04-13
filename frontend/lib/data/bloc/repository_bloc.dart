@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:financrr_frontend/data/repositories.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -15,9 +13,7 @@ class RepositoryBloc extends Bloc<RepositoryEvent, RepositoryState> {
     on<RepositoryWriteEvent>(_onRepositoryWriteEvent);
   }
 
-  FutureOr<T?> read<T>(RepositoryKey<T> key) => Repository().read(key);
-  Future<void> write<T>(RepositoryKey<T> key, T value) async => add(RepositoryWriteEvent(key, value));
-  Future<void> delete<T>(RepositoryKey<T> key) => Repository().delete(key);
+  void write<T>(RepositoryKey<T> key, T value) async => add(RepositoryWriteEvent(key, value));
 
   void _onRepositoryWriteEvent(RepositoryWriteEvent event, Emitter<RepositoryState> emit) async {
     await Repository().write(event.key, event.value);

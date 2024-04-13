@@ -44,9 +44,9 @@ void main() async {
 
   // init themes
   await AppThemeLoader.init();
-  final ThemeMode themeMode = (await RepositoryKey.themeMode.read())!;
-  final AppTheme lightTheme = AppTheme.getById((await RepositoryKey.currentLightThemeId.read())!)!;
-  final AppTheme darkTheme = AppTheme.getById((await RepositoryKey.currentDarkThemeId.read())!)!;
+  final ThemeMode themeMode = (await RepositoryKey.themeMode.readAsync())!;
+  final AppTheme lightTheme = AppTheme.getById((await RepositoryKey.currentLightThemeId.readAsync())!)!;
+  final AppTheme darkTheme = AppTheme.getById((await RepositoryKey.currentDarkThemeId.readAsync())!)!;
 
   // init logging
   Logger.root.level = kDebugMode ? Level.ALL : Level.INFO;

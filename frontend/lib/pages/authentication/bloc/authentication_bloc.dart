@@ -32,15 +32,15 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
   }
 
   void _onAuthenticationRecoveryRequested(AuthenticationRecoveryRequested event, Emitter<AuthenticationState> emit) async {
-    final String? token = await RepositoryKey.sessionToken.read();
-    final String? hostUrl = await RepositoryKey.hostUrl.read();
+    final String? token = await RepositoryKey.sessionToken.readAsync();
+    final String? hostUrl = await RepositoryKey.hostUrl.readAsync();
     if (token == null || hostUrl == null) {
       emit(const AuthenticationState.unauthenticated());
       return;
     }
     try {
       final Restrr api = await _getRestrrBuilder(Uri.parse(hostUrl)).refresh(sessionToken: token);
-      await RepositoryKey.sessionToken.write(api.session.token);
+      RepositoryKey.sessionToken.write(api.session.token);
       emit(AuthenticationState.authenticated(api));
     } on RestrrException catch (_) {
       emit(const AuthenticationState.unauthenticated());

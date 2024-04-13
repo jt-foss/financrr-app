@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restrr/restrr.dart';
 
+import '../data/repositories.dart';
 import 'input_utils.dart';
 
 /// A collection of form fields used throughout the application.
@@ -107,7 +108,7 @@ class FormFields {
                 if (time == null) return;
                 onExecutedAtChanged?.call(date.copyWith(hour: time.hour, minute: time.minute));
               },
-              initialValue: state.dateTimeFormat.format(executedAt ?? DateTime.now()),
+              initialValue: RepositoryKey.dateTimeFormat.readSync()!.format(executedAt ?? DateTime.now()),
               readOnly: true,
               decoration: const InputDecoration(labelText: 'Executed At'),
             ),

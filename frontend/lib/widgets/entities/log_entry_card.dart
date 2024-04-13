@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../data/bloc/repository_bloc.dart';
 import '../../data/log_repository.dart';
-import '../../pages/core/settings/l10n/bloc/l10n_bloc.dart';
+import '../../data/repositories.dart';
 
 class LogEntryCard extends StatelessWidget {
   final int index;
@@ -13,7 +14,7 @@ class LogEntryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<L10nBloc, L10nState>(
+    return BlocBuilder<RepositoryBloc, RepositoryState>(
       builder: (context, state) {
         return Card.outlined(
           elevation: 1,
@@ -30,7 +31,7 @@ class LogEntryCard extends StatelessWidget {
                       padding: const EdgeInsets.only(right: 5),
                       child: Icon(_getIcon(logEntry.level), color: _getColorTint(logEntry.level), size: 17),
                     ),
-                    Expanded(child: Text('${logEntry.level.name}, ${state.dateTimeFormat.format(logEntry.timestamp)}')),
+                    Expanded(child: Text('${logEntry.level.name}, ${RepositoryKey.dateTimeFormat.readSync()!.format(logEntry.timestamp)}')),
                   ],
                 ),
               ],
