@@ -1,4 +1,6 @@
+import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../../../data/repositories.dart';
 import '../../../../layout/adaptive_scaffold.dart';
 import '../../../../router.dart';
@@ -30,16 +32,34 @@ class _LocalStorageSettingsPageState extends State<LocalStorageSettingsPage> {
           width: size.width / 1.1,
           child: ListView(
             children: [
-              for (final key in RepositoryKey.values)
-                Card.outlined(
-                  child: ListTile(
-                    title: Text(key.readSyncAsString() ?? '<null>'),
-                    subtitle: Text(key.key),
-                  ),
-                )
+              Table(
+                border: TableBorder.all(color: context.theme.dividerColor),
+                children: [
+                  for (RepositoryKey key in RepositoryKey.values)
+                    TableRow(
+                      children: [
+                        _buildTableCell(key.key),
+                        _buildTableCell(key.readSyncAsString() ?? '<null>'),
+                      ],
+                    ),
+                ],
+              )
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildTableCell(String text) {
+    return GestureDetector(
+      onTap: () async {
+        context.showSnackBar('Copied to clipboard!');
+        await Clipboard.setData(ClipboardData(text: text));
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Text(text),
       ),
     );
   }

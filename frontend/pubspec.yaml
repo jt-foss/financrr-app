@@ -36,7 +36,7 @@ dependencies:
   restrr:
     git:
       url: https://github.com/financrr/restrr.git
-      ref: development
+      ref: fix/id-cache
   # L10n
   intl: any
   easy_localization: ^3.0.5

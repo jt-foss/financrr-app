@@ -73,7 +73,7 @@ class _SettingsPageState extends State<SettingsPage> {
       SettingsItem(
         child: ListTile(
           onTap: () => context.goPath(ThemeSettingsPage.pagePath.build()),
-          leading: const Icon(Icons.brightness_4_rounded),
+          leading: const Icon(Icons.brightness_4_outlined),
           title: const Text('Themes'),
         ),
       ),
@@ -89,7 +89,7 @@ class _SettingsPageState extends State<SettingsPage> {
       SettingsItem(
         child: ListTile(
           onTap: () => context.goPath(LocalStorageSettingsPage.pagePath.build()),
-          leading: const Icon(Icons.storage_outlined),
+          leading: const Icon(Icons.sd_storage_outlined),
           title: const Text('Local Storage'),
         ),
       ),
