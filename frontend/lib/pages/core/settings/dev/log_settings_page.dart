@@ -3,8 +3,7 @@ import 'package:financrr_frontend/widgets/entities/log_entry_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../data/log_repository.dart';
-import '../../../../data/repositories.dart';
+import '../../../../data/log_store.dart';
 import '../../../../layout/adaptive_scaffold.dart';
 import '../../../../router.dart';
 import '../../../../widgets/notice_card.dart';
@@ -27,7 +26,7 @@ class _LogSettingsPageState extends State<LogSettingsPage> {
   @override
   void initState() {
     super.initState();
-    _entries = Repositories.logEntryRepository.getAsList();
+    _entries = LogEntryStore().getAsList();
     sortEntries();
   }
 
@@ -60,10 +59,7 @@ class _LogSettingsPageState extends State<LogSettingsPage> {
                 }
                 if (_entries.isEmpty) {
                   return const NoticeCard(
-                      iconData: Icons.info_outline,
-                      title: 'No logs',
-                      description: 'No logs have been recorded yet.'
-                  );
+                      iconData: Icons.info_outline, title: 'No logs', description: 'No logs have been recorded yet.');
                 }
                 return GestureDetector(
                   onTap: () => setState(() {
@@ -73,14 +69,10 @@ class _LogSettingsPageState extends State<LogSettingsPage> {
                     context.showSnackBar('Copied to clipboard');
                     await Clipboard.setData(ClipboardData(text: _entries[index - 1].message));
                   },
-                  child: LogEntryCard(
-                      index: index - 1,
-                      logEntry: _entries[index - 1],
-                      expanded: index - 1 == _selectedEntryIndex
-                  ),
+                  child:
+                      LogEntryCard(index: index - 1, logEntry: _entries[index - 1], expanded: index - 1 == _selectedEntryIndex),
                 );
-              }
-          ),
+              }),
         ),
       ),
     );
@@ -103,11 +95,10 @@ class _LogSettingsPageState extends State<LogSettingsPage> {
             Text('${_entries.length} entries'),
             IconButton(
                 onPressed: () => setState(() {
-                  Repositories.logEntryRepository.clear();
-                  _entries.clear();
-                }),
-                icon: const Icon(Icons.delete_sweep_outlined)
-            )
+                      LogEntryStore().clear();
+                      _entries.clear();
+                    }),
+                icon: const Icon(Icons.delete_sweep_outlined))
           ],
         ),
         const Divider()

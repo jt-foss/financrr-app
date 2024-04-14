@@ -1,4 +1,5 @@
 import 'package:financrr_frontend/pages/core/settings/currency/currency_settings_page.dart';
+import 'package:financrr_frontend/pages/core/settings/dev/local_storage_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings/dev/log_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings/l10n/l10n_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings/session/session_settings_page.dart';
@@ -72,7 +73,7 @@ class _SettingsPageState extends State<SettingsPage> {
       SettingsItem(
         child: ListTile(
           onTap: () => context.goPath(ThemeSettingsPage.pagePath.build()),
-          leading: const Icon(Icons.brightness_4_rounded),
+          leading: const Icon(Icons.brightness_4_outlined),
           title: const Text('Themes'),
         ),
       ),
@@ -85,6 +86,13 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     ]),
     SettingsItemGroup(title: 'Developer', items: [
+      SettingsItem(
+        child: ListTile(
+          onTap: () => context.goPath(LocalStorageSettingsPage.pagePath.build()),
+          leading: const Icon(Icons.sd_storage_outlined),
+          title: const Text('Local Storage'),
+        ),
+      ),
       SettingsItem(
         child: ListTile(
           onTap: () => context.goPath(LogSettingsPage.pagePath.build()),

@@ -4,9 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restrr/restrr.dart';
 
-import '../../../data/host_repository.dart';
-import '../../../data/repositories.dart';
-import '../../../data/session_repository.dart';
+import '../../../data/bloc/store_bloc.dart';
+import '../../../data/store.dart';
 
 part 'authentication_event.dart';
 part 'authentication_state.dart';
@@ -25,7 +24,7 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
   void _onAuthenticationLoginRequested(AuthenticationLoginRequested event, Emitter<AuthenticationState> emit) async {
     try {
       final Restrr api = await _getRestrrBuilder(event.uri).login(username: event.username, password: event.password);
-      await Repositories.sessionRepository.write(api.session.token);
+      StoreBloc().write(StoreKey.sessionToken, api.session.token);
       emit(AuthenticationState.authenticated(api));
     } catch (e) {
       emit(const AuthenticationState.unauthenticated());
@@ -33,15 +32,15 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
   }
 
   void _onAuthenticationRecoveryRequested(AuthenticationRecoveryRequested event, Emitter<AuthenticationState> emit) async {
-    final HostPreferences hostPrefs = HostService.get();
-    if (!(await SessionService.hasSession()) || hostPrefs.hostUrl.isEmpty) {
+    final String? token = await StoreKey.sessionToken.readAsync();
+    final String? hostUrl = await StoreKey.hostUrl.readAsync();
+    if (token == null || hostUrl == null) {
       emit(const AuthenticationState.unauthenticated());
       return;
     }
-    final String token = (await Repositories.sessionRepository.read())!;
     try {
-      final Restrr api = await _getRestrrBuilder(Uri.parse(hostPrefs.hostUrl)).refresh(sessionToken: token);
-      await Repositories.sessionRepository.write(api.session.token);
+      final Restrr api = await _getRestrrBuilder(Uri.parse(hostUrl)).refresh(sessionToken: token);
+      StoreKey.sessionToken.write(api.session.token);
       emit(AuthenticationState.authenticated(api));
     } on RestrrException catch (_) {
       emit(const AuthenticationState.unauthenticated());
@@ -52,10 +51,9 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
     try {
       await event.api.session.delete();
     } catch (_) {}
-    await Repositories.sessionRepository.delete();
+    await StoreKey.sessionToken.delete();
     emit(const AuthenticationState.unauthenticated());
   }
 
-  RestrrBuilder _getRestrrBuilder(Uri uri) => RestrrBuilder(uri: uri)
-      ..options = (RestrrOptions()..isWeb = kIsWeb);
+  RestrrBuilder _getRestrrBuilder(Uri uri) => RestrrBuilder(uri: uri)..options = (RestrrOptions()..isWeb = kIsWeb);
 }
