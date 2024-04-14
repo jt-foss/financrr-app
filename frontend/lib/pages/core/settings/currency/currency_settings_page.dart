@@ -66,8 +66,7 @@ class _CurrencySettingsPageState extends State<CurrencySettingsPage> {
                   listener: (context, state) => _paginatedCurrencyKey.currentState?.reset(),
                   child: PaginatedWrapper(
                     key: _paginatedCurrencyKey,
-                    initialPageFunction: (forceRetrieve) =>
-                        _api.retrieveAllCurrencies(limit: 10, forceRetrieve: forceRetrieve),
+                    initialPageFunction: (forceRetrieve) => _api.retrieveAllCurrencies(limit: 10, forceRetrieve: forceRetrieve),
                     onSuccess: (context, snap) {
                       final PaginatedDataResult<Currency> currencies = snap.data!;
                       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -78,8 +77,8 @@ class _CurrencySettingsPageState extends State<CurrencySettingsPage> {
                           for (Currency c in currencies.items)
                             Padding(
                               padding: const EdgeInsets.only(bottom: 10),
-                              child: CurrencyCard(
-                                  currency: c, onDelete: c is! CustomCurrency ? null : () => _deleteCurrency(c)),
+                              child:
+                                  CurrencyCard(currency: c, onDelete: c is! CustomCurrency ? null : () => _deleteCurrency(c)),
                             ),
                           if (currencies.nextPage != null)
                             TextButton(
@@ -104,7 +103,6 @@ class _CurrencySettingsPageState extends State<CurrencySettingsPage> {
       await currency.delete();
       if (!mounted) return;
       context.showSnackBar('Successfully deleted "${currency.name}"');
-      context.read<CurrencyBloc>().add(const CurrencyUpdateEvent());
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);
     }
