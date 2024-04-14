@@ -39,7 +39,7 @@ class _LocalStorageSettingsPageState extends State<LocalStorageSettingsPage> {
                     TableRow(
                       children: [
                         _buildTableCell(key.key),
-                        _buildTableCell(key.readSyncAsString() ?? '<null>'),
+                        _buildTableCell(key.readAsStringSync() ?? '<null>'),
                       ],
                     ),
                 ],

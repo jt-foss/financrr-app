@@ -33,9 +33,9 @@ enum StoreKey<T> {
         assert(defaultValue == null || defaultFactory == null);
 
   T? readSync() => KeyValueStore._instance.readSync(this);
-  String? readSyncAsString() => KeyValueStore._instance.readAsStringSync(this);
+  String? readAsStringSync() => KeyValueStore._instance.readAsStringSync(this);
   Future<T?> readAsync() => KeyValueStore._instance.readAsync(this);
-  Future<String?> readAsyncAsString() => KeyValueStore._instance.readAsStringAsync(this);
+  Future<String?> readAsStringAsync() => KeyValueStore._instance.readAsStringAsync(this);
   void write(T value) => StoreBloc().write(this, value);
   Future<void> delete() => KeyValueStore._instance.delete(this);
 
