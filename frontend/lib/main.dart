@@ -38,8 +38,11 @@ void main() async {
   };
 
   Logger.root.onRecord.listen((event) {
-    LogEntryStore().add(
-        LogEntry(level: LogLevel.values.byName(event.level.name.toLowerCase()), message: event.message, timestamp: event.time));
+    LogEntryStore().add(LogEntry(
+        level: LogLevel.values.byName(event.level.name.toLowerCase()),
+        message: event.message,
+        timestamp: event.time,
+        loggerName: event.loggerName));
   });
 
   // init themes

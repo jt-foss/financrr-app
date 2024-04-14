@@ -1,12 +1,11 @@
 import 'package:financrr_frontend/util/extensions.dart';
-import 'package:financrr_frontend/widgets/entities/log_entry_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../data/log_store.dart';
+import '../../../../data/store.dart';
 import '../../../../layout/adaptive_scaffold.dart';
 import '../../../../router.dart';
-import '../../../../widgets/notice_card.dart';
 import '../../settings_page.dart';
 
 class LogSettingsPage extends StatefulWidget {
@@ -49,17 +48,14 @@ class _LogSettingsPageState extends State<LogSettingsPage> {
       child: Center(
         child: SizedBox(
           width: size.width / 1.1,
-          child: ListView.builder(
+          child: ListView.separated(
               // +1 for the divider
               // +1 for the notice card if there are no logs
-              itemCount: _entries.length + 1 + (_entries.isEmpty ? 1 : 0),
+              itemCount: _entries.length + 1,
+              separatorBuilder: (_, index) => index == 0 ? const SizedBox() : const Divider(),
               itemBuilder: (context, index) {
                 if (index == 0) {
                   return _buildDivider();
-                }
-                if (_entries.isEmpty) {
-                  return const NoticeCard(
-                      iconData: Icons.info_outline, title: 'No logs', description: 'No logs have been recorded yet.');
                 }
                 return GestureDetector(
                   onTap: () => setState(() {
@@ -69,8 +65,7 @@ class _LogSettingsPageState extends State<LogSettingsPage> {
                     context.showSnackBar('Copied to clipboard');
                     await Clipboard.setData(ClipboardData(text: _entries[index - 1].message));
                   },
-                  child:
-                      LogEntryCard(index: index - 1, logEntry: _entries[index - 1], expanded: index - 1 == _selectedEntryIndex),
+                  child: _buildLogEntryTile(_entries[index - 1], index - 1, expanded: index - 1 == _selectedEntryIndex),
                 );
               }),
         ),
@@ -104,5 +99,57 @@ class _LogSettingsPageState extends State<LogSettingsPage> {
         const Divider()
       ],
     );
+  }
+
+  Widget _buildLogEntryTile(LogEntry entry, int index, {bool expanded = false}) {
+    final Color? tint = _getColorTint(entry.level);
+    return Container(
+      decoration: BoxDecoration(
+        color: tint?.withOpacity(0.1),
+        borderRadius: tint != null ? BorderRadius.circular(10) : null,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(entry.loggerName, style: context.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold)),
+            Text(entry.message, maxLines: expanded ? null : 1),
+            Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 5),
+                  child: Icon(_getIcon(entry.level), color: _getColorTint(entry.level), size: 17),
+                ),
+                Expanded(child: Text('${entry.level.name}, ${StoreKey.dateTimeFormat.readSync()!.format(entry.timestamp)}')),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  IconData _getIcon(LogLevel level) {
+    return switch (level) {
+      LogLevel.finest => Icons.notes_outlined,
+      LogLevel.finer => Icons.notes_outlined,
+      LogLevel.fine => Icons.notes_outlined,
+      LogLevel.config => Icons.handyman_outlined,
+      LogLevel.info => Icons.info_outline,
+      LogLevel.warning => Icons.warning_amber_outlined,
+      LogLevel.severe => Icons.error_outline,
+      LogLevel.shout => Icons.error_outline,
+    };
+  }
+
+  Color? _getColorTint(LogLevel level) {
+    return switch (level) {
+      LogLevel.config => Colors.blue,
+      LogLevel.warning => Colors.orange,
+      LogLevel.severe => Colors.red,
+      LogLevel.shout => Colors.red,
+      _ => null,
+    };
   }
 }
