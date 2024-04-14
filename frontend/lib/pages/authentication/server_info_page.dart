@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:financrr_frontend/data/host_repository.dart';
+import 'package:financrr_frontend/data/store.dart';
 import 'package:financrr_frontend/layout/templates/auth_page_template.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/input_utils.dart';
@@ -34,8 +34,8 @@ class ServerInfoPageState extends State<ServerInfoPage> {
   @override
   void initState() {
     super.initState();
-    final String hostUrl = HostService.get().hostUrl;
-    if (hostUrl.isNotEmpty && InputValidators.url(hostUrl) == null) {
+    final String? hostUrl = StoreKey.hostUrl.readSync();
+    if (hostUrl != null && InputValidators.url(hostUrl) == null) {
       _urlController.text = hostUrl;
       _handleUrlCheck();
     }
@@ -122,6 +122,6 @@ class ServerInfoPageState extends State<ServerInfoPage> {
       _apiVersion = info.apiVersion;
     });
     _hostUri = Uri.parse(url);
-    HostService.setHostPreferences(url);
+    StoreKey.hostUrl.write(url);
   }
 }
