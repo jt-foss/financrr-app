@@ -12,8 +12,8 @@ import 'package:restrr/restrr.dart';
 
 import '../../../../../layout/adaptive_scaffold.dart';
 import '../../../../../router.dart';
-import '../../../../data/bloc/repository_bloc.dart';
-import '../../../../data/repositories.dart';
+import '../../../../data/bloc/store_bloc.dart';
+import '../../../../data/store.dart';
 import '../../../../widgets/async_wrapper.dart';
 
 class TransactionPage extends StatefulWidget {
@@ -95,7 +95,7 @@ class TransactionPageState extends State<TransactionPage> {
               await _fetchAccount(forceRetrieve: true);
               await _fetchTransaction(forceRetrieve: true);
             },
-            child: BlocBuilder<RepositoryBloc, RepositoryState>(
+            child: BlocBuilder<StoreBloc, StoreState>(
               builder: (context, state) {
                 final String amountStr = (transaction.type == TransactionType.deposit ? '' : '-') +
                     TextUtils.formatBalanceWithCurrency(transaction.amount, account.currencyId.get()!);
@@ -108,8 +108,7 @@ class TransactionPageState extends State<TransactionPage> {
                                 color: transaction.type == TransactionType.deposit
                                     ? context.theme.primaryColor
                                     : context.theme.colorScheme.error)),
-                        Text(
-                            transaction.description ?? RepositoryKey.dateTimeFormat.readSync()!.format(transaction.executedAt)),
+                        Text(transaction.description ?? StoreKey.dateTimeFormat.readSync()!.format(transaction.executedAt)),
                       ],
                     ),
                     const Divider(),
@@ -140,9 +139,8 @@ class TransactionPageState extends State<TransactionPage> {
                           _buildTableRow('Description', transaction.description ?? 'N/A'),
                           _buildTableRow('From', transaction.sourceId?.get()?.name ?? 'N/A'),
                           _buildTableRow('To', transaction.destinationId?.get()?.name ?? 'N/A'),
-                          _buildTableRow(
-                              'Executed at', RepositoryKey.dateTimeFormat.readSync()!.format(transaction.executedAt)),
-                          _buildTableRow('Created at', RepositoryKey.dateTimeFormat.readSync()!.format(transaction.createdAt)),
+                          _buildTableRow('Executed at', StoreKey.dateTimeFormat.readSync()!.format(transaction.executedAt)),
+                          _buildTableRow('Created at', StoreKey.dateTimeFormat.readSync()!.format(transaction.createdAt)),
                         ],
                       ),
                     )

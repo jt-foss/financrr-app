@@ -3,7 +3,7 @@ import 'package:financrr_frontend/widgets/entities/log_entry_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../data/log_repository.dart';
+import '../../../../data/log_store.dart';
 import '../../../../layout/adaptive_scaffold.dart';
 import '../../../../router.dart';
 import '../../../../widgets/notice_card.dart';
@@ -26,7 +26,7 @@ class _LogSettingsPageState extends State<LogSettingsPage> {
   @override
   void initState() {
     super.initState();
-    _entries = LogEntryRepository().getAsList();
+    _entries = LogEntryStore().getAsList();
     sortEntries();
   }
 
@@ -95,7 +95,7 @@ class _LogSettingsPageState extends State<LogSettingsPage> {
             Text('${_entries.length} entries'),
             IconButton(
                 onPressed: () => setState(() {
-                      LogEntryRepository().clear();
+                      LogEntryStore().clear();
                       _entries.clear();
                     }),
                 icon: const Icon(Icons.delete_sweep_outlined))

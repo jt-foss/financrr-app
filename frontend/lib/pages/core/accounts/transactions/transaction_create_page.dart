@@ -10,7 +10,7 @@ import 'package:restrr/restrr.dart';
 
 import '../../../../../layout/adaptive_scaffold.dart';
 import '../../../../../router.dart';
-import '../../../../data/repositories.dart';
+import '../../../../data/store.dart';
 import '../../../../widgets/async_wrapper.dart';
 import '../../../../widgets/entities/transaction_card.dart';
 
@@ -47,7 +47,7 @@ class _TransactionCreatePageState extends State<TransactionCreatePage> {
   @override
   void initState() {
     super.initState();
-    _executedAtController = TextEditingController(text: RepositoryKey.dateTimeFormat.readSync()!.format(_executedAt));
+    _executedAtController = TextEditingController(text: StoreKey.dateTimeFormat.readSync()!.format(_executedAt));
     _fetchAccount();
     _isValid = _formKey.currentState?.validate() ?? false;
   }

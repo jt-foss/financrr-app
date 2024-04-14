@@ -1,7 +1,7 @@
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../../../data/repositories.dart';
+import '../../../../data/store.dart';
 import '../../../../layout/adaptive_scaffold.dart';
 import '../../../../router.dart';
 import '../../settings_page.dart';
@@ -35,7 +35,7 @@ class _LocalStorageSettingsPageState extends State<LocalStorageSettingsPage> {
               Table(
                 border: TableBorder.all(color: context.theme.dividerColor),
                 children: [
-                  for (RepositoryKey key in RepositoryKey.values)
+                  for (StoreKey key in StoreKey.values)
                     TableRow(
                       children: [
                         _buildTableCell(key.key),

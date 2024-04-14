@@ -10,7 +10,7 @@ import 'package:restrr/restrr.dart';
 
 import '../../../../../layout/adaptive_scaffold.dart';
 import '../../../../../router.dart';
-import '../../../../data/repositories.dart';
+import '../../../../data/store.dart';
 import '../../../../widgets/async_wrapper.dart';
 import '../../../../widgets/entities/transaction_card.dart';
 
@@ -64,7 +64,7 @@ class TransactionEditPageState extends State<TransactionEditPage> {
                   _amountController = TextEditingController(text: transaction.amount.toString());
                   _descriptionController = TextEditingController(text: transaction.description);
                   _executedAtController =
-                      TextEditingController(text: RepositoryKey.dateTimeFormat.readSync()!.format(transaction.executedAt));
+                      TextEditingController(text: StoreKey.dateTimeFormat.readSync()!.format(transaction.executedAt));
                   _isValid = _formKey.currentState?.validate() ?? false;
                   _type = transaction.type;
                   _executedAt = transaction.executedAt;

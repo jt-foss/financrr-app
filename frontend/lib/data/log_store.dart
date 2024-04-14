@@ -8,7 +8,7 @@ class LogEntry {
   const LogEntry({required this.message, required this.level, required this.timestamp});
 }
 
-abstract class InMemoryRepository<T> {
+abstract class InMemoryStore<T> {
   final List<T> _items = [];
 
   int get length => _items.length;
@@ -19,10 +19,10 @@ abstract class InMemoryRepository<T> {
   List<T> getAsList() => List.from(_items);
 }
 
-class LogEntryRepository extends InMemoryRepository<LogEntry> {
-  static final LogEntryRepository _instance = LogEntryRepository._();
+class LogEntryStore extends InMemoryStore<LogEntry> {
+  static final LogEntryStore _instance = LogEntryStore._();
 
-  factory LogEntryRepository() => _instance;
+  factory LogEntryStore() => _instance;
 
-  LogEntryRepository._();
+  LogEntryStore._();
 }

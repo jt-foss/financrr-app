@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restrr/restrr.dart';
 
-import '../../data/bloc/repository_bloc.dart';
+import '../../data/bloc/store_bloc.dart';
 
 class CurrencyCard extends StatelessWidget {
   final Id id;
@@ -39,7 +39,7 @@ class CurrencyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<RepositoryBloc, RepositoryState>(
+    return BlocBuilder<StoreBloc, StoreState>(
       builder: (context, state) {
         return Card.outlined(
           child: Padding(

@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restrr/restrr.dart';
 
-import '../../data/bloc/repository_bloc.dart';
-import '../../data/repositories.dart';
+import '../../data/bloc/store_bloc.dart';
+import '../../data/store.dart';
 import '../../pages/core/accounts/transactions/transaction_page.dart';
 import '../../util/text_utils.dart';
 
@@ -51,7 +51,7 @@ class TransactionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<RepositoryBloc, RepositoryState>(
+    return BlocBuilder<StoreBloc, StoreState>(
       builder: (context, state) {
         return GestureDetector(
           onTap: !interactive
@@ -72,7 +72,7 @@ class TransactionCard extends StatelessWidget {
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(RepositoryKey.dateTimeFormat.readSync()!.format(executedAt)),
+                      Text(StoreKey.dateTimeFormat.readSync()!.format(executedAt)),
                       Text(
                           '${type == TransactionType.deposit ? '' : '-'}${TextUtils.formatBalanceWithCurrency(amount, account.currencyId.get()!)}',
                           style: context.textTheme.titleMedium?.copyWith(

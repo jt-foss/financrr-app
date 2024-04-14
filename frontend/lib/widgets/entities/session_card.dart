@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restrr/restrr.dart';
 
-import '../../data/bloc/repository_bloc.dart';
-import '../../data/repositories.dart';
+import '../../data/bloc/store_bloc.dart';
+import '../../data/store.dart';
 
 class SessionCard extends StatelessWidget {
   final Id id;
@@ -34,7 +34,7 @@ class SessionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<RepositoryBloc, RepositoryState>(
+    return BlocBuilder<StoreBloc, StoreState>(
       builder: (context, state) {
         return Card.outlined(
           child: Padding(
@@ -48,7 +48,7 @@ class SessionCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(name ?? '${isCurrent ? 'Current' : 'Unnamed'} Session', style: context.textTheme.titleSmall),
-                      Text('${RepositoryKey.dateTimeFormat.readSync()!.format(createdAt)} ($id)'),
+                      Text('${StoreKey.dateTimeFormat.readSync()!.format(createdAt)} ($id)'),
                     ],
                   ),
                 ),

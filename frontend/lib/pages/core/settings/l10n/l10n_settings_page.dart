@@ -1,4 +1,4 @@
-import 'package:financrr_frontend/data/repositories.dart';
+import 'package:financrr_frontend/data/store.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/text_utils.dart';
 import 'package:flutter/material.dart';
@@ -30,9 +30,9 @@ class _L10nSettingsPageState extends State<L10nSettingsPage> {
   @override
   void initState() {
     super.initState();
-    _decimalSeparator = RepositoryKey.decimalSeparator.readSync()!;
-    _thousandSeparator = RepositoryKey.thousandSeparator.readSync()!;
-    _dateTimeFormat = RepositoryKey.dateTimeFormat.readSync()!.pattern!;
+    _decimalSeparator = StoreKey.decimalSeparator.readSync()!;
+    _thousandSeparator = StoreKey.thousandSeparator.readSync()!;
+    _dateTimeFormat = StoreKey.dateTimeFormat.readSync()!.pattern!;
 
     _decimalSeparatorController = TextEditingController(text: _decimalSeparator);
     _thousandSeparatorController = TextEditingController(text: _thousandSeparator);
@@ -125,13 +125,13 @@ class _L10nSettingsPageState extends State<L10nSettingsPage> {
 
   void _save() {
     if (_decimalSeparatorController.text != _decimalSeparator) {
-      RepositoryKey.decimalSeparator.write(_decimalSeparatorController.text);
+      StoreKey.decimalSeparator.write(_decimalSeparatorController.text);
     }
     if (_thousandSeparatorController.text != _thousandSeparator) {
-      RepositoryKey.thousandSeparator.write(_thousandSeparatorController.text);
+      StoreKey.thousandSeparator.write(_thousandSeparatorController.text);
     }
     if (_dateTimeFormatController.text != _dateTimeFormat) {
-      RepositoryKey.dateTimeFormat.write(DateFormat(_dateTimeFormatController.text));
+      StoreKey.dateTimeFormat.write(DateFormat(_dateTimeFormatController.text));
     }
     setState(() {
       _decimalSeparator = _decimalSeparatorController.text;

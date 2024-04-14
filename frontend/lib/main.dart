@@ -2,9 +2,9 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:easy_localization/easy_localization.dart';
-import 'package:financrr_frontend/data/bloc/repository_bloc.dart';
-import 'package:financrr_frontend/data/log_repository.dart';
-import 'package:financrr_frontend/data/repositories.dart';
+import 'package:financrr_frontend/data/bloc/store_bloc.dart';
+import 'package:financrr_frontend/data/log_store.dart';
+import 'package:financrr_frontend/data/store.dart';
 import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
 import 'package:financrr_frontend/pages/core/settings/currency/bloc/currency_bloc.dart';
 import 'package:financrr_frontend/pages/core/settings/session/bloc/session_bloc.dart';
@@ -29,7 +29,7 @@ void main() async {
   Bloc.observer = AppBlocObserver();
 
   await EasyLocalization.ensureInitialized();
-  await Repository.init();
+  await KeyValueStore.init();
 
   FlutterError.onError = (details) {
     FlutterError.presentError(details);
@@ -38,15 +38,15 @@ void main() async {
   };
 
   Logger.root.onRecord.listen((event) {
-    LogEntryRepository().add(
+    LogEntryStore().add(
         LogEntry(level: LogLevel.values.byName(event.level.name.toLowerCase()), message: event.message, timestamp: event.time));
   });
 
   // init themes
   await AppThemeLoader.init();
-  final ThemeMode themeMode = (await RepositoryKey.themeMode.readAsync())!;
-  final AppTheme lightTheme = AppTheme.getById((await RepositoryKey.currentLightThemeId.readAsync())!)!;
-  final AppTheme darkTheme = AppTheme.getById((await RepositoryKey.currentDarkThemeId.readAsync())!)!;
+  final ThemeMode themeMode = (await StoreKey.themeMode.readAsync())!;
+  final AppTheme lightTheme = AppTheme.getById((await StoreKey.currentLightThemeId.readAsync())!)!;
+  final AppTheme darkTheme = AppTheme.getById((await StoreKey.currentDarkThemeId.readAsync())!)!;
 
   // init logging
   Logger.root.level = kDebugMode ? Level.ALL : Level.INFO;
@@ -97,7 +97,7 @@ class FinancrrAppState extends State<FinancrrApp> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => RepositoryBloc()),
+        BlocProvider(create: (_) => StoreBloc()),
         BlocProvider(create: (_) => AuthenticationBloc()..add(const AuthenticationRecoveryRequested())),
         BlocProvider(create: (_) => CurrencyBloc()),
         BlocProvider(create: (_) => SessionBloc()),
@@ -141,9 +141,9 @@ class FinancrrAppState extends State<FinancrrApp> {
         _activeDarkTheme = theme;
       }
       _themeMode = system ? ThemeMode.system : theme.themeMode;
-      RepositoryKey.currentLightThemeId.write(_activeLightTheme.id);
-      RepositoryKey.currentDarkThemeId.write(_activeDarkTheme.id);
-      RepositoryKey.themeMode.write(_themeMode);
+      StoreKey.currentLightThemeId.write(_activeLightTheme.id);
+      StoreKey.currentDarkThemeId.write(_activeDarkTheme.id);
+      StoreKey.themeMode.write(_themeMode);
     });
   }
 }

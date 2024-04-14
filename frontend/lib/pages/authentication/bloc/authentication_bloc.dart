@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restrr/restrr.dart';
 
-import '../../../data/bloc/repository_bloc.dart';
-import '../../../data/repositories.dart';
+import '../../../data/bloc/store_bloc.dart';
+import '../../../data/store.dart';
 
 part 'authentication_event.dart';
 part 'authentication_state.dart';
@@ -24,7 +24,7 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
   void _onAuthenticationLoginRequested(AuthenticationLoginRequested event, Emitter<AuthenticationState> emit) async {
     try {
       final Restrr api = await _getRestrrBuilder(event.uri).login(username: event.username, password: event.password);
-      RepositoryBloc().write(RepositoryKey.sessionToken, api.session.token);
+      StoreBloc().write(StoreKey.sessionToken, api.session.token);
       emit(AuthenticationState.authenticated(api));
     } catch (e) {
       emit(const AuthenticationState.unauthenticated());
@@ -32,15 +32,15 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
   }
 
   void _onAuthenticationRecoveryRequested(AuthenticationRecoveryRequested event, Emitter<AuthenticationState> emit) async {
-    final String? token = await RepositoryKey.sessionToken.readAsync();
-    final String? hostUrl = await RepositoryKey.hostUrl.readAsync();
+    final String? token = await StoreKey.sessionToken.readAsync();
+    final String? hostUrl = await StoreKey.hostUrl.readAsync();
     if (token == null || hostUrl == null) {
       emit(const AuthenticationState.unauthenticated());
       return;
     }
     try {
       final Restrr api = await _getRestrrBuilder(Uri.parse(hostUrl)).refresh(sessionToken: token);
-      RepositoryKey.sessionToken.write(api.session.token);
+      StoreKey.sessionToken.write(api.session.token);
       emit(AuthenticationState.authenticated(api));
     } on RestrrException catch (_) {
       emit(const AuthenticationState.unauthenticated());
@@ -51,7 +51,7 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
     try {
       await event.api.session.delete();
     } catch (_) {}
-    await RepositoryKey.sessionToken.delete();
+    await StoreKey.sessionToken.delete();
     emit(const AuthenticationState.unauthenticated());
   }
 

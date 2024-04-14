@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restrr/restrr.dart';
 
-import '../../../data/bloc/repository_bloc.dart';
+import '../../../data/bloc/store_bloc.dart';
 import '../../../layout/adaptive_scaffold.dart';
 import '../../../router.dart';
 import '../../../util/text_utils.dart';
@@ -66,7 +66,7 @@ class _AccountsOverviewPageState extends State<AccountsOverviewPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    BlocBuilder<RepositoryBloc, RepositoryState>(
+                    BlocBuilder<StoreBloc, StoreState>(
                       builder: (context, state) {
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,

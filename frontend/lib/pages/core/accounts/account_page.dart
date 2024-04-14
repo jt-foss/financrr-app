@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:financrr_frontend/data/bloc/repository_bloc.dart';
+import 'package:financrr_frontend/data/bloc/store_bloc.dart';
 import 'package:financrr_frontend/pages/core/accounts/transactions/transaction_create_page.dart';
 import 'package:financrr_frontend/pages/core/accounts/account_edit_page.dart';
 import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
@@ -85,7 +85,7 @@ class _AccountPageState extends State<AccountPage> {
             },
             child: ListView(
               children: [
-                BlocBuilder<RepositoryBloc, RepositoryState>(
+                BlocBuilder<StoreBloc, StoreState>(
                   builder: (context, state) {
                     return Column(
                       children: [

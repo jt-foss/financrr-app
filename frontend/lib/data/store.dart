@@ -1,12 +1,12 @@
 import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
-import 'package:financrr_frontend/data/bloc/repository_bloc.dart';
+import 'package:financrr_frontend/data/bloc/store_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum RepositoryKey<T> {
+enum StoreKey<T> {
   hostUrl<String>('host_url', type: String),
   dateTimeFormat<DateFormat>('date_time_format',
       type: DateFormat, defaultFactory: _defaultDateFormat, fromValue: _dateFormatFromValue, toValue: _dateFormatToValue),
@@ -27,17 +27,17 @@ enum RepositoryKey<T> {
   final T? Function(String?)? fromValue;
   final String? Function(T?)? toValue;
 
-  const RepositoryKey(this.key,
+  const StoreKey(this.key,
       {required this.type, this.defaultValue, this.defaultFactory, this.secure = false, this.fromValue, this.toValue})
       : assert(!secure || (type == String), 'Secure keys must be of type String!'),
         assert(defaultValue == null || defaultFactory == null);
 
-  T? readSync() => Repository().readSync(this);
-  String? readSyncAsString() => Repository().readSyncAsString(this);
-  Future<T?> readAsync() => Repository().readAsync(this);
-  Future<String?> readAsyncAsString() => Repository().readAsyncAsString(this);
-  void write(T value) => RepositoryBloc().write(this, value);
-  Future<void> delete() => Repository().delete(this);
+  T? readSync() => KeyValueStore._instance.readSync(this);
+  String? readSyncAsString() => KeyValueStore._instance.readAsStringSync(this);
+  Future<T?> readAsync() => KeyValueStore._instance.readAsync(this);
+  Future<String?> readAsyncAsString() => KeyValueStore._instance.readAsStringAsync(this);
+  void write(T value) => StoreBloc().write(this, value);
+  Future<void> delete() => KeyValueStore._instance.delete(this);
 
   static DateFormat _defaultDateFormat() => DateFormat.yMd();
   static DateFormat? _dateFormatFromValue(String? value) => value == null ? null : DateFormat(value);
@@ -50,42 +50,56 @@ enum RepositoryKey<T> {
   static ThemeMode? _themeModeFromValue(String? value) => _enumFromValue(value, ThemeMode.values);
 }
 
-class Repository {
-  static final Repository _instance = Repository._();
+/// A simple key-value store that uses SharedPreferences and FlutterSecureStorage to store data.
+/// This class is a singleton and should be initialized once before using it. (See [init])
+/// The store uses a local cache to allow synchronous reads, making it easier to use
+/// in the UI layer.
+class KeyValueStore {
+  static final KeyValueStore _instance = KeyValueStore._();
   static final Map<String, dynamic> _localCache = {};
 
   late final SharedPreferences _preferences;
   late final FlutterSecureStorage _storage;
   bool _initialized = false;
 
-  factory Repository() => _instance;
+  factory KeyValueStore() => _instance;
 
-  Repository._();
+  KeyValueStore._();
 
+  /// Initializes the KeyValueStore by loading the SharedPreferences and FlutterSecureStorage.
+  /// This will also initialize all default values for the keys & populate the local cache.
+  /// This method should only be called once - Otherwise, it will throw a StateError.
   static Future<void> init() async {
     if (_instance._initialized) {
-      throw StateError('Repository has already been initialized!');
+      throw StateError('Store has already been initialized!');
     }
     _instance._preferences = await SharedPreferences.getInstance();
     _instance._storage = const FlutterSecureStorage();
     _instance._initialized = true;
-    for (RepositoryKey key in RepositoryKey.values) {
+    for (StoreKey key in StoreKey.values) {
       // initializes all default values for keys that do not exist &
       // populate local cache
       _localCache[key.key] = await key.readAsync();
     }
   }
 
-  T? readSync<T>(RepositoryKey<T> key) {
+  /// Reads the value of the key from the local cache.
+  /// If the key does not exist in the cache, it will return null.
+  T? readSync<T>(StoreKey<T> key) {
     _checkInitialized();
     return _localCache[key.key];
   }
 
-  String? readSyncAsString<T>(RepositoryKey<T> key) {
+  /// Reads the value of the key from the local cache and converts it to a string,
+  /// by either using the [toValue] function of the key or by simply returning
+  /// its toString() representation.
+  String? readAsStringSync<T>(StoreKey<T> key) {
     return _toStringOrValue<T?>(readSync(key), key);
   }
 
-  Future<T?> readAsync<T>(RepositoryKey<T> key) async {
+  /// Reads the value of the key from the local cache.
+  /// If the key does not exist in the cache, it will be read from the storage.
+  Future<T?> readAsync<T>(StoreKey<T> key) async {
     _checkInitialized();
     if (key.secure) {
       return await _readOrInitSecureStringKey(key);
@@ -93,11 +107,15 @@ class Repository {
     return await _readOrInitSharedPrefsKey(key);
   }
 
-  Future<String?> readAsyncAsString<T>(RepositoryKey<T> key) async {
+  /// Reads the value of the key from the local cache and converts it to a string,
+  /// by either using the [toValue] function of the key or by simply returning
+  /// its toString() representation.
+  Future<String?> readAsStringAsync<T>(StoreKey<T> key) async {
     return _toStringOrValue<T?>(await readAsync(key), key);
   }
 
-  Future<void> write<T>(RepositoryKey<T> key, T value) async {
+  /// Writes the value to the local cache and the storage.
+  Future<void> write<T>(StoreKey<T> key, T value) async {
     _checkInitialized();
     _localCache[key.key] = value;
     final dynamic effectiveValue = _toStringOrValue<T?>(value, key);
@@ -114,7 +132,8 @@ class Repository {
     };
   }
 
-  Future<void> delete<T>(RepositoryKey<T> key) async {
+  /// Deletes the key from the local cache and the storage.
+  Future<void> delete<T>(StoreKey<T> key) async {
     _checkInitialized();
     _localCache.remove(key.key);
     if (key.secure) {
@@ -123,7 +142,7 @@ class Repository {
     _preferences.remove(key.key);
   }
 
-  Future<T?> _readOrInitSecureStringKey<T>(RepositoryKey<T> key) async {
+  Future<T?> _readOrInitSecureStringKey<T>(StoreKey<T> key) async {
     if (key.type != String) {
       throw StateError('Secure keys must be of type String!');
     }
@@ -140,7 +159,7 @@ class Repository {
     return defaultValue as T?;
   }
 
-  FutureOr<T>? _readOrInitSharedPrefsKey<T>(RepositoryKey<T> key) {
+  FutureOr<T>? _readOrInitSharedPrefsKey<T>(StoreKey<T> key) {
     if (_preferences.containsKey(key.key)) {
       final dynamic value = _preferences.get(key.key);
       return _fromStringOrValue(value, key);
@@ -154,22 +173,23 @@ class Repository {
 
   void _checkInitialized() {
     if (!_initialized) {
-      throw StateError('Repository has not been initialized yet!');
+      throw StateError('Store has not been initialized yet!');
     }
   }
 
-  T? _getDefault<T>(RepositoryKey<T> key) {
+  /// Returns the default value of the key.
+  T? _getDefault<T>(StoreKey<T> key) {
     if (key.defaultFactory != null) {
       return key.defaultFactory!();
     }
     return key.defaultValue;
   }
 
-  static dynamic _toStringOrValue<T>(T value, RepositoryKey<T> key) {
+  static dynamic _toStringOrValue<T>(T value, StoreKey<T> key) {
     return key.toValue?.call(value) ?? value;
   }
 
-  static T? _fromStringOrValue<T>(dynamic value, RepositoryKey<T> key) {
+  static T? _fromStringOrValue<T>(dynamic value, StoreKey<T> key) {
     return key.fromValue?.call(value) ?? value as T?;
   }
 }

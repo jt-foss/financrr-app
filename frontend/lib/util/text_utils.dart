@@ -1,13 +1,13 @@
 import 'package:restrr/restrr.dart';
 
-import '../data/repositories.dart';
+import '../data/store.dart';
 
 class TextUtils {
   const TextUtils._();
 
   static String formatBalanceWithCurrency(int amount, Currency currency) {
-    final String decimalSeparator = RepositoryKey.decimalSeparator.readSync()!;
-    final String thousandSeparator = RepositoryKey.thousandSeparator.readSync()!;
+    final String decimalSeparator = StoreKey.decimalSeparator.readSync()!;
+    final String thousandSeparator = StoreKey.thousandSeparator.readSync()!;
     return '${formatBalance(amount, currency.decimalPlaces, decimalSeparator, thousandSeparator)}${currency.symbol}';
   }
 
