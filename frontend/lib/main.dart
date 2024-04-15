@@ -24,6 +24,7 @@ Logger log = Logger('FinancrrLogger');
 
 void main() async {
   usePathUrlStrategy();
+  SharedPreferences.setPrefix('financrr.');
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = AppBlocObserver();
 
@@ -31,7 +32,6 @@ void main() async {
   await EasyLocalization.ensureInitialized();
 
   // init store
-  SharedPreferences.setPrefix('financrr.');
   await KeyValueStore.init();
 
   // init logging
