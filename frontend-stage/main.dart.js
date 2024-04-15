@@ -10268,16 +10268,16 @@ h=A.bqv(A.aYf(h.gdA(h)))
 $.aSe=!1
 $.ag7=!0
 $.afP=new A.auw(h,B.q8)
+if($.a0R!=null)A.N(A.U("setPrefix cannot be called after getInstance"))
+$.IN="financrr."
+$.b34=!0
+$.b33=null
 if($.ae==null)A.aXh()
 $.ae.toString
 $.Re=new A.ahh()
 s=2
 return A.M(A.amb(),$async$t5)
-case 2:if($.a0R!=null)A.N(A.U("setPrefix cannot be called after getInstance"))
-$.IN="financrr."
-$.b34=!0
-$.b33=null
-s=3
+case 2:s=3
 return A.M(A.Wg(),$async$t5)
 case 3:$.beL=new A.aTW()
 h=$.agl()
