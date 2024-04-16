@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../../data/store.dart';
 import '../../../../layout/adaptive_scaffold.dart';
+import '../../../../main.dart';
 import '../../../../router.dart';
 import '../../settings_page.dart';
 
@@ -25,6 +26,7 @@ class _LocalStorageSettingsPageState extends State<LocalStorageSettingsPage> {
   }
 
   Widget _buildVerticalLayout(Size size) {
+    log.config("text");
     return Padding(
       padding: const EdgeInsets.only(top: 10, bottom: 20),
       child: Center(
@@ -52,6 +54,7 @@ class _LocalStorageSettingsPageState extends State<LocalStorageSettingsPage> {
   }
 
   Widget _buildTableCell(String text) {
+    log.config(text);
     return GestureDetector(
       onTap: () async {
         context.showSnackBar('Copied to clipboard!');
