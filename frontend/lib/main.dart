@@ -23,6 +23,14 @@ import 'app_bloc_observer.dart';
 Logger log = Logger('FinancrrLogger');
 
 void main() async {
+  try {
+    await initApp();
+  } catch (e) {
+    runApp(FallbackErrorApp(error: e.toString()));
+  }
+}
+
+Future<void> initApp() async {
   usePathUrlStrategy();
   SharedPreferences.setPrefix('financrr.');
   WidgetsFlutterBinding.ensureInitialized();
@@ -148,6 +156,37 @@ class FinancrrAppState extends State<FinancrrApp> {
       StoreKey.currentDarkThemeId.write(_activeDarkTheme.id);
       StoreKey.themeMode.write(_themeMode);
     });
+  }
+}
+
+class FallbackErrorApp extends StatelessWidget {
+  final String error;
+
+  const FallbackErrorApp({super.key, required this.error});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        body: SafeArea(
+          child: GestureDetector(
+            onTap: () => Clipboard.setData(ClipboardData(text: error)),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline_rounded),
+                  const SizedBox(height: 10),
+                  const Text('An error occurred while initializing the app:', style: TextStyle(fontWeight: FontWeight.w700)),
+                  Expanded(child: Text(error, textAlign: TextAlign.center,))
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
