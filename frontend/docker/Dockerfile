@@ -4,7 +4,7 @@ FROM ghcr.io/cirruslabs/flutter:3.19.5 AS builder
 WORKDIR /app
 
 # Copy the project files into the Docker image
-COPY ./frontend /app
+COPY . /app
 
 # Fetch the dependencies
 RUN flutter pub get
