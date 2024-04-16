@@ -10,11 +10,13 @@ import 'package:financrr_frontend/pages/core/settings/currency/bloc/currency_blo
 import 'package:financrr_frontend/pages/core/settings/session/bloc/session_bloc.dart';
 import 'package:financrr_frontend/router.dart';
 import 'package:financrr_frontend/themes.dart';
+import 'package:financrr_frontend/widgets/fallback_error_app.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:logging/logging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -23,7 +25,19 @@ import 'app_bloc_observer.dart';
 Logger log = Logger('FinancrrLogger');
 
 void main() async {
+  // if an error occurs during initialization, show a fallback error app
+  Widget app;
+  try {
+    app = await initApp();
+  } catch (e, stackTrace) {
+    app = FallbackErrorApp(error: e.toString(), stackTrace: stackTrace.toString());
+  }
+  runApp(app);
+}
+
+Future<Widget> initApp() async {
   usePathUrlStrategy();
+  await initializeDateFormatting();
   SharedPreferences.setPrefix('financrr.');
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = AppBlocObserver();
@@ -58,11 +72,11 @@ void main() async {
   final AppTheme lightTheme = AppTheme.getById((await StoreKey.currentLightThemeId.readAsync())!)!;
   final AppTheme darkTheme = AppTheme.getById((await StoreKey.currentDarkThemeId.readAsync())!)!;
 
-  runApp(EasyLocalization(
+  return EasyLocalization(
       supportedLocales: const [Locale('en', 'US'), Locale('de', 'DE')],
       path: 'assets/l10n',
       fallbackLocale: const Locale('en', 'US'),
-      child: FinancrrApp(themeMode: themeMode, currentLightTheme: lightTheme, currentDarkTheme: darkTheme)));
+      child: FinancrrApp(themeMode: themeMode, currentLightTheme: lightTheme, currentDarkTheme: darkTheme));
 }
 
 class FinancrrApp extends StatefulWidget {

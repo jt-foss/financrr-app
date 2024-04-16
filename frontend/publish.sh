@@ -16,6 +16,7 @@ if [[ ! "$version_type" =~ ^(major|minor|patch|build)$ ]]; then
 fi
 
 # Increment version on separate branch
+git branch -d frontend/release/next &&
 git branch frontend/release/next &&
 git checkout frontend/release/next &&
 
@@ -29,6 +30,4 @@ flutter pub get &&
 
 # Build & Upload iOS
 flutter build ipa --obfuscate --split-debug-info=debug_info &&
-xcrun altool --upload-app --type ios -f build/ios/ipa/*.ipa --apiKey FCNM7TV5AK --apiIssuer 9717842e-73fe-4f11-bb0b-22eced17b1db &&
-cd ios &&
-cd .. || exit
+xcrun altool --upload-app --type ios -f build/ios/ipa/*.ipa --apiKey FCNM7TV5AK --apiIssuer 9717842e-73fe-4f11-bb0b-22eced17b1db
