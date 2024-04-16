@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:financrr_frontend/data/bloc/store_bloc.dart';
 import 'package:financrr_frontend/pages/core/accounts/transactions/transaction_create_page.dart';
 import 'package:financrr_frontend/pages/core/accounts/account_edit_page.dart';
 import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
@@ -15,7 +16,6 @@ import 'package:restrr/restrr.dart';
 
 import '../../../layout/adaptive_scaffold.dart';
 import '../../../router.dart';
-import '../settings/l10n/bloc/l10n_bloc.dart';
 import 'accounts_overview_page.dart';
 
 class AccountPage extends StatefulWidget {
@@ -85,11 +85,11 @@ class _AccountPageState extends State<AccountPage> {
             },
             child: ListView(
               children: [
-                BlocBuilder<L10nBloc, L10nState>(
+                BlocBuilder<StoreBloc, StoreState>(
                   builder: (context, state) {
                     return Column(
                       children: [
-                        Text(TextUtils.formatBalanceWithCurrency(state, account.balance, account.currencyId.get()!),
+                        Text(TextUtils.formatBalanceWithCurrency(account.balance, account.currencyId.get()!),
                             style: context.textTheme.titleLarge?.copyWith(color: context.theme.primaryColor)),
                         Text(account.name),
                       ],

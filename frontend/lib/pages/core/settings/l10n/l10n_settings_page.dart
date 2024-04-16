@@ -1,14 +1,13 @@
+import 'package:financrr_frontend/data/store.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/text_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../layout/adaptive_scaffold.dart';
 import '../../../../router.dart';
 import '../../settings_page.dart';
-import 'bloc/l10n_bloc.dart';
 
 class L10nSettingsPage extends StatefulWidget {
   static const PagePathBuilder pagePath = PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'languages');
@@ -31,10 +30,9 @@ class _L10nSettingsPageState extends State<L10nSettingsPage> {
   @override
   void initState() {
     super.initState();
-    final L10nState state = context.read<L10nBloc>().state;
-    _decimalSeparator = state.decimalSeparator;
-    _thousandSeparator = state.thousandSeparator;
-    _dateTimeFormat = state.dateTimeFormat.pattern!;
+    _decimalSeparator = StoreKey.decimalSeparator.readSync()!;
+    _thousandSeparator = StoreKey.thousandSeparator.readSync()!;
+    _dateTimeFormat = StoreKey.dateTimeFormat.readSync()!.pattern!;
 
     _decimalSeparatorController = TextEditingController(text: _decimalSeparator);
     _thousandSeparatorController = TextEditingController(text: _thousandSeparator);
@@ -126,13 +124,15 @@ class _L10nSettingsPageState extends State<L10nSettingsPage> {
   }
 
   void _save() {
-    context.read<L10nBloc>().add(
-          L10nDataChanged(
-            decimalSeparator: _decimalSeparatorController.text,
-            thousandSeparator: _thousandSeparatorController.text,
-            dateTimeFormat: _dateTimeFormatController.text,
-          ),
-        );
+    if (_decimalSeparatorController.text != _decimalSeparator) {
+      StoreKey.decimalSeparator.write(_decimalSeparatorController.text);
+    }
+    if (_thousandSeparatorController.text != _thousandSeparator) {
+      StoreKey.thousandSeparator.write(_thousandSeparatorController.text);
+    }
+    if (_dateTimeFormatController.text != _dateTimeFormat) {
+      StoreKey.dateTimeFormat.write(DateFormat(_dateTimeFormatController.text));
+    }
     setState(() {
       _decimalSeparator = _decimalSeparatorController.text;
       _thousandSeparator = _thousandSeparatorController.text;
