@@ -60,8 +60,6 @@ pub enum Relation {
     RepeatableTransaction,
 }
 
-find_all_by_user_id!(Entity);
-
 impl Related<super::budget::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::Budget.def()
@@ -81,3 +79,5 @@ impl Related<super::recurring_transaction::Entity> for Entity {
 }
 
 impl ActiveModelBehavior for ActiveModel {}
+
+find_all_by_user_id!(Entity);

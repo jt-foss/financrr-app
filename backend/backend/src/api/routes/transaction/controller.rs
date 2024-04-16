@@ -5,6 +5,7 @@ use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
 use crate::api::documentation::response::{InternalServerError, Unauthorized, ValidationError};
 use crate::api::error::api::ApiError;
 use crate::api::pagination::{PageSizeParam, Pagination};
+use crate::api::routes::transaction::recurring::controller::recurring_transaction_controller;
 use crate::api::routes::transaction::template::controller::transaction_template_controller;
 use crate::wrapper::entity::transaction::dto::{TransactionDTO, TransactionFromTemplate};
 use crate::wrapper::entity::transaction::Transaction;
@@ -16,6 +17,7 @@ pub(crate) fn transaction_controller(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/transaction")
             .configure(transaction_template_controller)
+            .configure(recurring_transaction_controller)
             .service(get_all_transactions)
             .service(create_transaction)
             .service(create_from_transaction_template)

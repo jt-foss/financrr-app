@@ -96,7 +96,8 @@ CREATE TABLE IF NOT EXISTS recurring_transaction
 (
     id                      SERIAL PRIMARY KEY,
     template                INTEGER REFERENCES transaction_template (id) ON UPDATE CASCADE ON DELETE CASCADE NOT NULL,
-    repeat_interval_seconds uint32                                                                           NOT NULL,
+    recurring_rule   json NOT NULL,
+    last_executed_at timestamp with time zone,
     created_at              timestamp with time zone                                                         NOT NULL DEFAULT current_timestamp
 );
 

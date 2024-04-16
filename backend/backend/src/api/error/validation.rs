@@ -22,6 +22,14 @@ impl ValidationError {
     pub(crate) fn has_error(&self) -> bool {
         !self.error.params.is_empty()
     }
+
+    pub(crate) fn return_result(self) -> Result<(), Self> {
+        if self.has_error() {
+            Err(self)
+        } else {
+            Ok(())
+        }
+    }
 }
 
 impl Default for ValidationError {

@@ -64,9 +64,11 @@ impl TransactionTemplate {
         user_id: i32,
         page_size: &PageSizeParam,
     ) -> Result<Vec<Self>, ApiError> {
-        find_all_paginated(transaction_template::Entity::find_all_by_user_id(user_id), page_size)
-            .await
-            .map(|models| models.into_iter().map(Self::from).collect())
+        Ok(find_all_paginated(transaction_template::Entity::find_all_by_user_id(user_id), page_size)
+            .await?
+            .into_iter()
+            .map(Self::from)
+            .collect())
     }
 
     pub(crate) async fn update(self, updated_dto: TransactionTemplateDTO) -> Result<Self, ApiError> {

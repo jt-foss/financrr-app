@@ -66,6 +66,10 @@ impl Entity {
             .filter(Column::EntityId.eq(account_id))
             .filter(Column::EntityType.eq(account::Entity.table_name().to_string()))
     }
+
+    pub fn find_all_by_type_and_id(entity_type: &str, entity_id: i32) -> Select<Self> {
+        Self::find().filter(Column::EntityType.eq(entity_type)).filter(Column::EntityId.eq(entity_id))
+    }
 }
 
 macro_rules! find_all_by_user_id {
