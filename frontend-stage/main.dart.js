@@ -10314,16 +10314,16 @@ if($.CN() instanceof A.rr){$.b61=A.boO()
 $.Qe=$.Q8=null}if($.Qt() instanceof A.rr)$.b7i=A.boN()
 s=3
 return A.M(A.dv(null,t.H),$async$pH)
-case 3:if($.af==null)A.aXy()
+case 3:if($.a10!=null)A.N(A.V("setPrefix cannot be called after getInstance"))
+$.IT="financrr."
+$.b3p=!0
+$.b3o=null
+if($.af==null)A.aXy()
 $.af.toString
 $.Rk=new A.ahp()
 s=4
 return A.M(A.amj(),$async$pH)
-case 4:if($.a10!=null)A.N(A.V("setPrefix cannot be called after getInstance"))
-$.IT="financrr."
-$.b3p=!0
-$.b3o=null
-s=5
+case 4:s=5
 return A.M(A.Wn(),$async$pH)
 case 5:$.bfb=new A.aTY()
 m=$.agt()
