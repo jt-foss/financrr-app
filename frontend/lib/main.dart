@@ -28,16 +28,23 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = AppBlocObserver();
 
+  // init l10ns
   await EasyLocalization.ensureInitialized();
+
+  // init store
   await KeyValueStore.init();
 
+  // init logging
   FlutterError.onError = (details) {
     FlutterError.presentError(details);
     log.severe(
         'FlutterError: ${details.exceptionAsString()}\n\nLibrary: ${details.library}\n\nContext: ${details.context}\n\nStackTrace: ${details.stack}');
   };
-
+  Logger.root.level = Level.ALL;
   Logger.root.onRecord.listen((event) {
+    if (kDebugMode) {
+      print('${event.level.name}: ${event.time}: ${event.message}');
+    }
     LogEntryStore().add(LogEntry(
         level: LogLevel.values.byName(event.level.name.toLowerCase()),
         message: event.message,
@@ -51,13 +58,6 @@ void main() async {
   final AppTheme lightTheme = AppTheme.getById((await StoreKey.currentLightThemeId.readAsync())!)!;
   final AppTheme darkTheme = AppTheme.getById((await StoreKey.currentDarkThemeId.readAsync())!)!;
 
-  // init logging
-  Logger.root.level = kDebugMode ? Level.ALL : Level.INFO;
-  Logger.root.onRecord.listen((record) {
-    if (kDebugMode) {
-      print('${record.level.name}: ${record.time}: ${record.message}');
-    }
-  });
   runApp(EasyLocalization(
       supportedLocales: const [Locale('en', 'US'), Locale('de', 'DE')],
       path: 'assets/l10n',
