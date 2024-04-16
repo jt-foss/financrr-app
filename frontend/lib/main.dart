@@ -38,6 +38,7 @@ void main() async {
 Future<Widget> initApp() async {
   usePathUrlStrategy();
   await initializeDateFormatting();
+  SharedPreferences.setPrefix('financrr.');
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = AppBlocObserver();
 
@@ -45,7 +46,6 @@ Future<Widget> initApp() async {
   await EasyLocalization.ensureInitialized();
 
   // init store
-  SharedPreferences.setPrefix('financrr.');
   await KeyValueStore.init();
 
   // init logging
