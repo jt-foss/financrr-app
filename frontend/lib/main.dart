@@ -10,6 +10,7 @@ import 'package:financrr_frontend/pages/core/settings/currency/bloc/currency_blo
 import 'package:financrr_frontend/pages/core/settings/session/bloc/session_bloc.dart';
 import 'package:financrr_frontend/router.dart';
 import 'package:financrr_frontend/themes.dart';
+import 'package:financrr_frontend/widgets/fallback_error_app.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -28,8 +29,8 @@ void main() async {
   Widget app;
   try {
     app = await initApp();
-  } catch (e) {
-    app = FallbackErrorApp(error: e.toString());
+  } catch (e, stackTrace) {
+    app = FallbackErrorApp(error: e.toString(), stackTrace: stackTrace.toString());
   }
   runApp(app);
 }
@@ -37,7 +38,6 @@ void main() async {
 Future<Widget> initApp() async {
   usePathUrlStrategy();
   await initializeDateFormatting();
-  SharedPreferences.setPrefix('financrr.');
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = AppBlocObserver();
 
@@ -45,6 +45,7 @@ Future<Widget> initApp() async {
   await EasyLocalization.ensureInitialized();
 
   // init store
+  SharedPreferences.setPrefix('financrr.');
   await KeyValueStore.init();
 
   // init logging
@@ -161,37 +162,6 @@ class FinancrrAppState extends State<FinancrrApp> {
       StoreKey.currentDarkThemeId.write(_activeDarkTheme.id);
       StoreKey.themeMode.write(_themeMode);
     });
-  }
-}
-
-class FallbackErrorApp extends StatelessWidget {
-  final String error;
-
-  const FallbackErrorApp({super.key, required this.error});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        body: SafeArea(
-          child: GestureDetector(
-            onTap: () => Clipboard.setData(ClipboardData(text: error)),
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error_outline_rounded),
-                  const SizedBox(height: 10),
-                  const Text('An error occurred while initializing the app:', style: TextStyle(fontWeight: FontWeight.w700)),
-                  Expanded(child: Text(error, textAlign: TextAlign.center,))
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }
 
