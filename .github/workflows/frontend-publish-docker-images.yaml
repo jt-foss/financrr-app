@@ -1,4 +1,4 @@
-name: (Backend) Create and publish Docker image
+name: (Frontend) Create and publish Docker image
 
 on:
   push:
@@ -66,7 +66,7 @@ jobs:
     # Set default working directory
     defaults:
       run:
-        working-directory: ./backend  # Change the working directory to /backend
+        working-directory: ./frontend  # Change the working directory to /frontend
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

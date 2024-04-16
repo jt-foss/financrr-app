@@ -1,4 +1,4 @@
-name: (Backend) Docker Compose Build
+name: (Frontend) Docker Compose Build
 
 on:
   push:
@@ -27,7 +27,7 @@ jobs:
       - name: Build Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./backend
+          context: ./frontend
           file: ./frontend/docker/Dockerfile
           platforms: linux/amd64
           load: true
@@ -43,7 +43,7 @@ jobs:
       - name: Build Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./backend
+          context: ./frontend
           file: ./frontend/docker/Dockerfile
           platforms: linux/arm64
           load: true
