@@ -54,3 +54,44 @@ jobs:
             ${{ env.REGISTRY }}/${{ matrix.config.image_name }}:${{ github.event.ref }}
             ${{ env.REGISTRY }}/${{ matrix.config.image_name }}:latest
           labels: ${{ steps.meta.outputs.labels }}
+
+  build-binaries:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    defaults:
+      run:
+        working-directory: ./backend  # Change the working directory to /backend
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Build binaries
+        run: |
+          cargo build --release
+          mv target/release/backend backend
+          mv target/release/migration migration
+      - name: Upload binaries
+        uses: actions/upload-artifact@v2
+        with:
+          name: binaries
+          path: |
+            ./backend
+            ./migration
+
+  create-release:
+    needs: build-binaries
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Download binaries
+        uses: actions/download-artifact@v2
+        with:
+          name: binaries
+      - uses: taiki-e/create-gh-release-action@v1
+        with:
+          changelog: CHANGELOG.md
+          branch: main
+          prefix: Version
+          token: ${{ secrets.GITHUB_TOKEN }}
