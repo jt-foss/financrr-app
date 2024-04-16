@@ -38,7 +38,7 @@ dependencies:
       url: https://github.com/financrr/restrr.git
       ref: fix/id-cache
   # L10n
-  intl: any
+  intl: ^0.18.1
   easy_localization: ^3.0.5
   # Routing
   go_router: ^13.2.3
