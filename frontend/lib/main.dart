@@ -23,14 +23,17 @@ import 'app_bloc_observer.dart';
 Logger log = Logger('FinancrrLogger');
 
 void main() async {
+  // if an error occurs during initialization, show a fallback error app
+  Widget app;
   try {
-    await initApp();
+    app = await initApp();
   } catch (e) {
-    runApp(FallbackErrorApp(error: e.toString()));
+    app = FallbackErrorApp(error: e.toString());
   }
+  runApp(app);
 }
 
-Future<void> initApp() async {
+Future<Widget> initApp() async {
   usePathUrlStrategy();
   SharedPreferences.setPrefix('financrr.');
   WidgetsFlutterBinding.ensureInitialized();
@@ -66,11 +69,11 @@ Future<void> initApp() async {
   final AppTheme lightTheme = AppTheme.getById((await StoreKey.currentLightThemeId.readAsync())!)!;
   final AppTheme darkTheme = AppTheme.getById((await StoreKey.currentDarkThemeId.readAsync())!)!;
 
-  runApp(EasyLocalization(
+  return EasyLocalization(
       supportedLocales: const [Locale('en', 'US'), Locale('de', 'DE')],
       path: 'assets/l10n',
       fallbackLocale: const Locale('en', 'US'),
-      child: FinancrrApp(themeMode: themeMode, currentLightTheme: lightTheme, currentDarkTheme: darkTheme)));
+      child: FinancrrApp(themeMode: themeMode, currentLightTheme: lightTheme, currentDarkTheme: darkTheme));
 }
 
 class FinancrrApp extends StatefulWidget {
