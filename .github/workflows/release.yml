@@ -89,9 +89,39 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: binaries
-      - uses: taiki-e/create-gh-release-action@v1
+      - name: Parse CHANGELOG.md
+        id: changelog
+        run: |
+          BODY=$(awk '/^## Version/{flag=1;next}/^## /{flag=0}flag' CHANGELOG.md)
+          TITLE=$(echo "$BODY" | head -n 1)
+          echo ::set-output name=body::"${BODY//$TITLE/}"
+          echo ::set-output name=title::"$TITLE"
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          changelog: CHANGELOG.md
-          branch: main
-          prefix: Version
-          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ steps.changelog.outputs.title }}
+          release_name: ${{ steps.changelog.outputs.title }}
+          body: ${{ steps.changelog.outputs.body }}
+          draft: false
+          prerelease: false
+      - name: Attach binaries to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./backend
+          asset_name: backend
+          asset_content_type: application/octet-stream
+      - name: Attach binaries to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./migration
+          asset_name: migration
+          asset_content_type: application/octet-stream
