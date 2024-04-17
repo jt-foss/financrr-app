@@ -10,7 +10,7 @@ COPY . /app
 RUN flutter pub get
 
 # Build the web application
-RUN flutter build web
+RUN flutter build web --release
 
 # Use nginx to serve the built web application
 FROM nginx:1.25.4-alpine3.18
