@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:financrr_frontend/pages/authentication/state/authentication_provider.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../../../layout/adaptive_scaffold.dart';
@@ -11,21 +13,21 @@ import '../../../widgets/async_wrapper.dart';
 import '../../../widgets/entities/account_card.dart';
 
 @RoutePage()
-class AccountEditPage extends StatefulWidget {
+class AccountEditPage extends StatefulHookConsumerWidget {
 
   final String? accountId;
 
   const AccountEditPage({super.key, required this.accountId});
 
   @override
-  State<StatefulWidget> createState() => AccountEditPageState();
+  ConsumerState<AccountEditPage> createState() => AccountEditPageState();
 }
 
-class AccountEditPageState extends State<AccountEditPage> {
+class AccountEditPageState extends ConsumerState<AccountEditPage> {
   final StreamController<Account> _accountStreamController = StreamController.broadcast();
   final GlobalKey<FormState> _formKey = GlobalKey();
 
-  late final Restrr _api = context.api!;
+  late final Restrr _api = api;
 
   late final TextEditingController _nameController;
   late final TextEditingController _descriptionController;

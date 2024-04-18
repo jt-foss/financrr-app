@@ -1,26 +1,28 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:financrr_frontend/pages/authentication/state/authentication_provider.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/form_fields.dart';
 import 'package:financrr_frontend/util/text_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../../../layout/adaptive_scaffold.dart';
 import '../../../widgets/entities/account_card.dart';
 
 @RoutePage()
-class AccountCreatePage extends StatefulWidget {
+class AccountCreatePage extends StatefulHookConsumerWidget {
 
   const AccountCreatePage({super.key});
 
   @override
-  State<StatefulWidget> createState() => _AccountCreatePageState();
+  ConsumerState<AccountCreatePage> createState() => _AccountCreatePageState();
 }
 
-class _AccountCreatePageState extends State<AccountCreatePage> {
+class _AccountCreatePageState extends ConsumerState<AccountCreatePage> {
   final GlobalKey<FormState> _formKey = GlobalKey();
 
-  late final Restrr _api = context.api!;
+  late final Restrr _api = api;
 
   late final TextEditingController _nameController = TextEditingController();
   late final TextEditingController _descriptionController = TextEditingController();

@@ -4,14 +4,10 @@ import 'package:flutter/material.dart';
 class DuplicateGuard extends AutoRouteGuard {
   @override
   void onNavigation(NavigationResolver resolver, StackRouter router) {
-    // Duplicate navigation
-    if (resolver.route.name == router.current.name) {
-      debugPrint(
-        'DuplicateGuard: Preventing duplicate route navigation for ${resolver.route.name}',
-      );
-      resolver.next(false);
-    } else {
-      resolver.next(true);
+    final bool sameRoute = resolver.route.name == router.current.name;
+    if (sameRoute) {
+      debugPrint('Prevented duplicate route navigation! (${resolver.route.name} -> ${router.current.name})');
     }
+    resolver.next(!sameRoute);
   }
 }

@@ -1,20 +1,22 @@
 import 'dart:math';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:financrr_frontend/pages/authentication/state/authentication_provider.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/widgets/entities/currency_card.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../../../layout/adaptive_scaffold.dart';
 import '../../../../util/form_fields.dart';
 
 @RoutePage()
-class CurrencyCreatePage extends StatefulWidget {
+class CurrencyCreatePage extends StatefulHookConsumerWidget {
   const CurrencyCreatePage({super.key});
 
   @override
-  State<StatefulWidget> createState() => _CurrencyCreatePageState();
+  ConsumerState<CurrencyCreatePage> createState() => _CurrencyCreatePageState();
 
   static List<Widget> buildCurrencyPreview(
       {required Size size,
@@ -43,10 +45,10 @@ class CurrencyCreatePage extends StatefulWidget {
   }
 }
 
-class _CurrencyCreatePageState extends State<CurrencyCreatePage> {
+class _CurrencyCreatePageState extends ConsumerState<CurrencyCreatePage> {
   final GlobalKey<FormState> _formKey = GlobalKey();
 
-  late final Restrr _api = context.api!;
+  late final Restrr _api = api;
 
   late final TextEditingController _symbolController;
   late final TextEditingController _nameController;

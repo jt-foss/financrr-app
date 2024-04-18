@@ -2,9 +2,11 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:financrr_frontend/pages/authentication/state/authentication_provider.dart';
 import 'package:financrr_frontend/pages/core/settings/currency/currency_create_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../../../layout/adaptive_scaffold.dart';
@@ -12,20 +14,20 @@ import '../../../../util/form_fields.dart';
 import '../../../../widgets/async_wrapper.dart';
 
 @RoutePage()
-class CurrencyEditPage extends StatefulWidget {
+class CurrencyEditPage extends StatefulHookConsumerWidget {
   final String? currencyId;
 
   const CurrencyEditPage({super.key, required this.currencyId});
 
   @override
-  State<StatefulWidget> createState() => _CurrencyEditPageState();
+  ConsumerState<CurrencyEditPage> createState() => _CurrencyEditPageState();
 }
 
-class _CurrencyEditPageState extends State<CurrencyEditPage> {
+class _CurrencyEditPageState extends ConsumerState<CurrencyEditPage> {
   final StreamController<Currency> _currencyStreamController = StreamController.broadcast();
   final GlobalKey<FormState> _formKey = GlobalKey();
 
-  late final Restrr _api = context.api!;
+  late final Restrr _api = api;
 
   late final TextEditingController _symbolController;
   late final TextEditingController _nameController;

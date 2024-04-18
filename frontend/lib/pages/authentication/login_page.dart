@@ -1,23 +1,27 @@
 import 'dart:async';
 
+import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:financrr_frontend/layout/templates/auth_page_template.dart';
+import 'package:financrr_frontend/pages/authentication/state/authentication_provider.dart';
+import 'package:financrr_frontend/pages/authentication/state/authentication_state.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../layout/adaptive_scaffold.dart';
+import '../../routing/app_router.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends StatefulHookConsumerWidget {
   final Uri hostUri;
 
   const LoginPage({super.key, required this.hostUri});
 
   @override
-  State<StatefulWidget> createState() => LoginPageState();
+  ConsumerState<LoginPage> createState() => LoginPageState();
 }
 
-class LoginPageState extends State<LoginPage> {
+class LoginPageState extends ConsumerState<LoginPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -95,8 +99,12 @@ class LoginPageState extends State<LoginPage> {
       context.showSnackBar('common_password_required'.tr());
       return;
     }
-    context
-        .read<AuthenticationBloc>()
-        .add(AuthenticationLoginRequested(uri: widget.hostUri, username: username, password: password));
+    final state = await ref.read(authProvider.notifier)
+        .login(username, password, widget.hostUri);
+    if (mounted && state.status == AuthenticationStatus.authenticated) {
+      context.replaceRoute(const TabControllerRoute());
+    } else {
+      context.showSnackBar('common_login_failed'.tr());
+    }
   }
 }

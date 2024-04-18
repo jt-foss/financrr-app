@@ -1,7 +1,8 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:financrr_frontend/pages/authentication/state/authentication_provider.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:restrr/restrr.dart';
 
@@ -25,16 +26,16 @@ class SettingsItem {
 }
 
 @RoutePage()
-class SettingsPage extends StatefulWidget {
+class SettingsPage extends StatefulHookConsumerWidget {
 
   const SettingsPage({super.key});
 
   @override
-  State<StatefulWidget> createState() => _SettingsPageState();
+  ConsumerState<SettingsPage> createState() => _SettingsPageState();
 }
 
-class _SettingsPageState extends State<SettingsPage> {
-  late final Restrr _api = context.api!;
+class _SettingsPageState extends ConsumerState<SettingsPage> {
+  late final Restrr _api = api;
 
   late final List<SettingsItemGroup> _items = [
     SettingsItemGroup(items: [
@@ -99,7 +100,7 @@ class _SettingsPageState extends State<SettingsPage> {
       SettingsItem(
         showCategory: false,
         child: ListTile(
-          onTap: () => context.read<AuthenticationBloc>().add(AuthenticationLogoutRequested(api: _api)),
+          onTap: () => ref.read(authProvider.notifier).logout(),
           leading: const Icon(Icons.logout),
           title: const Text('Logout'),
         ),

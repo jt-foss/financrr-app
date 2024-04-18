@@ -1,10 +1,10 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:financrr_frontend/pages/authentication/state/authentication_provider.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
-import '../../../data/bloc/store_bloc.dart';
 import '../../../layout/adaptive_scaffold.dart';
 import '../../../routing/app_router.dart';
 import '../../../util/text_utils.dart';
@@ -12,15 +12,15 @@ import '../../../widgets/entities/account_card.dart';
 import '../../../widgets/notice_card.dart';
 
 @RoutePage()
-class AccountsOverviewPage extends StatefulWidget {
+class AccountsOverviewPage extends StatefulHookConsumerWidget {
   const AccountsOverviewPage({super.key});
 
   @override
-  State<StatefulWidget> createState() => _AccountsOverviewPageState();
+  ConsumerState<AccountsOverviewPage> createState() => _AccountsOverviewPageState();
 }
 
-class _AccountsOverviewPageState extends State<AccountsOverviewPage> {
-  late final Restrr _api = context.api!;
+class _AccountsOverviewPageState extends ConsumerState<AccountsOverviewPage> {
+  late final Restrr _api = api;
 
   late Map<Currency, int> _currencies = _api.getAccounts().fold(
     {},
@@ -63,16 +63,12 @@ class _AccountsOverviewPageState extends State<AccountsOverviewPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    BlocBuilder<StoreBloc, StoreState>(
-                      builder: (context, state) {
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: _currencies.entries.map((entry) {
-                            return Text(TextUtils.formatBalanceWithCurrency(entry.value, entry.key),
-                                style: context.textTheme.titleSmall?.copyWith(color: context.theme.primaryColor));
-                          }).toList(),
-                        );
-                      },
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: _currencies.entries.map((entry) {
+                        return Text(TextUtils.formatBalanceWithCurrency(entry.value, entry.key),
+                            style: context.textTheme.titleSmall?.copyWith(color: context.theme.primaryColor));
+                      }).toList(),
                     ),
                     TextButton.icon(
                       label: const Text('Create Account'),

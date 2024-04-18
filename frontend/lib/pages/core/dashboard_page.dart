@@ -1,28 +1,30 @@
 import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:financrr_frontend/pages/authentication/state/authentication_provider.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/widgets/async_wrapper.dart';
 import 'package:financrr_frontend/widgets/entities/account_card.dart';
 import 'package:financrr_frontend/widgets/entities/transaction_card.dart';
 import 'package:financrr_frontend/widgets/notice_card.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../layout/adaptive_scaffold.dart';
 import '../../routing/app_router.dart';
 
 @RoutePage()
-class DashboardPage extends StatefulWidget {
+class DashboardPage extends StatefulHookConsumerWidget {
 
   const DashboardPage({super.key});
 
   @override
-  State<StatefulWidget> createState() => _DashboardPageState();
+  ConsumerState<DashboardPage> createState() => _DashboardPageState();
 }
 
-class _DashboardPageState extends State<DashboardPage> {
-  late final Restrr _api = context.api!;
+class _DashboardPageState extends ConsumerState<DashboardPage> {
+  late final Restrr _api = api;
 
   final StreamController<Paginated<Transaction>> _transactionStreamController = StreamController.broadcast();
 

@@ -1,9 +1,7 @@
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restrr/restrr.dart';
 
-import '../../data/bloc/store_bloc.dart';
 import '../../data/store.dart';
 
 class SessionCard extends StatelessWidget {
@@ -34,33 +32,29 @@ class SessionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<StoreBloc, StoreState>(
-      builder: (context, state) {
-        return Card.outlined(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: Row(
-              children: [
-                const Icon(Icons.devices_rounded),
-                const SizedBox(width: 20),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(name ?? '${isCurrent ? 'Current' : 'Unnamed'} Session', style: context.textTheme.titleSmall),
-                      Text('${StoreKey.dateTimeFormat.readSync()!.format(createdAt)} ($id)'),
-                    ],
-                  ),
-                ),
-                IconButton(
-                  onPressed: onDelete,
-                  icon: Icon(isCurrent ? Icons.logout_rounded : Icons.delete_rounded),
-                )
-              ],
+    return Card.outlined(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        child: Row(
+          children: [
+            const Icon(Icons.devices_rounded),
+            const SizedBox(width: 20),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(name ?? '${isCurrent ? 'Current' : 'Unnamed'} Session', style: context.textTheme.titleSmall),
+                  Text('${StoreKey.dateTimeFormat.readSync()!.format(createdAt)} ($id)'),
+                ],
+              ),
             ),
-          ),
-        );
-      },
+            IconButton(
+              onPressed: onDelete,
+              icon: Icon(isCurrent ? Icons.logout_rounded : Icons.delete_rounded),
+            )
+          ],
+        ),
+      ),
     );
   }
 }

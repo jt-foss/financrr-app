@@ -1,9 +1,7 @@
-import 'package:financrr_frontend/data/bloc/store_bloc.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/text_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restrr/restrr.dart';
 
 import '../data/store.dart';
@@ -91,30 +89,26 @@ class FormFields {
           ],
         ),
       ),
-      BlocBuilder<StoreBloc, StoreState>(
-        builder: (context, state) {
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: TextFormField(
-              onTap: () async {
-                final DateTime? date = await showDatePicker(
-                  context: context,
-                  firstDate: (executedAt ?? DateTime.now()).subtract(const Duration(days: 365)),
-                  lastDate: (executedAt ?? DateTime.now()).add(const Duration(days: 365)),
-                );
-                if (date == null) return;
-                final TimeOfDay? time = await showTimePicker(
-                    context: context, initialTime: executedAt != null ? TimeOfDay.fromDateTime(executedAt) : TimeOfDay.now());
-                if (time == null) return;
-                onExecutedAtChanged?.call(date.copyWith(hour: time.hour, minute: time.minute));
-              },
-              initialValue: StoreKey.dateTimeFormat.readSync()!.format(executedAt ?? DateTime.now()),
-              readOnly: true,
-              decoration: const InputDecoration(labelText: 'Executed At'),
-            ),
-          );
-        },
-      ),
+      Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: TextFormField(
+          onTap: () async {
+            final DateTime? date = await showDatePicker(
+              context: context,
+              firstDate: (executedAt ?? DateTime.now()).subtract(const Duration(days: 365)),
+              lastDate: (executedAt ?? DateTime.now()).add(const Duration(days: 365)),
+            );
+            if (date == null) return;
+            final TimeOfDay? time = await showTimePicker(
+                context: context, initialTime: executedAt != null ? TimeOfDay.fromDateTime(executedAt) : TimeOfDay.now());
+            if (time == null) return;
+            onExecutedAtChanged?.call(date.copyWith(hour: time.hour, minute: time.minute));
+          },
+          initialValue: StoreKey.dateTimeFormat.readSync()!.format(executedAt ?? DateTime.now()),
+          readOnly: true,
+          decoration: const InputDecoration(labelText: 'Executed At'),
+        ),
+      )
     ];
   }
 

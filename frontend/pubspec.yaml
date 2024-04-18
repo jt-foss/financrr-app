@@ -46,14 +46,15 @@ dependencies:
   flutter_secure_storage: ^9.0.0
   shared_preferences: ^2.2.2
   # State Management
-  flutter_bloc: ^8.1.5
-  equatable: ^2.0.5
+  riverpod: ^2.5.1
+  hooks_riverpod: ^2.5.1
   # Other
   flutter_svg: ^2.0.9
   logging: ^1.2.0
   device_info_plus: ^10.1.0
   package_info_plus: ^7.0.0
   url_launcher: ^6.2.6
+
 dev_dependencies:
   build_runner: any
   auto_route_generator: ^8.0.0

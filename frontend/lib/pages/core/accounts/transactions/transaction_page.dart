@@ -1,34 +1,34 @@
 import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:financrr_frontend/pages/authentication/state/authentication_provider.dart';
 import 'package:financrr_frontend/routing/app_router.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/text_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../../../../layout/adaptive_scaffold.dart';
-import '../../../../data/bloc/store_bloc.dart';
 import '../../../../data/store.dart';
 import '../../../../widgets/async_wrapper.dart';
 
 @RoutePage()
-class TransactionPage extends StatefulWidget {
+class TransactionPage extends StatefulHookConsumerWidget {
   final String? accountId;
   final String? transactionId;
 
   const TransactionPage({super.key, required this.accountId, required this.transactionId});
 
   @override
-  State<StatefulWidget> createState() => TransactionPageState();
+  ConsumerState<TransactionPage> createState() => TransactionPageState();
 }
 
-class TransactionPageState extends State<TransactionPage> {
+class TransactionPageState extends ConsumerState<TransactionPage> {
   final StreamController<Account> _accountStreamController = StreamController.broadcast();
   final StreamController<Transaction> _transactionStreamController = StreamController.broadcast();
 
-  late final Restrr _api = context.api!;
+  late final Restrr _api = api;
 
   Future<Account?> _fetchAccount({bool forceRetrieve = false}) async {
     return _accountStreamController.fetchData(
@@ -79,6 +79,8 @@ class TransactionPageState extends State<TransactionPage> {
   }
 
   Widget _buildVerticalLayout(Account account, Transaction transaction, Size size) {
+    final String amountStr = (transaction.type == TransactionType.deposit ? '' : '-') +
+        TextUtils.formatBalanceWithCurrency(transaction.amount, account.currencyId.get()!);
     return Padding(
       padding: const EdgeInsets.only(top: 10, bottom: 20),
       child: Align(
@@ -90,61 +92,55 @@ class TransactionPageState extends State<TransactionPage> {
               await _fetchAccount(forceRetrieve: true);
               await _fetchTransaction(forceRetrieve: true);
             },
-            child: BlocBuilder<StoreBloc, StoreState>(
-              builder: (context, state) {
-                final String amountStr = (transaction.type == TransactionType.deposit ? '' : '-') +
-                    TextUtils.formatBalanceWithCurrency(transaction.amount, account.currencyId.get()!);
-                return ListView(
+            child: ListView(
+              children: [
+                Column(
                   children: [
-                    Column(
-                      children: [
-                        Text(amountStr,
-                            style: context.textTheme.titleLarge?.copyWith(
-                                color: transaction.type == TransactionType.deposit
-                                    ? context.theme.primaryColor
-                                    : context.theme.colorScheme.error)),
-                        Text(transaction.description ?? StoreKey.dateTimeFormat.readSync()!.format(transaction.executedAt)),
-                      ],
-                    ),
-                    const Divider(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        IconButton(
-                            tooltip: 'Delete Transaction',
-                            onPressed: () => _deleteTransaction(transaction),
-                            icon: const Icon(Icons.delete_rounded, size: 17)),
-                        IconButton(
-                            tooltip: 'Edit Transaction',
-                            onPressed: () => context.pushRoute(
-                                TransactionEditRoute(
-                                    accountId: account.id.value.toString(),
-                                    transactionId: transaction.id.value.toString()
-                                )
-                              ),
-                            icon: const Icon(Icons.create_rounded, size: 17))
-                      ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10),
-                      child: Table(
-                        border: TableBorder.all(color: context.theme.dividerColor),
-                        children: [
-                          _buildTableRow('Type', transaction.type.name),
-                          _buildTableRow('Amount', amountStr),
-                          _buildTableRow('Name', transaction.name),
-                          _buildTableRow('Description', transaction.description ?? 'N/A'),
-                          _buildTableRow('From', transaction.sourceId?.get()?.name ?? 'N/A'),
-                          _buildTableRow('To', transaction.destinationId?.get()?.name ?? 'N/A'),
-                          _buildTableRow('Executed at', StoreKey.dateTimeFormat.readSync()!.format(transaction.executedAt)),
-                          _buildTableRow('Created at', StoreKey.dateTimeFormat.readSync()!.format(transaction.createdAt)),
-                        ],
-                      ),
-                    )
+                    Text(amountStr,
+                        style: context.textTheme.titleLarge?.copyWith(
+                            color: transaction.type == TransactionType.deposit
+                                ? context.theme.primaryColor
+                                : context.theme.colorScheme.error)),
+                    Text(transaction.description ?? StoreKey.dateTimeFormat.readSync()!.format(transaction.executedAt)),
                   ],
-                );
-              },
-            ),
+                ),
+                const Divider(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                        tooltip: 'Delete Transaction',
+                        onPressed: () => _deleteTransaction(transaction),
+                        icon: const Icon(Icons.delete_rounded, size: 17)),
+                    IconButton(
+                        tooltip: 'Edit Transaction',
+                        onPressed: () => context.pushRoute(
+                            TransactionEditRoute(
+                                accountId: account.id.value.toString(),
+                                transactionId: transaction.id.value.toString()
+                            )
+                        ),
+                        icon: const Icon(Icons.create_rounded, size: 17))
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Table(
+                    border: TableBorder.all(color: context.theme.dividerColor),
+                    children: [
+                      _buildTableRow('Type', transaction.type.name),
+                      _buildTableRow('Amount', amountStr),
+                      _buildTableRow('Name', transaction.name),
+                      _buildTableRow('Description', transaction.description ?? 'N/A'),
+                      _buildTableRow('From', transaction.sourceId?.get()?.name ?? 'N/A'),
+                      _buildTableRow('To', transaction.destinationId?.get()?.name ?? 'N/A'),
+                      _buildTableRow('Executed at', StoreKey.dateTimeFormat.readSync()!.format(transaction.executedAt)),
+                      _buildTableRow('Created at', StoreKey.dateTimeFormat.readSync()!.format(transaction.createdAt)),
+                    ],
+                  ),
+                )
+              ],
+            )
           ),
         ),
       ),

@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
-import 'package:financrr_frontend/data/bloc/store_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -36,7 +35,7 @@ enum StoreKey<T> {
   String? readAsStringSync() => KeyValueStore._instance.readAsStringSync(this);
   Future<T?> readAsync() => KeyValueStore._instance.readAsync(this);
   Future<String?> readAsStringAsync() => KeyValueStore._instance.readAsStringAsync(this);
-  void write(T value) => StoreBloc().write(this, value);
+  void write(T value) => KeyValueStore._instance.write(this, value);
   Future<void> delete() => KeyValueStore._instance.delete(this);
 
   static DateFormat _defaultDateFormat() => DateFormat.yMd();

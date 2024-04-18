@@ -1,9 +1,11 @@
 import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:financrr_frontend/pages/authentication/state/authentication_provider.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/form_fields.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../../../../layout/adaptive_scaffold.dart';
@@ -12,19 +14,19 @@ import '../../../../widgets/async_wrapper.dart';
 import '../../../../widgets/entities/transaction_card.dart';
 
 @RoutePage()
-class TransactionCreatePage extends StatefulWidget {
+class TransactionCreatePage extends StatefulHookConsumerWidget {
   final String? accountId;
 
   const TransactionCreatePage({super.key, required this.accountId});
 
   @override
-  State<StatefulWidget> createState() => _TransactionCreatePageState();
+  ConsumerState<TransactionCreatePage> createState() => _TransactionCreatePageState();
 }
 
-class _TransactionCreatePageState extends State<TransactionCreatePage> {
+class _TransactionCreatePageState extends ConsumerState<TransactionCreatePage> {
   final StreamController<Account> _accountStreamController = StreamController.broadcast();
   final GlobalKey<FormState> _formKey = GlobalKey();
-  late final Restrr _api = context.api!;
+  late final Restrr _api = api;
 
   late final TextEditingController _nameController = TextEditingController(text: 'Transaction');
   final TextEditingController _amountController = TextEditingController();

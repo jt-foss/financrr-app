@@ -1,25 +1,25 @@
 import 'package:auto_route/annotations.dart';
+import 'package:financrr_frontend/pages/authentication/state/authentication_provider.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/widgets/entities/session_card.dart';
 import 'package:financrr_frontend/widgets/paginated_wrapper.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../../../layout/adaptive_scaffold.dart';
-import 'bloc/session_bloc.dart';
 
 @RoutePage()
-class SessionSettingsPage extends StatefulWidget {
+class SessionSettingsPage extends StatefulHookConsumerWidget {
   const SessionSettingsPage({super.key});
 
   @override
-  State<StatefulWidget> createState() => _SessionSettingsPageState();
+  ConsumerState<SessionSettingsPage> createState() => _SessionSettingsPageState();
 }
 
-class _SessionSettingsPageState extends State<SessionSettingsPage> {
+class _SessionSettingsPageState extends ConsumerState<SessionSettingsPage> {
   final GlobalKey<PaginatedWrapperState<PartialSession>> _paginatedSessionKey = GlobalKey();
-  late final Restrr _api = context.api!;
+  late final Restrr _api = api;
 
   final ValueNotifier<int> _amount = ValueNotifier(0);
 
@@ -43,7 +43,7 @@ class _SessionSettingsPageState extends State<SessionSettingsPage> {
               children: [
                 SessionCard(
                     session: _api.session,
-                    onDelete: () => context.read<AuthenticationBloc>().add(AuthenticationLogoutRequested(api: _api))),
+                    onDelete: () => ref.read(authProvider.notifier).logout()),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -60,39 +60,36 @@ class _SessionSettingsPageState extends State<SessionSettingsPage> {
                   ],
                 ),
                 const Divider(),
-                BlocListener<SessionBloc, SessionState>(
-                  listener: (context, state) => _paginatedSessionKey.currentState?.reset(),
-                  child: PaginatedWrapper(
-                    key: _paginatedSessionKey,
-                    initialPageFunction: (forceRetrieve) => _api.retrieveAllSessions(limit: 10, forceRetrieve: forceRetrieve),
-                    onError: (context, snap) {
-                      if (snap.error is ServerException) {
-                        context.read<AuthenticationBloc>().add(AuthenticationLogoutRequested(api: _api));
-                      }
-                      return Text(snap.error.toString());
-                    },
-                    onSuccess: (context, snap) {
-                      final PaginatedDataResult<PartialSession> sessions = snap.data!;
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        _amount.value = sessions.total;
-                      });
-                      sessions.items.removeWhere((s) => s.id.value == _api.session.id.value);
-                      return Column(
-                        children: [
-                          for (PartialSession s in sessions.items)
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 10),
-                              child: SessionCard(session: s, onDelete: () => _deleteSession(s)),
-                            ),
-                          if (sessions.nextPage != null)
-                            TextButton(
-                              onPressed: () => sessions.nextPage!(_api),
-                              child: const Text('Load more'),
-                            ),
-                        ],
-                      );
-                    },
-                  ),
+                PaginatedWrapper(
+                  key: _paginatedSessionKey,
+                  initialPageFunction: (forceRetrieve) => _api.retrieveAllSessions(limit: 10, forceRetrieve: forceRetrieve),
+                  onError: (context, snap) {
+                    if (snap.error is ServerException) {
+                      ref.read(authProvider.notifier).logout();
+                    }
+                    return Text(snap.error.toString());
+                  },
+                  onSuccess: (context, snap) {
+                    final PaginatedDataResult<PartialSession> sessions = snap.data!;
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      _amount.value = sessions.total;
+                    });
+                    sessions.items.removeWhere((s) => s.id.value == _api.session.id.value);
+                    return Column(
+                      children: [
+                        for (PartialSession s in sessions.items)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 10),
+                            child: SessionCard(session: s, onDelete: () => _deleteSession(s)),
+                          ),
+                        if (sessions.nextPage != null)
+                          TextButton(
+                            onPressed: () => sessions.nextPage!(_api),
+                            child: const Text('Load more'),
+                          ),
+                      ],
+                    );
+                  },
                 )
               ],
             ),
@@ -108,7 +105,7 @@ class _SessionSettingsPageState extends State<SessionSettingsPage> {
       if (!mounted) return;
       context.showSnackBar('Successfully deleted "${session.name ?? 'Session ${session.id.value}'}"');
       if (session.id.value == _api.session.id.value) {
-        context.read<AuthenticationBloc>().add(AuthenticationLogoutRequested(api: _api));
+        ref.read(authProvider.notifier).logout();
       }
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);
@@ -120,7 +117,7 @@ class _SessionSettingsPageState extends State<SessionSettingsPage> {
       await _api.deleteAllSessions();
       if (!mounted) return;
       context.showSnackBar('Successfully deleted all Sessions!');
-      context.read<AuthenticationBloc>().add(AuthenticationLogoutRequested(api: _api));
+      ref.read(authProvider.notifier).logout();
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);
     }

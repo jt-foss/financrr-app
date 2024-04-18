@@ -2,9 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/widgets/text_circle_avatar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restrr/restrr.dart';
-import '../../data/bloc/store_bloc.dart';
 import '../../routing/app_router.dart';
 import '../../util/text_utils.dart';
 
@@ -37,35 +35,31 @@ class AccountCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<StoreBloc, StoreState>(
-      builder: (context, state) {
-        return GestureDetector(
-          onTap:
-              !interactive ? null : () => context.pushRoute(AccountRoute(accountId: id.toString())),
-          child: Card.outlined(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Row(
-                children: [
-                  TextCircleAvatar(text: name, radius: 25),
-                  const SizedBox(width: 20),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(name, style: context.textTheme.titleSmall),
-                        if (iban != null || description != null) Text(TextUtils.formatIBAN(iban) ?? description!),
-                      ],
-                    ),
-                  ),
-                  Text(TextUtils.formatBalanceWithCurrency(balance, currency!),
-                      style: context.textTheme.titleSmall?.copyWith(color: context.theme.primaryColor))
-                ],
+    return GestureDetector(
+      onTap:
+      !interactive ? null : () => context.pushRoute(AccountRoute(accountId: id.toString())),
+      child: Card.outlined(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: Row(
+            children: [
+              TextCircleAvatar(text: name, radius: 25),
+              const SizedBox(width: 20),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(name, style: context.textTheme.titleSmall),
+                    if (iban != null || description != null) Text(TextUtils.formatIBAN(iban) ?? description!),
+                  ],
+                ),
               ),
-            ),
+              Text(TextUtils.formatBalanceWithCurrency(balance, currency!),
+                  style: context.textTheme.titleSmall?.copyWith(color: context.theme.primaryColor))
+            ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }

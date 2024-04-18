@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
-import 'package:financrr_frontend/data/bloc/store_bloc.dart';
+import 'package:financrr_frontend/pages/authentication/state/authentication_provider.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/text_utils.dart';
 import 'package:financrr_frontend/widgets/async_wrapper.dart';
@@ -9,26 +9,26 @@ import 'package:financrr_frontend/widgets/entities/transaction_card.dart';
 import 'package:financrr_frontend/widgets/notice_card.dart';
 import 'package:financrr_frontend/widgets/paginated_wrapper.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../../layout/adaptive_scaffold.dart';
 import '../../../routing/app_router.dart';
 
 @RoutePage()
-class AccountPage extends StatefulWidget {
+class AccountPage extends StatefulHookConsumerWidget {
   final String? accountId;
 
   const AccountPage({super.key, required this.accountId});
 
   @override
-  State<StatefulWidget> createState() => _AccountPageState();
+  ConsumerState<AccountPage> createState() => _AccountPageState();
 }
 
-class _AccountPageState extends State<AccountPage> {
+class _AccountPageState extends ConsumerState<AccountPage> {
   final StreamController<Account> _accountStreamController = StreamController.broadcast();
   final GlobalKey<PaginatedWrapperState> _transactionPaginatedKey = GlobalKey();
-  late final Restrr _api = context.api!;
+  late final Restrr _api = api;
 
   Future<Account?> _fetchAccount({bool forceRetrieve = false}) async {
     return _accountStreamController.fetchData(
@@ -81,16 +81,12 @@ class _AccountPageState extends State<AccountPage> {
             },
             child: ListView(
               children: [
-                BlocBuilder<StoreBloc, StoreState>(
-                  builder: (context, state) {
-                    return Column(
-                      children: [
-                        Text(TextUtils.formatBalanceWithCurrency(account.balance, account.currencyId.get()!),
-                            style: context.textTheme.titleLarge?.copyWith(color: context.theme.primaryColor)),
-                        Text(account.name),
-                      ],
-                    );
-                  },
+                Column(
+                  children: [
+                    Text(TextUtils.formatBalanceWithCurrency(account.balance, account.currencyId.get()!),
+                        style: context.textTheme.titleLarge?.copyWith(color: context.theme.primaryColor)),
+                    Text(account.name),
+                  ],
                 ),
                 const Divider(),
                 Row(

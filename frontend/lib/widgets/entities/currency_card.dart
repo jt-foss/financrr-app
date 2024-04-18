@@ -2,10 +2,8 @@ import 'package:auto_route/auto_route.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/widgets/text_circle_avatar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restrr/restrr.dart';
 
-import '../../data/bloc/store_bloc.dart';
 import '../../routing/app_router.dart';
 
 class CurrencyCard extends StatelessWidget {
@@ -39,45 +37,41 @@ class CurrencyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<StoreBloc, StoreState>(
-      builder: (context, state) {
-        return Card.outlined(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: Row(
-              children: [
-                TextCircleAvatar(text: symbol, radius: 25),
-                const SizedBox(width: 20),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(name, style: context.textTheme.titleSmall),
-                      if (isoCode != null) Text(isoCode!),
-                    ],
-                  ),
-                ),
-                PopupMenuButton(
-                  enabled: interactive && isCustom,
-                  itemBuilder: (context) {
-                    return [
-                      PopupMenuItem(
-                        onTap: () => context.pushRoute(CurrencyEditRoute(currencyId: id.toString())),
-                        child: const Text('Edit'),
-                      ),
-                      if (onDelete != null)
-                        PopupMenuItem(
-                          onTap: onDelete,
-                          child: const Text('Delete'),
-                        ),
-                    ];
-                  },
-                )
-              ],
+    return Card.outlined(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        child: Row(
+          children: [
+            TextCircleAvatar(text: symbol, radius: 25),
+            const SizedBox(width: 20),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(name, style: context.textTheme.titleSmall),
+                  if (isoCode != null) Text(isoCode!),
+                ],
+              ),
             ),
-          ),
-        );
-      },
+            PopupMenuButton(
+              enabled: interactive && isCustom,
+              itemBuilder: (context) {
+                return [
+                  PopupMenuItem(
+                    onTap: () => context.pushRoute(CurrencyEditRoute(currencyId: id.toString())),
+                    child: const Text('Edit'),
+                  ),
+                  if (onDelete != null)
+                    PopupMenuItem(
+                      onTap: onDelete,
+                      child: const Text('Delete'),
+                    ),
+                ];
+              },
+            )
+          ],
+        ),
+      ),
     );
   }
 }

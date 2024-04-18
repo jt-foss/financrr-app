@@ -1,28 +1,22 @@
 import 'dart:io';
-import 'dart:js';
 import 'dart:ui';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:financrr_frontend/routing/app_router.dart';
-import 'package:financrr_frontend/data/bloc/store_bloc.dart';
 import 'package:financrr_frontend/data/log_store.dart';
 import 'package:financrr_frontend/data/store.dart';
-import 'package:financrr_frontend/pages/core/settings/currency/bloc/currency_bloc.dart';
-import 'package:financrr_frontend/pages/core/settings/session/bloc/session_bloc.dart';
 import 'package:financrr_frontend/themes.dart';
 import 'package:financrr_frontend/widgets/fallback_error_app.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:logging/logging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'app_bloc_observer.dart';
-
-Logger log = Logger('FinancrrLogger');
+Logger _log = Logger('GenericLogger');
 
 void main() async {
   // if an error occurs during initialization, show a fallback error app
@@ -40,7 +34,6 @@ Future<Widget> initApp() async {
   await initializeDateFormatting();
   SharedPreferences.setPrefix('financrr.');
   WidgetsFlutterBinding.ensureInitialized();
-  Bloc.observer = AppBlocObserver();
 
   // init l10ns
   await EasyLocalization.ensureInitialized();
@@ -51,7 +44,7 @@ Future<Widget> initApp() async {
   // init logging
   FlutterError.onError = (details) {
     FlutterError.presentError(details);
-    log.severe(
+    _log.severe(
         'FlutterError: ${details.exceptionAsString()}\n\nLibrary: ${details.library}\n\nContext: ${details.context}\n\nStackTrace: ${details.stack}');
   };
   Logger.root.level = Level.ALL;
@@ -72,14 +65,16 @@ Future<Widget> initApp() async {
   final AppTheme lightTheme = AppTheme.getById((await StoreKey.currentLightThemeId.readAsync())!)!;
   final AppTheme darkTheme = AppTheme.getById((await StoreKey.currentDarkThemeId.readAsync())!)!;
 
-  return EasyLocalization(
-      supportedLocales: const [Locale('en', 'US'), Locale('de', 'DE')],
-      path: 'assets/l10n',
-      fallbackLocale: const Locale('en', 'US'),
-      child: FinancrrApp(themeMode: themeMode, currentLightTheme: lightTheme, currentDarkTheme: darkTheme));
+  return ProviderScope(
+    child: EasyLocalization(
+        supportedLocales: const [Locale('en', 'US'), Locale('de', 'DE')],
+        path: 'assets/l10n',
+        fallbackLocale: const Locale('en', 'US'),
+        child: FinancrrApp(themeMode: themeMode, currentLightTheme: lightTheme, currentDarkTheme: darkTheme)),
+  );
 }
 
-class FinancrrApp extends StatefulWidget {
+class FinancrrApp extends StatefulHookConsumerWidget {
   final ThemeMode themeMode;
   final AppTheme currentLightTheme;
   final AppTheme currentDarkTheme;
@@ -87,12 +82,12 @@ class FinancrrApp extends StatefulWidget {
   const FinancrrApp({super.key, required this.themeMode, required this.currentLightTheme, required this.currentDarkTheme});
 
   @override
-  State<FinancrrApp> createState() => FinancrrAppState();
+  ConsumerState<FinancrrApp> createState() => FinancrrAppState();
 
   static FinancrrAppState of(BuildContext context) => context.findAncestorStateOfType<FinancrrAppState>()!;
 }
 
-class FinancrrAppState extends State<FinancrrApp> {
+class FinancrrAppState extends ConsumerState<FinancrrApp> {
   late AppTheme _activeLightTheme = widget.currentLightTheme;
   late AppTheme _activeDarkTheme = widget.currentDarkTheme;
   late ThemeMode _themeMode = widget.themeMode;
@@ -100,8 +95,6 @@ class FinancrrAppState extends State<FinancrrApp> {
   ThemeMode get themeMode => _themeMode;
   AppTheme get activeLightTheme => _activeLightTheme;
   AppTheme get activeDarkTheme => _activeDarkTheme;
-
-  late final _appRouter = FinancrrAppRouter();
 
   @override
   void initState() {
@@ -114,25 +107,19 @@ class FinancrrAppState extends State<FinancrrApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (_) => StoreBloc()),
-        BlocProvider(create: (_) => AuthenticationBloc()..add(const AuthenticationRecoveryRequested())),
-        BlocProvider(create: (_) => CurrencyBloc()),
-        BlocProvider(create: (_) => SessionBloc()),
-      ],
-      child: MaterialApp.router(
-          onGenerateTitle: (ctx) => 'brand_name'.tr(),
-          routerConfig: _appRouter.config(),
-          debugShowCheckedModeBanner: false,
-          scrollBehavior: CustomScrollBehavior(),
-          localizationsDelegates: context.localizationDelegates,
-          supportedLocales: context.supportedLocales,
-          locale: context.locale,
-          theme: _activeLightTheme.themeData,
-          darkTheme: _activeDarkTheme.themeData,
-          themeMode: _themeMode),
-    );
+    var router = ref.watch(appRouterProvider);
+
+    return MaterialApp.router(
+        onGenerateTitle: (ctx) => 'brand_name'.tr(),
+        routerConfig: router.config(),
+        debugShowCheckedModeBanner: false,
+        scrollBehavior: CustomScrollBehavior(),
+        localizationsDelegates: context.localizationDelegates,
+        supportedLocales: context.supportedLocales,
+        locale: context.locale,
+        theme: _activeLightTheme.themeData,
+        darkTheme: _activeDarkTheme.themeData,
+        themeMode: _themeMode);
   }
 
   /// Gets the currently active [AppTheme].

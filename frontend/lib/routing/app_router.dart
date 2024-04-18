@@ -3,6 +3,7 @@ import 'package:financrr_frontend/layout/tab_controller_page.dart';
 import 'package:financrr_frontend/routing/auth_guard.dart';
 import 'package:financrr_frontend/routing/duplicate_guard.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../pages/authentication/server_info_page.dart';
 import '../pages/core/accounts/account_create_page.dart';
@@ -26,10 +27,14 @@ import '../pages/splash_page.dart';
 
 part 'app_router.gr.dart';
 
+final appRouterProvider = Provider((ref) => FinancrrAppRouter(ref));
+
 @AutoRouterConfig(replaceInRouteName: 'Page,Route')
 class FinancrrAppRouter extends _$FinancrrAppRouter {
-  late final AuthGuard _authGuard = AuthGuard();
+  late final AuthGuard _authGuard;
   final DuplicateGuard _duplicateGuard = DuplicateGuard();
+
+  FinancrrAppRouter(ProviderRef<Object?> ref) : _authGuard = AuthGuard(ref);
 
   @override
   RouteType get defaultRouteType => const RouteType.cupertino();

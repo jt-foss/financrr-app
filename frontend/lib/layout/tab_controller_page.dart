@@ -74,11 +74,6 @@ class TabControllerPageState extends State<TabControllerPage> {
           label: 'Accounts',
         ),
         NavigationDestination(
-          icon: Icon(Icons.leaderboard_outlined),
-          selectedIcon: Icon(Icons.leaderboard_rounded),
-          label: 'Statistics',
-        ),
-        NavigationDestination(
           icon: Icon(Icons.settings_outlined),
           selectedIcon: Icon(Icons.settings_rounded),
           label: 'Settings',
@@ -101,11 +96,6 @@ class TabControllerPageState extends State<TabControllerPage> {
           icon: Icon(Icons.account_balance_wallet_outlined),
           selectedIcon: Icon(Icons.account_balance_wallet_rounded),
           label: Text('Accounts'),
-        ),
-        NavigationRailDestination(
-          icon: Icon(Icons.leaderboard_outlined),
-          selectedIcon: Icon(Icons.leaderboard_rounded),
-          label: Text('Statistics'),
         ),
         NavigationRailDestination(
           icon: Icon(Icons.settings_outlined),
