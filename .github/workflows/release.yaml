@@ -2,7 +2,8 @@ name: Release
 
 on:
   create:
-    tags: [ '*' ]
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'  # Regex to match vX.Y.Z tags
 
 concurrency:
   group: "release"
@@ -55,32 +56,64 @@ jobs:
             ${{ env.REGISTRY }}/${{ matrix.config.image_name }}:latest
           labels: ${{ steps.meta.outputs.labels }}
 
-  build-binaries:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    defaults:
-      run:
-        working-directory: ./backend  # Change the working directory to /backend
+  build-backend-binaries:
+    strategy:
+      matrix:
+        config:
+          - { target: 'aarch64-unknown-linux-gnu', os: 'ubuntu-latest' }
+          - { target: 'aarch64-unknown-linux-musl', os: 'ubuntu-latest' }
+          - { target: 'aarch64-apple-darwin', os: 'macos-latest' }
+          - { target: 'x86_64-unknown-linux-gnu', os: 'ubuntu-latest' }
+          - { target: 'x86_64-unknown-linux-musl', os: 'ubuntu-latest' }
+          - { target: 'x86_64-apple-darwin', os: 'macos-latest' }
+          - { target: 'universal-apple-darwin', os: 'macos-latest' }
+          - { target: 'x86_64-pc-windows-msvc', os: 'windows-latest' }
+    runs-on: ${{ matrix.config.os }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Build binaries
-        run: |
-          cargo build --release
-          mv target/release/backend backend
-          mv target/release/migration migration
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.config.target }}
+          override: true
+      - name: Build
+        run: cargo build --release --target ${{ matrix.config.target }}
+      - name: Move binaries
+        run: mv target/${{ matrix.config.target }}/release/* bin/
       - name: Upload binaries
         uses: actions/upload-artifact@v2
         with:
           name: binaries
-          path: |
-            ./backend
-            ./migration
+          path: bin/*
+
+  build-flutter-apps:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v1
+        with:
+          channel: 'stable'  # specify the Flutter version
+      - name: Build APK
+        run: flutter build apk --release
+      - name: Build IPA
+        run: flutter build ios --release --no-codesign
+      - name: Upload APK
+        uses: actions/upload-artifact@v2
+        with:
+          name: financrr.apk
+          path: build/app/outputs/flutter-apk/financrr.apk
+      - name: Upload IPA
+        uses: actions/upload-artifact@v2
+        with:
+          name: financrr.app
+          path: build/ios/iphoneos/financrr.app
 
   create-release:
-    needs: build-binaries
+    needs: [ build-backend-binaries, push-docker-image, build-flutter-apps ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -89,6 +122,17 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: binaries
+          path: bin/
+      - name: Download APK
+        uses: actions/download-artifact@v2
+        with:
+          name: financrr.apk
+          path: build/app/outputs/flutter-apk/
+      - name: Download IPA
+        uses: actions/download-artifact@v2
+        with:
+          name: financrr.app
+          path: build/ios/iphoneos/
       - name: Parse CHANGELOG.md
         id: changelog
         run: |
@@ -113,15 +157,24 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./backend
-          asset_name: backend
+          asset_path: bin/*
+          asset_name: ${{ matrix.config.target }}
           asset_content_type: application/octet-stream
-      - name: Attach binaries to release
+      - name: Attach APK to release
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./migration
-          asset_name: migration
+          asset_path: build/app/outputs/flutter-apk/financrr.apk
+          asset_name: financrr.apk
+          asset_content_type: application/vnd.android.package-archive
+      - name: Attach IPA to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/ios/iphoneos/financrr.app
+          asset_name: financrr.app
           asset_content_type: application/octet-stream
