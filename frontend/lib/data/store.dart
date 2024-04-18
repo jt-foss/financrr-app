@@ -94,7 +94,7 @@ class KeyValueStore {
   /// by either using the [toValue] function of the key or by simply returning
   /// its toString() representation.
   String? readAsStringSync<T>(StoreKey<T> key) {
-    return _toStringOrValue<T?>(readSync(key), key);
+    return _toStringOrValue<T?>(readSync(key), key).toString();
   }
 
   /// Reads the value of the key from the local cache.
@@ -190,7 +190,11 @@ class KeyValueStore {
   }
 
   static dynamic _toStringOrValue<T>(T value, StoreKey<T> key) {
-    return key.toValue?.call(value) ?? value;
+    final dynamic d = key.toValue?.call(value) ?? value;
+    if (d is Enum) {
+      return d.name;
+    }
+    return d;
   }
 
   static T? _fromStringOrValue<T>(dynamic value, StoreKey<T> key) {
