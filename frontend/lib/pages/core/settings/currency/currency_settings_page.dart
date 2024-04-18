@@ -1,4 +1,4 @@
-import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/widgets/entities/currency_card.dart';
 import 'package:financrr_frontend/widgets/paginated_wrapper.dart';
@@ -7,14 +7,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../../../layout/adaptive_scaffold.dart';
-import '../../../../router.dart';
-import '../../settings_page.dart';
+import '../../../../routing/app_router.dart';
 import 'bloc/currency_bloc.dart';
-import 'currency_create_page.dart';
 
+@RoutePage()
 class CurrencySettingsPage extends StatefulWidget {
-  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'currencies');
-
   const CurrencySettingsPage({super.key});
 
   @override
@@ -49,7 +46,7 @@ class _CurrencySettingsPageState extends State<CurrencySettingsPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     TextButton.icon(
-                      onPressed: () => context.goPath(CurrencyCreatePage.pagePath.build()),
+                      onPressed: () => context.pushRoute(const CurrencyCreateRoute()),
                       icon: const Icon(Icons.add),
                       label: const Text('Create'),
                     ),

@@ -1,4 +1,4 @@
-import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,16 +6,13 @@ import 'package:restrr/restrr.dart';
 
 import '../../../data/bloc/store_bloc.dart';
 import '../../../layout/adaptive_scaffold.dart';
-import '../../../router.dart';
+import '../../../routing/app_router.dart';
 import '../../../util/text_utils.dart';
 import '../../../widgets/entities/account_card.dart';
 import '../../../widgets/notice_card.dart';
-import 'account_create_page.dart';
-import 'account_edit_page.dart';
 
+@RoutePage()
 class AccountsOverviewPage extends StatefulWidget {
-  static const PagePathBuilder pagePath = PagePathBuilder('/@me/accounts');
-
   const AccountsOverviewPage({super.key});
 
   @override
@@ -80,7 +77,7 @@ class _AccountsOverviewPageState extends State<AccountsOverviewPage> {
                     TextButton.icon(
                       label: const Text('Create Account'),
                       icon: const Icon(Icons.add, size: 17),
-                      onPressed: () => context.goPath(AccountCreatePage.pagePath.build()),
+                      onPressed: () => context.pushRoute(const AccountCreateRoute()),
                     ),
                   ],
                 ),
@@ -90,7 +87,7 @@ class _AccountsOverviewPageState extends State<AccountsOverviewPage> {
                   child: NoticeCard(
                     title: 'No accounts found',
                     description: 'Create an account to get started',
-                    onTap: () => context.goPath(AccountCreatePage.pagePath.build()),
+                    onTap: () => context.pushRoute(const AccountCreateRoute()),
                   ),
                 ),
               for (Account account in _api.getAccounts())
@@ -113,8 +110,8 @@ class _AccountsOverviewPageState extends State<AccountsOverviewPage> {
                                       child: ListTile(
                                     title: const Text('Edit Account'),
                                     leading: const Icon(Icons.edit_rounded),
-                                    onTap: () => context.goPath(
-                                        AccountEditPage.pagePath.build(pathParams: {'accountId': account.id.value.toString()})),
+                                    onTap: () => context.pushRoute(
+                                        AccountEditRoute(accountId: account.id.value.toString())),
                                   )),
                                   PopupMenuItem(
                                       child: ListTile(

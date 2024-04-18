@@ -1,12 +1,10 @@
+import 'package:auto_route/annotations.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-import '../router.dart';
-
+@RoutePage()
 class SplashPage extends StatefulWidget {
-  static const PagePathBuilder pagePath = PagePathBuilder('/');
-
   const SplashPage({super.key});
 
   @override

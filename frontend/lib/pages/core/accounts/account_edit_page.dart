@@ -1,20 +1,17 @@
 import 'dart:async';
 
-import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../../../layout/adaptive_scaffold.dart';
-import '../../../../router.dart';
 import '../../../util/form_fields.dart';
 import '../../../widgets/async_wrapper.dart';
 import '../../../widgets/entities/account_card.dart';
-import 'account_page.dart';
 
+@RoutePage()
 class AccountEditPage extends StatefulWidget {
-  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: AccountPage.pagePath, path: 'edit');
 
   final String? accountId;
 
@@ -150,7 +147,7 @@ class AccountEditPageState extends State<AccountEditPage> {
       );
       if (!mounted) return;
       context.showSnackBar('Successfully edited "${_nameController.text}"');
-      context.pop();
+      context.maybePop();
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);
     }

@@ -1,7 +1,6 @@
 import 'dart:async';
 
-import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
-import 'package:financrr_frontend/pages/core/accounts/accounts_overview_page.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/widgets/async_wrapper.dart';
 import 'package:financrr_frontend/widgets/entities/account_card.dart';
@@ -11,11 +10,10 @@ import 'package:flutter/material.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../layout/adaptive_scaffold.dart';
-import '../../router.dart';
-import 'accounts/account_create_page.dart';
+import '../../routing/app_router.dart';
 
+@RoutePage()
 class DashboardPage extends StatefulWidget {
-  static const PagePathBuilder pagePath = PagePathBuilder('/@me/dashboard');
 
   const DashboardPage({super.key});
 
@@ -69,13 +67,13 @@ class _DashboardPageState extends State<DashboardPage> {
                                 child: ListTile(
                               title: const Text('Manage Accounts'),
                               leading: const Icon(Icons.manage_accounts_rounded),
-                              onTap: () => context.goPath(AccountsOverviewPage.pagePath.build()),
+                              onTap: () => context.pushRoute(const AccountsOverviewRoute()),
                             )),
                             PopupMenuItem(
                                 child: ListTile(
                               title: const Text('Create Account'),
                               leading: const Icon(Icons.add),
-                              onTap: () => context.goPath(AccountCreatePage.pagePath.build()),
+                              onTap: () => context.pushRoute(const AccountCreateRoute()),
                             ))
                           ];
                         })
@@ -88,7 +86,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       child: NoticeCard(
                           title: 'No accounts found',
                           description: 'Create an account to get started',
-                          onTap: () => context.goPath(AccountCreatePage.pagePath.build()))),
+                          onTap: () => context.pushRoute(const AccountCreateRoute()))),
                 if (_api.getAccounts().isNotEmpty) _buildTransactionSection()
               ]),
             )),

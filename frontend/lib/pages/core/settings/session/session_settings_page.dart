@@ -1,4 +1,4 @@
-import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
+import 'package:auto_route/annotations.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/widgets/entities/session_card.dart';
 import 'package:financrr_frontend/widgets/paginated_wrapper.dart';
@@ -7,13 +7,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../../../layout/adaptive_scaffold.dart';
-import '../../../../router.dart';
-import '../../settings_page.dart';
 import 'bloc/session_bloc.dart';
 
+@RoutePage()
 class SessionSettingsPage extends StatefulWidget {
-  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'session');
-
   const SessionSettingsPage({super.key});
 
   @override

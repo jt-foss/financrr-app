@@ -1,25 +1,20 @@
 import 'dart:async';
 
-import 'package:financrr_frontend/pages/core/accounts/account_page.dart';
-import 'package:financrr_frontend/pages/core/accounts/transactions/transaction_edit_page.dart';
-import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
+import 'package:auto_route/auto_route.dart';
+import 'package:financrr_frontend/routing/app_router.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/text_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../../../../layout/adaptive_scaffold.dart';
-import '../../../../../router.dart';
 import '../../../../data/bloc/store_bloc.dart';
 import '../../../../data/store.dart';
 import '../../../../widgets/async_wrapper.dart';
 
+@RoutePage()
 class TransactionPage extends StatefulWidget {
-  static const PagePathBuilder pagePath =
-      PagePathBuilder.child(parent: AccountPage.pagePath, path: 'transactions/:transactionId');
-
   final String? accountId;
   final String? transactionId;
 
@@ -121,10 +116,12 @@ class TransactionPageState extends State<TransactionPage> {
                             icon: const Icon(Icons.delete_rounded, size: 17)),
                         IconButton(
                             tooltip: 'Edit Transaction',
-                            onPressed: () => context.goPath(TransactionEditPage.pagePath.build(pathParams: {
-                                  'accountId': account.id.value.toString(),
-                                  'transactionId': transaction.id.value.toString()
-                                })),
+                            onPressed: () => context.pushRoute(
+                                TransactionEditRoute(
+                                    accountId: account.id.value.toString(),
+                                    transactionId: transaction.id.value.toString()
+                                )
+                              ),
                             icon: const Icon(Icons.create_rounded, size: 17))
                       ],
                     ),
@@ -171,7 +168,7 @@ class TransactionPageState extends State<TransactionPage> {
     try {
       await transaction.delete();
       if (!mounted) return;
-      context.pop();
+      context.maybePop();
       context.showSnackBar('Successfully deleted "${transaction.description ?? 'transaction'}"');
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);

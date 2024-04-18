@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:auto_route/annotations.dart';
 import 'package:financrr_frontend/data/store.dart';
 import 'package:financrr_frontend/layout/templates/auth_page_template.dart';
 import 'package:financrr_frontend/util/extensions.dart';
@@ -9,12 +10,10 @@ import 'package:flutter/material.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../layout/adaptive_scaffold.dart';
-import '../../router.dart';
 import 'login_page.dart';
 
+@RoutePage()
 class ServerInfoPage extends StatefulWidget {
-  static const PagePathBuilder pagePath = PagePathBuilder('/login');
-
   final String? redirectTo;
 
   const ServerInfoPage({super.key, this.redirectTo});

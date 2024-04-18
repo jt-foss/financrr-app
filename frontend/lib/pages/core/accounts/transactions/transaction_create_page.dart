@@ -1,22 +1,18 @@
 import 'dart:async';
 
-import 'package:financrr_frontend/pages/core/accounts/account_page.dart';
-import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/form_fields.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../../../../layout/adaptive_scaffold.dart';
-import '../../../../../router.dart';
 import '../../../../data/store.dart';
 import '../../../../widgets/async_wrapper.dart';
 import '../../../../widgets/entities/transaction_card.dart';
 
+@RoutePage()
 class TransactionCreatePage extends StatefulWidget {
-  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: AccountPage.pagePath, path: 'transactions/create');
-
   final String? accountId;
 
   const TransactionCreatePage({super.key, required this.accountId});
@@ -153,7 +149,7 @@ class _TransactionCreatePageState extends State<TransactionCreatePage> {
           currencyId: account.currencyId.value);
       if (!mounted) return;
       context.showSnackBar('Successfully created transaction');
-      context.pop();
+      context.maybePop();
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);
     }

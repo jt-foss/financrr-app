@@ -1,9 +1,7 @@
 import 'dart:async';
 
+import 'package:auto_route/auto_route.dart';
 import 'package:financrr_frontend/data/bloc/store_bloc.dart';
-import 'package:financrr_frontend/pages/core/accounts/transactions/transaction_create_page.dart';
-import 'package:financrr_frontend/pages/core/accounts/account_edit_page.dart';
-import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/text_utils.dart';
 import 'package:financrr_frontend/widgets/async_wrapper.dart';
@@ -15,12 +13,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../../layout/adaptive_scaffold.dart';
-import '../../../router.dart';
-import 'accounts_overview_page.dart';
+import '../../../routing/app_router.dart';
 
+@RoutePage()
 class AccountPage extends StatefulWidget {
-  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: AccountsOverviewPage.pagePath, path: ':accountId');
-
   final String? accountId;
 
   const AccountPage({super.key, required this.accountId});
@@ -101,8 +97,8 @@ class _AccountPageState extends State<AccountPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     TextButton.icon(
-                        onPressed: () => context.goPath(
-                            TransactionCreatePage.pagePath.build(pathParams: {'accountId': account.id.value.toString()})),
+                        onPressed: () => context.pushRoute(
+                            TransactionCreateRoute(accountId: account.id.value.toString())),
                         icon: const Icon(Icons.add, size: 17),
                         label: const Text('Create Transaction')),
                     const Spacer(),
@@ -113,7 +109,7 @@ class _AccountPageState extends State<AccountPage> {
                     IconButton(
                         tooltip: 'Edit Account',
                         onPressed: () => context
-                            .goPath(AccountEditPage.pagePath.build(pathParams: {'accountId': account.id.value.toString()})),
+                            .pushRoute(AccountEditRoute(accountId: account.id.value.toString())),
                         icon: const Icon(Icons.create, size: 17))
                   ],
                 ),
@@ -148,7 +144,7 @@ class _AccountPageState extends State<AccountPage> {
                   title: 'No transactions found',
                   description: 'Create a transaction to get started',
                   onTap: () => context
-                      .goPath(TransactionCreatePage.pagePath.build(pathParams: {'accountId': account.id.value.toString()})),
+                      .pushRoute(TransactionCreateRoute(accountId: account.id.value.toString())),
                 ));
               }
               return Column(

@@ -1,14 +1,14 @@
 import 'dart:io';
+import 'dart:js';
 import 'dart:ui';
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:financrr_frontend/routing/app_router.dart';
 import 'package:financrr_frontend/data/bloc/store_bloc.dart';
 import 'package:financrr_frontend/data/log_store.dart';
 import 'package:financrr_frontend/data/store.dart';
-import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
 import 'package:financrr_frontend/pages/core/settings/currency/bloc/currency_bloc.dart';
 import 'package:financrr_frontend/pages/core/settings/session/bloc/session_bloc.dart';
-import 'package:financrr_frontend/router.dart';
 import 'package:financrr_frontend/themes.dart';
 import 'package:financrr_frontend/widgets/fallback_error_app.dart';
 import 'package:flutter/foundation.dart';
@@ -101,6 +101,8 @@ class FinancrrAppState extends State<FinancrrApp> {
   AppTheme get activeLightTheme => _activeLightTheme;
   AppTheme get activeDarkTheme => _activeDarkTheme;
 
+  late final _appRouter = FinancrrAppRouter();
+
   @override
   void initState() {
     super.initState();
@@ -119,20 +121,17 @@ class FinancrrAppState extends State<FinancrrApp> {
         BlocProvider(create: (_) => CurrencyBloc()),
         BlocProvider(create: (_) => SessionBloc()),
       ],
-      child: BlocListener<AuthenticationBloc, AuthenticationState>(
-        listener: (context, state) => AppRouter.goRouter.refresh(),
-        child: MaterialApp.router(
-            onGenerateTitle: (ctx) => 'brand_name'.tr(),
-            routerConfig: AppRouter.goRouter,
-            debugShowCheckedModeBanner: false,
-            scrollBehavior: CustomScrollBehavior(),
-            localizationsDelegates: context.localizationDelegates,
-            supportedLocales: context.supportedLocales,
-            locale: context.locale,
-            theme: _activeLightTheme.themeData,
-            darkTheme: _activeDarkTheme.themeData,
-            themeMode: _themeMode),
-      ),
+      child: MaterialApp.router(
+          onGenerateTitle: (ctx) => 'brand_name'.tr(),
+          routerConfig: _appRouter.config(),
+          debugShowCheckedModeBanner: false,
+          scrollBehavior: CustomScrollBehavior(),
+          localizationsDelegates: context.localizationDelegates,
+          supportedLocales: context.supportedLocales,
+          locale: context.locale,
+          theme: _activeLightTheme.themeData,
+          darkTheme: _activeDarkTheme.themeData,
+          themeMode: _themeMode),
     );
   }
 

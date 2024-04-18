@@ -1,23 +1,18 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:auto_route/auto_route.dart';
 import 'package:financrr_frontend/pages/core/settings/currency/currency_create_page.dart';
-import 'package:financrr_frontend/pages/core/settings/currency/currency_settings_page.dart';
-import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../../../layout/adaptive_scaffold.dart';
-import '../../../../router.dart';
 import '../../../../util/form_fields.dart';
 import '../../../../widgets/async_wrapper.dart';
 
+@RoutePage()
 class CurrencyEditPage extends StatefulWidget {
-  static const PagePathBuilder pagePath =
-      PagePathBuilder.child(parent: CurrencySettingsPage.pagePath, path: ':currencyId/edit');
-
   final String? currencyId;
 
   const CurrencyEditPage({super.key, required this.currencyId});
@@ -169,7 +164,7 @@ class _CurrencyEditPageState extends State<CurrencyEditPage> {
       );
       if (!mounted) return;
       context.showSnackBar('Successfully edited "${_nameController.text}"');
-      context.pop();
+      context.maybePop();
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);
     }

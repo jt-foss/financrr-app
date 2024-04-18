@@ -1,14 +1,12 @@
+import 'package:auto_route/annotations.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../../data/store.dart';
 import '../../../../layout/adaptive_scaffold.dart';
-import '../../../../router.dart';
-import '../../settings_page.dart';
 
+@RoutePage()
 class LocalStorageSettingsPage extends StatefulWidget {
-  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'local-storage');
-
   const LocalStorageSettingsPage({super.key});
 
   @override
