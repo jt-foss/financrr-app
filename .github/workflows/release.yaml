@@ -109,8 +109,8 @@ jobs:
       - name: Upload IPA
         uses: actions/upload-artifact@v2
         with:
-          name: financrr.app
-          path: build/ios/iphoneos/financrr.app
+          name: financrr.ipa
+          path: build/ios/iphoneos/financrr.ipa
 
   create-release:
     needs: [ build-backend-binaries, push-docker-image, build-flutter-apps ]
@@ -131,7 +131,7 @@ jobs:
       - name: Download IPA
         uses: actions/download-artifact@v2
         with:
-          name: financrr.app
+          name: financrr.ipa
           path: build/ios/iphoneos/
       - name: Parse CHANGELOG.md
         id: changelog
@@ -175,6 +175,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: build/ios/iphoneos/financrr.app
-          asset_name: financrr.app
+          asset_path: build/ios/iphoneos/financrr.ipa
+          asset_name: financrr.ipa
           asset_content_type: application/octet-stream
