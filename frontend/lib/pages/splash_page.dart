@@ -47,7 +47,7 @@ class _SplashPageState extends ConsumerState<SplashPage> with SingleTickerProvid
         break;
       case AuthenticationStatus.unauthenticated:
       case AuthenticationStatus.unknown:
-        context.replaceRoute(ServerInfoRoute());
+        context.replaceRoute(ServerConfigRoute());
         break;
     }
   }

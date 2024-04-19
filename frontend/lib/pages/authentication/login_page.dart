@@ -12,6 +12,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../layout/adaptive_scaffold.dart';
 import '../../routing/app_router.dart';
 
+@RoutePage()
 class LoginPage extends StatefulHookConsumerWidget {
   final Uri hostUri;
 

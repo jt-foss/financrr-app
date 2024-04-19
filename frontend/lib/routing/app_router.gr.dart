@@ -93,12 +93,22 @@ abstract class _$FinancrrAppRouter extends RootStackRouter {
         child: const LogSettingsPage(),
       );
     },
-    ServerInfoRoute.name: (routeData) {
-      final args = routeData.argsAs<ServerInfoRouteArgs>(
-          orElse: () => const ServerInfoRouteArgs());
+    LoginRoute.name: (routeData) {
+      final args = routeData.argsAs<LoginRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: ServerInfoPage(
+        child: LoginPage(
+          key: args.key,
+          hostUri: args.hostUri,
+        ),
+      );
+    },
+    ServerConfigRoute.name: (routeData) {
+      final args = routeData.argsAs<ServerConfigRouteArgs>(
+          orElse: () => const ServerConfigRouteArgs());
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: ServerConfigPage(
           key: args.key,
           redirectTo: args.redirectTo,
         ),
@@ -396,29 +406,66 @@ class LogSettingsRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
-/// [ServerInfoPage]
-class ServerInfoRoute extends PageRouteInfo<ServerInfoRouteArgs> {
-  ServerInfoRoute({
+/// [LoginPage]
+class LoginRoute extends PageRouteInfo<LoginRouteArgs> {
+  LoginRoute({
+    Key? key,
+    required Uri hostUri,
+    List<PageRouteInfo>? children,
+  }) : super(
+          LoginRoute.name,
+          args: LoginRouteArgs(
+            key: key,
+            hostUri: hostUri,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'LoginRoute';
+
+  static const PageInfo<LoginRouteArgs> page = PageInfo<LoginRouteArgs>(name);
+}
+
+class LoginRouteArgs {
+  const LoginRouteArgs({
+    this.key,
+    required this.hostUri,
+  });
+
+  final Key? key;
+
+  final Uri hostUri;
+
+  @override
+  String toString() {
+    return 'LoginRouteArgs{key: $key, hostUri: $hostUri}';
+  }
+}
+
+/// generated route for
+/// [ServerConfigPage]
+class ServerConfigRoute extends PageRouteInfo<ServerConfigRouteArgs> {
+  ServerConfigRoute({
     Key? key,
     String? redirectTo,
     List<PageRouteInfo>? children,
   }) : super(
-          ServerInfoRoute.name,
-          args: ServerInfoRouteArgs(
+          ServerConfigRoute.name,
+          args: ServerConfigRouteArgs(
             key: key,
             redirectTo: redirectTo,
           ),
           initialChildren: children,
         );
 
-  static const String name = 'ServerInfoRoute';
+  static const String name = 'ServerConfigRoute';
 
-  static const PageInfo<ServerInfoRouteArgs> page =
-      PageInfo<ServerInfoRouteArgs>(name);
+  static const PageInfo<ServerConfigRouteArgs> page =
+      PageInfo<ServerConfigRouteArgs>(name);
 }
 
-class ServerInfoRouteArgs {
-  const ServerInfoRouteArgs({
+class ServerConfigRouteArgs {
+  const ServerConfigRouteArgs({
     this.key,
     this.redirectTo,
   });
@@ -429,7 +476,7 @@ class ServerInfoRouteArgs {
 
   @override
   String toString() {
-    return 'ServerInfoRouteArgs{key: $key, redirectTo: $redirectTo}';
+    return 'ServerConfigRouteArgs{key: $key, redirectTo: $redirectTo}';
   }
 }
 

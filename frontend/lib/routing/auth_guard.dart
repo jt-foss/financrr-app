@@ -14,7 +14,7 @@ class AuthGuard extends AutoRouteGuard {
     if (ref.watch(authProvider).isAuthenticated) {
       resolver.next(true);
     } else {
-      router.replaceAll([ServerInfoRoute()]);
+      router.replaceAll([ServerConfigRoute()]);
     }
   }
 }

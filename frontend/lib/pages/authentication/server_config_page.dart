@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:auto_route/annotations.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:financrr_frontend/data/store.dart';
 import 'package:financrr_frontend/layout/templates/auth_page_template.dart';
 import 'package:financrr_frontend/util/extensions.dart';
@@ -10,19 +11,20 @@ import 'package:flutter/material.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../layout/adaptive_scaffold.dart';
+import '../../routing/app_router.dart';
 import 'login_page.dart';
 
 @RoutePage()
-class ServerInfoPage extends StatefulWidget {
+class ServerConfigPage extends StatefulWidget {
   final String? redirectTo;
 
-  const ServerInfoPage({super.key, this.redirectTo});
+  const ServerConfigPage({super.key, this.redirectTo});
 
   @override
-  State<StatefulWidget> createState() => ServerInfoPageState();
+  State<StatefulWidget> createState() => ServerConfigPageState();
 }
 
-class ServerInfoPageState extends State<ServerInfoPage> {
+class ServerConfigPageState extends State<ServerConfigPage> {
   final TextEditingController _urlController = TextEditingController();
 
   bool _isLoading = false;
@@ -85,7 +87,7 @@ class ServerInfoPageState extends State<ServerInfoPage> {
                 : TextButton.icon(
                     onPressed: () {
                       if (_isValid) {
-                        Navigator.push(context, MaterialPageRoute(builder: (ctx) => LoginPage(hostUri: _hostUri!)));
+                        context.pushRoute(LoginRoute(hostUri: _hostUri!));
                       } else {
                         _handleUrlCheck();
                       }
