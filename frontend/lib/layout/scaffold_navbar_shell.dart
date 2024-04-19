@@ -1,4 +1,5 @@
 import 'package:financrr_frontend/util/extensions.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -65,11 +66,12 @@ class ScaffoldNavBarShellState extends State<ScaffoldNavBarShell> {
   @override
   Widget build(BuildContext context) {
     final isMobile = context.isMobile;
+    final Widget shell = kIsWeb ? SelectionArea(child: widget.navigationShell) : widget.navigationShell;
     return Scaffold(
       body: SafeArea(
         top: false,
         child: isMobile
-            ? widget.navigationShell
+            ? shell
             : Row(
                 children: [
                   StatefulBuilder(builder: (context, setState) {
@@ -84,7 +86,7 @@ class ScaffoldNavBarShellState extends State<ScaffoldNavBarShell> {
                     );
                   }),
                   Expanded(
-                    child: widget.navigationShell,
+                    child: shell,
                   )
                 ],
               ),
