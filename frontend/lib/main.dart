@@ -116,8 +116,7 @@ class FinancrrAppState extends ConsumerState<FinancrrApp> {
         // themes
         theme: theme.lightTheme.themeData,
         darkTheme: theme.darkTheme.themeData,
-        themeMode: theme.mode
-    );
+        themeMode: theme.mode);
   }
 }
 

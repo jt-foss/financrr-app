@@ -38,35 +38,36 @@ class AuthPageTemplateState extends ConsumerState<AuthPageTemplate> {
         physics: const BouncingScrollPhysics(),
         child: Center(
             child: SizedBox(
-              width: MediaQuery.of(context).size.width / 1.2,
-              child: Column(children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 20),
-                  child: Row(
-                    mainAxisAlignment: widget.showBackButton ? MainAxisAlignment.spaceBetween : MainAxisAlignment.end,
-                    children: [
-                      if (widget.showBackButton)
-                        IconButton(
-                            tooltip: 'Change Server Configuration',
-                            onPressed: () => Navigator.of(context).pop(),
-                            icon: Icon(Icons.arrow_back, color: Colors.grey[400])),
-                      IconButton(
-                          tooltip: 'Toggle theme',
-                          onPressed: () => ref.themeNotifier.setMode(theme.mode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light),
-                          icon: Icon(context.lightMode ? Icons.nightlight_round : Icons.wb_sunny, color: Colors.grey[400])),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: SvgPicture.asset(ref.currentTheme.logoPath,
-                      width: 100, colorFilter: ColorFilter.mode(ref.themeData.primaryColor, BlendMode.srcIn)),
-                ),
-                Text('sign_in_message_$_random',
+          width: MediaQuery.of(context).size.width / 1.2,
+          child: Column(children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 20),
+              child: Row(
+                mainAxisAlignment: widget.showBackButton ? MainAxisAlignment.spaceBetween : MainAxisAlignment.end,
+                children: [
+                  if (widget.showBackButton)
+                    IconButton(
+                        tooltip: 'Change Server Configuration',
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: Icon(Icons.arrow_back, color: Colors.grey[400])),
+                  IconButton(
+                      tooltip: 'Toggle theme',
+                      onPressed: () =>
+                          ref.themeNotifier.setMode(theme.mode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light),
+                      icon: Icon(context.lightMode ? Icons.nightlight_round : Icons.wb_sunny, color: Colors.grey[400])),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: SvgPicture.asset(ref.currentTheme.logoPath,
+                  width: 100, colorFilter: ColorFilter.mode(ref.themeData.primaryColor, BlendMode.srcIn)),
+            ),
+            Text('sign_in_message_$_random',
                     style: ref.textTheme.titleLarge?.copyWith(color: ref.themeData.primaryColor))
-                    .tr(),
-                widget.child
-              ]),
-            )));
+                .tr(),
+            widget.child
+          ]),
+        )));
   }
 }

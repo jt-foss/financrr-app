@@ -25,7 +25,9 @@ class ThemeNotifier extends StateNotifier<ThemeState> {
     return switch (state.mode) {
       ThemeMode.light => state.lightTheme,
       ThemeMode.dark => state.darkTheme,
-      ThemeMode.system => WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.light ? state.lightTheme : state.darkTheme
+      ThemeMode.system => WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.light
+          ? state.lightTheme
+          : state.darkTheme
     };
   }
 
@@ -36,6 +38,7 @@ class ThemeNotifier extends StateNotifier<ThemeState> {
     StoreKey.currentLightThemeId.write(theme.id);
     state = state.copyWith(lightTheme: theme);
   }
+
   void setDarkTheme(AppTheme theme) {
     if (theme.themeMode != ThemeMode.dark) {
       throw ArgumentError('Theme is not a dark theme!');

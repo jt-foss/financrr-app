@@ -7,7 +7,8 @@ import '../../../shared/models/store.dart';
 import '../../../utils/platform_utils.dart';
 import '../models/authentication.state.dart';
 
-final StateNotifierProvider<AuthenticationNotifier, AuthenticationState> authProvider = StateNotifierProvider((_) => AuthenticationNotifier());
+final StateNotifierProvider<AuthenticationNotifier, AuthenticationState> authProvider =
+    StateNotifierProvider((_) => AuthenticationNotifier());
 
 extension ConsumerStateAuthExtension on ConsumerState {
   Restrr get api => ref.read(authProvider).api!;
