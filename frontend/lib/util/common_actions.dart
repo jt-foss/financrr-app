@@ -12,7 +12,7 @@ class CommonActions {
 
   static Future<void> logOut(State state, WidgetRef ref) async {
     await ref.read(authProvider.notifier).logout();
-    if (state.mounted) state.context.goPath(SplashPage.pagePath.build());
+    if (state.mounted) state.context.pushPath(SplashPage.pagePath.build());
   }
 
   static Future<void> copyToClipboard(State state, String text, {bool showCopiedValue = false}) async {

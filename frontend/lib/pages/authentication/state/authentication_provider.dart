@@ -22,13 +22,13 @@ class AuthenticationNotifier extends StateNotifier<AuthenticationState> {
   /// Attempts to recover a previous session.
   /// If the session is not recoverable, the user is logged out.
   Future<AuthenticationState> attemptRecovery() async {
+    if (state.isAuthenticated) {
+      return state;
+    }
     final String? token = await StoreKey.sessionToken.readAsync();
     final String? hostUrl = await StoreKey.hostUrl.readAsync();
     if (token == null || hostUrl == null) {
       return await _authFailure();
-    }
-    if (state.isAuthenticated) {
-      return state;
     }
     try {
       final Restrr api = await _getRestrrBuilder(Uri.parse(hostUrl)).refresh(sessionToken: token);
@@ -52,12 +52,12 @@ class AuthenticationNotifier extends StateNotifier<AuthenticationState> {
     if (!state.isAuthenticated) {
       throw StateError('User is not logged in!');
     }
-    final bool success = await state.api!.deleteCurrentSession();
-    if (success) {
-      await _authFailure();
-    } else {
-      _log.severe('Could not logout user ${state.api!.selfUser.effectiveDisplayName}');
+    try {
+      await state.api!.deleteCurrentSession();
+    } catch (_) {
+      _log.warning('AuthenticationProvider: Could not delete current session!');
     }
+    await _authFailure();
   }
 
   AuthenticationState _authSuccess(Restrr api) {
