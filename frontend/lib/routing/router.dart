@@ -167,15 +167,16 @@ class AppRouter {
   List<GoRoute> _noShellRoutes() {
     return [
       GoRoute(
-        path: SplashPage.pagePath.path,
-        pageBuilder: (context, state) => _buildDefaultPageTransition(context, state, const SplashPage())),
+          path: SplashPage.pagePath.path,
+          pageBuilder: (context, state) => _buildDefaultPageTransition(context, state, const SplashPage())),
       GoRoute(
           path: ServerConfigPage.pagePath.path,
           pageBuilder: (context, state) =>
               _buildDefaultPageTransition(context, state, ServerConfigPage(key: GlobalKeys.loginPage))),
       GoRoute(
           path: LoginPage.pagePath.path,
-          pageBuilder: (context, state) => _buildDefaultPageTransition(context, state, LoginPage(hostUri: state.extra as Uri)))
+          pageBuilder: (context, state) =>
+              _buildDefaultPageTransition(context, state, LoginPage(hostUri: state.extra as Uri)))
     ];
   }
 
@@ -183,7 +184,8 @@ class AppRouter {
     return [];
   }
 
-  String? Function(BuildContext, GoRouterState) guards(List<Guard> guards) => (_, state) => Guards(guards).redirectPath(ref, state);
+  String? Function(BuildContext, GoRouterState) guards(List<Guard> guards) =>
+      (_, state) => Guards(guards).redirectPath(ref, state);
 
   static Page<T> _buildDefaultPageTransition<T>(BuildContext context, GoRouterState state, Widget child) {
     return CupertinoPage(child: child);

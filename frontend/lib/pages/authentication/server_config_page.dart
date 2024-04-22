@@ -114,8 +114,9 @@ class ServerConfigPageState extends State<ServerConfigPage> {
       info = await Restrr.checkUri(Uri.parse(url), isWeb: kIsWeb);
     } on RestrrException catch (e) {
       setState(() => _isLoading = false);
-      context.showSnackBar(e.message ?? 'err');
-      return;
+      if (mounted) {
+        context.showSnackBar(e.message ?? 'err');
+      }
     }
     setState(() {
       _isLoading = false;

@@ -8,7 +8,7 @@ import 'package:restrr/restrr.dart';
 import 'authentication_state.dart';
 
 final authProvider =
-    StateNotifierProvider<AuthenticationNotifier, AuthenticationState>((ref) => AuthenticationNotifier(ref));
+    StateNotifierProvider<AuthenticationNotifier, AuthenticationState>((_) => AuthenticationNotifier());
 
 extension ConsumerStateAuthExtension on ConsumerState {
   Restrr get api => ref.read(authProvider).api!;
@@ -17,9 +17,7 @@ extension ConsumerStateAuthExtension on ConsumerState {
 class AuthenticationNotifier extends StateNotifier<AuthenticationState> {
   final Logger _log = Logger('AuthenticationNotifier');
 
-  final StateNotifierProviderRef<AuthenticationNotifier, AuthenticationState> _ref;
-
-  AuthenticationNotifier(this._ref) : super(const AuthenticationState.initial());
+  AuthenticationNotifier() : super(const AuthenticationState.initial());
 
   /// Attempts to recover a previous session.
   /// If the session is not recoverable, the user is logged out.
