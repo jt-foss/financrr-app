@@ -2,12 +2,13 @@ import 'package:financrr_frontend/pages/authentication/server_config_page.dart';
 import 'package:financrr_frontend/pages/authentication/state/authentication_provider.dart';
 import 'package:financrr_frontend/pages/authentication/state/authentication_state.dart';
 import 'package:financrr_frontend/pages/core/dashboard_page.dart';
+import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../routing/router.dart';
+import '../routing/page_path.dart';
 
 class SplashPage extends StatefulHookConsumerWidget {
   static const PagePathBuilder pagePath = PagePathBuilder('/');

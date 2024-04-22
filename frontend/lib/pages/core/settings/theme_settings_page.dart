@@ -4,7 +4,7 @@ import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
 
 import '../../../layout/adaptive_scaffold.dart';
-import '../../../routing/router.dart';
+import '../../../routing/page_path.dart';
 import '../settings_page.dart';
 
 class ThemeSettingsPage extends StatefulWidget {

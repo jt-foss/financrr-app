@@ -1,11 +1,12 @@
 import 'package:financrr_frontend/pages/authentication/state/authentication_provider.dart';
+import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../../layout/adaptive_scaffold.dart';
-import '../../../routing/router.dart';
+import '../../../routing/page_path.dart';
 import '../../../util/text_utils.dart';
 import '../../../widgets/entities/account_card.dart';
 import '../../../widgets/notice_card.dart';

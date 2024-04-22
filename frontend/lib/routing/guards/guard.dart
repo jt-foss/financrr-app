@@ -1,6 +1,7 @@
-import 'package:financrr_frontend/routing/router.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import '../page_path.dart';
 
 class Guards {
   final List<Guard> _guards;

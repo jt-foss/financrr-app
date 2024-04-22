@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:financrr_frontend/pages/authentication/state/authentication_provider.dart';
+import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/widgets/async_wrapper.dart';
 import 'package:financrr_frontend/widgets/entities/account_card.dart';
@@ -11,7 +12,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../layout/adaptive_scaffold.dart';
-import '../../routing/router.dart';
+import '../../routing/page_path.dart';
 import 'accounts/account_create_page.dart';
 import 'accounts/accounts_overview_page.dart';
 

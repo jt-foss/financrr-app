@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../../data/store.dart';
 import '../../../../layout/adaptive_scaffold.dart';
-import '../../../../routing/router.dart';
+import '../../../../routing/page_path.dart';
 import '../../settings_page.dart';
 
 class LocalStorageSettingsPage extends StatefulWidget {

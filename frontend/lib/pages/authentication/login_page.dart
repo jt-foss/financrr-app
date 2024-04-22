@@ -5,12 +5,13 @@ import 'package:financrr_frontend/layout/templates/auth_page_template.dart';
 import 'package:financrr_frontend/pages/authentication/state/authentication_provider.dart';
 import 'package:financrr_frontend/pages/authentication/state/authentication_state.dart';
 import 'package:financrr_frontend/pages/core/dashboard_page.dart';
+import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../layout/adaptive_scaffold.dart';
-import '../../routing/router.dart';
+import '../../routing/page_path.dart';
 
 class LoginPage extends StatefulHookConsumerWidget {
   static const PagePathBuilder pagePath = PagePathBuilder('/login');

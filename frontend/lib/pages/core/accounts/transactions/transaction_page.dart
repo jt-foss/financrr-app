@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:financrr_frontend/pages/authentication/state/authentication_provider.dart';
 import 'package:financrr_frontend/pages/core/accounts/transactions/transaction_edit_page.dart';
+import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/text_utils.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +12,7 @@ import 'package:restrr/restrr.dart';
 
 import '../../../../../layout/adaptive_scaffold.dart';
 import '../../../../data/store.dart';
-import '../../../../routing/router.dart';
+import '../../../../routing/page_path.dart';
 import '../../../../widgets/async_wrapper.dart';
 import '../account_page.dart';
 

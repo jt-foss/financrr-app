@@ -1,4 +1,4 @@
-import 'package:financrr_frontend/routing/router.dart';
+import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:restrr/restrr.dart';

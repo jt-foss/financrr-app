@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../layout/adaptive_scaffold.dart';
-import '../../../../routing/router.dart';
+import '../../../../routing/page_path.dart';
 import '../../settings_page.dart';
 
 class L10nSettingsPage extends StatefulWidget {

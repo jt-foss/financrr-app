@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import '../../../../data/log_store.dart';
 import '../../../../data/store.dart';
 import '../../../../layout/adaptive_scaffold.dart';
-import '../../../../routing/router.dart';
+import '../../../../routing/page_path.dart';
 import '../../settings_page.dart';
 
 class LogSettingsPage extends StatefulWidget {

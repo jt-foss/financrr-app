@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:financrr_frontend/data/store.dart';
 import 'package:financrr_frontend/layout/templates/auth_page_template.dart';
+import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/input_utils.dart';
 import 'package:flutter/foundation.dart';
@@ -9,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../layout/adaptive_scaffold.dart';
-import '../../routing/router.dart';
+import '../../routing/page_path.dart';
 import 'login_page.dart';
 
 class ServerConfigPage extends StatefulWidget {
