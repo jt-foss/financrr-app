@@ -1,13 +1,14 @@
+import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/shared/ui/text_circle_avatar.dart';
-import 'package:financrr_frontend/utils/extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../modules/accounts/views/account_page.dart';
 import '../../utils/text_utils.dart';
 
-class AccountCard extends StatelessWidget {
+class AccountCard extends ConsumerWidget {
   final Id id;
   final String name;
   final String? iban;
@@ -35,7 +36,7 @@ class AccountCard extends StatelessWidget {
       this.interactive = true});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
       onTap:
           !interactive ? null : () => context.goPath(AccountPage.pagePath.build(params: {'accountId': id.toString()})),
@@ -50,13 +51,13 @@ class AccountCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(name, style: context.textTheme.titleSmall),
+                    Text(name, style: ref.textTheme.titleSmall),
                     if (iban != null || description != null) Text(TextUtils.formatIBAN(iban) ?? description!),
                   ],
                 ),
               ),
               Text(TextUtils.formatBalanceWithCurrency(balance, currency!),
-                  style: context.textTheme.titleSmall?.copyWith(color: context.theme.primaryColor))
+                  style: ref.textTheme.titleSmall?.copyWith(color: ref.themeData.primaryColor))
             ],
           ),
         ),

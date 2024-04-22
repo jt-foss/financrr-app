@@ -1,33 +1,9 @@
-import 'dart:convert';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
 
-import '../../utils/json_utils.dart';
-
-class AppThemeLoader {
-  static Future<void> init() async {
-    final String manifestContent = await rootBundle.loadString('AssetManifest.json');
-    final Map<String, dynamic> manifest = jsonDecode(manifestContent);
-    final List<String> filtered = manifest.keys
-        .where((path) => path.startsWith('assets/themes/') && path.endsWith('.financrr-theme.json'))
-        .toList();
-    for (String path in filtered) {
-      final Map<String, dynamic> json = jsonDecode(await rootBundle.loadString(path));
-      final AppTheme? theme = AppTheme.tryFromJson(json);
-      if (theme != null) {
-        AppTheme._themes[theme.id] = theme;
-      } else {
-        throw StateError('Could not load theme: $path');
-      }
-    }
-  }
-}
+import '../../../utils/json_utils.dart';
 
 class AppTheme {
-  static final Map<String, AppTheme> _themes = {};
-
   static const String fontFamily = 'Montserrat';
   static const List<String> fontFamilyFallback = ['Arial', 'sans-serif'];
 
@@ -41,17 +17,14 @@ class AppTheme {
 
   const AppTheme(
       {required this.id,
-      required this.logoPath,
-      this.translationKey,
-      this.fallbackName,
-      required this.previewColor,
-      required this.themeMode,
-      required this.themeData});
+        required this.logoPath,
+        this.translationKey,
+        this.fallbackName,
+        required this.previewColor,
+        required this.themeMode,
+        required this.themeData});
 
   String get effectiveName => translationKey?.tr() ?? fallbackName ?? id;
-
-  static AppTheme? getById(String id) => _themes[id];
-  static Iterable<AppTheme> get themes => _themes.values;
 
   static AppTheme? tryFromJson(Map<String, dynamic> json) {
     final AppThemeColor? previewColor = AppThemeColor.tryFromJson(json['preview_color']);
@@ -88,15 +61,15 @@ class AppTheme {
     final TextTheme textTheme = _buildTextTheme(primaryColor);
     final AppBarTheme? appBarTheme = _tryAppBarThemeFromJson(fullJson, json['app_bar_theme_data']);
     final NavigationBarThemeData? navigationBarTheme =
-        _tryNavigationBarThemeDataFromJson(fullJson, json['navigation_bar_theme_data']);
+    _tryNavigationBarThemeDataFromJson(fullJson, json['navigation_bar_theme_data']);
     final NavigationRailThemeData? navigationRailTheme =
-        _tryNavigationRailThemeDataFromJson(fullJson, json['navigation_rail_theme_data']);
+    _tryNavigationRailThemeDataFromJson(fullJson, json['navigation_rail_theme_data']);
     final ElevatedButtonThemeData? elevatedButtonTheme =
-        _tryElevatedButtonThemeDataFromJson(fullJson, json['elevated_button_theme_data']);
+    _tryElevatedButtonThemeDataFromJson(fullJson, json['elevated_button_theme_data']);
     final TextButtonThemeData? textButtonTheme =
-        _tryTextButtonThemeDataFromJson(fullJson, json['text_button_theme_data']);
+    _tryTextButtonThemeDataFromJson(fullJson, json['text_button_theme_data']);
     final TextSelectionThemeData? textSelectionTheme =
-        _tryTextSelectionThemeDataFromJson(fullJson, json['text_selection_theme_data']);
+    _tryTextSelectionThemeDataFromJson(fullJson, json['text_selection_theme_data']);
     final SwitchThemeData? switchTheme = _trySwitchThemeDataFromJson(fullJson, json['switch_theme_data']);
     final SnackBarThemeData? snackBarTheme = _trySnackBarThemeDataFromJson(fullJson, json['snack_bar_theme_data']);
     final DrawerThemeData? drawerTheme = _tryDrawerThemeData(fullJson, json['drawer_theme_data']);

@@ -1,6 +1,6 @@
 import 'package:financrr_frontend/modules/dashboard/views/dashboard_page.dart';
+import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
-import 'package:financrr_frontend/utils/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -48,8 +48,8 @@ class _SplashPageState extends ConsumerState<SplashPage> with SingleTickerProvid
       body: Center(
         child: FadeTransition(
           opacity: _fadeTransition,
-          child: SvgPicture.asset(context.appTheme.logoPath,
-              width: 100, height: 100, colorFilter: ColorFilter.mode(context.theme.primaryColor, BlendMode.srcIn)),
+          child: SvgPicture.asset(ref.currentTheme.logoPath,
+              width: 100, height: 100, colorFilter: ColorFilter.mode(ref.themeData.primaryColor, BlendMode.srcIn)),
         ),
       ),
     );

@@ -1,13 +1,14 @@
+import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
-import 'package:financrr_frontend/utils/extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../modules/transactions/views/transaction_page.dart';
 import '../../utils/text_utils.dart';
 import '../models/store.dart';
 
-class TransactionCard extends StatelessWidget {
+class TransactionCard extends ConsumerWidget {
   final Id id;
   final Id? source;
   final Id? destination;
@@ -48,7 +49,7 @@ class TransactionCard extends StatelessWidget {
       this.interactive = true});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
       onTap: !interactive
           ? null
@@ -60,8 +61,8 @@ class TransactionCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(name, style: context.textTheme.titleSmall),
-              if (description != null) Text(description!, style: context.textTheme.bodyMedium),
+              Text(name, style: ref.textTheme.titleSmall),
+              if (description != null) Text(description!, style: ref.textTheme.bodyMedium),
               Text(TextUtils.formatIBAN(account.iban) ?? account.name),
               const SizedBox(height: 10),
               Row(
@@ -71,10 +72,10 @@ class TransactionCard extends StatelessWidget {
                   Text(StoreKey.dateTimeFormat.readSync()!.format(executedAt)),
                   Text(
                       '${type == TransactionType.deposit ? '' : '-'}${TextUtils.formatBalanceWithCurrency(amount, account.currencyId.get()!)}',
-                      style: context.textTheme.titleMedium?.copyWith(
+                      style: ref.textTheme.titleMedium?.copyWith(
                           color: type == TransactionType.deposit
-                              ? context.theme.primaryColor
-                              : context.theme.colorScheme.error)),
+                              ? ref.themeData.primaryColor
+                              : ref.themeData.colorScheme.error)),
                 ],
               ),
             ],

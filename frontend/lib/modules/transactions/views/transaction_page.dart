@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:financrr_frontend/modules/auth/providers/authentication.provider.dart';
+import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/modules/transactions/views/transaction_edit_page.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
@@ -102,10 +103,10 @@ class TransactionPageState extends ConsumerState<TransactionPage> {
                   Column(
                     children: [
                       Text(amountStr,
-                          style: context.textTheme.titleLarge?.copyWith(
+                          style: ref.textTheme.titleLarge?.copyWith(
                               color: transaction.type == TransactionType.deposit
-                                  ? context.theme.primaryColor
-                                  : context.theme.colorScheme.error)),
+                                  ? ref.themeData.primaryColor
+                                  : ref.themeData.colorScheme.error)),
                       Text(transaction.description ??
                           StoreKey.dateTimeFormat.readSync()!.format(transaction.executedAt)),
                     ],
@@ -130,7 +131,7 @@ class TransactionPageState extends ConsumerState<TransactionPage> {
                   Padding(
                     padding: const EdgeInsets.only(top: 10),
                     child: Table(
-                      border: TableBorder.all(color: context.theme.dividerColor),
+                      border: TableBorder.all(color: ref.themeData.dividerColor),
                       children: [
                         _buildTableRow('Type', transaction.type.name),
                         _buildTableRow('Amount', amountStr),

@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:financrr_frontend/modules/auth/providers/authentication.provider.dart';
+import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/shared/ui/async_wrapper.dart';
 import 'package:financrr_frontend/shared/ui/account_card.dart';
-import 'package:financrr_frontend/utils/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
@@ -63,7 +63,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Account and Cards', style: context.textTheme.titleSmall),
+                    Text('Account and Cards', style: ref.textTheme.titleSmall),
                     PopupMenuButton(
                         icon: const Icon(Icons.more_horiz),
                         itemBuilder: (context) {
@@ -105,7 +105,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
       children: [
         Padding(
           padding: const EdgeInsets.only(top: 20),
-          child: Text('Latest Transactions', style: context.textTheme.titleSmall),
+          child: Text('Latest Transactions', style: ref.textTheme.titleSmall),
         ),
         const Divider(),
         StreamWrapper(

@@ -1,21 +1,22 @@
-import 'package:financrr_frontend/utils/extensions.dart';
+import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../shared/models/store.dart';
 import '../../../shared/ui/adaptive_scaffold.dart';
 import '../../../routing/page_path.dart';
 import '../../../utils/common_actions.dart';
 import 'settings_page.dart';
 
-class LocalStorageSettingsPage extends StatefulWidget {
+class LocalStorageSettingsPage extends StatefulHookConsumerWidget {
   static const PagePathBuilder pagePath = PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'local-storage');
 
   const LocalStorageSettingsPage({super.key});
 
   @override
-  State<StatefulWidget> createState() => _LocalStorageSettingsPageState();
+  ConsumerState<LocalStorageSettingsPage> createState() => _LocalStorageSettingsPageState();
 }
 
-class _LocalStorageSettingsPageState extends State<LocalStorageSettingsPage> {
+class _LocalStorageSettingsPageState extends ConsumerState<LocalStorageSettingsPage> {
   @override
   Widget build(BuildContext context) {
     return AdaptiveScaffold(
@@ -33,13 +34,13 @@ class _LocalStorageSettingsPageState extends State<LocalStorageSettingsPage> {
           child: ListView(
             children: [
               Table(
-                border: TableBorder.all(color: context.theme.dividerColor),
+                border: TableBorder.all(color: ref.themeData.dividerColor),
                 children: [
                   for (StoreKey key in StoreKey.values)
                     TableRow(
                       children: [
                         _buildTableCell(key.key),
-                        _buildTableCell(key.readAsStringSync() ?? '<null>'),
+                        _buildTableCell(_readKey(key)),
                       ],
                     ),
                 ],
@@ -59,5 +60,13 @@ class _LocalStorageSettingsPageState extends State<LocalStorageSettingsPage> {
         child: Text(text),
       ),
     );
+  }
+
+  String _readKey<T>(StoreKey<T> key) {
+    try {
+      return key.readAsStringSync() ?? '<null>';
+    } catch (e) {
+      return e.toString();
+    }
   }
 }

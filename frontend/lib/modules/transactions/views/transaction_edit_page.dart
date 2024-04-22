@@ -135,7 +135,7 @@ class TransactionEditPageState extends ConsumerState<TransactionEditPage> {
                 ),
                 const Divider(),
                 ...FormFields.transaction(
-                  context,
+                  this,
                   currentAccount: account,
                   nameController: _nameController,
                   amountController: _amountController,

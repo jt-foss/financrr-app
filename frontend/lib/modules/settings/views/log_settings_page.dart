@@ -1,5 +1,6 @@
-import 'package:financrr_frontend/utils/extensions.dart';
+import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../models/log_entry.model.dart';
 import '../models/log_store.dart';
@@ -9,16 +10,16 @@ import '../../../../routing/page_path.dart';
 import '../../../../modules/settings/views/settings_page.dart';
 import '../../../utils/common_actions.dart';
 
-class LogSettingsPage extends StatefulWidget {
+class LogSettingsPage extends StatefulHookConsumerWidget {
   static const PagePathBuilder pagePath = PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'logs');
 
   const LogSettingsPage({super.key});
 
   @override
-  State<StatefulWidget> createState() => _LogSettingsPageState();
+  ConsumerState<LogSettingsPage> createState() => _LogSettingsPageState();
 }
 
-class _LogSettingsPageState extends State<LogSettingsPage> {
+class _LogSettingsPageState extends ConsumerState<LogSettingsPage> {
   bool _sortTimeAscending = false;
   int? _selectedEntryIndex;
   late List<LogEntry> _entries;
@@ -112,7 +113,7 @@ class _LogSettingsPageState extends State<LogSettingsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(entry.loggerName, style: context.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold)),
+            Text(entry.loggerName, style: ref.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold)),
             Text(entry.message, maxLines: expanded ? null : 1),
             Row(
               children: [

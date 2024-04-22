@@ -117,12 +117,14 @@ class KeyValueStore {
   }
 
   /// Writes the value to the local cache and the storage.
-  Future<void> write<T>(StoreKey<T> key, T value) async {
+  Future<void> write<T>(StoreKey<T> key, T value, {bool storeLocal = true}) async {
     _checkInitialized();
-    _localCache[key.key] = value;
     // simplify enums to strings
+    if (storeLocal) {
+      _localCache[key.key] = value;
+    }
     if (value is Enum) {
-      return await write(key, value.name);
+      return await write(key, value.name, storeLocal: false);
     }
     final dynamic effectiveValue = _toStringOrValue<T?>(value, key);
     if (key.secure) {

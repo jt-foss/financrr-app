@@ -3,9 +3,9 @@ import 'dart:ui';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:financrr_frontend/modules/settings/models/log_store.dart';
+import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/routing/router.dart';
 import 'package:financrr_frontend/shared/models/store.dart';
-import 'package:financrr_frontend/shared/models/themes.dart';
 import 'package:financrr_frontend/shared/ui/fallback_error_app.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +17,8 @@ import 'package:logging/logging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'modules/settings/models/log_entry.model.dart';
+import 'modules/settings/models/theme.model.dart';
+import 'modules/settings/models/theme_loader.dart';
 
 Logger _log = Logger('GenericLogger');
 
@@ -64,8 +66,8 @@ Future<Widget> initApp() async {
   // init themes
   await AppThemeLoader.init();
   final ThemeMode themeMode = (await StoreKey.themeMode.readAsync())!;
-  final AppTheme lightTheme = AppTheme.getById((await StoreKey.currentLightThemeId.readAsync())!)!;
-  final AppTheme darkTheme = AppTheme.getById((await StoreKey.currentDarkThemeId.readAsync())!)!;
+  final AppTheme lightTheme = AppThemeLoader.getById((await StoreKey.currentLightThemeId.readAsync())!)!;
+  final AppTheme darkTheme = AppThemeLoader.getById((await StoreKey.currentDarkThemeId.readAsync())!)!;
 
   return ProviderScope(
     child: EasyLocalization(
@@ -86,19 +88,9 @@ class FinancrrApp extends StatefulHookConsumerWidget {
 
   @override
   ConsumerState<FinancrrApp> createState() => FinancrrAppState();
-
-  static FinancrrAppState of(BuildContext context) => context.findAncestorStateOfType<FinancrrAppState>()!;
 }
 
 class FinancrrAppState extends ConsumerState<FinancrrApp> {
-  late AppTheme _activeLightTheme = widget.currentLightTheme;
-  late AppTheme _activeDarkTheme = widget.currentDarkTheme;
-  late ThemeMode _themeMode = widget.themeMode;
-
-  ThemeMode get themeMode => _themeMode;
-  AppTheme get activeLightTheme => _activeLightTheme;
-  AppTheme get activeDarkTheme => _activeDarkTheme;
-
   @override
   void initState() {
     super.initState();
@@ -111,6 +103,7 @@ class FinancrrAppState extends ConsumerState<FinancrrApp> {
   @override
   Widget build(BuildContext context) {
     var router = ref.watch(appRouterProvider);
+    var theme = ref.watch(themeProvider);
 
     return MaterialApp.router(
         onGenerateTitle: (ctx) => 'brand_name'.tr(),
@@ -120,37 +113,11 @@ class FinancrrAppState extends ConsumerState<FinancrrApp> {
         localizationsDelegates: context.localizationDelegates,
         supportedLocales: context.supportedLocales,
         locale: context.locale,
-        theme: _activeLightTheme.themeData,
-        darkTheme: _activeDarkTheme.themeData,
-        themeMode: _themeMode);
-  }
-
-  /// Gets the currently active [AppTheme].
-  AppTheme getAppTheme() {
-    if (_themeMode == ThemeMode.light) {
-      return _activeLightTheme;
-    }
-    if (_themeMode == ThemeMode.dark) {
-      return _activeDarkTheme;
-    }
-    return WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.light
-        ? _activeLightTheme
-        : _activeDarkTheme;
-  }
-
-  void changeAppTheme({required AppTheme theme, bool system = false}) {
-    setState(() {
-      if (theme.themeMode == ThemeMode.light) {
-        _activeLightTheme = theme;
-      }
-      if (theme.themeMode == ThemeMode.dark) {
-        _activeDarkTheme = theme;
-      }
-      _themeMode = system ? ThemeMode.system : theme.themeMode;
-      StoreKey.currentLightThemeId.write(_activeLightTheme.id);
-      StoreKey.currentDarkThemeId.write(_activeDarkTheme.id);
-      StoreKey.themeMode.write(_themeMode);
-    });
+        // themes
+        theme: theme.lightTheme.themeData,
+        darkTheme: theme.darkTheme.themeData,
+        themeMode: theme.mode
+    );
   }
 }
 
