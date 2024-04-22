@@ -25,8 +25,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import 'guards/core_auth_guard.dart';
-import 'guards/login_auth_guard.dart';
+import 'guards/auth_guard.dart';
 import 'navbar_shell.dart';
 
 final Provider<AppRouter> appRouterProvider = Provider((ref) => AppRouter(ref));
@@ -34,8 +33,7 @@ final Provider<AppRouter> appRouterProvider = Provider((ref) => AppRouter(ref));
 class AppRouter {
   final ProviderRef<Object?> ref;
 
-  final LoginAuthGuard _loginAuthGuard = LoginAuthGuard();
-  final CoreAuthGuard _coreAuthGuard = CoreAuthGuard();
+  final AuthGuard _coreAuthGuard = AuthGuard();
 
   AppRouter(this.ref);
 
@@ -170,9 +168,7 @@ class AppRouter {
     return [
       GoRoute(
         path: SplashPage.pagePath.path,
-        pageBuilder: (context, state) => _buildDefaultPageTransition(context, state, const SplashPage()),
-        redirect: guards([_loginAuthGuard]),
-      ),
+        pageBuilder: (context, state) => _buildDefaultPageTransition(context, state, const SplashPage())),
       GoRoute(
           path: ServerConfigPage.pagePath.path,
           pageBuilder: (context, state) =>
