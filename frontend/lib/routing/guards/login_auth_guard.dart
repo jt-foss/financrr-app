@@ -7,7 +7,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../pages/authentication/state/authentication_provider.dart';
 import 'guard.dart';
 
-class AuthGuard extends Guard {
+class LoginAuthGuard extends Guard {
   @override
   PagePathBuilder? redirect(ProviderRef<Object?> ref, GoRouterState state) {
     if (!ref.read(authProvider).isAuthenticated) {

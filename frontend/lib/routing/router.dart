@@ -25,7 +25,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import 'guards/auth_guard.dart';
+import 'guards/core_auth_guard.dart';
+import 'guards/login_auth_guard.dart';
 import 'navbar_shell.dart';
 
 final Provider<AppRouter> appRouterProvider = Provider((ref) => AppRouter(ref));
@@ -33,7 +34,8 @@ final Provider<AppRouter> appRouterProvider = Provider((ref) => AppRouter(ref));
 class AppRouter {
   final ProviderRef<Object?> ref;
 
-  final AuthGuard _authGuard = AuthGuard();
+  final LoginAuthGuard _loginAuthGuard = LoginAuthGuard();
+  final CoreAuthGuard _coreAuthGuard = CoreAuthGuard();
 
   AppRouter(this.ref);
 
@@ -53,35 +55,35 @@ class AppRouter {
               GoRoute(
                   path: DashboardPage.pagePath.path,
                   pageBuilder: _defaultBranchPageBuilder(const DashboardPage()),
-                  redirect: guards),
+                  redirect: guards([_coreAuthGuard])),
               ..._shellRoutes(),
             ]),
             StatefulShellBranch(routes: [
               GoRoute(
                   path: AccountsOverviewPage.pagePath.path,
                   pageBuilder: _defaultBranchPageBuilder(const AccountsOverviewPage()),
-                  redirect: guards,
+                  redirect: guards([_coreAuthGuard]),
                   routes: [
                     GoRoute(
                         path: AccountCreatePage.pagePath.path,
                         pageBuilder: _defaultPageBuilder(const AccountCreatePage()),
-                        redirect: guards),
+                        redirect: guards([_coreAuthGuard])),
                     GoRoute(
                         path: AccountPage.pagePath.path,
                         pageBuilder: (context, state) => _buildDefaultPageTransition(
                             context, state, AccountPage(accountId: state.pathParameters['accountId'])),
-                        redirect: guards,
+                        redirect: guards([_coreAuthGuard]),
                         routes: [
                           GoRoute(
                               path: AccountEditPage.pagePath.path,
                               pageBuilder: (context, state) => _buildDefaultPageTransition(
                                   context, state, AccountEditPage(accountId: state.pathParameters['accountId'])),
-                              redirect: guards),
+                              redirect: guards([_coreAuthGuard])),
                           GoRoute(
                               path: TransactionCreatePage.pagePath.path,
                               pageBuilder: (context, state) => _buildDefaultPageTransition(
                                   context, state, TransactionCreatePage(accountId: state.pathParameters['accountId'])),
-                              redirect: guards),
+                              redirect: guards([_coreAuthGuard])),
                           GoRoute(
                               path: TransactionPage.pagePath.path,
                               pageBuilder: (context, state) => _buildDefaultPageTransition(
@@ -90,7 +92,7 @@ class AppRouter {
                                   TransactionPage(
                                       accountId: state.pathParameters['accountId'],
                                       transactionId: state.pathParameters['transactionId'])),
-                              redirect: guards,
+                              redirect: guards([_coreAuthGuard]),
                               routes: [
                                 GoRoute(
                                     path: TransactionEditPage.pagePath.path,
@@ -100,7 +102,7 @@ class AppRouter {
                                         TransactionEditPage(
                                             accountId: state.pathParameters['accountId'],
                                             transactionId: state.pathParameters['transactionId'])),
-                                    redirect: guards)
+                                    redirect: guards([_coreAuthGuard]))
                               ]),
                         ])
                   ]),
@@ -110,53 +112,53 @@ class AppRouter {
               GoRoute(
                   path: '/@me/statistics',
                   pageBuilder: _defaultBranchPageBuilder(const DummyPage(text: 'coming soon!')),
-                  redirect: guards),
+                  redirect: guards([_coreAuthGuard])),
               ..._shellRoutes(),
             ]),
             StatefulShellBranch(routes: [
               GoRoute(
                   path: SettingsPage.pagePath.path,
                   pageBuilder: _defaultBranchPageBuilder(const SettingsPage()),
-                  redirect: guards,
+                  redirect: guards([_coreAuthGuard]),
                   routes: [
                     GoRoute(
                         path: ThemeSettingsPage.pagePath.path,
                         pageBuilder: _defaultPageBuilder(const ThemeSettingsPage()),
-                        redirect: guards),
+                        redirect: guards([_coreAuthGuard])),
                     GoRoute(
                         path: CurrencySettingsPage.pagePath.path,
                         pageBuilder: _defaultPageBuilder(const CurrencySettingsPage()),
-                        redirect: guards,
+                        redirect: guards([_coreAuthGuard]),
                         routes: [
                           GoRoute(
                               path: CurrencyCreatePage.pagePath.path,
                               pageBuilder: _defaultPageBuilder(const CurrencyCreatePage()),
-                              redirect: guards),
+                              redirect: guards([_coreAuthGuard])),
                           GoRoute(
                               path: CurrencyEditPage.pagePath.path,
                               pageBuilder: (context, state) => _buildDefaultPageTransition(
                                   context, state, CurrencyEditPage(currencyId: state.pathParameters['currencyId'])),
-                              redirect: guards)
+                              redirect: guards([_coreAuthGuard]))
                         ]),
                     GoRoute(
                       path: LocalStorageSettingsPage.pagePath.path,
                       pageBuilder: _defaultPageBuilder(const LocalStorageSettingsPage()),
-                      redirect: guards,
+                      redirect: guards([_coreAuthGuard]),
                     ),
                     GoRoute(
                       path: LogSettingsPage.pagePath.path,
                       pageBuilder: _defaultPageBuilder(const LogSettingsPage()),
-                      redirect: guards,
+                      redirect: guards([_coreAuthGuard]),
                     ),
                     GoRoute(
                       path: L10nSettingsPage.pagePath.path,
                       pageBuilder: _defaultPageBuilder(const L10nSettingsPage()),
-                      redirect: guards,
+                      redirect: guards([_coreAuthGuard]),
                     ),
                     GoRoute(
                         path: SessionSettingsPage.pagePath.path,
                         pageBuilder: _defaultPageBuilder(const SessionSettingsPage()),
-                        redirect: guards),
+                        redirect: guards([_coreAuthGuard])),
                   ]),
               ..._shellRoutes(),
             ]),
@@ -169,17 +171,15 @@ class AppRouter {
       GoRoute(
         path: SplashPage.pagePath.path,
         pageBuilder: (context, state) => _buildDefaultPageTransition(context, state, const SplashPage()),
-        redirect: guards,
+        redirect: guards([_loginAuthGuard]),
       ),
       GoRoute(
           path: ServerConfigPage.pagePath.path,
           pageBuilder: (context, state) =>
-              _buildDefaultPageTransition(context, state, ServerConfigPage(key: GlobalKeys.loginPage)),
-          redirect: guards),
+              _buildDefaultPageTransition(context, state, ServerConfigPage(key: GlobalKeys.loginPage))),
       GoRoute(
           path: LoginPage.pagePath.path,
-          pageBuilder: (context, state) => _buildDefaultPageTransition(context, state, LoginPage(hostUri: state.extra as Uri)),
-      )
+          pageBuilder: (context, state) => _buildDefaultPageTransition(context, state, LoginPage(hostUri: state.extra as Uri)))
     ];
   }
 
@@ -187,7 +187,7 @@ class AppRouter {
     return [];
   }
 
-  String? guards(BuildContext ctx, GoRouterState state) => Guards([_authGuard]).redirectPath(ref, state);
+  String? Function(BuildContext, GoRouterState) guards(List<Guard> guards) => (_, state) => Guards(guards).redirectPath(ref, state);
 
   static Page<T> _buildDefaultPageTransition<T>(BuildContext context, GoRouterState state, Widget child) {
     return CupertinoPage(child: child);
