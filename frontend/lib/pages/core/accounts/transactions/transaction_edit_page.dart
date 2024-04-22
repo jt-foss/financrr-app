@@ -1,20 +1,23 @@
 import 'dart:async';
 
-import 'package:auto_route/auto_route.dart';
 import 'package:financrr_frontend/pages/authentication/state/authentication_provider.dart';
+import 'package:financrr_frontend/pages/core/accounts/transactions/transaction_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/form_fields.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../../../../layout/adaptive_scaffold.dart';
 import '../../../../data/store.dart';
+import '../../../../routing/router.dart';
 import '../../../../widgets/async_wrapper.dart';
 import '../../../../widgets/entities/transaction_card.dart';
 
-@RoutePage()
 class TransactionEditPage extends StatefulHookConsumerWidget {
+  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: TransactionPage.pagePath, path: 'edit');
+
   final String? accountId;
   final String? transactionId;
 
@@ -163,7 +166,8 @@ class TransactionEditPageState extends ConsumerState<TransactionEditPage> {
     );
   }
 
-  Future<void> _editTransaction(Account account, Transaction transaction, TransactionType type, {Account? secondary}) async {
+  Future<void> _editTransaction(Account account, Transaction transaction, TransactionType type,
+      {Account? secondary}) async {
     if (!_isValid) return;
     final (Id?, Id?) sourceAndDest = switch (_type) {
       TransactionType.deposit => (null, account.id.value),
@@ -181,7 +185,7 @@ class TransactionEditPageState extends ConsumerState<TransactionEditPage> {
           currencyId: account.currencyId.value);
       if (!mounted) return;
       context.showSnackBar('Successfully edited transaction');
-      context.maybePop();
+      context.pop();
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);
     }

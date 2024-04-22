@@ -1,14 +1,17 @@
-import 'package:auto_route/auto_route.dart';
+import 'package:financrr_frontend/pages/authentication/server_config_page.dart';
 import 'package:financrr_frontend/pages/authentication/state/authentication_provider.dart';
 import 'package:financrr_frontend/pages/authentication/state/authentication_state.dart';
-import 'package:financrr_frontend/routing/app_router.dart';
+import 'package:financrr_frontend/pages/core/dashboard_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-@RoutePage()
+import '../routing/router.dart';
+
 class SplashPage extends StatefulHookConsumerWidget {
+  static const PagePathBuilder pagePath = PagePathBuilder('/');
+
   const SplashPage({super.key});
 
   @override
@@ -43,11 +46,11 @@ class _SplashPageState extends ConsumerState<SplashPage> with SingleTickerProvid
     if (!mounted) return;
     switch (state.status) {
       case AuthenticationStatus.authenticated:
-        context.replaceRoute(const TabControllerRoute());
+        context.replacePath(DashboardPage.pagePath.build());
         break;
       case AuthenticationStatus.unauthenticated:
       case AuthenticationStatus.unknown:
-        context.replaceRoute(ServerConfigRoute());
+        context.replacePath(ServerConfigPage.pagePath.build());
         break;
     }
   }

@@ -1,17 +1,19 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:financrr_frontend/pages/authentication/state/authentication_provider.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/form_fields.dart';
 import 'package:financrr_frontend/util/text_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../../../layout/adaptive_scaffold.dart';
+import '../../../routing/router.dart';
 import '../../../widgets/entities/account_card.dart';
+import 'accounts_overview_page.dart';
 
-@RoutePage()
 class AccountCreatePage extends StatefulHookConsumerWidget {
+  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: AccountsOverviewPage.pagePath, path: 'create');
 
   const AccountCreatePage({super.key});
 
@@ -113,7 +115,7 @@ class _AccountCreatePageState extends ConsumerState<AccountCreatePage> {
       );
       if (!mounted) return;
       context.showSnackBar('Successfully created "${_nameController.text}"');
-      context.maybePop();
+      context.pop();
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);
     }

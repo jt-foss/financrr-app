@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:auto_route/auto_route.dart';
 import 'package:financrr_frontend/pages/authentication/state/authentication_provider.dart';
+import 'package:financrr_frontend/pages/core/accounts/transactions/transaction_create_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/text_utils.dart';
 import 'package:financrr_frontend/widgets/async_wrapper.dart';
@@ -13,10 +13,14 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../../layout/adaptive_scaffold.dart';
-import '../../../routing/app_router.dart';
+import '../../../routing/router.dart';
+import 'account_edit_page.dart';
+import 'accounts_overview_page.dart';
 
-@RoutePage()
 class AccountPage extends StatefulHookConsumerWidget {
+  static const PagePathBuilder pagePath =
+      PagePathBuilder.child(parent: AccountsOverviewPage.pagePath, path: ':accountId');
+
   final String? accountId;
 
   const AccountPage({super.key, required this.accountId});
@@ -93,8 +97,8 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     TextButton.icon(
-                        onPressed: () => context.pushRoute(
-                            TransactionCreateRoute(accountId: account.id.value.toString())),
+                        onPressed: () => context.goPath(
+                            TransactionCreatePage.pagePath.build(params: {'accountId': account.id.value.toString()})),
                         icon: const Icon(Icons.add, size: 17),
                         label: const Text('Create Transaction')),
                     const Spacer(),
@@ -105,7 +109,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                     IconButton(
                         tooltip: 'Edit Account',
                         onPressed: () => context
-                            .pushRoute(AccountEditRoute(accountId: account.id.value.toString())),
+                            .goPath(AccountEditPage.pagePath.build(params: {'accountId': account.id.value.toString()})),
                         icon: const Icon(Icons.create, size: 17))
                   ],
                 ),
@@ -140,7 +144,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                   title: 'No transactions found',
                   description: 'Create a transaction to get started',
                   onTap: () => context
-                      .pushRoute(TransactionCreateRoute(accountId: account.id.value.toString())),
+                      .goPath(TransactionCreatePage.pagePath.build(params: {'accountId': account.id.value.toString()})),
                 ));
               }
               return Column(

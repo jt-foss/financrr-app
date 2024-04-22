@@ -1,4 +1,3 @@
-import 'package:auto_route/annotations.dart';
 import 'package:financrr_frontend/pages/authentication/state/authentication_provider.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/widgets/entities/session_card.dart';
@@ -8,9 +7,12 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../../../layout/adaptive_scaffold.dart';
+import '../../../../routing/router.dart';
+import '../../settings_page.dart';
 
-@RoutePage()
 class SessionSettingsPage extends StatefulHookConsumerWidget {
+  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'session');
+
   const SessionSettingsPage({super.key});
 
   @override
@@ -41,9 +43,7 @@ class _SessionSettingsPageState extends ConsumerState<SessionSettingsPage> {
             onRefresh: () async => _paginatedSessionKey.currentState?.reset(),
             child: ListView(
               children: [
-                SessionCard(
-                    session: _api.session,
-                    onDelete: () => ref.read(authProvider.notifier).logout()),
+                SessionCard(session: _api.session, onDelete: () => ref.read(authProvider.notifier).logout()),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -62,7 +62,8 @@ class _SessionSettingsPageState extends ConsumerState<SessionSettingsPage> {
                 const Divider(),
                 PaginatedWrapper(
                   key: _paginatedSessionKey,
-                  initialPageFunction: (forceRetrieve) => _api.retrieveAllSessions(limit: 10, forceRetrieve: forceRetrieve),
+                  initialPageFunction: (forceRetrieve) =>
+                      _api.retrieveAllSessions(limit: 10, forceRetrieve: forceRetrieve),
                   onError: (context, snap) {
                     if (snap.error is ServerException) {
                       ref.read(authProvider.notifier).logout();

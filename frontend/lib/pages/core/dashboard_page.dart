@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:auto_route/auto_route.dart';
 import 'package:financrr_frontend/pages/authentication/state/authentication_provider.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/widgets/async_wrapper.dart';
@@ -12,10 +11,12 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../layout/adaptive_scaffold.dart';
-import '../../routing/app_router.dart';
+import '../../routing/router.dart';
+import 'accounts/account_create_page.dart';
+import 'accounts/accounts_overview_page.dart';
 
-@RoutePage()
 class DashboardPage extends StatefulHookConsumerWidget {
+  static const PagePathBuilder pagePath = PagePathBuilder('/@me/dashboard');
 
   const DashboardPage({super.key});
 
@@ -29,7 +30,8 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
   final StreamController<Paginated<Transaction>> _transactionStreamController = StreamController.broadcast();
 
   Future<Paginated<Transaction>> _fetchLatestTransactions({bool forceRetrieve = false}) async {
-    final Paginated<Transaction> transactions = await _api.retrieveAllTransactions(limit: 10, forceRetrieve: forceRetrieve);
+    final Paginated<Transaction> transactions =
+        await _api.retrieveAllTransactions(limit: 10, forceRetrieve: forceRetrieve);
     _transactionStreamController.add(transactions);
     return transactions;
   }
@@ -69,13 +71,13 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                                 child: ListTile(
                               title: const Text('Manage Accounts'),
                               leading: const Icon(Icons.manage_accounts_rounded),
-                              onTap: () => context.pushRoute(const AccountsOverviewRoute()),
+                              onTap: () => context.goPath(AccountsOverviewPage.pagePath.build()),
                             )),
                             PopupMenuItem(
                                 child: ListTile(
                               title: const Text('Create Account'),
                               leading: const Icon(Icons.add),
-                              onTap: () => context.pushRoute(const AccountCreateRoute()),
+                              onTap: () => context.goPath(AccountCreatePage.pagePath.build()),
                             ))
                           ];
                         })
@@ -88,7 +90,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                       child: NoticeCard(
                           title: 'No accounts found',
                           description: 'Create an account to get started',
-                          onTap: () => context.pushRoute(const AccountCreateRoute()))),
+                          onTap: () => context.goPath(AccountCreatePage.pagePath.build()))),
                 if (_api.getAccounts().isNotEmpty) _buildTransactionSection()
               ]),
             )),
@@ -113,11 +115,13 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
               final List<Transaction> transactions = snap.data!.items;
               if (transactions.isEmpty) {
                 return const Center(
-                    child: NoticeCard(title: 'No transactions found', description: 'Your transactions will appear here'));
+                    child:
+                        NoticeCard(title: 'No transactions found', description: 'Your transactions will appear here'));
               }
               return Column(
                 children: [
-                  for (Transaction t in transactions) SizedBox(width: double.infinity, child: TransactionCard(transaction: t))
+                  for (Transaction t in transactions)
+                    SizedBox(width: double.infinity, child: TransactionCard(transaction: t))
                 ],
               );
             })

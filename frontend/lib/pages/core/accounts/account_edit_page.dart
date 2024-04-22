@@ -1,19 +1,21 @@
 import 'dart:async';
 
-import 'package:auto_route/auto_route.dart';
 import 'package:financrr_frontend/pages/authentication/state/authentication_provider.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../../../layout/adaptive_scaffold.dart';
+import '../../../routing/router.dart';
 import '../../../util/form_fields.dart';
 import '../../../widgets/async_wrapper.dart';
 import '../../../widgets/entities/account_card.dart';
+import 'account_page.dart';
 
-@RoutePage()
 class AccountEditPage extends StatefulHookConsumerWidget {
+  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: AccountPage.pagePath, path: 'edit');
 
   final String? accountId;
 
@@ -149,7 +151,7 @@ class AccountEditPageState extends ConsumerState<AccountEditPage> {
       );
       if (!mounted) return;
       context.showSnackBar('Successfully edited "${_nameController.text}"');
-      context.maybePop();
+      context.pop();
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);
     }

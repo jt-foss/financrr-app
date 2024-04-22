@@ -1,20 +1,24 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:auto_route/auto_route.dart';
 import 'package:financrr_frontend/pages/authentication/state/authentication_provider.dart';
 import 'package:financrr_frontend/pages/core/settings/currency/currency_create_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../../../layout/adaptive_scaffold.dart';
+import '../../../../routing/router.dart';
 import '../../../../util/form_fields.dart';
 import '../../../../widgets/async_wrapper.dart';
+import 'currency_settings_page.dart';
 
-@RoutePage()
 class CurrencyEditPage extends StatefulHookConsumerWidget {
+  static const PagePathBuilder pagePath =
+      PagePathBuilder.child(parent: CurrencySettingsPage.pagePath, path: ':currencyId/edit');
+
   final String? currencyId;
 
   const CurrencyEditPage({super.key, required this.currencyId});
@@ -166,7 +170,7 @@ class _CurrencyEditPageState extends ConsumerState<CurrencyEditPage> {
       );
       if (!mounted) return;
       context.showSnackBar('Successfully edited "${_nameController.text}"');
-      context.maybePop();
+      context.pop();
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);
     }

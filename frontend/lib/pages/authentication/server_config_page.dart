@@ -1,7 +1,5 @@
 import 'dart:async';
 
-import 'package:auto_route/annotations.dart';
-import 'package:auto_route/auto_route.dart';
 import 'package:financrr_frontend/data/store.dart';
 import 'package:financrr_frontend/layout/templates/auth_page_template.dart';
 import 'package:financrr_frontend/util/extensions.dart';
@@ -11,11 +9,12 @@ import 'package:flutter/material.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../layout/adaptive_scaffold.dart';
-import '../../routing/app_router.dart';
+import '../../routing/router.dart';
 import 'login_page.dart';
 
-@RoutePage()
 class ServerConfigPage extends StatefulWidget {
+  static const PagePathBuilder pagePath = PagePathBuilder('/server-config');
+
   final String? redirectTo;
 
   const ServerConfigPage({super.key, this.redirectTo});
@@ -87,7 +86,7 @@ class ServerConfigPageState extends State<ServerConfigPage> {
                 : TextButton.icon(
                     onPressed: () {
                       if (_isValid) {
-                        context.pushRoute(LoginRoute(hostUri: _hostUri!));
+                        context.goPath(LoginPage.pagePath.build(), extra: _hostUri);
                       } else {
                         _handleUrlCheck();
                       }

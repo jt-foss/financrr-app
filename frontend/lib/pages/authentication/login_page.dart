@@ -1,19 +1,20 @@
 import 'dart:async';
 
-import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:financrr_frontend/layout/templates/auth_page_template.dart';
 import 'package:financrr_frontend/pages/authentication/state/authentication_provider.dart';
 import 'package:financrr_frontend/pages/authentication/state/authentication_state.dart';
+import 'package:financrr_frontend/pages/core/dashboard_page.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../layout/adaptive_scaffold.dart';
-import '../../routing/app_router.dart';
+import '../../routing/router.dart';
 
-@RoutePage()
 class LoginPage extends StatefulHookConsumerWidget {
+  static const PagePathBuilder pagePath = PagePathBuilder('/login');
+
   final Uri hostUri;
 
   const LoginPage({super.key, required this.hostUri});
@@ -100,10 +101,9 @@ class LoginPageState extends ConsumerState<LoginPage> {
       context.showSnackBar('common_password_required'.tr());
       return;
     }
-    final state = await ref.read(authProvider.notifier)
-        .login(username, password, widget.hostUri);
+    final AuthenticationState state = await ref.read(authProvider.notifier).login(username, password, widget.hostUri);
     if (mounted && state.status == AuthenticationStatus.authenticated) {
-      context.replaceRoute(const TabControllerRoute());
+      context.replacePath(DashboardPage.pagePath.build());
     } else {
       context.showSnackBar('common_login_failed'.tr());
     }

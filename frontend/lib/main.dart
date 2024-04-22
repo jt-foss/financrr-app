@@ -2,9 +2,9 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:easy_localization/easy_localization.dart';
-import 'package:financrr_frontend/routing/app_router.dart';
 import 'package:financrr_frontend/data/log_store.dart';
 import 'package:financrr_frontend/data/store.dart';
+import 'package:financrr_frontend/routing/router.dart';
 import 'package:financrr_frontend/themes.dart';
 import 'package:financrr_frontend/widgets/fallback_error_app.dart';
 import 'package:flutter/foundation.dart';
@@ -79,7 +79,8 @@ class FinancrrApp extends StatefulHookConsumerWidget {
   final AppTheme currentLightTheme;
   final AppTheme currentDarkTheme;
 
-  const FinancrrApp({super.key, required this.themeMode, required this.currentLightTheme, required this.currentDarkTheme});
+  const FinancrrApp(
+      {super.key, required this.themeMode, required this.currentLightTheme, required this.currentDarkTheme});
 
   @override
   ConsumerState<FinancrrApp> createState() => FinancrrAppState();
@@ -111,7 +112,7 @@ class FinancrrAppState extends ConsumerState<FinancrrApp> {
 
     return MaterialApp.router(
         onGenerateTitle: (ctx) => 'brand_name'.tr(),
-        routerConfig: router.config(),
+        routerConfig: router.goRouter,
         debugShowCheckedModeBanner: false,
         scrollBehavior: CustomScrollBehavior(),
         localizationsDelegates: context.localizationDelegates,
@@ -154,7 +155,8 @@ class FinancrrAppState extends ConsumerState<FinancrrApp> {
 class CustomHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
-    return super.createHttpClient(context)..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+    return super.createHttpClient(context)
+      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
   }
 }
 

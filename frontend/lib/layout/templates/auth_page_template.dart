@@ -49,8 +49,8 @@ class AuthPageTemplateState extends State<AuthPageTemplate> {
                         icon: Icon(Icons.arrow_back, color: Colors.grey[400])),
                   IconButton(
                       tooltip: 'Toggle theme',
-                      onPressed: () => FinancrrApp.of(context)
-                          .changeAppTheme(theme: context.lightMode ? AppTheme.getById('DARK')! : AppTheme.getById('LIGHT')!),
+                      onPressed: () => FinancrrApp.of(context).changeAppTheme(
+                          theme: context.lightMode ? AppTheme.getById('DARK')! : AppTheme.getById('LIGHT')!),
                       icon: Icon(context.lightMode ? Icons.nightlight_round : Icons.wb_sunny, color: Colors.grey[400])),
                 ],
               ),
@@ -60,7 +60,8 @@ class AuthPageTemplateState extends State<AuthPageTemplate> {
               child: SvgPicture.asset(context.appTheme.logoPath,
                   width: 100, colorFilter: ColorFilter.mode(context.theme.primaryColor, BlendMode.srcIn)),
             ),
-            Text('sign_in_message_$_random', style: context.textTheme.titleLarge?.copyWith(color: context.theme.primaryColor))
+            Text('sign_in_message_$_random',
+                    style: context.textTheme.titleLarge?.copyWith(color: context.theme.primaryColor))
                 .tr(),
             widget.child
           ]),

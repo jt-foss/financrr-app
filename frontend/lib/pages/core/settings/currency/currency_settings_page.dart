@@ -1,4 +1,3 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:financrr_frontend/pages/authentication/state/authentication_provider.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/widgets/entities/currency_card.dart';
@@ -8,10 +7,13 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../../../layout/adaptive_scaffold.dart';
-import '../../../../routing/app_router.dart';
+import '../../../../routing/router.dart';
+import '../../settings_page.dart';
+import 'currency_create_page.dart';
 
-@RoutePage()
 class CurrencySettingsPage extends StatefulHookConsumerWidget {
+  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'currencies');
+
   const CurrencySettingsPage({super.key});
 
   @override
@@ -46,7 +48,7 @@ class _CurrencySettingsPageState extends ConsumerState<CurrencySettingsPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     TextButton.icon(
-                      onPressed: () => context.pushRoute(const CurrencyCreateRoute()),
+                      onPressed: () => context.goPath(CurrencyCreatePage.pagePath.build()),
                       icon: const Icon(Icons.add),
                       label: const Text('Create'),
                     ),
@@ -61,7 +63,8 @@ class _CurrencySettingsPageState extends ConsumerState<CurrencySettingsPage> {
                 const Divider(),
                 PaginatedWrapper(
                   key: _paginatedCurrencyKey,
-                  initialPageFunction: (forceRetrieve) => _api.retrieveAllCurrencies(limit: 10, forceRetrieve: forceRetrieve),
+                  initialPageFunction: (forceRetrieve) =>
+                      _api.retrieveAllCurrencies(limit: 10, forceRetrieve: forceRetrieve),
                   onSuccess: (context, snap) {
                     final PaginatedDataResult<Currency> currencies = snap.data!;
                     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -72,8 +75,8 @@ class _CurrencySettingsPageState extends ConsumerState<CurrencySettingsPage> {
                         for (Currency c in currencies.items)
                           Padding(
                             padding: const EdgeInsets.only(bottom: 10),
-                            child:
-                                CurrencyCard(currency: c, onDelete: c is! CustomCurrency ? null : () => _deleteCurrency(c)),
+                            child: CurrencyCard(
+                                currency: c, onDelete: c is! CustomCurrency ? null : () => _deleteCurrency(c)),
                           ),
                         if (currencies.nextPage != null)
                           TextButton(

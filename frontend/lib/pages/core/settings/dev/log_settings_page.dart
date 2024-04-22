@@ -1,4 +1,3 @@
-import 'package:auto_route/annotations.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,9 +5,12 @@ import 'package:flutter/services.dart';
 import '../../../../data/log_store.dart';
 import '../../../../data/store.dart';
 import '../../../../layout/adaptive_scaffold.dart';
+import '../../../../routing/router.dart';
+import '../../settings_page.dart';
 
-@RoutePage()
 class LogSettingsPage extends StatefulWidget {
+  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'logs');
+
   const LogSettingsPage({super.key});
 
   @override
@@ -29,7 +31,8 @@ class _LogSettingsPageState extends State<LogSettingsPage> {
 
   void sortEntries() {
     _selectedEntryIndex = null;
-    _entries.sort((a, b) => _sortTimeAscending ? a.timestamp.compareTo(b.timestamp) : b.timestamp.compareTo(a.timestamp));
+    _entries
+        .sort((a, b) => _sortTimeAscending ? a.timestamp.compareTo(b.timestamp) : b.timestamp.compareTo(a.timestamp));
   }
 
   @override
@@ -119,7 +122,8 @@ class _LogSettingsPageState extends State<LogSettingsPage> {
                   padding: const EdgeInsets.only(right: 5),
                   child: Icon(_getIcon(entry.level), color: _getColorTint(entry.level), size: 17),
                 ),
-                Expanded(child: Text('${entry.level.name}, ${StoreKey.dateTimeFormat.readSync()!.format(entry.timestamp)}')),
+                Expanded(
+                    child: Text('${entry.level.name}, ${StoreKey.dateTimeFormat.readSync()!.format(entry.timestamp)}')),
               ],
             ),
           ],

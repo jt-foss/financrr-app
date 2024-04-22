@@ -1,4 +1,3 @@
-import 'package:auto_route/annotations.dart';
 import 'package:financrr_frontend/data/store.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/text_utils.dart';
@@ -7,9 +6,12 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../layout/adaptive_scaffold.dart';
+import '../../../../routing/router.dart';
+import '../../settings_page.dart';
 
-@RoutePage()
 class L10nSettingsPage extends StatefulWidget {
+  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'languages');
+
   const L10nSettingsPage({super.key});
 
   @override

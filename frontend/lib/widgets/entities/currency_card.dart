@@ -1,10 +1,10 @@
-import 'package:auto_route/auto_route.dart';
+import 'package:financrr_frontend/routing/router.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/widgets/text_circle_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:restrr/restrr.dart';
 
-import '../../routing/app_router.dart';
+import '../../pages/core/settings/currency/currency_edit_page.dart';
 
 class CurrencyCard extends StatelessWidget {
   final Id id;
@@ -58,7 +58,7 @@ class CurrencyCard extends StatelessWidget {
               itemBuilder: (context) {
                 return [
                   PopupMenuItem(
-                    onTap: () => context.pushRoute(CurrencyEditRoute(currencyId: id.toString())),
+                    onTap: () => context.goPath(CurrencyEditPage.pagePath.build(params: {'currencyId': id.toString()})),
                     child: const Text('Edit'),
                   ),
                   if (onDelete != null)
