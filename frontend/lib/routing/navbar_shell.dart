@@ -1,4 +1,4 @@
-import 'package:financrr_frontend/util/extensions.dart';
+import 'package:financrr_frontend/utils/extensions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
