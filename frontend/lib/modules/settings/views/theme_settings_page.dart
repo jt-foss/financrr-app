@@ -42,7 +42,7 @@ class _ThemeSettingsPageState extends ConsumerState<ThemeSettingsPage> {
                   trailing: Switch(
                     value: themeState.mode == ThemeMode.system,
                     onChanged: (value) =>
-                        ref.themeNotifier.setMode(value ? ThemeMode.system : ref.currentTheme.themeMode),
+                        ref.read(themeProvider.notifier).setMode(value ? ThemeMode.system : ref.currentTheme.themeMode),
                   ),
                   subtitle: Text(
                       'Current device theme: ${WidgetsBinding.instance.platformDispatcher.platformBrightness.name}')),
@@ -63,11 +63,11 @@ class _ThemeSettingsPageState extends ConsumerState<ThemeSettingsPage> {
       child: ListTile(
         onTap: () {
           if (theme.themeMode == ThemeMode.light) {
-            ref.themeNotifier.setLightTheme(theme);
+            ref.read(themeProvider.notifier).setLightTheme(theme);
           } else {
-            ref.themeNotifier.setDarkTheme(theme);
+            ref.read(themeProvider.notifier).setDarkTheme(theme);
           }
-          ref.themeNotifier.setMode(theme.themeMode);
+          ref.read(themeProvider.notifier).setMode(theme.themeMode);
         },
         contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
         title: Text(theme.effectiveName),

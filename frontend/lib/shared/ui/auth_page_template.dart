@@ -52,8 +52,9 @@ class AuthPageTemplateState extends ConsumerState<AuthPageTemplate> {
                         icon: Icon(Icons.arrow_back, color: Colors.grey[400])),
                   IconButton(
                       tooltip: 'Toggle theme',
-                      onPressed: () =>
-                          ref.themeNotifier.setMode(theme.mode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light),
+                      onPressed: () => ref
+                          .read(themeProvider.notifier)
+                          .setMode(theme.mode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light),
                       icon: Icon(context.lightMode ? Icons.nightlight_round : Icons.wb_sunny, color: Colors.grey[400])),
                 ],
               ),
