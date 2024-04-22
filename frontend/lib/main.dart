@@ -2,11 +2,11 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:easy_localization/easy_localization.dart';
-import 'package:financrr_frontend/data/log_store.dart';
-import 'package:financrr_frontend/data/store.dart';
+import 'package:financrr_frontend/modules/settings/models/log_store.dart';
 import 'package:financrr_frontend/routing/router.dart';
-import 'package:financrr_frontend/themes.dart';
-import 'package:financrr_frontend/widgets/fallback_error_app.dart';
+import 'package:financrr_frontend/shared/models/store.dart';
+import 'package:financrr_frontend/shared/models/themes.dart';
+import 'package:financrr_frontend/shared/ui/fallback_error_app.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,6 +15,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:logging/logging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'modules/settings/models/log_entry.model.dart';
 
 Logger _log = Logger('GenericLogger');
 
