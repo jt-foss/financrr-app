@@ -1,4 +1,5 @@
 import 'package:financrr_frontend/pages/authentication/state/authentication_provider.dart';
+import 'package:financrr_frontend/util/common_actions.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/widgets/entities/session_card.dart';
 import 'package:financrr_frontend/widgets/paginated_wrapper.dart';
@@ -43,7 +44,7 @@ class _SessionSettingsPageState extends ConsumerState<SessionSettingsPage> {
             onRefresh: () async => _paginatedSessionKey.currentState?.reset(),
             child: ListView(
               children: [
-                SessionCard(session: _api.session, onDelete: () => ref.read(authProvider.notifier).logout()),
+                SessionCard(session: _api.session, onDelete: () => CommonActions.logOut(this, ref)),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -66,7 +67,7 @@ class _SessionSettingsPageState extends ConsumerState<SessionSettingsPage> {
                       _api.retrieveAllSessions(limit: 10, forceRetrieve: forceRetrieve),
                   onError: (context, snap) {
                     if (snap.error is ServerException) {
-                      ref.read(authProvider.notifier).logout();
+                      CommonActions.logOut(this, ref);
                     }
                     return Text(snap.error.toString());
                   },
@@ -106,7 +107,7 @@ class _SessionSettingsPageState extends ConsumerState<SessionSettingsPage> {
       if (!mounted) return;
       context.showSnackBar('Successfully deleted "${session.name ?? 'Session ${session.id.value}'}"');
       if (session.id.value == _api.session.id.value) {
-        ref.read(authProvider.notifier).logout();
+        CommonActions.logOut(this, ref);
       }
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);
@@ -118,7 +119,7 @@ class _SessionSettingsPageState extends ConsumerState<SessionSettingsPage> {
       await _api.deleteAllSessions();
       if (!mounted) return;
       context.showSnackBar('Successfully deleted all Sessions!');
-      ref.read(authProvider.notifier).logout();
+      CommonActions.logOut(this, ref);
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);
     }

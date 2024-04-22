@@ -5,15 +5,18 @@ import 'package:financrr_frontend/pages/core/settings/dev/log_settings_page.dart
 import 'package:financrr_frontend/pages/core/settings/l10n/l10n_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings/session/session_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings/theme_settings_page.dart';
+import 'package:financrr_frontend/pages/splash_page.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../layout/adaptive_scaffold.dart';
 import '../../routing/page_path.dart';
+import '../../util/common_actions.dart';
 import '../../widgets/text_circle_avatar.dart';
 
 class SettingsItemGroup {
@@ -106,7 +109,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       SettingsItem(
         showCategory: false,
         child: ListTile(
-          onTap: () => ref.read(authProvider.notifier).logout(),
+          onTap: () => CommonActions.logOut(this, ref),
           leading: const Icon(Icons.logout),
           title: const Text('Logout'),
         ),

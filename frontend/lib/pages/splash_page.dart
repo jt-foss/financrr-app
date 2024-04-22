@@ -1,6 +1,3 @@
-import 'package:financrr_frontend/pages/authentication/server_config_page.dart';
-import 'package:financrr_frontend/pages/authentication/state/authentication_provider.dart';
-import 'package:financrr_frontend/pages/authentication/state/authentication_state.dart';
 import 'package:financrr_frontend/pages/core/dashboard_page.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/util/extensions.dart';
@@ -21,8 +18,6 @@ class SplashPage extends StatefulHookConsumerWidget {
 }
 
 class _SplashPageState extends ConsumerState<SplashPage> with SingleTickerProviderStateMixin {
-  static final _log = Logger('SplashPage');
-
   late final AnimationController _controller = AnimationController(
     vsync: this,
     duration: const Duration(seconds: 2),
@@ -36,30 +31,16 @@ class _SplashPageState extends ConsumerState<SplashPage> with SingleTickerProvid
   @override
   void initState() {
     super.initState();
-    _navigate();
+    // Attempt to go to the dashboard page
+    // The AuthGuard will try to recover the session and redirect to the ServerConfigPage if the session
+    // is not recoverable
+    context.goPath(DashboardPage.pagePath.build());
   }
 
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
-  }
-
-  void _navigate() async {
-    _log.info('Attempting to recover session...');
-    final AuthenticationState state = await ref.read(authProvider.notifier).attemptRecovery();
-    if (!mounted) return;
-    switch (state.status) {
-      case AuthenticationStatus.authenticated:
-        _log.info('Session recovered, redirecting to DashboardPage');
-        context.goPath(DashboardPage.pagePath.build());
-        break;
-      case AuthenticationStatus.unauthenticated:
-      case AuthenticationStatus.unknown:
-        _log.info('Session recovery failed, redirecting to ServerConfigPage');
-        context.goPath(ServerConfigPage.pagePath.build());
-        break;
-    }
   }
 
   @override

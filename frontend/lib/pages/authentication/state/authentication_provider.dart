@@ -27,6 +27,9 @@ class AuthenticationNotifier extends StateNotifier<AuthenticationState> {
     if (token == null || hostUrl == null) {
       return await _authFailure();
     }
+    if (state.isAuthenticated) {
+      return state;
+    }
     try {
       final Restrr api = await _getRestrrBuilder(Uri.parse(hostUrl)).refresh(sessionToken: token);
       return _authSuccess(api);

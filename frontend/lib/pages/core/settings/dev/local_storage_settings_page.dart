@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../../../data/store.dart';
 import '../../../../layout/adaptive_scaffold.dart';
 import '../../../../routing/page_path.dart';
+import '../../../../util/common_actions.dart';
 import '../../settings_page.dart';
 
 class LocalStorageSettingsPage extends StatefulWidget {
@@ -53,10 +54,7 @@ class _LocalStorageSettingsPageState extends State<LocalStorageSettingsPage> {
 
   Widget _buildTableCell(String text) {
     return GestureDetector(
-      onTap: () async {
-        context.showSnackBar('Copied to clipboard!');
-        await Clipboard.setData(ClipboardData(text: text));
-      },
+      onTap: () => CommonActions.copyToClipboard(this, text),
       child: Padding(
         padding: const EdgeInsets.all(10),
         child: Text(text),

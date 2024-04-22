@@ -105,7 +105,7 @@ class LoginPageState extends ConsumerState<LoginPage> {
     final AuthenticationState state = await ref.read(authProvider.notifier).login(username, password, widget.hostUri);
     if (!mounted) return;
     if (state.status == AuthenticationStatus.authenticated) {
-      context.pushPath(DashboardPage.pagePath.build());
+      context.goPath(DashboardPage.pagePath.build());
     } else {
       context.showSnackBar('common_login_failed'.tr());
     }

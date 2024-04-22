@@ -6,6 +6,7 @@ import '../../../../data/log_store.dart';
 import '../../../../data/store.dart';
 import '../../../../layout/adaptive_scaffold.dart';
 import '../../../../routing/page_path.dart';
+import '../../../../util/common_actions.dart';
 import '../../settings_page.dart';
 
 class LogSettingsPage extends StatefulWidget {
@@ -62,10 +63,7 @@ class _LogSettingsPageState extends State<LogSettingsPage> {
                   onTap: () => setState(() {
                     _selectedEntryIndex = _selectedEntryIndex == index - 1 ? null : index - 1;
                   }),
-                  onLongPress: () async {
-                    context.showSnackBar('Copied to clipboard');
-                    await Clipboard.setData(ClipboardData(text: _entries[index - 1].message));
-                  },
+                  onLongPress: () => CommonActions.copyToClipboard(this, _entries[index - 1].message),
                   child: _buildLogEntryTile(_entries[index - 1], index - 1, expanded: index - 1 == _selectedEntryIndex),
                 );
               }),

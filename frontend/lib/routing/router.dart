@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:financrr_frontend/pages/authentication/login_page.dart';
 import 'package:financrr_frontend/pages/authentication/server_config_page.dart';
 import 'package:financrr_frontend/pages/core/settings/dev/local_storage_settings_page.dart';
@@ -20,12 +22,14 @@ import 'package:financrr_frontend/pages/core/settings_page.dart';
 import 'package:financrr_frontend/pages/core/dashboard_page.dart';
 import 'package:financrr_frontend/pages/core/dummy_page.dart';
 import 'package:financrr_frontend/routing/guards/guard.dart';
+import 'package:financrr_frontend/routing/guards/login_auth_guard.dart';
 import 'package:financrr_frontend/util/constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import 'guards/auth_guard.dart';
+import 'guards/core_auth_guard.dart';
+import 'guards/extra_guard.dart';
 import 'navbar_shell.dart';
 
 final Provider<AppRouter> appRouterProvider = Provider((ref) => AppRouter(ref));
@@ -33,7 +37,8 @@ final Provider<AppRouter> appRouterProvider = Provider((ref) => AppRouter(ref));
 class AppRouter {
   final ProviderRef<Object?> ref;
 
-  final AuthGuard _coreAuthGuard = AuthGuard();
+  final CoreAuthGuard _coreAuthGuard = CoreAuthGuard();
+  final LoginAuthGuard _loginAuthGuard = LoginAuthGuard();
 
   AppRouter(this.ref);
 
@@ -45,7 +50,7 @@ class AppRouter {
     navigatorKey: rootNavigatorKey,
     routes: [
       ..._noShellRoutes(),
-      GoRoute(path: '/@me', redirect: (_, __) => '/@me/dashboard'),
+      GoRoute(path: '/@me', redirect: (_, __) => DashboardPage.pagePath.path),
       StatefulShellRoute.indexedStack(
           builder: (context, state, shell) => ScaffoldNavBarShell(navigationShell: shell),
           branches: [
@@ -172,11 +177,14 @@ class AppRouter {
       GoRoute(
           path: ServerConfigPage.pagePath.path,
           pageBuilder: (context, state) =>
-              _buildDefaultPageTransition(context, state, ServerConfigPage(key: GlobalKeys.loginPage))),
+              _buildDefaultPageTransition(context, state, ServerConfigPage(key: GlobalKeys.loginPage)),
+          redirect: guards([_loginAuthGuard])),
       GoRoute(
           path: LoginPage.pagePath.path,
           pageBuilder: (context, state) =>
-              _buildDefaultPageTransition(context, state, LoginPage(hostUri: state.extra as Uri)))
+              _buildDefaultPageTransition(context, state, LoginPage(hostUri: state.extra as Uri)),
+          redirect: guards([ExtraGuard(ServerConfigPage.pagePath)])
+      )
     ];
   }
 
@@ -184,7 +192,7 @@ class AppRouter {
     return [];
   }
 
-  String? Function(BuildContext, GoRouterState) guards(List<Guard> guards) =>
+  FutureOr<String?> Function(BuildContext, GoRouterState) guards(List<Guard> guards) =>
       (_, state) => Guards(guards).redirectPath(ref, state);
 
   static Page<T> _buildDefaultPageTransition<T>(BuildContext context, GoRouterState state, Widget child) {
