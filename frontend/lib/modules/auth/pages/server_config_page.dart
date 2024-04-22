@@ -1,10 +1,12 @@
 import 'dart:async';
 
+import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/shared/ui/auth_page_template.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../../shared/models/store.dart';
@@ -13,7 +15,7 @@ import '../../../routing/page_path.dart';
 import '../../../utils/input_utils.dart';
 import 'login_page.dart';
 
-class ServerConfigPage extends StatefulWidget {
+class ServerConfigPage extends StatefulHookConsumerWidget {
   static const PagePathBuilder pagePath = PagePathBuilder('/server-config');
 
   final String? redirectTo;
@@ -21,10 +23,10 @@ class ServerConfigPage extends StatefulWidget {
   const ServerConfigPage({super.key, this.redirectTo});
 
   @override
-  State<StatefulWidget> createState() => ServerConfigPageState();
+  ConsumerState<ServerConfigPage> createState() => ServerConfigPageState();
 }
 
-class ServerConfigPageState extends State<ServerConfigPage> {
+class ServerConfigPageState extends ConsumerState<ServerConfigPage> {
   final TextEditingController _urlController = TextEditingController();
 
   bool _isLoading = false;
@@ -76,7 +78,7 @@ class ServerConfigPageState extends State<ServerConfigPage> {
                   Padding(
                     padding: const EdgeInsets.only(top: 5),
                     child: Text('Status: Healthy, v$_apiVersion',
-                        style: context.textTheme.labelMedium?.copyWith(color: context.theme.primaryColor)),
+                        style: ref.textTheme.labelMedium?.copyWith(color: ref.themeData.primaryColor)),
                   )
               ],
             )),

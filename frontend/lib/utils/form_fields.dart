@@ -1,7 +1,8 @@
-import 'package:financrr_frontend/utils/extensions.dart';
+import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/utils/text_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
 import '../shared/models/store.dart';
@@ -12,7 +13,7 @@ import 'input_utils.dart';
 class FormFields {
   const FormFields._();
 
-  static List<Widget> transaction(BuildContext context,
+  static List<Widget> transaction(ConsumerState state,
       {required Account currentAccount,
       required TextEditingController nameController,
       required TextEditingController amountController,
@@ -51,7 +52,7 @@ class FormFields {
                   .map((account) {
                 return DropdownMenuItem(
                   value: account,
-                  child: Text(account.name, style: context.textTheme.bodyMedium),
+                  child: Text(account.name, style: state.ref.textTheme.bodyMedium),
                 );
               }).toList(),
               onChanged: onSecondaryChanged,
@@ -94,13 +95,13 @@ class FormFields {
         child: TextFormField(
           onTap: () async {
             final DateTime? date = await showDatePicker(
-              context: context,
+              context: state.context,
               firstDate: (executedAt ?? DateTime.now()).subtract(const Duration(days: 365)),
               lastDate: (executedAt ?? DateTime.now()).add(const Duration(days: 365)),
             );
-            if (date == null) return;
+            if (date == null || !state.mounted) return;
             final TimeOfDay? time = await showTimePicker(
-                context: context,
+                context: state.context,
                 initialTime: executedAt != null ? TimeOfDay.fromDateTime(executedAt) : TimeOfDay.now());
             if (time == null) return;
             onExecutedAtChanged?.call(date.copyWith(hour: time.hour, minute: time.minute));
@@ -113,7 +114,7 @@ class FormFields {
     ];
   }
 
-  static List<Widget> account(BuildContext context,
+  static List<Widget> account(WidgetRef ref,
       {required Restrr api,
       required TextEditingController nameController,
       required TextEditingController descriptionController,
@@ -176,7 +177,7 @@ class FormFields {
             items: api.getCurrencies().map((currency) {
               return DropdownMenuItem(
                 value: currency,
-                child: Text('${currency.name} (${currency.symbol})', style: context.textTheme.bodyMedium),
+                child: Text('${currency.name} (${currency.symbol})', style: ref.textTheme.bodyMedium),
               );
             }).toList(),
             onChanged: onCurrencyChanged),

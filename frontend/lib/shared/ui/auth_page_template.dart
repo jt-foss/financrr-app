@@ -1,36 +1,39 @@
 import 'dart:math';
 
 import 'package:easy_localization/easy_localization.dart';
-import 'package:financrr_frontend/main.dart';
-import 'package:financrr_frontend/shared/models/themes.dart';
+import 'package:financrr_frontend/modules/settings/models/theme.state.dart';
+import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'adaptive_scaffold.dart';
 
-class AuthPageTemplate extends StatefulWidget {
+class AuthPageTemplate extends StatefulHookConsumerWidget {
   final bool showBackButton;
   final Widget child;
 
   const AuthPageTemplate({super.key, required this.child, this.showBackButton = false});
 
   @override
-  State<StatefulWidget> createState() => AuthPageTemplateState();
+  ConsumerState<AuthPageTemplate> createState() => AuthPageTemplateState();
 }
 
-class AuthPageTemplateState extends State<AuthPageTemplate> {
+class AuthPageTemplateState extends ConsumerState<AuthPageTemplate> {
   final int _random = Random().nextInt(4) + 1;
 
   @override
   Widget build(BuildContext context) {
+    var theme = ref.watch(themeProvider);
+
     return AdaptiveScaffold(
       resizeToAvoidBottomInset: false,
-      verticalBuilder: (_, __, size) => SafeArea(child: _buildVerticalLayout(size)),
+      verticalBuilder: (_, __, size) => SafeArea(child: _buildVerticalLayout(size, theme)),
     );
   }
 
-  Widget _buildVerticalLayout(Size size) {
+  Widget _buildVerticalLayout(Size size, ThemeState theme) {
     return SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Center(
@@ -49,19 +52,19 @@ class AuthPageTemplateState extends State<AuthPageTemplate> {
                         icon: Icon(Icons.arrow_back, color: Colors.grey[400])),
                   IconButton(
                       tooltip: 'Toggle theme',
-                      onPressed: () => FinancrrApp.of(context).changeAppTheme(
-                          theme: context.lightMode ? AppTheme.getById('DARK')! : AppTheme.getById('LIGHT')!),
+                      onPressed: () =>
+                          ref.themeNotifier.setMode(theme.mode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light),
                       icon: Icon(context.lightMode ? Icons.nightlight_round : Icons.wb_sunny, color: Colors.grey[400])),
                 ],
               ),
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 10),
-              child: SvgPicture.asset(context.appTheme.logoPath,
-                  width: 100, colorFilter: ColorFilter.mode(context.theme.primaryColor, BlendMode.srcIn)),
+              child: SvgPicture.asset(ref.currentTheme.logoPath,
+                  width: 100, colorFilter: ColorFilter.mode(ref.themeData.primaryColor, BlendMode.srcIn)),
             ),
             Text('sign_in_message_$_random',
-                    style: context.textTheme.titleLarge?.copyWith(color: context.theme.primaryColor))
+                    style: ref.textTheme.titleLarge?.copyWith(color: ref.themeData.primaryColor))
                 .tr(),
             widget.child
           ]),

@@ -80,7 +80,7 @@ class _AccountCreatePageState extends ConsumerState<AccountCreatePage> {
                   currency: _currency ?? _api.getCurrencies().first,
                 ),
                 const Divider(),
-                ...FormFields.account(context,
+                ...FormFields.account(ref,
                     api: _api,
                     nameController: _nameController,
                     descriptionController: _descriptionController,

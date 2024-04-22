@@ -1,12 +1,13 @@
+import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/shared/ui/text_circle_avatar.dart';
-import 'package:financrr_frontend/utils/extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../modules/settings/views/currency_edit_page.dart';
 
-class CurrencyCard extends StatelessWidget {
+class CurrencyCard extends ConsumerWidget {
   final Id id;
   final String name;
   final String symbol;
@@ -36,7 +37,7 @@ class CurrencyCard extends StatelessWidget {
       this.onDelete});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Card.outlined(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -48,7 +49,7 @@ class CurrencyCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(name, style: context.textTheme.titleSmall),
+                  Text(name, style: ref.textTheme.titleSmall),
                   if (isoCode != null) Text(isoCode!),
                 ],
               ),

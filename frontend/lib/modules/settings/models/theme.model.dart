@@ -1,33 +1,9 @@
-import 'dart:convert';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
 
-import '../../utils/json_utils.dart';
-
-class AppThemeLoader {
-  static Future<void> init() async {
-    final String manifestContent = await rootBundle.loadString('AssetManifest.json');
-    final Map<String, dynamic> manifest = jsonDecode(manifestContent);
-    final List<String> filtered = manifest.keys
-        .where((path) => path.startsWith('assets/themes/') && path.endsWith('.financrr-theme.json'))
-        .toList();
-    for (String path in filtered) {
-      final Map<String, dynamic> json = jsonDecode(await rootBundle.loadString(path));
-      final AppTheme? theme = AppTheme.tryFromJson(json);
-      if (theme != null) {
-        AppTheme._themes[theme.id] = theme;
-      } else {
-        throw StateError('Could not load theme: $path');
-      }
-    }
-  }
-}
+import '../../../utils/json_utils.dart';
 
 class AppTheme {
-  static final Map<String, AppTheme> _themes = {};
-
   static const String fontFamily = 'Montserrat';
   static const List<String> fontFamilyFallback = ['Arial', 'sans-serif'];
 
@@ -49,9 +25,6 @@ class AppTheme {
       required this.themeData});
 
   String get effectiveName => translationKey?.tr() ?? fallbackName ?? id;
-
-  static AppTheme? getById(String id) => _themes[id];
-  static Iterable<AppTheme> get themes => _themes.values;
 
   static AppTheme? tryFromJson(Map<String, dynamic> json) {
     final AppThemeColor? previewColor = AppThemeColor.tryFromJson(json['preview_color']);

@@ -1,4 +1,5 @@
 import 'package:financrr_frontend/modules/auth/providers/authentication.provider.dart';
+import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
 import 'package:flutter/material.dart';
@@ -71,7 +72,7 @@ class _AccountsOverviewPageState extends ConsumerState<AccountsOverviewPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: _currencies.entries.map((entry) {
                         return Text(TextUtils.formatBalanceWithCurrency(entry.value, entry.key),
-                            style: context.textTheme.titleSmall?.copyWith(color: context.theme.primaryColor));
+                            style: ref.textTheme.titleSmall?.copyWith(color: ref.themeData.primaryColor));
                       }).toList(),
                     ),
                     TextButton.icon(
@@ -99,7 +100,7 @@ class _AccountsOverviewPageState extends ConsumerState<AccountsOverviewPage> {
                         children: [
                           Padding(
                             padding: const EdgeInsets.only(top: 5),
-                            child: Text(account.name, style: context.textTheme.titleSmall),
+                            child: Text(account.name, style: ref.textTheme.titleSmall),
                           ),
                           const Spacer(),
                           PopupMenuButton(

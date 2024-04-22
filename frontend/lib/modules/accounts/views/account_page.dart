@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:financrr_frontend/modules/auth/providers/authentication.provider.dart';
+import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/shared/ui/async_wrapper.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
@@ -89,7 +90,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                 Column(
                   children: [
                     Text(TextUtils.formatBalanceWithCurrency(account.balance, account.currencyId.get()!),
-                        style: context.textTheme.titleLarge?.copyWith(color: context.theme.primaryColor)),
+                        style: ref.textTheme.titleLarge?.copyWith(color: ref.themeData.primaryColor)),
                     Text(account.name),
                   ],
                 ),
@@ -130,7 +131,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Latest Transactions', style: context.textTheme.titleMedium),
+        Text('Latest Transactions', style: ref.textTheme.titleMedium),
         Padding(
           padding: const EdgeInsets.only(top: 10),
           child: PaginatedWrapper(

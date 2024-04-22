@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:financrr_frontend/modules/auth/providers/authentication.provider.dart';
+import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/modules/settings/views/currency_create_page.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
 import 'package:flutter/material.dart';
@@ -144,7 +145,7 @@ class _CurrencyEditPageState extends ConsumerState<CurrencyEditPage> {
                             child: Padding(
                               padding: const EdgeInsets.only(left: 10),
                               child: Text('This currency is not custom and can therefore not be edited!',
-                                  style: context.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700)),
+                                  style: ref.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700)),
                             ),
                           ),
                         ],

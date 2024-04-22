@@ -1,10 +1,10 @@
 import 'package:financrr_frontend/modules/auth/providers/authentication.provider.dart';
+import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/modules/settings/views/local_storage_settings_page.dart';
 import 'package:financrr_frontend/modules/settings/views/l10n_settings_page.dart';
 import 'package:financrr_frontend/modules/settings/views/session_settings_page.dart';
 import 'package:financrr_frontend/modules/settings/views/theme_settings_page.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
-import 'package:financrr_frontend/utils/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -50,7 +50,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         showCategory: false,
         child: ListTile(
           leading: TextCircleAvatar(text: _api.selfUser.effectiveDisplayName, radius: 25),
-          title: Text(_api.selfUser.effectiveDisplayName, style: context.textTheme.titleSmall),
+          title: Text(_api.selfUser.effectiveDisplayName, style: ref.textTheme.titleSmall),
           subtitle: const Text('placeholder@financrr.app'),
         ),
       ),
@@ -154,7 +154,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   if (group.title != null) ...[
                     Padding(
                       padding: const EdgeInsets.only(top: 5),
-                      child: Text(group.title!, style: context.textTheme.titleSmall),
+                      child: Text(group.title!, style: ref.textTheme.titleSmall),
                     ),
                     const Divider()
                   ],

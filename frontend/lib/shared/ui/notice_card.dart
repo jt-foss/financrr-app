@@ -1,7 +1,8 @@
-import 'package:financrr_frontend/utils/extensions.dart';
+import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class NoticeCard extends StatelessWidget {
+class NoticeCard extends ConsumerWidget {
   final IconData iconData;
   final String title;
   final String description;
@@ -16,7 +17,7 @@ class NoticeCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Card.outlined(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -39,11 +40,11 @@ class NoticeCard extends StatelessWidget {
                                 WidgetSpan(
                                     child: Padding(
                                   padding: const EdgeInsets.only(left: 5),
-                                  child: Icon(Icons.arrow_forward_rounded, size: 17, color: context.theme.primaryColor),
+                                  child: Icon(Icons.arrow_forward_rounded, size: 17, color: ref.themeData.primaryColor),
                                 ))
                               ],
-                              style: context.textTheme.bodyMedium
-                                  ?.copyWith(color: context.theme.primaryColor, fontWeight: FontWeight.w500))),
+                              style: ref.textTheme.bodyMedium
+                                  ?.copyWith(color: ref.themeData.primaryColor, fontWeight: FontWeight.w500))),
                         ),
                 ],
               ),
