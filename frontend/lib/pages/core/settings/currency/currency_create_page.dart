@@ -1,18 +1,21 @@
 import 'dart:math';
 
-import 'package:auto_route/auto_route.dart';
 import 'package:financrr_frontend/pages/authentication/state/authentication_provider.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/widgets/entities/currency_card.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../../../layout/adaptive_scaffold.dart';
+import '../../../../routing/page_path.dart';
 import '../../../../util/form_fields.dart';
+import 'currency_settings_page.dart';
 
-@RoutePage()
 class CurrencyCreatePage extends StatefulHookConsumerWidget {
+  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: CurrencySettingsPage.pagePath, path: 'create');
+
   const CurrencyCreatePage({super.key});
 
   @override
@@ -141,7 +144,7 @@ class _CurrencyCreatePageState extends ConsumerState<CurrencyCreatePage> {
       );
       if (!mounted) return;
       context.showSnackBar('Successfully created "${_nameController.text}"');
-      context.maybePop();
+      context.pop();
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);
     }

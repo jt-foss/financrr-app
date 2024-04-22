@@ -8,7 +8,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 enum StoreKey<T> {
   hostUrl<String>('host_url', type: String),
   dateTimeFormat<DateFormat>('date_time_format',
-      type: DateFormat, defaultFactory: _defaultDateFormat, fromValue: _dateFormatFromValue, toValue: _dateFormatToValue),
+      type: DateFormat,
+      defaultFactory: _defaultDateFormat,
+      fromValue: _dateFormatFromValue,
+      toValue: _dateFormatToValue),
   decimalSeparator<String>('decimal_separator', type: String, defaultValue: '.'),
   thousandSeparator<String>('thousand_separator', type: String, defaultValue: ','),
   sessionToken<String>('session_token', type: String, secure: true),

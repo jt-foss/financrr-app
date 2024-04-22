@@ -1,9 +1,9 @@
-import 'package:auto_route/auto_route.dart';
+import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/widgets/text_circle_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:restrr/restrr.dart';
-import '../../routing/app_router.dart';
+import '../../pages/core/accounts/account_page.dart';
 import '../../util/text_utils.dart';
 
 class AccountCard extends StatelessWidget {
@@ -37,7 +37,7 @@ class AccountCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap:
-      !interactive ? null : () => context.pushRoute(AccountRoute(accountId: id.toString())),
+          !interactive ? null : () => context.goPath(AccountPage.pagePath.build(params: {'accountId': id.toString()})),
       child: Card.outlined(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),

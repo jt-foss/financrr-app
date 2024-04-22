@@ -1,10 +1,10 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:financrr_frontend/routing/app_router.dart';
+import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../data/store.dart';
+import '../../pages/core/accounts/transactions/transaction_page.dart';
 import '../../util/text_utils.dart';
 
 class TransactionCard extends StatelessWidget {
@@ -52,7 +52,8 @@ class TransactionCard extends StatelessWidget {
     return GestureDetector(
       onTap: !interactive
           ? null
-          : () => context.pushRoute(TransactionRoute(accountId: account.id.value.toString(), transactionId: id.toString())),
+          : () => context.goPath(TransactionPage.pagePath
+              .build(params: {'accountId': account.id.value.toString(), 'transactionId': id.toString()})),
       child: Card.outlined(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),

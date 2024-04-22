@@ -1,12 +1,14 @@
-import 'package:auto_route/annotations.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../../../../data/store.dart';
 import '../../../../layout/adaptive_scaffold.dart';
+import '../../../../routing/page_path.dart';
+import '../../../../util/common_actions.dart';
+import '../../settings_page.dart';
 
-@RoutePage()
 class LocalStorageSettingsPage extends StatefulWidget {
+  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'local-storage');
+
   const LocalStorageSettingsPage({super.key});
 
   @override
@@ -51,10 +53,7 @@ class _LocalStorageSettingsPageState extends State<LocalStorageSettingsPage> {
 
   Widget _buildTableCell(String text) {
     return GestureDetector(
-      onTap: () async {
-        context.showSnackBar('Copied to clipboard!');
-        await Clipboard.setData(ClipboardData(text: text));
-      },
+      onTap: () => CommonActions.copyToClipboard(this, text),
       child: Padding(
         padding: const EdgeInsets.all(10),
         child: Text(text),

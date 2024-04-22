@@ -1,18 +1,21 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:financrr_frontend/pages/authentication/state/authentication_provider.dart';
+import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../../layout/adaptive_scaffold.dart';
-import '../../../routing/app_router.dart';
+import '../../../routing/page_path.dart';
 import '../../../util/text_utils.dart';
 import '../../../widgets/entities/account_card.dart';
 import '../../../widgets/notice_card.dart';
+import 'account_create_page.dart';
+import 'account_edit_page.dart';
 
-@RoutePage()
 class AccountsOverviewPage extends StatefulHookConsumerWidget {
+  static const PagePathBuilder pagePath = PagePathBuilder('/@me/accounts');
+
   const AccountsOverviewPage({super.key});
 
   @override
@@ -50,7 +53,8 @@ class _AccountsOverviewPageState extends ConsumerState<AccountsOverviewPage> {
                 _currencies = _api.getAccounts().fold(
                   {},
                   (map, account) {
-                    map.update(account.currencyId.get()!, (value) => value + account.balance, ifAbsent: () => account.balance);
+                    map.update(account.currencyId.get()!, (value) => value + account.balance,
+                        ifAbsent: () => account.balance);
                     return map;
                   },
                 );
@@ -73,7 +77,7 @@ class _AccountsOverviewPageState extends ConsumerState<AccountsOverviewPage> {
                     TextButton.icon(
                       label: const Text('Create Account'),
                       icon: const Icon(Icons.add, size: 17),
-                      onPressed: () => context.pushRoute(const AccountCreateRoute()),
+                      onPressed: () => context.goPath(AccountCreatePage.pagePath.build()),
                     ),
                   ],
                 ),
@@ -83,7 +87,7 @@ class _AccountsOverviewPageState extends ConsumerState<AccountsOverviewPage> {
                   child: NoticeCard(
                     title: 'No accounts found',
                     description: 'Create an account to get started',
-                    onTap: () => context.pushRoute(const AccountCreateRoute()),
+                    onTap: () => context.goPath(AccountCreatePage.pagePath.build()),
                   ),
                 ),
               for (Account account in _api.getAccounts())
@@ -106,8 +110,8 @@ class _AccountsOverviewPageState extends ConsumerState<AccountsOverviewPage> {
                                       child: ListTile(
                                     title: const Text('Edit Account'),
                                     leading: const Icon(Icons.edit_rounded),
-                                    onTap: () => context.pushRoute(
-                                        AccountEditRoute(accountId: account.id.value.toString())),
+                                    onTap: () => context.goPath(AccountEditPage.pagePath
+                                        .build(params: {'accountId': account.id.value.toString()})),
                                   )),
                                   PopupMenuItem(
                                       child: ListTile(

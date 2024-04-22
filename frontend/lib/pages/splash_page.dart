@@ -1,14 +1,15 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:financrr_frontend/pages/authentication/state/authentication_provider.dart';
-import 'package:financrr_frontend/pages/authentication/state/authentication_state.dart';
-import 'package:financrr_frontend/routing/app_router.dart';
+import 'package:financrr_frontend/pages/core/dashboard_page.dart';
+import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-@RoutePage()
+import '../routing/page_path.dart';
+
 class SplashPage extends StatefulHookConsumerWidget {
+  static const PagePathBuilder pagePath = PagePathBuilder('/');
+
   const SplashPage({super.key});
 
   @override
@@ -29,27 +30,16 @@ class _SplashPageState extends ConsumerState<SplashPage> with SingleTickerProvid
   @override
   void initState() {
     super.initState();
-    _navigate();
+    // Attempt to go to the dashboard page
+    // The AuthGuard will try to recover the session and redirect to the ServerConfigPage if the session
+    // is not recoverable
+    context.goPath(DashboardPage.pagePath.build());
   }
 
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
-  }
-
-  void _navigate() async {
-    final AuthenticationState state = await ref.read(authProvider.notifier).attemptRecovery();
-    if (!mounted) return;
-    switch (state.status) {
-      case AuthenticationStatus.authenticated:
-        context.replaceRoute(const TabControllerRoute());
-        break;
-      case AuthenticationStatus.unauthenticated:
-      case AuthenticationStatus.unknown:
-        context.replaceRoute(ServerConfigRoute());
-        break;
-    }
   }
 
   @override

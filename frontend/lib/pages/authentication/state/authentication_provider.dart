@@ -8,7 +8,7 @@ import 'package:restrr/restrr.dart';
 import 'authentication_state.dart';
 
 final authProvider =
-    StateNotifierProvider<AuthenticationNotifier, AuthenticationState>((ref) => AuthenticationNotifier(ref));
+    StateNotifierProvider<AuthenticationNotifier, AuthenticationState>((_) => AuthenticationNotifier());
 
 extension ConsumerStateAuthExtension on ConsumerState {
   Restrr get api => ref.read(authProvider).api!;
@@ -17,13 +17,14 @@ extension ConsumerStateAuthExtension on ConsumerState {
 class AuthenticationNotifier extends StateNotifier<AuthenticationState> {
   final Logger _log = Logger('AuthenticationNotifier');
 
-  final StateNotifierProviderRef<AuthenticationNotifier, AuthenticationState> _ref;
-
-  AuthenticationNotifier(this._ref) : super(const AuthenticationState.initial());
+  AuthenticationNotifier() : super(const AuthenticationState.initial());
 
   /// Attempts to recover a previous session.
   /// If the session is not recoverable, the user is logged out.
   Future<AuthenticationState> attemptRecovery() async {
+    if (state.isAuthenticated) {
+      return state;
+    }
     final String? token = await StoreKey.sessionToken.readAsync();
     final String? hostUrl = await StoreKey.hostUrl.readAsync();
     if (token == null || hostUrl == null) {
@@ -51,12 +52,12 @@ class AuthenticationNotifier extends StateNotifier<AuthenticationState> {
     if (!state.isAuthenticated) {
       throw StateError('User is not logged in!');
     }
-    final bool success = await state.api!.deleteCurrentSession();
-    if (success) {
-      await _authFailure();
-    } else {
-      _log.severe('Could not logout user ${state.api!.selfUser.effectiveDisplayName}');
+    try {
+      await state.api!.deleteCurrentSession();
+    } catch (_) {
+      _log.warning('AuthenticationProvider: Could not delete current session!');
     }
+    await _authFailure();
   }
 
   AuthenticationState _authSuccess(Restrr api) {

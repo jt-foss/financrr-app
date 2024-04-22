@@ -1,5 +1,11 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:financrr_frontend/pages/authentication/state/authentication_provider.dart';
+import 'package:financrr_frontend/pages/core/settings/currency/currency_settings_page.dart';
+import 'package:financrr_frontend/pages/core/settings/dev/local_storage_settings_page.dart';
+import 'package:financrr_frontend/pages/core/settings/dev/log_settings_page.dart';
+import 'package:financrr_frontend/pages/core/settings/l10n/l10n_settings_page.dart';
+import 'package:financrr_frontend/pages/core/settings/session/session_settings_page.dart';
+import 'package:financrr_frontend/pages/core/settings/theme_settings_page.dart';
+import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -7,7 +13,8 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../layout/adaptive_scaffold.dart';
-import '../../routing/app_router.dart';
+import '../../routing/page_path.dart';
+import '../../util/common_actions.dart';
 import '../../widgets/text_circle_avatar.dart';
 
 class SettingsItemGroup {
@@ -25,8 +32,8 @@ class SettingsItem {
   const SettingsItem({this.showCategory = true, required this.child});
 }
 
-@RoutePage()
 class SettingsPage extends StatefulHookConsumerWidget {
+  static const PagePathBuilder pagePath = PagePathBuilder('/@me/settings');
 
   const SettingsPage({super.key});
 
@@ -51,14 +58,14 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     SettingsItemGroup(title: 'Account', items: [
       SettingsItem(
         child: ListTile(
-          onTap: () => context.pushRoute(const CurrencySettingsRoute()),
+          onTap: () => context.goPath(CurrencySettingsPage.pagePath.build()),
           leading: const Icon(Icons.currency_exchange_rounded),
           title: const Text('Currencies'),
         ),
       ),
       SettingsItem(
         child: ListTile(
-          onTap: () => context.pushRoute(const SessionSettingsRoute()),
+          onTap: () => context.goPath(SessionSettingsPage.pagePath.build()),
           leading: const Icon(Icons.devices_rounded),
           title: const Text('Sessions'),
         ),
@@ -67,14 +74,14 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     SettingsItemGroup(title: 'App', items: [
       SettingsItem(
         child: ListTile(
-          onTap: () => context.pushRoute(const ThemeSettingsRoute()),
+          onTap: () => context.goPath(ThemeSettingsPage.pagePath.build()),
           leading: const Icon(Icons.brightness_4_outlined),
           title: const Text('Themes'),
         ),
       ),
       SettingsItem(
         child: ListTile(
-          onTap: () => context.pushRoute(const L10nSettingsRoute()),
+          onTap: () => context.goPath(L10nSettingsPage.pagePath.build()),
           leading: const Icon(Icons.language_rounded),
           title: const Text('Language'),
         ),
@@ -83,14 +90,14 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     SettingsItemGroup(title: 'Developer', items: [
       SettingsItem(
         child: ListTile(
-          onTap: () => context.pushRoute(const LocalStorageSettingsRoute()),
+          onTap: () => context.goPath(LocalStorageSettingsPage.pagePath.build()),
           leading: const Icon(Icons.sd_storage_outlined),
           title: const Text('Local Storage'),
         ),
       ),
       SettingsItem(
         child: ListTile(
-          onTap: () => context.pushRoute(const LogSettingsRoute()),
+          onTap: () => context.goPath(LogSettingsPage.pagePath.build()),
           leading: const Icon(Icons.format_align_left_rounded),
           title: const Text('Logs'),
         ),
@@ -100,7 +107,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       SettingsItem(
         showCategory: false,
         child: ListTile(
-          onTap: () => ref.read(authProvider.notifier).logout(),
+          onTap: () => CommonActions.logOut(this, ref),
           leading: const Icon(Icons.logout),
           title: const Text('Logout'),
         ),

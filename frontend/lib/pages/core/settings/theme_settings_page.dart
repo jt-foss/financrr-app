@@ -1,13 +1,15 @@
-import 'package:auto_route/annotations.dart';
 import 'package:financrr_frontend/main.dart';
 import 'package:financrr_frontend/themes.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
 
 import '../../../layout/adaptive_scaffold.dart';
+import '../../../routing/page_path.dart';
+import '../settings_page.dart';
 
-@RoutePage()
 class ThemeSettingsPage extends StatefulWidget {
+  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'themes');
+
   const ThemeSettingsPage({super.key});
 
   @override
