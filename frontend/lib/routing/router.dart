@@ -183,8 +183,7 @@ class AppRouter {
           path: LoginPage.pagePath.path,
           pageBuilder: (context, state) =>
               _buildDefaultPageTransition(context, state, LoginPage(hostUri: state.extra as Uri)),
-          redirect: guards([ExtraGuard(ServerConfigPage.pagePath)])
-      )
+          redirect: guards([ExtraGuard(ServerConfigPage.pagePath)]))
     ];
   }
 

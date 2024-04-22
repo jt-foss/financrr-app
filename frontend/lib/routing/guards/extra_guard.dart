@@ -1,11 +1,9 @@
 import 'dart:async';
 
-import 'package:financrr_frontend/pages/authentication/server_config_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logging/logging.dart';
 
-import '../../pages/authentication/state/authentication_provider.dart';
 import '../page_path.dart';
 import 'guard.dart';
 
