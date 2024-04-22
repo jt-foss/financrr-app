@@ -126,6 +126,6 @@ class ScaffoldNavBarShellState extends State<ScaffoldNavBarShell> {
 
   /// Jumps to the corresponding [StatefulShellBranch], based on the specified index.
   void goToBranch(int index) {
-    widget.navigationShell.goBranch(index);
+    widget.navigationShell.goBranch(index, initialLocation: widget.navigationShell.currentIndex == index);
   }
 }

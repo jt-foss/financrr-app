@@ -10,8 +10,4 @@ extension BuildContextExtension on BuildContext {
   Future<T?> pushPath<T extends Object?>(PagePath path, {Object? extra}) {
     return push(path.fullPath, extra: extra);
   }
-
-  void replacePath(PagePath path, {Object? extra}) {
-    replace(path.fullPath, extra: extra);
-  }
 }
