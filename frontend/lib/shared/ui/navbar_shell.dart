@@ -1,15 +1,17 @@
+import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ScaffoldNavBarShell extends StatefulWidget {
   final StatefulNavigationShell navigationShell;
 
   const ScaffoldNavBarShell({super.key, required this.navigationShell});
 
-  static ScaffoldNavBarShellState? maybeOf(BuildContext context) =>
-      context.findAncestorStateOfType<ScaffoldNavBarShellState>();
+  static ScaffoldNavBarShellState? maybeOf(BuildContext context) => context.findAncestorStateOfType<ScaffoldNavBarShellState>();
 
   @override
   State<StatefulWidget> createState() => ScaffoldNavBarShellState();
@@ -33,8 +35,8 @@ class ScaffoldNavBarShellState extends State<ScaffoldNavBarShell> {
       label: 'Statistics',
     ),
     NavigationDestination(
-      icon: Icon(Icons.settings_outlined),
-      selectedIcon: Icon(Icons.settings_rounded),
+      icon: Icon(Icons.person_outline_rounded),
+      selectedIcon: Icon(Icons.person_rounded),
       label: 'Settings',
     ),
   ];
@@ -105,8 +107,9 @@ class ScaffoldNavBarShellState extends State<ScaffoldNavBarShell> {
               )
             : null,
       ),
+      extendBody: true,
       bottomNavigationBar: isMobile
-          ? NavigationBar(
+          ? FinancrrNavigationBar(
               onDestinationSelected: (index) => goToBranch(index),
               selectedIndex: widget.navigationShell.currentIndex,
               destinations: _navBarDestinations)
@@ -127,5 +130,79 @@ class ScaffoldNavBarShellState extends State<ScaffoldNavBarShell> {
   /// Jumps to the corresponding [StatefulShellBranch], based on the specified index.
   void goToBranch(int index) {
     widget.navigationShell.goBranch(index, initialLocation: widget.navigationShell.currentIndex == index);
+  }
+}
+
+class FinancrrNavigationBar extends ConsumerWidget {
+  final List<NavigationDestination> destinations;
+  final int selectedIndex;
+  final void Function(int) onDestinationSelected;
+
+  const FinancrrNavigationBar({
+    super.key,
+    required this.destinations,
+    required this.selectedIndex,
+    required this.onDestinationSelected,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    var theme = ref.watch(themeProvider);
+    final ThemeData themeData = theme.getActive().themeData;
+
+    Widget buildNavBarItem({required NavigationDestination destination, required int index, bool isSelected = false}) {
+      final IconData iconData = (destination.icon as Icon).icon!;
+      final IconData selectedIconData = (destination.selectedIcon as Icon).icon ?? iconData;
+      return GestureDetector(
+        onTap: () => onDestinationSelected(index),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 100),
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: isSelected ? null : themeData.primaryColor.withOpacity(0.1),
+                border: Border.all(
+                  color: isSelected ? themeData.primaryColor : Colors.transparent,
+                  width: 4,
+                ),
+              ),
+              child: Icon(isSelected ? selectedIconData : iconData, color: isSelected ? themeData.primaryColor : null),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 5),
+              child: Text(destination.label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isSelected ? themeData.primaryColor : null,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  )),
+            )
+          ],
+        ),
+      );
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(.1)
+      ),
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 30, top: 10, left: 10, right: 10),
+        child: Row(
+          children: [
+            for (NavigationDestination destination in destinations)
+              Expanded(
+                child: buildNavBarItem(
+                    destination: destination,
+                    index: destinations.indexOf(destination),
+                    isSelected: destinations.indexOf(destination) == selectedIndex),
+              )
+          ],
+        ),
+      ),
+    );
   }
 }

@@ -30,7 +30,7 @@ import '../modules/transactions/views/transaction_page.dart';
 import '../utils/constants.dart';
 import 'guards/core_auth_guard.dart';
 import 'guards/extra_guard.dart';
-import 'navbar_shell.dart';
+import '../shared/ui/navbar_shell.dart';
 
 final Provider<AppRouter> appRouterProvider = Provider((ref) => AppRouter(ref));
 
