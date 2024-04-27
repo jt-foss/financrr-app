@@ -1,3 +1,4 @@
+import 'package:financrr_frontend/data/bloc/store_bloc.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/text_utils.dart';
 import 'package:flutter/material.dart';
@@ -5,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restrr/restrr.dart';
 
-import '../pages/core/settings/l10n/bloc/l10n_bloc.dart';
+import '../data/store.dart';
 import 'input_utils.dart';
 
 /// A collection of form fields used throughout the application.
@@ -90,7 +91,7 @@ class FormFields {
           ],
         ),
       ),
-      BlocBuilder<L10nBloc, L10nState>(
+      BlocBuilder<StoreBloc, StoreState>(
         builder: (context, state) {
           return Padding(
             padding: const EdgeInsets.only(bottom: 10),
@@ -103,12 +104,11 @@ class FormFields {
                 );
                 if (date == null) return;
                 final TimeOfDay? time = await showTimePicker(
-                    context: context,
-                    initialTime: executedAt != null ? TimeOfDay.fromDateTime(executedAt) : TimeOfDay.now());
+                    context: context, initialTime: executedAt != null ? TimeOfDay.fromDateTime(executedAt) : TimeOfDay.now());
                 if (time == null) return;
                 onExecutedAtChanged?.call(date.copyWith(hour: time.hour, minute: time.minute));
               },
-              initialValue: state.dateTimeFormat.format(executedAt ?? DateTime.now()),
+              initialValue: StoreKey.dateTimeFormat.readSync()!.format(executedAt ?? DateTime.now()),
               readOnly: true,
               decoration: const InputDecoration(labelText: 'Executed At'),
             ),

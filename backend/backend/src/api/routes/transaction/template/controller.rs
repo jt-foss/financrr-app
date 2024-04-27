@@ -1,6 +1,6 @@
 use actix_web::http::Uri;
 use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
-use web::Path;
+use web::{Path, ServiceConfig};
 
 use crate::api::documentation::response::{InternalServerError, Unauthorized, ValidationError};
 use crate::api::error::api::ApiError;
@@ -9,9 +9,9 @@ use crate::wrapper::entity::transaction::template::dto::TransactionTemplateDTO;
 use crate::wrapper::entity::transaction::template::TransactionTemplate;
 use crate::wrapper::entity::user::User;
 use crate::wrapper::permission::{HasPermissionOrError, Permissions};
-use crate::wrapper::types::phantom::Phantom;
+use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
-pub(crate) fn transaction_template_controller(cfg: &mut web::ServiceConfig) {
+pub(crate) fn transaction_template_controller(cfg: &mut ServiceConfig) {
     cfg.service(
         web::scope("/template")
             .service(get_all_transaction_templates)
@@ -34,7 +34,7 @@ security(
 ("bearer_token" = [])
 ),
 path = "/api/v1/transaction/template",
-tag = "Transaction")]
+tag = "Transaction-Template")]
 #[get("")]
 pub(crate) async fn get_all_transaction_templates(
     user: Phantom<User>,
@@ -57,13 +57,13 @@ security(
 ("bearer_token" = [])
 ),
 path = "/api/v1/transaction/template/{template_id}",
-tag = "Transaction")]
+tag = "Transaction-Template")]
 #[get("/{template_id}")]
 pub(crate) async fn get_one_transaction_template(
     user: Phantom<User>,
     template_id: Path<i32>,
 ) -> Result<impl Responder, ApiError> {
-    let transaction = TransactionTemplate::get_by_id(template_id.into_inner()).await?;
+    let transaction = TransactionTemplate::find_by_id(template_id.into_inner()).await?;
     transaction.has_permission_or_error(user.get_id(), Permissions::READ).await?;
 
     Ok(HttpResponse::Ok().json(transaction))
@@ -81,7 +81,7 @@ security(
 ),
 path = "/api/v1/transaction/template",
 request_body = TransactionTemplateDTO,
-tag = "Transaction")]
+tag = "Transaction-Template")]
 #[post("")]
 pub(crate) async fn create_transaction_template(
     user: Phantom<User>,
@@ -104,13 +104,13 @@ security(
 ("bearer_token" = [])
 ),
 path = "/api/v1/transaction/template/{template_id}",
-tag = "Transaction")]
+tag = "Transaction-Template")]
 #[delete("/{template_id}")]
 pub(crate) async fn delete_transaction_template(
     user: Phantom<User>,
     template_id: Path<i32>,
 ) -> Result<impl Responder, ApiError> {
-    let template = TransactionTemplate::get_by_id(template_id.into_inner()).await?;
+    let template = TransactionTemplate::find_by_id(template_id.into_inner()).await?;
     template.has_permission_or_error(user.get_id(), Permissions::READ_DELETE).await?;
 
     template.delete().await?;
@@ -129,14 +129,14 @@ security(
 ),
 path = "/api/v1/transaction/template/{template_id}",
 request_body = TransactionTemplateDTO,
-tag = "Transaction")]
+tag = "Transaction-Template")]
 #[patch("/{template_id}")]
 pub(crate) async fn update_transaction_template(
     user: Phantom<User>,
     update: TransactionTemplateDTO,
     template_id: Path<i32>,
 ) -> Result<impl Responder, ApiError> {
-    let template = TransactionTemplate::get_by_id(template_id.into_inner()).await?;
+    let template = TransactionTemplate::find_by_id(template_id.into_inner()).await?;
     template.has_permission_or_error(user.get_id(), Permissions::READ_WRITE).await?;
 
     let template = template.update(update).await?;

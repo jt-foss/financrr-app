@@ -2,6 +2,7 @@ use actix_web::error::ResponseError;
 use actix_web::http::header::ContentType;
 use actix_web::http::StatusCode;
 use actix_web::HttpResponse;
+use croner::errors::CronError;
 use derive_more::{Display, Error};
 use redis::RedisError;
 use sea_orm::DbErr;
@@ -196,6 +197,17 @@ impl From<actix_web::Error> for ApiError {
             status_code: error.as_response_error().status_code(),
             api_code: ApiCode::ACTIX_ERROR,
             details: error.to_string(),
+            reference: None,
+        }
+    }
+}
+
+impl From<CronError> for ApiError {
+    fn from(value: CronError) -> Self {
+        Self {
+            status_code: StatusCode::BAD_REQUEST,
+            api_code: ApiCode::CRON_ERROR,
+            details: value.to_string(),
             reference: None,
         }
     }

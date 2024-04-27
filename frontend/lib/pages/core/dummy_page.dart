@@ -27,9 +27,7 @@ class _DummyPageState extends State<DummyPage> {
           child: ListView(
             children: const [
               NoticeCard(
-                  iconData: Icons.bar_chart_rounded,
-                  title: 'Statistics',
-                  description: 'There will be content here soon!'),
+                  iconData: Icons.bar_chart_rounded, title: 'Statistics', description: 'There will be content here soon!'),
             ],
           ),
         ),

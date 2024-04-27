@@ -2,60 +2,89 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:easy_localization/easy_localization.dart';
-import 'package:financrr_frontend/data/l10n_repository.dart';
-import 'package:financrr_frontend/data/repositories.dart';
+import 'package:financrr_frontend/data/bloc/store_bloc.dart';
+import 'package:financrr_frontend/data/log_store.dart';
+import 'package:financrr_frontend/data/store.dart';
 import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
-import 'package:financrr_frontend/pages/core/settings/l10n/bloc/l10n_bloc.dart';
+import 'package:financrr_frontend/pages/core/settings/currency/bloc/currency_bloc.dart';
+import 'package:financrr_frontend/pages/core/settings/session/bloc/session_bloc.dart';
 import 'package:financrr_frontend/router.dart';
 import 'package:financrr_frontend/themes.dart';
+import 'package:financrr_frontend/widgets/fallback_error_app.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:logging/logging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app_bloc_observer.dart';
-import 'data/theme_repository.dart';
+
+Logger log = Logger('FinancrrLogger');
 
 void main() async {
+  // if an error occurs during initialization, show a fallback error app
+  Widget app;
+  try {
+    app = await initApp();
+  } catch (e, stackTrace) {
+    app = FallbackErrorApp(error: e.toString(), stackTrace: stackTrace.toString());
+  }
+  runApp(app);
+}
+
+Future<Widget> initApp() async {
   usePathUrlStrategy();
+  await initializeDateFormatting();
   SharedPreferences.setPrefix('financrr.');
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = AppBlocObserver();
 
-  // init l10n
+  // init l10ns
   await EasyLocalization.ensureInitialized();
 
-  // init data repositories
-  final SharedPreferences preferences = await SharedPreferences.getInstance();
-  const FlutterSecureStorage storage = FlutterSecureStorage();
-  await Repositories.init(storage, preferences);
+  // init store
+  await KeyValueStore.init();
+
+  // init logging
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details);
+    log.severe(
+        'FlutterError: ${details.exceptionAsString()}\n\nLibrary: ${details.library}\n\nContext: ${details.context}\n\nStackTrace: ${details.stack}');
+  };
+  Logger.root.level = Level.ALL;
+  Logger.root.onRecord.listen((event) {
+    if (kDebugMode) {
+      print('${event.level.name}: ${event.time}: ${event.message}');
+    }
+    LogEntryStore().add(LogEntry(
+        level: LogLevel.values.byName(event.level.name.toLowerCase()),
+        message: event.message,
+        timestamp: event.time,
+        loggerName: event.loggerName));
+  });
 
   // init themes
   await AppThemeLoader.init();
-  final EffectiveThemePreferences themePreferences = await ThemeService.getOrInsertEffective();
+  final ThemeMode themeMode = (await StoreKey.themeMode.readAsync())!;
+  final AppTheme lightTheme = AppTheme.getById((await StoreKey.currentLightThemeId.readAsync())!)!;
+  final AppTheme darkTheme = AppTheme.getById((await StoreKey.currentDarkThemeId.readAsync())!)!;
 
-  // init logging
-  Logger.root.level = kDebugMode ? Level.ALL : Level.INFO;
-  Logger.root.onRecord.listen((record) {
-    if (kDebugMode) {
-      print('${record.level.name}: ${record.time}: ${record.message}');
-    }
-  });
-  runApp(EasyLocalization(
+  return EasyLocalization(
       supportedLocales: const [Locale('en', 'US'), Locale('de', 'DE')],
       path: 'assets/l10n',
       fallbackLocale: const Locale('en', 'US'),
-      child: FinancrrApp(themePreferences: themePreferences)));
+      child: FinancrrApp(themeMode: themeMode, currentLightTheme: lightTheme, currentDarkTheme: darkTheme));
 }
 
 class FinancrrApp extends StatefulWidget {
-  final EffectiveThemePreferences themePreferences;
+  final ThemeMode themeMode;
+  final AppTheme currentLightTheme;
+  final AppTheme currentDarkTheme;
 
-  const FinancrrApp({super.key, required this.themePreferences});
+  const FinancrrApp({super.key, required this.themeMode, required this.currentLightTheme, required this.currentDarkTheme});
 
   @override
   State<FinancrrApp> createState() => FinancrrAppState();
@@ -64,9 +93,9 @@ class FinancrrApp extends StatefulWidget {
 }
 
 class FinancrrAppState extends State<FinancrrApp> {
-  AppTheme _activeLightTheme = AppTheme.getById('LIGHT')!;
-  AppTheme _activeDarkTheme = AppTheme.getById('DARK')!;
-  ThemeMode _themeMode = ThemeMode.system;
+  late AppTheme _activeLightTheme = widget.currentLightTheme;
+  late AppTheme _activeDarkTheme = widget.currentDarkTheme;
+  late ThemeMode _themeMode = widget.themeMode;
 
   ThemeMode get themeMode => _themeMode;
   AppTheme get activeLightTheme => _activeLightTheme;
@@ -75,9 +104,6 @@ class FinancrrAppState extends State<FinancrrApp> {
   @override
   void initState() {
     super.initState();
-    _activeLightTheme = widget.themePreferences.currentLightTheme;
-    _activeDarkTheme = widget.themePreferences.currentDarkTheme;
-    _themeMode = widget.themePreferences.themeMode;
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       systemNavigationBarColor: Colors.transparent,
@@ -88,10 +114,10 @@ class FinancrrAppState extends State<FinancrrApp> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        BlocProvider(create: (_) => StoreBloc()),
         BlocProvider(create: (_) => AuthenticationBloc()..add(const AuthenticationRecoveryRequested())),
-        BlocProvider(
-            create: (_) => L10nBloc(L10nService.get().decimalSeparator, L10nService.get().thousandSeparator,
-                DateFormat(L10nService.get().dateTimeFormat)))
+        BlocProvider(create: (_) => CurrencyBloc()),
+        BlocProvider(create: (_) => SessionBloc()),
       ],
       child: BlocListener<AuthenticationBloc, AuthenticationState>(
         listener: (context, state) => AppRouter.goRouter.refresh(),
@@ -132,7 +158,9 @@ class FinancrrAppState extends State<FinancrrApp> {
         _activeDarkTheme = theme;
       }
       _themeMode = system ? ThemeMode.system : theme.themeMode;
-      ThemeService.setThemePreferences(_activeLightTheme, _activeDarkTheme, _themeMode);
+      StoreKey.currentLightThemeId.write(_activeLightTheme.id);
+      StoreKey.currentDarkThemeId.write(_activeDarkTheme.id);
+      StoreKey.themeMode.write(_themeMode);
     });
   }
 }
@@ -140,8 +168,7 @@ class FinancrrAppState extends State<FinancrrApp> {
 class CustomHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
-    return super.createHttpClient(context)
-      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+    return super.createHttpClient(context)..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
   }
 }
 

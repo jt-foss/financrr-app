@@ -56,11 +56,9 @@ pub enum Relation {
         on_delete = "Cascade"
     )]
     Currency,
-    #[sea_orm(has_many = "super::repeatable_transaction::Entity")]
+    #[sea_orm(has_many = "super::recurring_transaction::Entity")]
     RepeatableTransaction,
 }
-
-find_all_by_user_id!(Entity);
 
 impl Related<super::budget::Entity> for Entity {
     fn to() -> RelationDef {
@@ -74,10 +72,12 @@ impl Related<super::currency::Entity> for Entity {
     }
 }
 
-impl Related<super::repeatable_transaction::Entity> for Entity {
+impl Related<super::recurring_transaction::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::RepeatableTransaction.def()
     }
 }
 
 impl ActiveModelBehavior for ActiveModel {}
+
+find_all_by_user_id!(Entity);

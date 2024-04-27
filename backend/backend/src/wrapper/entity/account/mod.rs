@@ -90,10 +90,6 @@ impl Account {
         Ok(count(account::Entity::find_by_id(id)).await? > 0)
     }
 
-    pub(crate) async fn find_by_id(id: i32) -> Result<Self, ApiError> {
-        Ok(Self::from(find_one_or_error(account::Entity::find_by_id(id), "Account").await?))
-    }
-
     pub(crate) async fn find_all_by_user(user_id: i32) -> Result<Vec<Self>, ApiError> {
         Ok(find_all(account::Entity::find_all_by_user_id(user_id)).await?.into_iter().map(Self::from).collect())
     }
@@ -135,11 +131,11 @@ impl TableName for Account {
 }
 
 impl Identifiable for Account {
-    async fn from_id(id: i32) -> Result<Self, ApiError>
+    async fn find_by_id(id: i32) -> Result<Self, ApiError>
     where
         Self: Sized,
     {
-        Self::find_by_id(id).await
+        find_one_or_error(account::Entity::find_by_id(id), "Account").await.map(Self::from)
     }
 }
 

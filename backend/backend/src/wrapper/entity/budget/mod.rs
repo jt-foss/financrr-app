@@ -106,7 +106,7 @@ impl Budget {
 permission_impl!(Budget);
 
 impl Identifiable for Budget {
-    async fn from_id(id: i32) -> Result<Self, ApiError> {
+    async fn find_by_id(id: i32) -> Result<Self, ApiError> {
         Ok(Self::from(find_one_or_error(budget::Entity::find_by_id(id), "Budget").await?))
     }
 }

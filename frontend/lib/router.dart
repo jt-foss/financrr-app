@@ -1,6 +1,8 @@
 import 'package:financrr_frontend/layout/scaffold_navbar_shell.dart';
 import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
 import 'package:financrr_frontend/pages/authentication/login_page.dart';
+import 'package:financrr_frontend/pages/core/settings/dev/local_storage_settings_page.dart';
+import 'package:financrr_frontend/pages/core/settings/dev/log_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings/l10n/l10n_settings_page.dart';
 import 'package:financrr_frontend/pages/splash_page.dart';
 import 'package:financrr_frontend/pages/authentication/server_info_page.dart';
@@ -13,8 +15,8 @@ import 'package:financrr_frontend/pages/core/accounts/account_create_page.dart';
 import 'package:financrr_frontend/pages/core/accounts/account_edit_page.dart';
 import 'package:financrr_frontend/pages/core/settings/currency/currency_create_page.dart';
 import 'package:financrr_frontend/pages/core/settings/currency/currency_edit_page.dart';
-import 'package:financrr_frontend/pages/core/settings/currency_settings_page.dart';
-import 'package:financrr_frontend/pages/core/settings/session_settings_page.dart';
+import 'package:financrr_frontend/pages/core/settings/currency/currency_settings_page.dart';
+import 'package:financrr_frontend/pages/core/settings/session/session_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings/theme_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings_page.dart';
 import 'package:financrr_frontend/pages/core/dashboard_page.dart';
@@ -54,7 +56,7 @@ class AppRouter {
                   routes: [
                     GoRoute(
                         path: AccountCreatePage.pagePath.path,
-                        pageBuilder: _defaultBranchPageBuilder(const AccountCreatePage()),
+                        pageBuilder: _defaultPageBuilder(const AccountCreatePage()),
                         redirect: coreAuthGuard),
                     GoRoute(
                         path: AccountPage.pagePath.path,
@@ -111,16 +113,16 @@ class AppRouter {
                   routes: [
                     GoRoute(
                         path: ThemeSettingsPage.pagePath.path,
-                        pageBuilder: _defaultBranchPageBuilder(const ThemeSettingsPage()),
+                        pageBuilder: _defaultPageBuilder(const ThemeSettingsPage()),
                         redirect: coreAuthGuard),
                     GoRoute(
                         path: CurrencySettingsPage.pagePath.path,
-                        pageBuilder: _defaultBranchPageBuilder(const CurrencySettingsPage()),
+                        pageBuilder: _defaultPageBuilder(const CurrencySettingsPage()),
                         redirect: coreAuthGuard,
                         routes: [
                           GoRoute(
                               path: CurrencyCreatePage.pagePath.path,
-                              pageBuilder: _defaultBranchPageBuilder(const CurrencyCreatePage()),
+                              pageBuilder: _defaultPageBuilder(const CurrencyCreatePage()),
                               redirect: coreAuthGuard),
                           GoRoute(
                               path: CurrencyEditPage.pagePath.path,
@@ -129,13 +131,23 @@ class AppRouter {
                               redirect: coreAuthGuard)
                         ]),
                     GoRoute(
+                      path: LocalStorageSettingsPage.pagePath.path,
+                      pageBuilder: _defaultPageBuilder(const LocalStorageSettingsPage()),
+                      redirect: coreAuthGuard,
+                    ),
+                    GoRoute(
+                      path: LogSettingsPage.pagePath.path,
+                      pageBuilder: _defaultPageBuilder(const LogSettingsPage()),
+                      redirect: coreAuthGuard,
+                    ),
+                    GoRoute(
                       path: L10nSettingsPage.pagePath.path,
-                      pageBuilder: _defaultBranchPageBuilder(const L10nSettingsPage()),
+                      pageBuilder: _defaultPageBuilder(const L10nSettingsPage()),
                       redirect: coreAuthGuard,
                     ),
                     GoRoute(
                         path: SessionSettingsPage.pagePath.path,
-                        pageBuilder: _defaultBranchPageBuilder(const SessionSettingsPage()),
+                        pageBuilder: _defaultPageBuilder(const SessionSettingsPage()),
                         redirect: coreAuthGuard),
                   ]),
               ..._shellRoutes(),
@@ -189,7 +201,15 @@ class AppRouter {
   }
 
   static Page<T> _buildDefaultPageTransition<T>(BuildContext context, GoRouterState state, Widget child) {
-    return CustomTransitionPage(
+    return CupertinoPage(child: child);
+  }
+
+  static Page<T> Function(BuildContext, GoRouterState) _defaultPageBuilder<T>(Widget child) {
+    return (context, state) => _buildDefaultPageTransition(context, state, child);
+  }
+
+  static Page<T> Function(BuildContext, GoRouterState) _defaultBranchPageBuilder<T>(Widget child) {
+    return (context, state) => CustomTransitionPage(
         child: child,
         transitionsBuilder: (context, animation, _, child) {
           return FadeTransition(
@@ -198,9 +218,6 @@ class AppRouter {
           );
         });
   }
-
-  static Page<T> Function(BuildContext, GoRouterState) _defaultBranchPageBuilder<T>(Widget child) =>
-      (context, state) => _buildDefaultPageTransition(context, state, child);
 }
 
 class PagePathBuilder {

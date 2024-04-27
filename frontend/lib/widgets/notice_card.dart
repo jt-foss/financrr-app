@@ -33,9 +33,8 @@ class NoticeCard extends StatelessWidget {
                       ? Text(description)
                       : GestureDetector(
                           onTap: onTap,
-                          child: Expanded(
-                              child: Text.rich(TextSpan(
-                                  children: [
+                          child: Text.rich(TextSpan(
+                              children: [
                                 TextSpan(text: description),
                                 WidgetSpan(
                                     child: Padding(
@@ -43,8 +42,8 @@ class NoticeCard extends StatelessWidget {
                                   child: Icon(Icons.arrow_forward_rounded, size: 17, color: context.theme.primaryColor),
                                 ))
                               ],
-                                  style: context.textTheme.bodyMedium
-                                      ?.copyWith(color: context.theme.primaryColor, fontWeight: FontWeight.w500)))),
+                              style: context.textTheme.bodyMedium
+                                  ?.copyWith(color: context.theme.primaryColor, fontWeight: FontWeight.w500))),
                         ),
                 ],
               ),

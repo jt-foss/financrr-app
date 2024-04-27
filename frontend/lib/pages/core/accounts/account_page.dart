@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:financrr_frontend/data/bloc/store_bloc.dart';
 import 'package:financrr_frontend/pages/core/accounts/transactions/transaction_create_page.dart';
 import 'package:financrr_frontend/pages/core/accounts/account_edit_page.dart';
 import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
@@ -15,12 +16,10 @@ import 'package:restrr/restrr.dart';
 
 import '../../../layout/adaptive_scaffold.dart';
 import '../../../router.dart';
-import '../settings/l10n/bloc/l10n_bloc.dart';
 import 'accounts_overview_page.dart';
 
 class AccountPage extends StatefulWidget {
-  static const PagePathBuilder pagePath =
-      PagePathBuilder.child(parent: AccountsOverviewPage.pagePath, path: ':accountId');
+  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: AccountsOverviewPage.pagePath, path: ':accountId');
 
   final String? accountId;
 
@@ -86,11 +85,11 @@ class _AccountPageState extends State<AccountPage> {
             },
             child: ListView(
               children: [
-                BlocBuilder<L10nBloc, L10nState>(
+                BlocBuilder<StoreBloc, StoreState>(
                   builder: (context, state) {
                     return Column(
                       children: [
-                        Text(TextUtils.formatBalanceWithCurrency(state, account.balance, account.currencyId.get()!),
+                        Text(TextUtils.formatBalanceWithCurrency(account.balance, account.currencyId.get()!),
                             style: context.textTheme.titleLarge?.copyWith(color: context.theme.primaryColor)),
                         Text(account.name),
                       ],
@@ -102,8 +101,8 @@ class _AccountPageState extends State<AccountPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     TextButton.icon(
-                        onPressed: () => context.goPath(TransactionCreatePage.pagePath
-                            .build(pathParams: {'accountId': account.id.value.toString()})),
+                        onPressed: () => context.goPath(
+                            TransactionCreatePage.pagePath.build(pathParams: {'accountId': account.id.value.toString()})),
                         icon: const Icon(Icons.add, size: 17),
                         label: const Text('Create Transaction')),
                     const Spacer(),
@@ -113,8 +112,8 @@ class _AccountPageState extends State<AccountPage> {
                         icon: const Icon(Icons.delete_rounded, size: 17)),
                     IconButton(
                         tooltip: 'Edit Account',
-                        onPressed: () => context.goPath(
-                            AccountEditPage.pagePath.build(pathParams: {'accountId': account.id.value.toString()})),
+                        onPressed: () => context
+                            .goPath(AccountEditPage.pagePath.build(pathParams: {'accountId': account.id.value.toString()})),
                         icon: const Icon(Icons.create, size: 17))
                   ],
                 ),
@@ -142,14 +141,14 @@ class _AccountPageState extends State<AccountPage> {
             initialPageFunction: (forceRetrieve) => account.retrieveAllTransactions(forceRetrieve: forceRetrieve),
             onLoading: (_, __) => const Center(child: CircularProgressIndicator()),
             onSuccess: (context, snap) {
-              final List<Transaction> transactions = snap.data!.page.items;
+              final List<Transaction> transactions = snap.data!.items;
               if (transactions.isEmpty) {
                 return Center(
                     child: NoticeCard(
                   title: 'No transactions found',
                   description: 'Create a transaction to get started',
-                  onTap: () => context.goPath(
-                      TransactionCreatePage.pagePath.build(pathParams: {'accountId': account.id.value.toString()})),
+                  onTap: () => context
+                      .goPath(TransactionCreatePage.pagePath.build(pathParams: {'accountId': account.id.value.toString()})),
                 ));
               }
               return Column(

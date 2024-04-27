@@ -25,6 +25,10 @@ actix-web-prom = "0.8.0"
 # Async runtime/Event handeling
 tokio.workspace = true
 
+# Scheduling
+deschuler = "0.1.1"
+croner = "2.0.4"
+
 # Validation
 validator = { version = "0.16.1", features = ["derive"] }
 actix-web-validator = "5.0.1"
@@ -39,7 +43,7 @@ redis = {  version = "0.25.3", features = ["aio", "tokio-comp"] }
 
 # Serialization and deserialization
 serde.workspace = true
-serde_json = "1.0.115"
+serde_json = "1.0.116"
 
 # Generating openapi spec
 utoipa = { version = "4.2.0", features = ["actix_extras", "openapi_extensions", "time", "preserve_order", "preserve_path_order", "non_strict_integers"] }
@@ -62,6 +66,7 @@ regex = { version = "1.10.4", features = ["std", "perf", "unicode"] }
 itertools = "0.12.1"
 bitflags = {  version = "2.5.0", features = ["std", "serde"] }
 paste = "1.0.14"
+cron = "0.12.1"
 
 # Future Utils
 futures-util = "0.3.30"

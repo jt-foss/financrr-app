@@ -12,8 +12,9 @@ import 'package:restrr/restrr.dart';
 
 import '../../../../../layout/adaptive_scaffold.dart';
 import '../../../../../router.dart';
+import '../../../../data/bloc/store_bloc.dart';
+import '../../../../data/store.dart';
 import '../../../../widgets/async_wrapper.dart';
-import '../../settings/l10n/bloc/l10n_bloc.dart';
 
 class TransactionPage extends StatefulWidget {
   static const PagePathBuilder pagePath =
@@ -94,10 +95,10 @@ class TransactionPageState extends State<TransactionPage> {
               await _fetchAccount(forceRetrieve: true);
               await _fetchTransaction(forceRetrieve: true);
             },
-            child: BlocBuilder<L10nBloc, L10nState>(
+            child: BlocBuilder<StoreBloc, StoreState>(
               builder: (context, state) {
                 final String amountStr = (transaction.type == TransactionType.deposit ? '' : '-') +
-                    TextUtils.formatBalanceWithCurrency(state, transaction.amount, account.currencyId.get()!);
+                    TextUtils.formatBalanceWithCurrency(transaction.amount, account.currencyId.get()!);
                 return ListView(
                   children: [
                     Column(
@@ -107,24 +108,24 @@ class TransactionPageState extends State<TransactionPage> {
                                 color: transaction.type == TransactionType.deposit
                                     ? context.theme.primaryColor
                                     : context.theme.colorScheme.error)),
-                        Text(transaction.description ?? transaction.executedAt.toIso8601String()),
+                        Text(transaction.description ?? StoreKey.dateTimeFormat.readSync()!.format(transaction.executedAt)),
                       ],
                     ),
                     const Divider(),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        TextButton.icon(
+                        IconButton(
+                            tooltip: 'Delete Transaction',
                             onPressed: () => _deleteTransaction(transaction),
-                            icon: const Icon(Icons.delete_rounded, size: 17),
-                            label: const Text('Delete Transaction')),
-                        TextButton.icon(
+                            icon: const Icon(Icons.delete_rounded, size: 17)),
+                        IconButton(
+                            tooltip: 'Edit Transaction',
                             onPressed: () => context.goPath(TransactionEditPage.pagePath.build(pathParams: {
                                   'accountId': account.id.value.toString(),
                                   'transactionId': transaction.id.value.toString()
                                 })),
-                            icon: const Icon(Icons.create_rounded, size: 17),
-                            label: const Text('Edit Transaction'))
+                            icon: const Icon(Icons.create_rounded, size: 17))
                       ],
                     ),
                     Padding(
@@ -138,8 +139,8 @@ class TransactionPageState extends State<TransactionPage> {
                           _buildTableRow('Description', transaction.description ?? 'N/A'),
                           _buildTableRow('From', transaction.sourceId?.get()?.name ?? 'N/A'),
                           _buildTableRow('To', transaction.destinationId?.get()?.name ?? 'N/A'),
-                          _buildTableRow('Executed at', state.dateTimeFormat.format(transaction.executedAt)),
-                          _buildTableRow('Created at', state.dateTimeFormat.format(transaction.createdAt)),
+                          _buildTableRow('Executed at', StoreKey.dateTimeFormat.readSync()!.format(transaction.executedAt)),
+                          _buildTableRow('Created at', StoreKey.dateTimeFormat.readSync()!.format(transaction.createdAt)),
                         ],
                       ),
                     )

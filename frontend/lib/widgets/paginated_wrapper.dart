@@ -2,20 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:restrr/restrr.dart';
 
 class PaginatedDataResult<T> {
-  final Paginated<T> page;
-  final bool hasNext;
-  final bool hasPrevious;
+  final int total;
+  final List<T> items;
+  final Function(Restrr)? nextPage;
+  final Function(Restrr)? previousPage;
 
-  const PaginatedDataResult(this.page, this.hasNext, this.hasPrevious);
+  const PaginatedDataResult({required this.total, required this.items, this.nextPage, this.previousPage});
 }
 
 class PaginatedWrapper<T> extends StatefulWidget {
   final Future<Paginated<T>> Function(bool) initialPageFunction;
   final Widget Function(BuildContext, AsyncSnapshot<PaginatedDataResult<T>>) onSuccess;
-  final Widget Function(BuildContext, AsyncSnapshot<PaginatedDataResult<T>>) onLoading;
+  final Widget Function(BuildContext, AsyncSnapshot<PaginatedDataResult<T>>)? onLoading;
+  final Widget Function(BuildContext, AsyncSnapshot<PaginatedDataResult<T>>)? onError;
 
-  const PaginatedWrapper(
-      {super.key, required this.initialPageFunction, required this.onSuccess, required this.onLoading});
+  const PaginatedWrapper({super.key, required this.initialPageFunction, required this.onSuccess, this.onLoading, this.onError});
 
   @override
   State<PaginatedWrapper<T>> createState() => PaginatedWrapperState<T>();
@@ -25,34 +26,41 @@ class PaginatedWrapperState<T> extends State<PaginatedWrapper<T>> {
   final Map<int, Paginated<T>> _pages = {};
 
   int? _currentPage;
+  RestrrException? _error;
 
   @override
   void initState() {
     super.initState();
-    widget.initialPageFunction.call(false).then((page) {
-      _pages[page.pageNumber] = page;
-      setState(() => _currentPage = page.pageNumber);
-    });
+    _loadInitialPage();
   }
 
   Future<void> _loadInitialPage({bool forceRetrieve = false}) async {
-    final Paginated<T> page = await widget.initialPageFunction.call(forceRetrieve);
-    _pages[page.pageNumber] = page;
-    setState(() => _currentPage = page.pageNumber);
+    try {
+      final Paginated<T> page = await widget.initialPageFunction.call(forceRetrieve);
+      _pages[page.pageNumber] = page;
+      setState(() => _currentPage = page.pageNumber);
+    } on RestrrException catch (e) {
+      setState(() => _error = e);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (widget.onError != null && _error != null) {
+      return widget.onError!.call(context, AsyncSnapshot.withError(ConnectionState.done, _error!));
+    }
     return _currentPage == null
-        ? widget.onLoading.call(context, AsyncSnapshot<PaginatedDataResult<T>>.waiting())
+        ? (widget.onLoading ?? (_, __) => const Center(child: CircularProgressIndicator()))
+            .call(context, const AsyncSnapshot.waiting())
         : widget.onSuccess.call(
             context,
             AsyncSnapshot<PaginatedDataResult<T>>.withData(
                 ConnectionState.done,
-                PaginatedDataResult(
-                    _pages[_currentPage] ?? const Paginated(pageNumber: 0, limit: 0, total: 0, items: []),
-                    hasNext,
-                    hasPrevious)));
+                PaginatedDataResult<T>(
+                    total: _pages[_currentPage]!.total,
+                    items: _pages.entries.map((e) => e.value.items).expand((e) => e).toList(),
+                    nextPage: hasNext ? nextPage : null,
+                    previousPage: hasPrevious ? previousPage : null)));
   }
 
   bool get hasNext => _pages[_currentPage]?.hasNext ?? false;

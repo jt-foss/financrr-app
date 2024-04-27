@@ -52,6 +52,7 @@ api_codes!(
     (1100, RESOURCE_NOT_FOUND, "Requested resource was not found!");
     (1101, SERIALIZATION_ERROR, "Serialization error!");
     (1102, MISSING_PERMISSIONS, "Missing permissions!");
+    (1103, CRON_ERROR, "Error while parsing to cron!");
 );
 
 //validation errors

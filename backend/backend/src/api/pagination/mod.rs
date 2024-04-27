@@ -16,6 +16,7 @@ use crate::wrapper::entity::account::Account;
 use crate::wrapper::entity::budget::Budget;
 use crate::wrapper::entity::currency::Currency;
 use crate::wrapper::entity::session::Session;
+use crate::wrapper::entity::transaction::recurring::RecurringTransaction;
 use crate::wrapper::entity::transaction::template::TransactionTemplate;
 use crate::wrapper::entity::transaction::Transaction;
 
@@ -30,6 +31,7 @@ PaginatedBudget = Pagination < Budget >,
 PaginatedCurrency = Pagination < Currency >,
 PaginatedTransaction = Pagination < Transaction >,
 PaginatedTransactionTemplate = Pagination < TransactionTemplate >,
+PaginatedRecurringTransaction = Pagination < RecurringTransaction >,
 PaginatedSession = Pagination < Session >,
 )]
 pub(crate) struct Pagination<T: Serialize + ToSchema<'static>> {

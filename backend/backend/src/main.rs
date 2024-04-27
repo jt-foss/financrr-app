@@ -68,6 +68,8 @@ tags(
 (name = "Account", description = "Endpoints for finance-account management."),
 (name = "Currency", description = "Endpoints for currency management."),
 (name = "Transaction", description = "Endpoints for transaction management."),
+(name = "Transaction-Template", description = "Endpoints for transaction template management."),
+(name = "Recurring-Transaction", description = "Endpoints for recurring transaction management."),
 (name = "Budget", description = "Endpoints for budget management.")
 ),
 modifiers(& BearerTokenAddon)

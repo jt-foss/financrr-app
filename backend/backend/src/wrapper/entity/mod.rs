@@ -1,9 +1,17 @@
+use std::future::Future;
+
+use crate::api::error::validation::ValidationError;
+
 pub(crate) mod account;
 pub(crate) mod budget;
 pub(crate) mod currency;
 pub(crate) mod session;
 pub(crate) mod transaction;
 pub(crate) mod user;
+
+pub(crate) trait DbValidator {
+    fn validate_against_db(&self) -> impl Future<Output = Result<(), ValidationError>> + Send;
+}
 
 pub(crate) trait WrapperEntity: TableName {
     fn get_id(&self) -> i32;

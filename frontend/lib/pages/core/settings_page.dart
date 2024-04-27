@@ -1,21 +1,26 @@
-import 'package:financrr_frontend/pages/core/settings/currency_settings_page.dart';
+import 'package:financrr_frontend/pages/core/settings/currency/currency_settings_page.dart';
+import 'package:financrr_frontend/pages/core/settings/dev/local_storage_settings_page.dart';
+import 'package:financrr_frontend/pages/core/settings/dev/log_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings/l10n/l10n_settings_page.dart';
-import 'package:financrr_frontend/pages/core/settings/session_settings_page.dart';
+import 'package:financrr_frontend/pages/core/settings/session/session_settings_page.dart';
 import 'package:financrr_frontend/pages/core/settings/theme_settings_page.dart';
 import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../layout/adaptive_scaffold.dart';
 import '../../router.dart';
+import '../../widgets/text_circle_avatar.dart';
 
 class SettingsItemGroup {
   final String? title;
   final List<SettingsItem> items;
+  final bool groupInCard;
 
-  const SettingsItemGroup({this.title, required this.items});
+  const SettingsItemGroup({this.title, required this.items, this.groupInCard = true});
 }
 
 class SettingsItem {
@@ -42,13 +47,8 @@ class _SettingsPageState extends State<SettingsPage> {
       SettingsItem(
         showCategory: false,
         child: ListTile(
-          leading: Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(color: context.theme.primaryColor.withOpacity(.5), shape: BoxShape.circle),
-            child: Center(child: Text(_api.selfUser.effectiveDisplayName.substring(0, 2))),
-          ),
-          title: Text(_api.selfUser.effectiveDisplayName),
+          leading: TextCircleAvatar(text: _api.selfUser.effectiveDisplayName, radius: 25),
+          title: Text(_api.selfUser.effectiveDisplayName, style: context.textTheme.titleSmall),
           subtitle: const Text('placeholder@financrr.app'),
         ),
       ),
@@ -73,7 +73,7 @@ class _SettingsPageState extends State<SettingsPage> {
       SettingsItem(
         child: ListTile(
           onTap: () => context.goPath(ThemeSettingsPage.pagePath.build()),
-          leading: const Icon(Icons.brightness_4_rounded),
+          leading: const Icon(Icons.brightness_4_outlined),
           title: const Text('Themes'),
         ),
       ),
@@ -84,10 +84,20 @@ class _SettingsPageState extends State<SettingsPage> {
           title: const Text('Language'),
         ),
       ),
-      const SettingsItem(
+    ]),
+    SettingsItemGroup(title: 'Developer', items: [
+      SettingsItem(
         child: ListTile(
-          leading: Icon(Icons.format_align_left_rounded),
-          title: Text('Logs'),
+          onTap: () => context.goPath(LocalStorageSettingsPage.pagePath.build()),
+          leading: const Icon(Icons.sd_storage_outlined),
+          title: const Text('Local Storage'),
+        ),
+      ),
+      SettingsItem(
+        child: ListTile(
+          onTap: () => context.goPath(LogSettingsPage.pagePath.build()),
+          leading: const Icon(Icons.format_align_left_rounded),
+          title: const Text('Logs'),
         ),
       ),
     ]),
@@ -100,6 +110,20 @@ class _SettingsPageState extends State<SettingsPage> {
           title: const Text('Logout'),
         ),
       ),
+    ]),
+    SettingsItemGroup(groupInCard: false, items: [
+      SettingsItem(
+          showCategory: false,
+          child: FutureBuilder(
+            future: PackageInfo.fromPlatform(),
+            builder: (context, AsyncSnapshot<PackageInfo> snapshot) {
+              if (!snapshot.hasData) return const SizedBox();
+              final PackageInfo info = snapshot.data!;
+              return Align(
+                child: Text('made with ❤️\nv${info.version}+${info.buildNumber}', textAlign: TextAlign.center),
+              );
+            },
+          )),
     ])
   ];
 
@@ -132,7 +156,10 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                     const Divider()
                   ],
-                  Card.outlined(child: Column(children: group.items.map((item) => item.child).toList()))
+                  if (group.groupInCard)
+                    Card.outlined(child: Column(children: group.items.map((item) => item.child).toList()))
+                  else
+                    Column(children: group.items.map((item) => item.child).toList()),
                 ],
               );
             },

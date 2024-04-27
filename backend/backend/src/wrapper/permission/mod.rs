@@ -14,7 +14,7 @@ use entity::utility::table::{does_entity_exist, does_table_exists};
 use crate::api::error::api::ApiError;
 use crate::api::pagination::{PageSizeParam, Pagination};
 use crate::database::connection::get_database_connection;
-use crate::database::entity::{count, delete, find_all_paginated, find_one, insert, update};
+use crate::database::entity::{count, delete, find_all, find_all_paginated, find_one, insert, update};
 use crate::wrapper::entity::{TableName, WrapperEntity};
 
 pub(crate) mod cleanup;
@@ -85,6 +85,17 @@ impl PermissionsEntity {
         }
 
         Ok(false)
+    }
+
+    pub(crate) async fn find_all_by_type_and_id(
+        entity_type: &str,
+        entity_id: i32,
+    ) -> Result<Vec<PermissionsEntity>, ApiError> {
+        Ok(find_all(permissions::Entity::find_all_by_type_and_id(entity_type, entity_id))
+            .await?
+            .into_iter()
+            .map(Self::from)
+            .collect())
     }
 }
 

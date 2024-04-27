@@ -2,16 +2,15 @@ import 'dart:async';
 
 import 'package:financrr_frontend/pages/core/accounts/transactions/transaction_page.dart';
 import 'package:financrr_frontend/pages/authentication/bloc/authentication_bloc.dart';
-import 'package:financrr_frontend/pages/core/settings/l10n/bloc/l10n_bloc.dart';
 import 'package:financrr_frontend/util/extensions.dart';
 import 'package:financrr_frontend/util/form_fields.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../../../../layout/adaptive_scaffold.dart';
 import '../../../../../router.dart';
+import '../../../../data/store.dart';
 import '../../../../widgets/async_wrapper.dart';
 import '../../../../widgets/entities/transaction_card.dart';
 
@@ -56,7 +55,6 @@ class TransactionEditPageState extends State<TransactionEditPage> {
   @override
   void initState() {
     super.initState();
-    final L10nState state = context.read<L10nBloc>().state;
     _fetchAccount().then((_) {
       Future.delayed(
           const Duration(milliseconds: 100),
@@ -66,7 +64,7 @@ class TransactionEditPageState extends State<TransactionEditPage> {
                   _amountController = TextEditingController(text: transaction.amount.toString());
                   _descriptionController = TextEditingController(text: transaction.description);
                   _executedAtController =
-                      TextEditingController(text: state.dateTimeFormat.format(transaction.executedAt));
+                      TextEditingController(text: StoreKey.dateTimeFormat.readSync()!.format(transaction.executedAt));
                   _isValid = _formKey.currentState?.validate() ?? false;
                   _type = transaction.type;
                   _executedAt = transaction.executedAt;
@@ -167,8 +165,7 @@ class TransactionEditPageState extends State<TransactionEditPage> {
     );
   }
 
-  Future<void> _editTransaction(Account account, Transaction transaction, TransactionType type,
-      {Account? secondary}) async {
+  Future<void> _editTransaction(Account account, Transaction transaction, TransactionType type, {Account? secondary}) async {
     if (!_isValid) return;
     final (Id?, Id?) sourceAndDest = switch (_type) {
       TransactionType.deposit => (null, account.id.value),

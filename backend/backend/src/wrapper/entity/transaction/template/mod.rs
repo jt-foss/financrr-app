@@ -56,10 +56,6 @@ impl TransactionTemplate {
         Ok(template)
     }
 
-    pub(crate) async fn get_by_id(id: i32) -> Result<Self, ApiError> {
-        find_one_or_error(transaction_template::Entity::find_by_id(id), "TransactionTemplate").await.map(Self::from)
-    }
-
     pub(crate) async fn count_all_by_user_id(user_id: i32) -> Result<u64, ApiError> {
         count(transaction_template::Entity::find_all_by_user_id(user_id)).await
     }
@@ -68,9 +64,11 @@ impl TransactionTemplate {
         user_id: i32,
         page_size: &PageSizeParam,
     ) -> Result<Vec<Self>, ApiError> {
-        find_all_paginated(transaction_template::Entity::find_all_by_user_id(user_id), page_size)
-            .await
-            .map(|models| models.into_iter().map(Self::from).collect())
+        Ok(find_all_paginated(transaction_template::Entity::find_all_by_user_id(user_id), page_size)
+            .await?
+            .into_iter()
+            .map(Self::from)
+            .collect())
     }
 
     pub(crate) async fn update(self, updated_dto: TransactionTemplateDTO) -> Result<Self, ApiError> {
@@ -117,8 +115,8 @@ impl From<transaction_template::Model> for TransactionTemplate {
 }
 
 impl Identifiable for TransactionTemplate {
-    async fn from_id(id: i32) -> Result<Self, ApiError> {
-        Self::get_by_id(id).await
+    async fn find_by_id(id: i32) -> Result<Self, ApiError> {
+        find_one_or_error(transaction_template::Entity::find_by_id(id), "TransactionTemplate").await.map(Self::from)
     }
 }
 

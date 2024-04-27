@@ -24,6 +24,7 @@ use crate::wrapper::permission::{Permission, Permissions};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
 pub(crate) mod dto;
+pub(crate) mod recurring;
 pub(crate) mod template;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
@@ -103,10 +104,6 @@ impl Transaction {
         Ok(())
     }
 
-    pub(crate) async fn find_by_id(id: i32) -> Result<Self, ApiError> {
-        Ok(Self::from(find_one_or_error(transaction::Entity::find_by_id(id), "Transaction").await?))
-    }
-
     pub(crate) async fn find_all_by_user_paginated(
         user_id: i32,
         page_size: &PageSizeParam,
@@ -138,8 +135,8 @@ impl WrapperEntity for Transaction {
 }
 
 impl Identifiable for Transaction {
-    async fn from_id(id: i32) -> Result<Self, ApiError> {
-        Self::find_by_id(id).await
+    async fn find_by_id(id: i32) -> Result<Self, ApiError> {
+        find_one_or_error(transaction::Entity::find_by_id(id), "Transaction").await.map(Self::from)
     }
 }
 
