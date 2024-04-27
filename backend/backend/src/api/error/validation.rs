@@ -1,4 +1,5 @@
 use std::borrow::Cow;
+use validator::ValidationErrors;
 
 pub(crate) struct ValidationError {
     pub(crate) error: validator::ValidationError,
@@ -37,5 +38,11 @@ impl Default for ValidationError {
         Self {
             error: validator::ValidationError::new("Validation error"),
         }
+    }
+}
+
+impl Into<ValidationErrors> for ValidationError {
+    fn into(self) -> ValidationErrors {
+        self.error.into()
     }
 }
