@@ -4,6 +4,7 @@ use actix_web::http::StatusCode;
 use actix_web::HttpResponse;
 use croner::errors::CronError;
 use derive_more::{Display, Error};
+use deschuler::cron_builder::config::BuilderConfigBuilderError;
 use redis::RedisError;
 use sea_orm::DbErr;
 use serde::{Serialize, Serializer};
@@ -111,6 +112,7 @@ impl ResponseError for ApiError {
     fn error_response(&self) -> HttpResponse {
         if self.status_code.eq(&StatusCode::INTERNAL_SERVER_ERROR) {
             error!("Internal server error: {}", self);
+            //TODO insert sentry error here
         }
 
         HttpResponse::build(self.status_code()).insert_header(ContentType::json()).json(self)
@@ -207,6 +209,17 @@ impl From<CronError> for ApiError {
         Self {
             status_code: StatusCode::BAD_REQUEST,
             api_code: ApiCode::CRON_ERROR,
+            details: value.to_string(),
+            reference: None,
+        }
+    }
+}
+
+impl From<BuilderConfigBuilderError> for ApiError {
+    fn from(value: BuilderConfigBuilderError) -> Self {
+        Self {
+            status_code: StatusCode::INTERNAL_SERVER_ERROR,
+            api_code: ApiCode::CRON_BUILDER_ERROR,
             details: value.to_string(),
             reference: None,
         }

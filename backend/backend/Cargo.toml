@@ -26,12 +26,12 @@ actix-web-prom = "0.8.0"
 tokio.workspace = true
 
 # Scheduling
-deschuler = "0.1.1"
+deschuler = "0.2.0"
 croner = "2.0.4"
 
 # Validation
-validator = { version = "0.16.1", features = ["derive"] }
-actix-web-validator = "5.0.1"
+validator = { version = "0.18.1", features = ["derive"] }
+actix-web-validator5 = "1.0.0"
 iban = "0.1.7"
 
 # Database / ORM
@@ -58,6 +58,8 @@ tracing-appender = "0.2.3"
 
 # Date/Time
 time.workspace = true
+chrono = { version = "0.4.38", features = ["clock"]}
+chrono-tz = "0.9.0"
 
 # Utils
 dotenvy = "0.15.7"
@@ -66,7 +68,6 @@ regex = { version = "1.10.4", features = ["std", "perf", "unicode"] }
 itertools = "0.12.1"
 bitflags = {  version = "2.5.0", features = ["std", "serde"] }
 paste = "1.0.14"
-cron = "0.12.1"
 
 # Future Utils
 futures-util = "0.3.30"

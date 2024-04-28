@@ -11,7 +11,7 @@ use actix_web::{
     App, HttpServer,
 };
 use actix_web_prom::{PrometheusMetrics, PrometheusMetricsBuilder};
-use actix_web_validator::{Error, JsonConfig, PathConfig, QueryConfig};
+use actix_web_validator5::{Error, JsonConfig, PathConfig, QueryConfig};
 use dotenvy::dotenv;
 use redis::Client;
 use sea_orm::DatabaseConnection;

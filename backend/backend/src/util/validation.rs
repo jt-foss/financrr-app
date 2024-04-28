@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 use std::collections::HashMap;
 
-use actix_web_validator::error::flatten_errors;
+use actix_web_validator5::error::flatten_errors;
 use iban::Iban;
 use regex::Regex;
 use sea_orm::EntityTrait;

@@ -65,6 +65,7 @@ api_codes!(
     (1300, ENTITY_ERROR, "DB-Entity error!");
     (1301, DB_ERROR, "Database error!");
     (1302, REDIS_ERROR, "Redis error!");
+    (1303, CRON_BUILDER_ERROR, "Cron builder error!");
 );
 
 // misc
