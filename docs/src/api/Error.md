@@ -46,11 +46,12 @@ We call these custom error codes `Api Codes`.
 
 ### Internal server errors
 
-| Code | Description      |
-|------|------------------|
-| 1300 | DB-Entitiy error |
-| 1301 | Database error   |
-| 1302 | Redis error      |
+| Code | Description        |
+|------|--------------------|
+| 1300 | DB-Entitiy error   |
+| 1301 | Database error     |
+| 1302 | Redis error        |
+| 1303 | Cron builder error |
 
 ### Misc errors
 
