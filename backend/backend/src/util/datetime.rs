@@ -5,8 +5,8 @@ pub(crate) fn convert_chrono_to_time(chrono: &DateTime<FixedOffset>) -> OffsetDa
     let timestamp = chrono.timestamp();
     let offset_seconds = chrono.offset().fix().local_minus_utc();
 
-    let utc_offset = UtcOffset::from_whole_seconds(offset_seconds)
-        .expect("Failed to convert chrono offset to UtcOffset");
+    let utc_offset =
+        UtcOffset::from_whole_seconds(offset_seconds).expect("Failed to convert chrono offset to UtcOffset");
 
     OffsetDateTime::from_unix_timestamp(timestamp)
         .expect("Failed to convert timestamp to OffsetDateTime")

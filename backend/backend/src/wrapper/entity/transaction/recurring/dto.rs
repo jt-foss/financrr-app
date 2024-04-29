@@ -1,20 +1,21 @@
 use actix_web::FromRequest;
 use futures_util::future::LocalBoxFuture;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use utoipa::ToSchema;
 use validator::Validate;
 
 use crate::api::error::api::ApiError;
 use crate::api::error::validation::ValidationError;
-use crate::wrapper::entity::transaction::template::TransactionTemplate;
 use crate::wrapper::entity::DbValidator;
+use crate::wrapper::entity::transaction::recurring::recurring_rule::dto::RecurringRuleDTO;
+use crate::wrapper::entity::transaction::template::TransactionTemplate;
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema, Validate)]
 pub(crate) struct RecurringTransactionDTO {
     pub(crate) template_id: Phantom<TransactionTemplate>,
-    pub(crate) recurring_rule: Value,
+    #[validate(nested)]
+    pub(crate) recurring_rule: RecurringRuleDTO,
 }
 
 impl DbValidator for RecurringTransactionDTO {

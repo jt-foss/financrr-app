@@ -12,13 +12,15 @@ use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
 use crate::database::entity::{count, find_all_paginated, find_one_or_error, insert};
 use crate::permission_impl;
-use crate::wrapper::entity::transaction::recurring::dto::RecurringTransactionDTO;
-use crate::wrapper::entity::transaction::template::TransactionTemplate;
 use crate::wrapper::entity::{TableName, WrapperEntity};
+use crate::wrapper::entity::transaction::recurring::dto::RecurringTransactionDTO;
+use crate::wrapper::entity::transaction::recurring::recurring_rule::RecurringRule;
+use crate::wrapper::entity::transaction::template::TransactionTemplate;
 use crate::wrapper::permission::{Permission, Permissions};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
 pub(crate) mod dto;
+pub(crate) mod recurring_rule;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub(crate) struct RecurringTransaction {
@@ -31,10 +33,11 @@ pub(crate) struct RecurringTransaction {
 
 impl RecurringTransaction {
     pub(crate) async fn new(dto: RecurringTransactionDTO, user_id: i32) -> Result<Self, ApiError> {
+        let recurring_rule = RecurringRule::from(dto.recurring_rule);
         let active_model = recurring_transaction::ActiveModel {
             id: Default::default(),
             template: Set(dto.template_id.get_id()),
-            recurring_rule: Set(dto.recurring_rule),
+            recurring_rule: Set(recurring_rule.to_json_value()?),
             last_executed_at: Set(None),
             created_at: Set(get_now()),
         };
