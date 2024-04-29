@@ -87,10 +87,7 @@ impl PermissionsEntity {
         Ok(false)
     }
 
-    pub(crate) async fn find_all_by_type_and_id(
-        entity_type: &str,
-        entity_id: i32,
-    ) -> Result<Vec<PermissionsEntity>, ApiError> {
+    pub(crate) async fn find_all_by_type_and_id(entity_type: &str, entity_id: i32) -> Result<Vec<Self>, ApiError> {
         Ok(find_all(permissions::Entity::find_all_by_type_and_id(entity_type, entity_id))
             .await?
             .into_iter()

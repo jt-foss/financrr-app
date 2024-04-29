@@ -1,3 +1,5 @@
+use actix_web::dev::Payload;
+use actix_web::web::Json;
 use actix_web::FromRequest;
 use futures_util::future::LocalBoxFuture;
 use serde::{Deserialize, Serialize};
@@ -33,8 +35,8 @@ impl FromRequest for RecurringTransactionDTO {
     type Error = ApiError;
     type Future = LocalBoxFuture<'static, Result<Self, Self::Error>>;
 
-    fn from_request(req: &actix_web::HttpRequest, payload: &mut actix_web::dev::Payload) -> Self::Future {
-        let json_fut = actix_web::web::Json::<Self>::from_request(req, payload);
+    fn from_request(req: &actix_web::HttpRequest, payload: &mut Payload) -> Self::Future {
+        let json_fut = Json::<Self>::from_request(req, payload);
         Box::pin(async move {
             let dto = json_fut.await?;
             let dto = dto.into_inner();

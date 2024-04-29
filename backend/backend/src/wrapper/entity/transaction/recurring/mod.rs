@@ -1,16 +1,17 @@
-use std::cell::OnceCell;
 use std::sync::{Arc, Mutex};
 
 use deschuler::scheduler::job::Job;
-use deschuler::scheduler::Scheduler;
 use deschuler::scheduler::tokio_scheduler::config::TokioSchedulerConfigBuilder;
 use deschuler::scheduler::tokio_scheduler::TokioScheduler;
+use deschuler::scheduler::Scheduler;
+use once_cell::sync::OnceCell;
 use sea_orm::{EntityName, EntityTrait, Set};
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
 use tracing::error;
 use utoipa::ToSchema;
 
+use db_iterator::process_entity;
 use entity::recurring_transaction;
 use entity::recurring_transaction::Model;
 use entity::utility::time::get_now;
@@ -21,19 +22,21 @@ use crate::database::entity::{count, find_all_paginated, find_one_or_error, inse
 use crate::permission_impl;
 use crate::util::cron::get_cron_builder_config_default;
 use crate::util::datetime::{convert_chrono_to_time, convert_time_to_chrono};
-use crate::wrapper::entity::{TableName, WrapperEntity};
 use crate::wrapper::entity::transaction::dto::TransactionDTO;
 use crate::wrapper::entity::transaction::recurring::dto::RecurringTransactionDTO;
 use crate::wrapper::entity::transaction::recurring::recurring_rule::RecurringRule;
 use crate::wrapper::entity::transaction::template::TransactionTemplate;
 use crate::wrapper::entity::transaction::Transaction;
+use crate::wrapper::entity::{TableName, WrapperEntity};
 use crate::wrapper::permission::{Permission, Permissions, PermissionsEntity};
+use crate::wrapper::processor::db_iterator;
+use crate::wrapper::processor::db_iterator::{CountAllFn, FindAllPaginatedFn, JobFn};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
 pub(crate) mod dto;
 pub(crate) mod recurring_rule;
 
-const SCHEDULER: OnceCell<Arc<Mutex<TokioScheduler>>> = OnceCell::new();
+static SCHEDULER: OnceCell<Arc<Mutex<TokioScheduler>>> = OnceCell::new();
 const CHANNEL_SIZE: usize = 10240;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
@@ -46,41 +49,41 @@ pub(crate) struct RecurringTransaction {
 }
 
 impl RecurringTransaction {
-    pub(crate) async fn index() -> Result<(), ApiError> {
-        let limit: u64 = 500;
-        let count = Self::count_all().await?;
-        let pages = (count as f64 / limit as f64).ceil() as u64;
+    pub(crate) async fn redo_missed_transactions() {
+        let count_all: CountAllFn = Arc::new(|| Box::pin(Self::count_all()));
+        let find_all_paginated: FindAllPaginatedFn<Self> = Arc::new(move |page_size: PageSizeParam| {
+            let page_size = page_size.clone();
+            Box::pin(Self::find_all_paginated(page_size))
+        });
+        let job: JobFn<Self> = Arc::new(move |transaction: Self| {
+            let transaction = transaction.clone();
+            Box::pin(async move { transaction.redo_missed_transactions_job().await })
+        });
 
-        for page in 1..=pages {
-            let page_size = PageSizeParam::new(page, limit);
-            let transactions = Self::find_all_paginated(&page_size).await?;
-            Self::index_page(transactions).await;
+        process_entity(count_all, find_all_paginated, job).await;
+    }
+
+    async fn redo_missed_transactions_job(&self) -> Result<(), ApiError> {
+        if let Some(last_executed) = self.last_executed_at {
+            let now_chrono = convert_time_to_chrono(&get_now());
+            let cron = self.recurring_rule.to_cron()?;
+            let last_executed = convert_time_to_chrono(&last_executed);
+            let mut next_occurrence = cron.find_next_occurrence(&last_executed, false)?;
+
+            while next_occurrence < now_chrono {
+                let next_occurrence_time = convert_chrono_to_time(&next_occurrence);
+                if let Ok(user_id) = PermissionsEntity::find_all_by_type_and_id(Self::table_name(), self.id)
+                    .await
+                    .map(|permissions| permissions[0].user_id)
+                {
+                    self.handle_job(next_occurrence_time, user_id).await;
+                }
+
+                next_occurrence = self.recurring_rule.to_cron()?.find_next_occurrence(&next_occurrence, false)?;
+            }
         }
 
         Ok(())
-    }
-
-    async fn index_page(page: Vec<Self>) {
-        for transaction in page {
-            if let Some(last_executed) = transaction.last_executed_at {
-                let now_chrono = convert_time_to_chrono(&get_now());
-                let cron = transaction.recurring_rule.to_cron().unwrap();
-                let last_executed = convert_time_to_chrono(&last_executed);
-                let mut next_occurrence = cron.find_next_occurrence(&last_executed, false).unwrap();
-
-                while next_occurrence < now_chrono {
-                    let next_occurrence_time = convert_chrono_to_time(&next_occurrence);
-                    if let Ok(user_id) = PermissionsEntity::find_all_by_type_and_id(Self::table_name(), transaction.id)
-                        .await
-                        .map(|permissions| permissions[0].user_id) {
-                        transaction.handle_job(next_occurrence_time, user_id).await;
-                    }
-
-                    next_occurrence = transaction.recurring_rule.to_cron()
-                        .unwrap().find_next_occurrence(&next_occurrence, false).unwrap();
-                }
-            }
-        }
     }
 
     pub(crate) async fn new(dto: RecurringTransactionDTO, user_id: i32) -> Result<Self, ApiError> {
@@ -127,10 +130,8 @@ impl RecurringTransaction {
     async fn handle_job(&self, now: OffsetDateTime, user_id: i32) {
         if let Err(err) = self.recurring_transaction_job_task(now, user_id).await {
             error!("Could not execute recurring transaction job. Error: {:?}", err);
-        } else {
-            if let Err(err) = self.update_last_run(now).await {
-                error!("Could not update last run. Error: {:?}", err);
-            }
+        } else if let Err(err) = self.update_last_run(now).await {
+            error!("Could not update last run. Error: {:?}", err);
         }
     }
 
@@ -183,8 +184,8 @@ impl RecurringTransaction {
         count(recurring_transaction::Entity::find()).await
     }
 
-    pub(crate) async fn find_all_paginated(page_size: &PageSizeParam) -> Result<Vec<Self>, ApiError> {
-        Ok(find_all_paginated(recurring_transaction::Entity::find(), page_size)
+    pub(crate) async fn find_all_paginated(page_size: PageSizeParam) -> Result<Vec<Self>, ApiError> {
+        Ok(find_all_paginated(recurring_transaction::Entity::find(), &page_size)
             .await?
             .into_iter()
             .map(Self::from)

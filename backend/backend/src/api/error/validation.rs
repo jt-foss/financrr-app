@@ -42,10 +42,10 @@ impl Default for ValidationError {
     }
 }
 
-impl Into<ValidationErrors> for ValidationError {
-    fn into(self) -> ValidationErrors {
-        let mut errors = ValidationErrors::new();
-        errors.add("Validation Error", self.error.clone());
+impl From<ValidationError> for ValidationErrors {
+    fn from(error: ValidationError) -> Self {
+        let mut errors = Self::new();
+        errors.add("Validation Error", error.error);
 
         errors
     }

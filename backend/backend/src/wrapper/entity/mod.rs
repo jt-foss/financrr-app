@@ -1,6 +1,6 @@
 use std::future::Future;
 
-use tracing::{error, info};
+use tracing::info;
 
 use crate::api::error::validation::ValidationError;
 use crate::wrapper::entity::transaction::recurring::RecurringTransaction;
@@ -14,11 +14,7 @@ pub(crate) mod user;
 
 pub(crate) async fn start_wrapper() {
     info!("Recurring transaction indexing...");
-    tokio::spawn(async move {
-        if let Err(err) = RecurringTransaction::index().await {
-            error!("Could not start recurring transaction scheduler. Error: {:?}", err);
-        }
-    });
+    RecurringTransaction::redo_missed_transactions().await
 }
 
 pub(crate) trait DbValidator {
