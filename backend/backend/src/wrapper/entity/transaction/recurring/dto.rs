@@ -6,9 +6,9 @@ use validator::Validate;
 
 use crate::api::error::api::ApiError;
 use crate::api::error::validation::ValidationError;
-use crate::wrapper::entity::DbValidator;
 use crate::wrapper::entity::transaction::recurring::recurring_rule::dto::RecurringRuleDTO;
 use crate::wrapper::entity::transaction::template::TransactionTemplate;
+use crate::wrapper::entity::DbValidator;
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema, Validate)]

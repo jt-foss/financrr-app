@@ -26,9 +26,7 @@ async fn clean_up() -> Result<(), ApiError> {
     let count = PermissionsEntity::count_all().await?;
     let pages = (count as f64 / limit as f64).ceil() as u64;
 
-    info!("Cleaning up {} pages with {} permissions per page...", pages, limit);
     for page in 1..=pages {
-        info!("Cleaning up page {}...", page);
         let page_size = PageSizeParam::new(page, limit);
         let permissions = PermissionsEntity::get_all_paginated(page_size).await?;
         clean_up_page(permissions).await?;

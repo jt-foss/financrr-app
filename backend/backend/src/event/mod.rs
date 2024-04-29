@@ -14,6 +14,8 @@ use crate::wrapper::entity::budget::event_listener::budget_listener;
 pub(crate) mod lifecycle;
 pub(crate) mod macros;
 
+const CHANNEL_SIZE: usize = 10240;
+
 pub(crate) fn init() {
     account_listener();
     budget_listener();
@@ -70,7 +72,7 @@ pub(crate) struct EventBus<T: Clone> {
 
 impl<T: Debug + Clone + Send + 'static> EventBus<T> {
     pub(crate) fn new() -> Self {
-        let (sender, _) = channel(10_000);
+        let (sender, _) = channel(CHANNEL_SIZE);
         Self {
             sender,
         }

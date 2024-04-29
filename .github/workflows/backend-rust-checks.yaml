@@ -25,6 +25,8 @@ jobs:
         run: cargo audit --ignore RUSTSEC-2023-0071 # Marvin attack (RSA) crate. Being worked on.
 
   clippy:
+    env:
+      RUSTFLAGS: "-Dwarnings"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

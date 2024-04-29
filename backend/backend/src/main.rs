@@ -40,6 +40,7 @@ use crate::database::redis::clear_redis;
 use crate::util::panic::install_panic_hook;
 use crate::util::validation::ValidationErrorJsonPayload;
 use crate::wrapper::entity::session::Session;
+use crate::wrapper::entity::start_wrapper;
 use crate::wrapper::permission::cleanup::schedule_clean_up_task;
 
 pub(crate) mod api;
@@ -129,6 +130,9 @@ async fn main() -> Result<()> {
 
     info!("\t[*] Initializing prometheus metrics...");
     let prometheus_metrics = build_prometheus_metrics();
+
+    info!("\t[*] Starting wrapper...");
+    start_wrapper().await;
 
     info!("Starting server... Listening on: {}", Config::get_config().address);
 
