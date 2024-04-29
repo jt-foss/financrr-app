@@ -15,7 +15,7 @@ pub(crate) mod user;
 pub(crate) async fn start_wrapper() {
     info!("Recurring transaction indexing...");
     tokio::spawn(async move {
-        if let Err(err) = RecurringTransaction::index() {
+        if let Err(err) = RecurringTransaction::index().await {
             error!("Could not start recurring transaction scheduler. Error: {:?}", err);
         }
     });

@@ -64,7 +64,9 @@ impl RecurringTransaction {
         for transaction in page {
             if let Some(last_executed) = transaction.last_executed_at {
                 let now_chrono = convert_time_to_chrono(&get_now());
-                let mut next_occurrence = transaction.recurring_rule.to_cron()?.find_next_occurrence(&last_executed, false)?;
+                let cron = transaction.recurring_rule.to_cron().unwrap();
+                let last_executed = convert_time_to_chrono(&last_executed);
+                let mut next_occurrence = cron.find_next_occurrence(&last_executed, false).unwrap();
 
                 while next_occurrence < now_chrono {
                     let next_occurrence_time = convert_chrono_to_time(&next_occurrence);
@@ -74,7 +76,8 @@ impl RecurringTransaction {
                         transaction.handle_job(next_occurrence_time, user_id).await;
                     }
 
-                    next_occurrence = transaction.recurring_rule.to_cron()?.find_next_occurrence(&next_occurrence, false)?;
+                    next_occurrence = transaction.recurring_rule.to_cron()
+                        .unwrap().find_next_occurrence(&next_occurrence, false).unwrap();
                 }
             }
         }

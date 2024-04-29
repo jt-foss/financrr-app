@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use tokio::time::interval;
-use tracing::{error, info};
+use tracing::error;
 
 use crate::api::error::api::ApiError;
 use crate::api::pagination::{PageSizeParam, Pagination};
