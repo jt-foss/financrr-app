@@ -128,10 +128,10 @@ async fn main() -> Result<()> {
     info!("\t[*] Initializing rate limiter...");
     let limiter = Data::new(build_rate_limiter());
 
-    info!("\t[*] Initializing prometheus metrics...");
+    info!("[*] Initializing prometheus metrics...");
     let prometheus_metrics = build_prometheus_metrics();
 
-    info!("\t[*] Starting wrapper...");
+    info!("[*] Starting wrapper...");
     start_wrapper().await;
 
     info!("Starting server... Listening on: {}", Config::get_config().address);
