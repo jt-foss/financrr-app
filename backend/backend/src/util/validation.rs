@@ -24,7 +24,8 @@ pub(crate) const MAX_PASSWORD_LENGTH: usize = 128;
 pub(crate) struct ValidationErrorJsonPayload {
     pub(crate) message: String,
     pub(crate) fields: Vec<FieldError>,
-}
+}_errors(error);
+        let mut field_errors: Vec<Field
 
 #[derive(Debug, Serialize, ToSchema)]
 pub(crate) struct FieldError {
@@ -37,9 +38,10 @@ impl From<&validator::ValidationErrors> for ValidationErrorJsonPayload {
     fn from(error: &validator::ValidationErrors) -> Self {
         let errors = flatten_errors(error);
         let mut field_errors: Vec<FieldError> = Vec::new();
-        for (index, field, error) in errors {
-            field_errors.insert(index as usize, map_field_error(field.as_str(), error))
+        for (_, field, error) in errors {
+            field_errors.push(map_field_error(field.as_str(), error))
         }
+
         Self {
             message: "Validation error".to_owned(),
             fields: field_errors,
