@@ -13,8 +13,8 @@ pub(crate) mod transaction;
 pub(crate) mod user;
 
 pub(crate) async fn start_wrapper() {
-    info!("Recurring transaction indexing...");
-    RecurringTransaction::redo_missed_transactions().await
+    info!("Initialize recurring transaction...");
+    RecurringTransaction::init().await
 }
 
 pub(crate) trait DbValidator {

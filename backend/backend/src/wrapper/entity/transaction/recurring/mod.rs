@@ -1,9 +1,9 @@
 use std::sync::{Arc, Mutex};
 
 use deschuler::scheduler::job::Job;
+use deschuler::scheduler::Scheduler;
 use deschuler::scheduler::tokio_scheduler::config::TokioSchedulerConfig;
 use deschuler::scheduler::tokio_scheduler::TokioScheduler;
-use deschuler::scheduler::Scheduler;
 use once_cell::sync::OnceCell;
 use sea_orm::{EntityName, EntityTrait, Set};
 use serde::{Deserialize, Serialize};
@@ -22,12 +22,12 @@ use crate::database::entity::{count, find_all_paginated, find_one_or_error, inse
 use crate::permission_impl;
 use crate::util::cron::get_cron_builder_config_default;
 use crate::util::datetime::{convert_chrono_to_time, convert_time_to_chrono};
+use crate::wrapper::entity::{TableName, WrapperEntity};
 use crate::wrapper::entity::transaction::dto::TransactionDTO;
 use crate::wrapper::entity::transaction::recurring::dto::RecurringTransactionDTO;
 use crate::wrapper::entity::transaction::recurring::recurring_rule::RecurringRule;
 use crate::wrapper::entity::transaction::template::TransactionTemplate;
 use crate::wrapper::entity::transaction::Transaction;
-use crate::wrapper::entity::{TableName, WrapperEntity};
 use crate::wrapper::permission::{Permission, Permissions, PermissionsEntity};
 use crate::wrapper::processor::db_iterator;
 use crate::wrapper::processor::db_iterator::{CountAllFn, FindAllPaginatedFn, JobFn};
@@ -49,18 +49,39 @@ pub(crate) struct RecurringTransaction {
 }
 
 impl RecurringTransaction {
-    pub(crate) async fn redo_missed_transactions() {
-        let count_all: CountAllFn = Arc::new(|| Box::pin(Self::count_all()));
-        let find_all_paginated: FindAllPaginatedFn<Self> = Arc::new(move |page_size: PageSizeParam| {
-            let page_size = page_size.clone();
-            Box::pin(Self::find_all_paginated(page_size))
-        });
+    pub(crate) async fn init() {
+        Self::redo_missed_transactions().await;
+        Self::schedule_recurring_transactions().await;
+    }
+
+    async fn redo_missed_transactions() {
+        let (count_all, find_all_paginated) = Self::get_count_all_and_find_all_fns();
         let job: JobFn<Self> = Arc::new(move |transaction: Self| {
             let transaction = transaction.clone();
             Box::pin(async move { transaction.redo_missed_transactions_job().await })
         });
 
         process_entity(count_all, find_all_paginated, job).await;
+    }
+
+    async fn schedule_recurring_transactions() {
+        let (count_all, find_all_paginated) = Self::get_count_all_and_find_all_fns();
+        let job: JobFn<Self> = Arc::new(move |transaction: Self| {
+            let transaction = transaction.clone();
+            Box::pin(async move { transaction.start_recurring_transaction(0) })
+        });
+
+        process_entity(count_all, find_all_paginated, job).await;
+    }
+
+    fn get_count_all_and_find_all_fns() -> (CountAllFn, FindAllPaginatedFn<Self>) {
+        let count_all: CountAllFn = Arc::new(|| Box::pin(Self::count_all()));
+        let find_all_paginated: FindAllPaginatedFn<Self> = Arc::new(move |page_size: PageSizeParam| {
+            let page_size = page_size.clone();
+            Box::pin(Self::find_all_paginated(page_size))
+        });
+
+        (count_all, find_all_paginated)
     }
 
     async fn redo_missed_transactions_job(&self) -> Result<(), ApiError> {
