@@ -59,7 +59,6 @@ tracing-appender = "0.2.3"
 # Date/Time
 time.workspace = true
 chrono = { version = "0.4.38", features = ["clock"]}
-chrono-tz = "0.9.0"
 
 # Utils
 dotenvy = "0.15.7"
