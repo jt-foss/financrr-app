@@ -100,7 +100,7 @@ jobs:
       - name: Build APK
         run: flutter build apk --release
       - name: Build IPA
-        run: flutter build ios --release --no-codesign
+        run: flutter build ios --release --no-codesign # TODO sign binaries
       - name: Upload APK
         uses: actions/upload-artifact@v2
         with:
@@ -113,7 +113,7 @@ jobs:
           path: build/ios/iphoneos/financrr.ipa
 
   create-release:
-    needs: [ build-backend-binaries, push-docker-image, build-flutter-apps ]
+    needs: [ build-backend-binaries, build-flutter-apps ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -178,25 +178,3 @@ jobs:
           asset_path: build/ios/iphoneos/financrr.ipa
           asset_name: financrr.ipa
           asset_content_type: application/octet-stream
-
-  deploy-ios-app:
-    needs: build-flutter-apps
-    runs-on: macos-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v1
-        with:
-          channel: 'stable'
-      - name: Download IPA
-        uses: actions/download-artifact@v2
-        with:
-          name: financrr.ipa
-          path: build/ios/iphoneos/
-      - name: Install Application Loader
-        run: |
-          xcode-select --install
-      - name: Upload to TestFlight
-        run: |
-          xcrun altool --upload-app --type ios --file build/ios/iphoneos/financrr.ipa --username ${{ secrets.APP_STORE_CONNECT_USERNAME }} --password ${{ secrets.APP_STORE_CONNECT_PASSWORD }}
