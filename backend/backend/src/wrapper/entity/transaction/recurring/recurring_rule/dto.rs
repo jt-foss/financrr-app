@@ -7,26 +7,33 @@ use crate::api::error::validation::ValidationError;
 const SPECIALS: [&str; 5] = ["@yearly", "@annually", "@monthly", "@weekly", "@daily"];
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
-pub(crate) struct RecurringRuleDTO {
-    pub(crate) day_of_month: Option<String>,
-    pub(crate) month: Option<String>,
-    pub(crate) day_of_week: Option<String>,
-    pub(crate) special: Option<String>,
+pub(crate) enum RecurringRuleDTO {
+    #[serde(rename = "cronPattern")]
+    CronPattern(CronPatternDTO),
+    #[serde(rename = "special")]
+    Special(String),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
+pub(crate) struct CronPatternDTO {
+    pub(crate) day_of_month: String,
+    pub(crate) month: String,
+    pub(crate) day_of_week: String,
 }
 
 impl Validate for RecurringRuleDTO {
     fn validate(&self) -> Result<(), ValidationErrors> {
         let mut errors = ValidationError::new("RecurringRule");
-        if self.day_of_month.is_none() && self.month.is_none() && self.day_of_week.is_none() && self.special.is_none() {
-            errors.add("recurring_rule", "At least one of the fields must be present");
-        }
-        if let Some(special) = self.special.as_ref() {
-            if self.day_of_month.is_some() || self.month.is_some() || self.day_of_week.is_some() {
-                errors.add("special", "Special field must be the only field present");
+        match self {
+            Self::CronPattern(inner) => {
+                if inner.day_of_month.eq("*") && inner.month.eq("*") && inner.day_of_week.eq("*") {
+                    errors.add("cronPattern", "Invalid cron pattern. At least one of day_of_month, month, day_of_week must be set to a value other than *");
+                }
             }
-
-            if SPECIALS.iter().all(|&s| s != special) {
-                errors.add("special", format!("Invalid special field. Allowed values: {:?}", SPECIALS).as_str());
+            Self::Special(special) => {
+                if SPECIALS.iter().all(|&s| s != special) {
+                    errors.add("special", format!("Invalid special field. Allowed values: {:?}", SPECIALS).as_str());
+                }
             }
         }
 

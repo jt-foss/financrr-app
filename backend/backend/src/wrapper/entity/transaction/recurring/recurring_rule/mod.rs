@@ -9,19 +9,39 @@ use entity::utility::time::get_now;
 
 use crate::api::error::api::ApiError;
 use crate::util::cron::get_cron_builder_default;
-use crate::wrapper::entity::transaction::recurring::recurring_rule::dto::RecurringRuleDTO;
+use crate::wrapper::entity::transaction::recurring::recurring_rule::dto::{CronPatternDTO, RecurringRuleDTO};
 
 pub(crate) mod dto;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
-pub(crate) struct RecurringRule {
-    pub(crate) second: Option<String>,
-    pub(crate) minute: Option<String>,
-    pub(crate) hour: Option<String>,
-    pub(crate) day_of_month: Option<String>,
-    pub(crate) month: Option<String>,
-    pub(crate) day_of_week: Option<String>,
-    pub(crate) special: Option<String>,
+pub(crate) enum RecurringRule {
+    #[serde(rename = "cronPattern")]
+    CronPattern(CronPattern),
+    #[serde(rename = "special")]
+    Special(String),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
+pub(crate) struct CronPattern {
+    pub(crate) second: String,
+    pub(crate) minute: String,
+    pub(crate) hour: String,
+    pub(crate) day_of_month: String,
+    pub(crate) month: String,
+    pub(crate) day_of_week: String,
+}
+
+impl CronPattern {
+    pub(crate) fn from_dto(dto: CronPatternDTO, now: OffsetDateTime) -> Self {
+        Self {
+            second: now.second().to_string(),
+            minute: now.minute().to_string(),
+            hour: now.hour().to_string(),
+            day_of_month: dto.day_of_month,
+            month: dto.month,
+            day_of_week: dto.day_of_week,
+        }
+    }
 }
 
 impl RecurringRule {
@@ -34,45 +54,28 @@ impl RecurringRule {
     }
 
     pub(crate) fn from_recurring_ruled_dto(dto: RecurringRuleDTO, now: OffsetDateTime) -> Self {
-        match dto.special {
-            None => Self {
-                second: Some(now.second().to_string()),
-                minute: Some(now.minute().to_string()),
-                hour: Some(now.hour().to_string()),
-                day_of_month: dto.day_of_month,
-                month: dto.month,
-                day_of_week: dto.day_of_week,
-                special: None,
-            },
-            Some(_) => Self {
-                second: None,
-                minute: None,
-                hour: None,
-                day_of_month: None,
-                month: None,
-                day_of_week: None,
-                special: dto.special,
-            },
+        match dto {
+            RecurringRuleDTO::CronPattern(cron_dto) => Self::CronPattern(CronPattern::from_dto(cron_dto, now)),
+            RecurringRuleDTO::Special(special) => Self::Special(special),
+
         }
     }
 
     pub(crate) fn to_cron(&self) -> Result<Cron, ApiError> {
-        match self.special.as_ref() {
-            Some(str) => Self::build_special(str),
-            None => self.build_cron(get_cron_builder_default()),
+        match self {
+            Self::CronPattern(pattern) => Self::build_cron(pattern, get_cron_builder_default()),
+            Self::Special(special) => Self::build_special(special)
         }
     }
 
-    fn build_cron(&self, mut cron_builder: CronBuilder) -> Result<Cron, ApiError> {
-        if let Some(str) = self.day_of_month.as_ref() {
-            cron_builder.day_of_month(str.clone());
-        }
-        if let Some(str) = self.month.as_ref() {
-            cron_builder.month(str.clone());
-        }
-        if let Some(str) = self.day_of_week.as_ref() {
-            cron_builder.day_of_week(str.clone());
-        }
+    fn build_cron(pattern: &CronPattern, mut cron_builder: CronBuilder) -> Result<Cron, ApiError> {
+        cron_builder.second(pattern.second.clone());
+        cron_builder.minute(pattern.minute.clone());
+        cron_builder.hour(pattern.hour.clone());
+
+        cron_builder.day_of_month(pattern.day_of_month.clone());
+        cron_builder.month(pattern.month.clone());
+        cron_builder.day_of_week(pattern.day_of_week.clone());
 
         cron_builder.build().map_err(ApiError::from)
     }
