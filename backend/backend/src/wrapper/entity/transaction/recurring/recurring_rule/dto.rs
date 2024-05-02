@@ -30,6 +30,6 @@ impl Validate for RecurringRuleDTO {
             }
         }
 
-        Err(errors.into())
+        errors.return_result().map_err(|e| e.into())
     }
 }

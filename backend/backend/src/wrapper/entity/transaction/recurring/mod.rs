@@ -1,7 +1,7 @@
 use std::sync::{Arc, Mutex};
 
 use deschuler::scheduler::job::Job;
-use deschuler::scheduler::tokio_scheduler::config::TokioSchedulerConfigBuilder;
+use deschuler::scheduler::tokio_scheduler::config::TokioSchedulerConfig;
 use deschuler::scheduler::tokio_scheduler::TokioScheduler;
 use deschuler::scheduler::Scheduler;
 use once_cell::sync::OnceCell;
@@ -110,7 +110,6 @@ impl RecurringTransaction {
 
     fn start_recurring_transaction(&self, user_id: i32) -> Result<(), ApiError> {
         let binding = get_recurring_transaction_scheduler();
-        let mut scheduler = binding.lock().expect("Failed to lock scheduler mutex");
         let cron = self.recurring_rule.to_cron()?;
 
         let transaction = self.clone();
@@ -122,6 +121,7 @@ impl RecurringTransaction {
             })
         }));
 
+        let mut scheduler = binding.lock().expect("Failed to lock scheduler mutex");
         scheduler.schedule_job(cron, job);
 
         Ok(())
@@ -233,11 +233,10 @@ pub(crate) fn get_recurring_transaction_scheduler() -> Arc<Mutex<TokioScheduler>
 
 fn create_tokio_scheduler() -> TokioScheduler {
     let builder_config = get_cron_builder_config_default();
-    let config = TokioSchedulerConfigBuilder::default()
-        .builder_config(builder_config)
-        .channel_size(CHANNEL_SIZE)
-        .build()
-        .expect("Could not build TokioSchedulerConfig");
+    let config = TokioSchedulerConfig {
+        channel_size: CHANNEL_SIZE,
+        builder_config,
+    };
 
     let mut scheduler = TokioScheduler::new(config);
     scheduler.start();

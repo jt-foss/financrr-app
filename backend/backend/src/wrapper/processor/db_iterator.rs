@@ -25,7 +25,6 @@ where
     let count = count_all().await.expect("Failed to count all");
     let pages = (count as f64 / limit as f64).ceil() as u64;
 
-    let job = Arc::new(job);
     for page in 1..=pages {
         let page_size = PageSizeParam::new(page, limit);
         let data = find_all_paginated(page_size).await.expect("Failed to find all paginated");

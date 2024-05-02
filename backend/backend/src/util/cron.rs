@@ -1,5 +1,5 @@
 use chrono::FixedOffset;
-use deschuler::cron_builder::config::{BuilderConfig, BuilderConfigBuilder};
+use deschuler::cron_builder::config::BuilderConfig;
 use deschuler::cron_builder::CronBuilder;
 use time::OffsetDateTime;
 
@@ -19,11 +19,10 @@ pub(crate) fn get_cron_builder(now: &OffsetDateTime) -> CronBuilder {
 }
 
 pub(crate) fn get_cron_builder_config(timezone: FixedOffset, is_utc: bool) -> BuilderConfig {
-    BuilderConfigBuilder::default()
-        .timezone(timezone)
-        .use_utc(is_utc)
-        .build()
-        .expect("Could not build cron BuilderConfig!")
+    BuilderConfig {
+        timezone,
+        use_utc: is_utc,
+    }
 }
 
 pub(crate) fn get_cron_builder_config_default() -> BuilderConfig {

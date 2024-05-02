@@ -24,8 +24,7 @@ pub(crate) const MAX_PASSWORD_LENGTH: usize = 128;
 pub(crate) struct ValidationErrorJsonPayload {
     pub(crate) message: String,
     pub(crate) fields: Vec<FieldError>,
-}_errors(error);
-        let mut field_errors: Vec<Field
+}
 
 #[derive(Debug, Serialize, ToSchema)]
 pub(crate) struct FieldError {
