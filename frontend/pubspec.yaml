@@ -39,7 +39,7 @@ dependencies:
       ref: fix/id-cache
   # L10n
   intl: ^0.18.1
-  easy_localization: ^3.0.5
+  easy_localization: ^3.0.6
   # Routing
   # Data
   flutter_secure_storage: ^9.0.0
