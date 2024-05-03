@@ -1,9 +1,9 @@
 use std::sync::{Arc, Mutex};
 
 use deschuler::scheduler::job::Job;
-use deschuler::scheduler::Scheduler;
 use deschuler::scheduler::tokio_scheduler::config::TokioSchedulerConfig;
 use deschuler::scheduler::tokio_scheduler::TokioScheduler;
+use deschuler::scheduler::Scheduler;
 use once_cell::sync::OnceCell;
 use sea_orm::{EntityName, EntityTrait, Set};
 use serde::{Deserialize, Serialize};
@@ -22,13 +22,13 @@ use crate::database::entity::{count, find_all_paginated, find_one_or_error, inse
 use crate::permission_impl;
 use crate::util::cron::get_cron_builder_config_default;
 use crate::util::datetime::{convert_chrono_to_time, convert_time_to_chrono};
-use crate::wrapper::entity::{TableName, WrapperEntity};
+use crate::wrapper::entity::account::Account;
 use crate::wrapper::entity::transaction::dto::TransactionDTO;
 use crate::wrapper::entity::transaction::recurring::dto::RecurringTransactionDTO;
 use crate::wrapper::entity::transaction::recurring::recurring_rule::RecurringRule;
 use crate::wrapper::entity::transaction::template::TransactionTemplate;
 use crate::wrapper::entity::transaction::Transaction;
-use crate::wrapper::permission::{Permission, Permissions, PermissionsEntity};
+use crate::wrapper::entity::{TableName, WrapperEntity};
 use crate::wrapper::processor::db_iterator;
 use crate::wrapper::processor::db_iterator::{CountAllFn, FindAllPaginatedFn, JobFn};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
@@ -68,7 +68,7 @@ impl RecurringTransaction {
         let (count_all, find_all_paginated) = Self::get_count_all_and_find_all_fns();
         let job: JobFn<Self> = Arc::new(move |transaction: Self| {
             let transaction = transaction.clone();
-            Box::pin(async move { transaction.start_recurring_transaction(0) })
+            Box::pin(async move { transaction.start_recurring_transaction() })
         });
 
         process_entity(count_all, find_all_paginated, job).await;
@@ -93,12 +93,7 @@ impl RecurringTransaction {
 
             while next_occurrence < now_chrono {
                 let next_occurrence_time = convert_chrono_to_time(&next_occurrence);
-                if let Ok(user_id) = PermissionsEntity::find_all_by_type_and_id(Self::table_name(), self.id)
-                    .await
-                    .map(|permissions| permissions[0].user_id)
-                {
-                    self.handle_job(next_occurrence_time, user_id).await;
-                }
+                self.handle_job(next_occurrence_time).await;
 
                 next_occurrence = self.recurring_rule.to_cron()?.find_next_occurrence(&next_occurrence, false)?;
             }
@@ -107,7 +102,7 @@ impl RecurringTransaction {
         Ok(())
     }
 
-    pub(crate) async fn new(dto: RecurringTransactionDTO, user_id: i32) -> Result<Self, ApiError> {
+    pub(crate) async fn new(dto: RecurringTransactionDTO) -> Result<Self, ApiError> {
         let recurring_rule = RecurringRule::from(dto.recurring_rule);
         recurring_rule.to_cron()?; // doing this to check if the cron is valid
         let active_model = recurring_transaction::ActiveModel {
@@ -120,16 +115,22 @@ impl RecurringTransaction {
         let model = insert(active_model).await?;
         let transaction = Self::from(model);
 
+        let template = dto.template_id.fetch_inner().await?;
         //grant permission
-        transaction.add_permission(user_id, Permissions::all()).await?;
+        if let Some(source) = template.source_id.as_ref() {
+            Account::assign_permissions_from_account(&transaction, source.get_id()).await?;
+        }
+        if let Some(destination) = template.destination_id.as_ref() {
+            Account::assign_permissions_from_account(&transaction, destination.get_id()).await?;
+        }
 
         //starting the recurring transaction
-        transaction.start_recurring_transaction(user_id)?;
+        transaction.start_recurring_transaction()?;
 
         Ok(transaction)
     }
 
-    fn start_recurring_transaction(&self, user_id: i32) -> Result<(), ApiError> {
+    fn start_recurring_transaction(&self) -> Result<(), ApiError> {
         let binding = get_recurring_transaction_scheduler();
         let cron = self.recurring_rule.to_cron()?;
 
@@ -138,7 +139,7 @@ impl RecurringTransaction {
             let transaction = transaction.clone();
             Box::pin(async move {
                 let now = convert_chrono_to_time(&now);
-                transaction.handle_job(now, user_id).await;
+                transaction.handle_job(now).await;
             })
         }));
 
@@ -148,18 +149,18 @@ impl RecurringTransaction {
         Ok(())
     }
 
-    async fn handle_job(&self, now: OffsetDateTime, user_id: i32) {
-        if let Err(err) = self.recurring_transaction_job_task(now, user_id).await {
+    async fn handle_job(&self, now: OffsetDateTime) {
+        if let Err(err) = self.recurring_transaction_job_task(now).await {
             error!("Could not execute recurring transaction job. Error: {:?}", err);
         } else if let Err(err) = self.update_last_run(now).await {
             error!("Could not update last run. Error: {:?}", err);
         }
     }
 
-    async fn recurring_transaction_job_task(&self, now: OffsetDateTime, user_id: i32) -> Result<(), ApiError> {
+    async fn recurring_transaction_job_task(&self, now: OffsetDateTime) -> Result<(), ApiError> {
         let template = Arc::new(self.template.fetch_inner().await?);
         let dto = TransactionDTO::from_template(template, now).await?;
-        Transaction::new(dto, user_id).await?;
+        Transaction::new(dto).await?;
 
         Ok(())
     }

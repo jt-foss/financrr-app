@@ -90,7 +90,7 @@ pub(crate) async fn create_recurring_transaction(
         .has_permission_or_error(user.get_id(), Permissions::READ)
         .await?;
 
-    let transaction = RecurringTransaction::new(recurring_transaction_dto, user.get_id()).await?;
+    let transaction = RecurringTransaction::new(recurring_transaction_dto).await?;
 
     Ok(HttpResponse::Ok().json(transaction))
 }

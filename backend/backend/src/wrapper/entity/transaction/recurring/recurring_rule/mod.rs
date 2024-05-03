@@ -57,14 +57,13 @@ impl RecurringRule {
         match dto {
             RecurringRuleDTO::CronPattern(cron_dto) => Self::CronPattern(CronPattern::from_dto(cron_dto, now)),
             RecurringRuleDTO::Special(special) => Self::Special(special),
-
         }
     }
 
     pub(crate) fn to_cron(&self) -> Result<Cron, ApiError> {
         match self {
             Self::CronPattern(pattern) => Self::build_cron(pattern, get_cron_builder_default()),
-            Self::Special(special) => Self::build_special(special)
+            Self::Special(special) => Self::build_special(special),
         }
     }
 

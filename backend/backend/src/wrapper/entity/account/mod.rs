@@ -1,6 +1,7 @@
 use sea_orm::{EntityName, EntityTrait, Set};
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
+use tracing::error;
 use utoipa::ToSchema;
 
 use entity::utility::time::get_now;
@@ -14,7 +15,7 @@ use crate::wrapper::entity::account::dto::AccountDTO;
 use crate::wrapper::entity::currency::Currency;
 use crate::wrapper::entity::transaction::Transaction;
 use crate::wrapper::entity::{TableName, WrapperEntity};
-use crate::wrapper::permission::{Permission, Permissions};
+use crate::wrapper::permission::{Permission, Permissions, PermissionsEntity};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
 pub(crate) mod dto;
@@ -113,6 +114,20 @@ impl Account {
 
     pub(crate) async fn count_transactions_by_account_id(account_id: i32) -> Result<u64, ApiError> {
         count(transaction::Entity::find_all_by_account_id(account_id)).await
+    }
+
+    pub(crate) async fn assign_permissions_from_account(
+        obj: &impl Permission,
+        account_id: i32,
+    ) -> Result<(), ApiError> {
+        let permissions = PermissionsEntity::find_all_by_type_and_id(Self::table_name(), account_id).await?;
+        for permission in permissions {
+            if let Err(err) = obj.add_permission(permission.user_id, permission.permissions).await {
+                error!("Failed to add permission to user: {}", err);
+            }
+        }
+
+        Ok(())
     }
 }
 

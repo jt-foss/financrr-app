@@ -124,6 +124,7 @@ macro_rules! permission_impl {
     };
 }
 
+#[allow(unused)] //TODO remove once multiple users per account has been implemented
 pub(crate) trait Permission: PermissionByIds + WrapperEntity {
     fn get_permissions(&self, user_id: i32) -> impl Future<Output = Result<Permissions, ApiError>> {
         async move { Self::get_permissions_by_id(self.get_id(), user_id).await }

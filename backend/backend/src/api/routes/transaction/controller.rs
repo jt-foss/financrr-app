@@ -96,7 +96,7 @@ pub(crate) async fn create_transaction(
         return Err(ApiError::Unauthorized());
     }
 
-    Ok(HttpResponse::Created().json(Transaction::new(transaction, user.get_id()).await?))
+    Ok(HttpResponse::Created().json(Transaction::new(transaction).await?))
 }
 
 #[utoipa::path(post,
@@ -120,7 +120,7 @@ pub(crate) async fn create_from_transaction_template(
     template.has_permission_or_error(user.get_id(), Permissions::READ).await?;
     let dto = TransactionDTO::from_template(template, transaction_from_template.executed_at).await?;
 
-    Ok(HttpResponse::Created().json(Transaction::new(dto, user.get_id()).await?))
+    Ok(HttpResponse::Created().json(Transaction::new(dto).await?))
 }
 
 #[utoipa::path(delete,

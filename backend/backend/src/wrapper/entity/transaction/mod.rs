@@ -20,7 +20,6 @@ use crate::wrapper::entity::budget::Budget;
 use crate::wrapper::entity::currency::Currency;
 use crate::wrapper::entity::transaction::dto::TransactionDTO;
 use crate::wrapper::entity::{TableName, WrapperEntity};
-use crate::wrapper::permission::{Permission, Permissions};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
 pub(crate) mod dto;
@@ -44,11 +43,11 @@ pub(crate) struct Transaction {
 }
 
 impl Transaction {
-    pub(crate) async fn new(dto: TransactionDTO, user_id: i32) -> Result<Self, ApiError> {
+    pub(crate) async fn new(dto: TransactionDTO) -> Result<Self, ApiError> {
         let active_model = transaction::ActiveModel {
             id: Default::default(),
-            source: Set(dto.source_id.map(|source| source.get_id())),
-            destination: Set(dto.destination_id.map(|destination| destination.get_id())),
+            source: Set(dto.source_id.as_ref().map(|source| source.get_id())),
+            destination: Set(dto.destination_id.as_ref().map(|destination| destination.get_id())),
             amount: Set(dto.amount),
             currency: Set(dto.currency_id.get_id()),
             name: Set(dto.name),
@@ -62,7 +61,12 @@ impl Transaction {
         let transaction = Self::from(model);
 
         //grant permission
-        transaction.add_permission(user_id, Permissions::all()).await?;
+        if let Some(source) = dto.source_id.as_ref() {
+            Account::assign_permissions_from_account(&transaction, source.get_id()).await?;
+        }
+        if let Some(destination) = dto.destination_id.as_ref() {
+            Account::assign_permissions_from_account(&transaction, destination.get_id()).await?;
+        }
 
         // check if execute_at is in the future
         if transaction.executed_at > get_now() {
