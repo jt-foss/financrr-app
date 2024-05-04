@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:financrr_frontend/modules/auth/pages/register_page.dart';
 import 'package:financrr_frontend/modules/settings/views/local_storage_settings_page.dart';
 import 'package:financrr_frontend/modules/settings/views/l10n_settings_page.dart';
 import 'package:financrr_frontend/shared/views/splash_page.dart';
@@ -181,9 +182,13 @@ class AppRouter {
           redirect: guards([_loginAuthGuard])),
       GoRoute(
           path: LoginPage.pagePath.path,
-          pageBuilder: (context, state) =>
-              _buildDefaultPageTransition(context, state, LoginPage(hostUri: state.extra as Uri)),
-          redirect: guards([ExtraGuard(ServerConfigPage.pagePath)]))
+          pageBuilder: (context, state) => _buildDefaultPageTransition(context, state, LoginPage(hostUri: state.extra as Uri)),
+          redirect: guards([ExtraGuard(ServerConfigPage.pagePath)])),
+      GoRoute(
+        path: RegisterPage.pagePath.path,
+        pageBuilder: (context, state) => _buildDefaultPageTransition(context, state, RegisterPage(hostUri: state.extra as Uri)),
+        redirect: guards([ExtraGuard(ServerConfigPage.pagePath)]),
+      )
     ];
   }
 
