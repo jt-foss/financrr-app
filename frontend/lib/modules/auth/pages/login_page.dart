@@ -1,13 +1,12 @@
 import 'dart:async';
 
-import 'package:easy_localization/easy_localization.dart';
 import 'package:financrr_frontend/modules/auth/pages/register_page.dart';
 import 'package:financrr_frontend/shared/ui/auth_page_template.dart';
 import 'package:financrr_frontend/modules/auth/providers/authentication.provider.dart';
 import 'package:financrr_frontend/modules/auth/models/authentication.state.dart';
 import 'package:financrr_frontend/modules/dashboard/views/dashboard_page.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
-import 'package:financrr_frontend/utils/extensions.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -30,6 +29,7 @@ class LoginPageState extends ConsumerState<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
 
   bool _obscureText = true;
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -57,15 +57,15 @@ class LoginPageState extends ConsumerState<LoginPage> {
                       padding: const EdgeInsets.symmetric(vertical: 20),
                       child: TextFormField(
                         controller: _usernameController,
-                        decoration: InputDecoration(labelText: 'common_username'.tr()),
+                        decoration: InputDecoration(labelText: L10nKey.commonUsername.toString()),
                         autofillHints: const [AutofillHints.username, AutofillHints.newUsername],
-                        validator: (value) => value!.isEmpty ? 'common_username_required'.tr() : null,
+                        validator: (value) => value!.isEmpty ? L10nKey.commonUsernameRequired.toString() : null,
                       ),
                     ),
                     TextFormField(
                       controller: _passwordController,
                       decoration: InputDecoration(
-                          labelText: 'common_password'.tr(),
+                          labelText: L10nKey.commonPassword.toString(),
                           suffixIcon: Padding(
                             padding: const EdgeInsets.only(right: 10),
                             child: IconButton(
@@ -74,7 +74,7 @@ class LoginPageState extends ConsumerState<LoginPage> {
                           )),
                       obscureText: _obscureText,
                       autofillHints: const [AutofillHints.password, AutofillHints.newPassword],
-                      validator: (value) => value!.isEmpty ? 'common_password_required'.tr() : null,
+                      validator: (value) => value!.isEmpty ? L10nKey.commonPasswordRequired.toString() : null,
                     ),
                   ],
                 )),
@@ -85,7 +85,9 @@ class LoginPageState extends ConsumerState<LoginPage> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: _handleLogin,
-                    child: const Text('common_login').tr(),
+                    child: _isLoading
+                        ? const CircularProgressIndicator()
+                        : L10nKey.commonLogin.toText(),
                   ),
                 )),
             Padding(
@@ -94,8 +96,13 @@ class LoginPageState extends ConsumerState<LoginPage> {
                   width: double.infinity,
                   height: 50,
                   child: TextButton(
-                    onPressed: () => context.goPath(RegisterPage.pagePath.build(), extra: widget.hostUri),
-                    child: const Text('Don\'t have an account?'),
+                    onPressed: () {
+                      if (_isLoading) {
+                        return;
+                      }
+                      context.goPath(RegisterPage.pagePath.build(), extra: widget.hostUri);
+                    },
+                    child: L10nKey.authLoginNoAccount.toText(),
                   ),
                 )),
           ],
@@ -103,22 +110,29 @@ class LoginPageState extends ConsumerState<LoginPage> {
   }
 
   Future<void> _handleLogin() async {
+    if (_isLoading) {
+      return;
+    }
+    // check if username is empty
     final String username = _usernameController.text;
     if (username.isEmpty) {
-      context.showSnackBar('common_username_required'.tr());
+      L10nKey.commonUsernameRequired.showSnack(context);
       return;
     }
+    // check if password is empty
     final String password = _passwordController.text;
     if (password.isEmpty) {
-      context.showSnackBar('common_password_required'.tr());
+      L10nKey.commonPasswordRequired.showSnack(context);
       return;
     }
+    setState(() => _isLoading = true);
     final AuthenticationState state = await ref.read(authProvider.notifier).login(username, password, widget.hostUri);
+    setState(() => _isLoading = false);
     if (!mounted) return;
     if (state.status == AuthenticationStatus.authenticated) {
       context.goPath(DashboardPage.pagePath.build());
     } else {
-      context.showSnackBar('common_login_failed'.tr());
+      L10nKey.authLoginFailed.showSnack(context);
     }
   }
 }

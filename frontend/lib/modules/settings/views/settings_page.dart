@@ -5,6 +5,7 @@ import 'package:financrr_frontend/modules/settings/views/l10n_settings_page.dart
 import 'package:financrr_frontend/modules/settings/views/session_settings_page.dart';
 import 'package:financrr_frontend/modules/settings/views/theme_settings_page.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -18,7 +19,7 @@ import 'currency_settings_page.dart';
 import 'log_settings_page.dart';
 
 class SettingsItemGroup {
-  final String? title;
+  final L10nKey? title;
   final List<SettingsItem> items;
   final bool groupInCard;
 
@@ -27,9 +28,31 @@ class SettingsItemGroup {
 
 class SettingsItem {
   final bool showCategory;
-  final Widget child;
+  final Widget? child;
+  final L10nKey? title;
+  final IconData? iconData;
+  final PagePathBuilder? destination;
+  final Function()? onTap;
 
-  const SettingsItem({this.showCategory = true, required this.child});
+  const SettingsItem({this.showCategory = true, required this.title, required this.iconData, this.destination, this.onTap})
+      : child = null;
+
+  const SettingsItem.fromChild({this.showCategory = true, required this.child})
+      : title = null,
+        iconData = null,
+        destination = null,
+        onTap = null;
+
+  Widget build(BuildContext context) {
+    if (child != null) {
+      return child!;
+    }
+    return ListTile(
+      onTap: () => destination == null ? onTap?.call() : context.goPath(destination!.build()),
+      leading: Icon(iconData),
+      title: title!.toText(),
+    );
+  }
 }
 
 class SettingsPage extends StatefulHookConsumerWidget {
@@ -46,7 +69,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
   late final List<SettingsItemGroup> _items = [
     SettingsItemGroup(items: [
-      SettingsItem(
+      SettingsItem.fromChild(
         showCategory: false,
         child: ListTile(
           leading: TextCircleAvatar(text: _api.selfUser.effectiveDisplayName, radius: 25),
@@ -55,74 +78,68 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         ),
       ),
     ]),
-    SettingsItemGroup(title: 'Account', items: [
+    const SettingsItemGroup(title: L10nKey.settingsCategoryAccount, items: [
       SettingsItem(
-        child: ListTile(
-          onTap: () => context.goPath(CurrencySettingsPage.pagePath.build()),
-          leading: const Icon(Icons.currency_exchange_rounded),
-          title: const Text('Currencies'),
-        ),
+        title: L10nKey.settingsItemCurrencies,
+        iconData: Icons.currency_exchange_rounded,
+        destination: CurrencySettingsPage.pagePath,
       ),
       SettingsItem(
-        child: ListTile(
-          onTap: () => context.goPath(SessionSettingsPage.pagePath.build()),
-          leading: const Icon(Icons.devices_rounded),
-          title: const Text('Sessions'),
-        ),
+        title: L10nKey.settingsItemSessions,
+        iconData: Icons.devices_rounded,
+        destination: SessionSettingsPage.pagePath,
       ),
     ]),
-    SettingsItemGroup(title: 'App', items: [
+    const SettingsItemGroup(title: L10nKey.settingsCategoryApp, items: [
       SettingsItem(
-        child: ListTile(
-          onTap: () => context.goPath(ThemeSettingsPage.pagePath.build()),
-          leading: const Icon(Icons.brightness_4_outlined),
-          title: const Text('Themes'),
-        ),
+        title: L10nKey.settingsItemAppearance,
+        iconData: Icons.palette_outlined,
+        destination: ThemeSettingsPage.pagePath,
       ),
       SettingsItem(
-        child: ListTile(
-          onTap: () => context.goPath(L10nSettingsPage.pagePath.build()),
-          leading: const Icon(Icons.language_rounded),
-          title: const Text('Language'),
-        ),
+        title: L10nKey.settingsItemLanguage,
+        iconData: Icons.language_rounded,
+        destination: L10nSettingsPage.pagePath,
       ),
     ]),
-    SettingsItemGroup(title: 'Developer', items: [
+    SettingsItemGroup(title: L10nKey.settingsCategoryDeveloper, items: [
       SettingsItem(
-        child: ListTile(
-          onTap: () => context.goPath(LocalStorageSettingsPage.pagePath.build()),
-          leading: const Icon(Icons.sd_storage_outlined),
-          title: const Text('Local Storage'),
-        ),
+        title: L10nKey.settingsItemLocalStorage,
+        iconData: Icons.sd_storage_outlined,
+        destination: LocalStorageSettingsPage.pagePath,
       ),
       SettingsItem(
-        child: ListTile(
-          onTap: () => context.goPath(LogSettingsPage.pagePath.build()),
-          leading: const Icon(Icons.format_align_left_rounded),
-          title: const Text('Logs'),
-        ),
+        title: L10nKey.settingsItemLogs,
+        iconData: Icons.format_align_left_rounded,
+        destination: LogSettingsPage.pagePath,
       ),
     ]),
     SettingsItemGroup(items: [
       SettingsItem(
         showCategory: false,
-        child: ListTile(
-          onTap: () => CommonActions.logOut(this, ref),
-          leading: const Icon(Icons.logout),
-          title: const Text('Logout'),
-        ),
+        title: L10nKey.commonLogout,
+        iconData: Icons.logout,
+        onTap: () => CommonActions.logOut(this, ref),
       ),
     ]),
     SettingsItemGroup(groupInCard: false, items: [
-      SettingsItem(
+      SettingsItem.fromChild(
           showCategory: false,
           child: FutureBuilder(
             future: PackageInfo.fromPlatform(),
             builder: (context, AsyncSnapshot<PackageInfo> snapshot) {
               if (!snapshot.hasData) return const SizedBox();
               final PackageInfo info = snapshot.data!;
-              return Align(
-                child: Text('made with ❤️\nv${info.version}+${info.buildNumber}', textAlign: TextAlign.center),
+              return SizedBox(
+                width: double.infinity,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    L10nKey.settingsFooter.toText(),
+                    L10nKey.commonVersion.toText(namedArgs: {'version': '${info.version}+${info.buildNumber}'})
+                  ],
+                ),
               );
             },
           )),
@@ -154,14 +171,14 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   if (group.title != null) ...[
                     Padding(
                       padding: const EdgeInsets.only(top: 5),
-                      child: Text(group.title!, style: ref.textTheme.titleSmall),
+                      child: group.title!.toText(style: ref.textTheme.titleSmall),
                     ),
                     const Divider()
                   ],
                   if (group.groupInCard)
-                    Card.outlined(child: Column(children: group.items.map((item) => item.child).toList()))
+                    Card.outlined(child: Column(children: group.items.map((item) => item.build(context)).toList()))
                   else
-                    Column(children: group.items.map((item) => item.child).toList()),
+                    Column(children: group.items.map((item) => item.build(context)).toList()),
                 ],
               );
             },

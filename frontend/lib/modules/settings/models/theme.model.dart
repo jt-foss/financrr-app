@@ -1,4 +1,4 @@
-import 'package:easy_localization/easy_localization.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 
 import '../../../utils/json_utils.dart';
@@ -9,7 +9,7 @@ class AppTheme {
 
   final String id;
   final String logoPath;
-  final String? translationKey;
+  final L10nKey? translationKey;
   final String? fallbackName;
   final Color previewColor;
   final ThemeMode themeMode;
@@ -24,7 +24,7 @@ class AppTheme {
       required this.themeMode,
       required this.themeData});
 
-  String get effectiveName => translationKey?.tr() ?? fallbackName ?? id;
+  String get effectiveName => translationKey?.toString() ?? fallbackName ?? id;
 
   static AppTheme? tryFromJson(Map<String, dynamic> json) {
     final AppThemeColor? previewColor = AppThemeColor.tryFromJson(json['preview_color']);
@@ -38,14 +38,14 @@ class AppTheme {
         JsonUtils.isInvalidType(json, 'theme_data', Map)) {
       return null;
     }
-    if ((json['translation_key'] != null && json['fallback_name'] != null) ||
-        json['translation_key'] == null && json['fallback_name'] == null) {
+    final L10nKey? translationKey = L10nKey.fromKey(json['translation_key']!);
+    if (translationKey == null && json['fallback_name'] == null) {
       throw StateError('Either translation_key or fallback_name must be set!');
     }
     return AppTheme(
         id: json['id'],
         logoPath: json['logo_path'],
-        translationKey: json['translation_key'],
+        translationKey: translationKey,
         fallbackName: json['fallback_name'],
         previewColor: previewColor.toColor(json),
         themeMode: themeMode,

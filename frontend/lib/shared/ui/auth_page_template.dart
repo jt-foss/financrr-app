@@ -1,10 +1,10 @@
 import 'dart:math';
 
-import 'package:easy_localization/easy_localization.dart';
 import 'package:financrr_frontend/modules/settings/models/theme.state.dart';
 import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -67,11 +67,19 @@ class AuthPageTemplateState extends ConsumerState<AuthPageTemplate> {
               child: SvgPicture.asset(ref.currentTheme.logoPath,
                   width: 100, colorFilter: ColorFilter.mode(ref.themeData.primaryColor, BlendMode.srcIn)),
             ),
-            Text('${widget.registerWelcomeMessages ? 'sign_up' : 'sign_in'}_message_$_random',
-                    style: ref.textTheme.titleLarge?.copyWith(color: ref.themeData.primaryColor))
-                .tr(),
+            _getRandomMessageKey().toText(
+                textAlign: TextAlign.center,
+                style: ref.textTheme.titleLarge?.copyWith(color: ref.themeData.primaryColor)),
             widget.child
           ]),
         )));
+  }
+
+  L10nKey _getRandomMessageKey() {
+    L10nKey? key = L10nKey.fromKey('auth_${widget.registerWelcomeMessages ? 'register' : 'login'}_message_$_random');
+    if (key != null) {
+      return key;
+    }
+    return widget.registerWelcomeMessages ? L10nKey.authRegisterMessage1 : L10nKey.authLoginMessage1;
   }
 }

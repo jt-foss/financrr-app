@@ -4,6 +4,7 @@ import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart
 import 'package:financrr_frontend/shared/ui/auth_page_template.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -77,7 +78,8 @@ class ServerConfigPageState extends ConsumerState<ServerConfigPage> {
                 if (_isValid && _apiVersion != null)
                   Padding(
                     padding: const EdgeInsets.only(top: 5),
-                    child: Text('Status: Healthy, v$_apiVersion',
+                    child: L10nKey.authConfigStatus.toText(
+                        namedArgs: {'hostStatus': 'Healthy', 'apiVersion': '$_apiVersion'},
                         style: ref.textTheme.labelMedium?.copyWith(color: ref.themeData.primaryColor)),
                   )
               ],
@@ -95,7 +97,7 @@ class ServerConfigPageState extends ConsumerState<ServerConfigPage> {
                       }
                     },
                     label: const Icon(Icons.arrow_forward, size: 18),
-                    icon: Text(_isValid ? 'Next' : 'Check URL'),
+                    icon: (_isValid ? L10nKey.commonNext : L10nKey.authConfigCheckUrl).toText(),
                   )),
       ],
     ));
@@ -104,7 +106,7 @@ class ServerConfigPageState extends ConsumerState<ServerConfigPage> {
   Future<void> _handleUrlCheck() async {
     final String url = _urlController.text;
     if (InputValidators.url(url) != null) {
-      context.showSnackBar('Please provide a valid URL');
+      L10nKey.commonUrlInvalid.showSnack(context);
       return;
     }
     setState(() {
