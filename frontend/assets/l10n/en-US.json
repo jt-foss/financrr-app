@@ -29,9 +29,12 @@
   "common_username": "Username",
   "common_username_required": "Please provide a username",
   "settings_appearance": "Appearance",
-  "settings_currency": "Currency",
+  "settings_currency": "Currencies",
   "settings_language": "Language",
+  "settings_local_storage": "Local Storage",
   "settings_logout": "Log Out",
+  "settings_logs": "Logs",
+  "settings_sessions": "Sessions",
   "theme_dark": "Dark",
   "theme_light": "Light",
   "theme_midnight": "Midnight"
