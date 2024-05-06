@@ -1,4 +1,10 @@
 {
+  "auth_login": "Log In",
+  "auth_login_message_1": "Good to see you!",
+  "auth_login_message_2": "Welcome back!",
+  "auth_login_message_3": "Nice to see you!",
+  "auth_login_message_4": "Oh, look who's there!",
+  "auth_login_message_5": "I think I've seen this one before",
   "auth_register_message_1": "Let's get you going!",
   "auth_register_message_2": "Another one bites the dust",
   "auth_register_message_3": "A new user appears!",
