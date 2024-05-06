@@ -35,8 +35,7 @@ class FallbackErrorApp extends StatelessWidget {
                           WidgetSpan(
                             child: GestureDetector(
                                 onTap: () => launchUrl(Uri.parse(githubIssueUrl)),
-                                child: const Text(' issue on our GitHub repository',
-                                    style: TextStyle(color: Colors.blue))),
+                                child: const Text(' issue on our GitHub repository', style: TextStyle(color: Colors.blue))),
                           ),
                           const TextSpan(text: ' or contact us via support@financrr.app')
                         ],

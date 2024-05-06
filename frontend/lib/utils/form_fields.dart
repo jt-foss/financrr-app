@@ -101,8 +101,7 @@ class FormFields {
             );
             if (date == null || !state.mounted) return;
             final TimeOfDay? time = await showTimePicker(
-                context: state.context,
-                initialTime: executedAt != null ? TimeOfDay.fromDateTime(executedAt) : TimeOfDay.now());
+                context: state.context, initialTime: executedAt != null ? TimeOfDay.fromDateTime(executedAt) : TimeOfDay.now());
             if (time == null) return;
             onExecutedAtChanged?.call(date.copyWith(hour: time.hour, minute: time.minute));
           },

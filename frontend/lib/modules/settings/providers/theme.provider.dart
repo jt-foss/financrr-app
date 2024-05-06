@@ -22,9 +22,8 @@ class ThemeNotifier extends StateNotifier<ThemeState> {
     return switch (state.mode) {
       ThemeMode.light => state.lightTheme,
       ThemeMode.dark => state.darkTheme,
-      ThemeMode.system => WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.light
-          ? state.lightTheme
-          : state.darkTheme
+      ThemeMode.system =>
+        WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.light ? state.lightTheme : state.darkTheme
     };
   }
 

@@ -33,8 +33,7 @@ class _LogSettingsPageState extends ConsumerState<LogSettingsPage> {
 
   void sortEntries() {
     _selectedEntryIndex = null;
-    _entries
-        .sort((a, b) => _sortTimeAscending ? a.timestamp.compareTo(b.timestamp) : b.timestamp.compareTo(a.timestamp));
+    _entries.sort((a, b) => _sortTimeAscending ? a.timestamp.compareTo(b.timestamp) : b.timestamp.compareTo(a.timestamp));
   }
 
   @override
@@ -121,8 +120,7 @@ class _LogSettingsPageState extends ConsumerState<LogSettingsPage> {
                   padding: const EdgeInsets.only(right: 5),
                   child: Icon(_getIcon(entry.level), color: _getColorTint(entry.level), size: 17),
                 ),
-                Expanded(
-                    child: Text('${entry.level.name}, ${StoreKey.dateTimeFormat.readSync()!.format(entry.timestamp)}')),
+                Expanded(child: Text('${entry.level.name}, ${StoreKey.dateTimeFormat.readSync()!.format(entry.timestamp)}')),
               ],
             ),
           ],

@@ -73,9 +73,8 @@ class TransactionCard extends ConsumerWidget {
                   Text(
                       '${type == TransactionType.deposit ? '' : '-'}${TextUtils.formatBalanceWithCurrency(amount, account.currencyId.get()!)}',
                       style: ref.textTheme.titleMedium?.copyWith(
-                          color: type == TransactionType.deposit
-                              ? ref.themeData.primaryColor
-                              : ref.themeData.colorScheme.error)),
+                          color:
+                              type == TransactionType.deposit ? ref.themeData.primaryColor : ref.themeData.colorScheme.error)),
                 ],
               ),
             ],

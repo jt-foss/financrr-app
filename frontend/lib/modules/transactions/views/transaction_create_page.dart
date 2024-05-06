@@ -16,8 +16,7 @@ import '../../../utils/form_fields.dart';
 import '../../accounts/views/account_page.dart';
 
 class TransactionCreatePage extends StatefulHookConsumerWidget {
-  static const PagePathBuilder pagePath =
-      PagePathBuilder.child(parent: AccountPage.pagePath, path: 'transactions/create');
+  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: AccountPage.pagePath, path: 'transactions/create');
 
   final String? accountId;
 

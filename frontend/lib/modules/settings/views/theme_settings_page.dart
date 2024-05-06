@@ -44,8 +44,8 @@ class _ThemeSettingsPageState extends ConsumerState<ThemeSettingsPage> {
                     onChanged: (value) =>
                         ref.read(themeProvider.notifier).setMode(value ? ThemeMode.system : ref.currentTheme.themeMode),
                   ),
-                  subtitle: Text(
-                      'Current device theme: ${WidgetsBinding.instance.platformDispatcher.platformBrightness.name}')),
+                  subtitle:
+                      Text('Current device theme: ${WidgetsBinding.instance.platformDispatcher.platformBrightness.name}')),
               const Divider(),
               for (AppTheme theme in AppThemeLoader.themes) _buildThemePreview(theme, themeState)
             ],

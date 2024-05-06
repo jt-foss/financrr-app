@@ -63,8 +63,7 @@ class _SessionSettingsPageState extends ConsumerState<SessionSettingsPage> {
                 const Divider(),
                 PaginatedWrapper(
                   key: _paginatedSessionKey,
-                  initialPageFunction: (forceRetrieve) =>
-                      _api.retrieveAllSessions(limit: 10, forceRetrieve: forceRetrieve),
+                  initialPageFunction: (forceRetrieve) => _api.retrieveAllSessions(limit: 10, forceRetrieve: forceRetrieve),
                   onError: (context, snap) {
                     if (snap.error is ServerException) {
                       CommonActions.logOut(this, ref);

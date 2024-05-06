@@ -85,9 +85,7 @@ class LoginPageState extends ConsumerState<LoginPage> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: _handleLogin,
-                    child: _isLoading
-                        ? const CircularProgressIndicator()
-                        : L10nKey.commonLogin.toText(),
+                    child: _isLoading ? const CircularProgressIndicator() : L10nKey.commonLogin.toText(),
                   ),
                 )),
             Padding(

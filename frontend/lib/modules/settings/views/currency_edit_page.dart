@@ -5,6 +5,7 @@ import 'package:financrr_frontend/modules/auth/providers/authentication.provider
 import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/modules/settings/views/currency_create_page.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -84,15 +85,9 @@ class _CurrencyEditPageState extends ConsumerState<CurrencyEditPage> {
   Widget _handleCurrencyStream(Size size) {
     return StreamWrapper(
       stream: _currencyStreamController.stream,
-      onSuccess: (ctx, snap) {
-        return _buildVerticalLayout(snap.data!, size);
-      },
-      onLoading: (ctx, snap) {
-        return const Center(child: CircularProgressIndicator());
-      },
-      onError: (ctx, snap) {
-        return const Text('Could not find currency');
-      },
+      onSuccess: (ctx, snap) => _buildVerticalLayout(snap.data!, size),
+      onLoading: (ctx, snap) => const Center(child: CircularProgressIndicator()),
+      onError: (ctx, snap) => L10nKey.currencyNotFound.toText(),
     );
   }
 
@@ -128,7 +123,9 @@ class _CurrencyEditPageState extends ConsumerState<CurrencyEditPage> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: _isValid && _isCustom ? () => _editCurrency(currency as CustomCurrency) : null,
-                    child: Text(_nameController.text.isEmpty ? 'Edit Currency' : 'Edit "${_nameController.text}"'),
+                    child: _nameController.text.isEmpty
+                        ? L10nKey.currencyEdit.toText()
+                        : L10nKey.commonEditObject.toText(namedArgs: {'object': _nameController.text}),
                   ),
                 ),
                 if (!_isCustom)
@@ -144,8 +141,8 @@ class _CurrencyEditPageState extends ConsumerState<CurrencyEditPage> {
                           Expanded(
                             child: Padding(
                               padding: const EdgeInsets.only(left: 10),
-                              child: Text('This currency is not custom and can therefore not be edited!',
-                                  style: ref.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700)),
+                              child: L10nKey.currencyNotEditable
+                                  .toText(style: ref.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700)),
                             ),
                           ),
                         ],
@@ -170,7 +167,7 @@ class _CurrencyEditPageState extends ConsumerState<CurrencyEditPage> {
         isoCode: _isoCodeController.text.isEmpty ? null : _isoCodeController.text,
       );
       if (!mounted) return;
-      context.showSnackBar('Successfully edited "${_nameController.text}"');
+      L10nKey.commonEditObjectSuccess.showSnack(context, namedArgs: {'object': _nameController.text});
       context.pop();
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);

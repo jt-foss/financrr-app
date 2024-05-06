@@ -20,6 +20,12 @@ enum L10nKey {
   authRegisterMessage4('auth_register_message_4'),
   authRegisterMessage5('auth_register_message_5'),
   brandName('brand_name'),
+  commonCreate('common_create'),
+  commonCreateObject('common_create_object', hasParams: true),
+  commonCreateObjectSuccess('common_create_object_success', hasParams: true),
+  commonEditObject('common_edit_object', hasParams: true),
+  commonEditObjectSuccess('common_edit_object_success', hasParams: true),
+  commonLoadMore('common_load_more'),
   commonLogin('common_login'),
   commonLogout('common_logout'),
   commonNext('common_next'),
@@ -29,11 +35,16 @@ enum L10nKey {
   commonPasswordRepeatRequired('common_password_repeat_required'),
   commonPasswordRequired('common_password_required'),
   commonPasswordWeak('common_password_weak'),
+  commonPreview('common_preview'),
   commonRegister('common_register'),
   commonUrlInvalid('common_url_invalid'),
   commonUsername('common_username'),
   commonUsernameRequired('common_username_required'),
   commonVersion('common_version', hasParams: true),
+  currencyCreate('currency_create'),
+  currencyEdit('currency_edit'),
+  currencyNotEditable('currency_not_editable'),
+  currencyNotFound('currency_not_found'),
   settingsCategoryAccount('settings_category_account'),
   settingsCategoryApp('settings_category_app'),
   settingsCategoryDeveloper('settings_category_developer'),
@@ -54,7 +65,11 @@ enum L10nKey {
   const L10nKey(this.key, {this.hasParams = false});
 
   Text toText({Map<String, String>? namedArgs, TextStyle? style, TextAlign? textAlign}) {
-    return Text(key, style: style, textAlign: textAlign,).tr(namedArgs: namedArgs);
+    return Text(
+      key,
+      style: style,
+      textAlign: textAlign,
+    ).tr(namedArgs: namedArgs);
   }
 
   void showSnack(BuildContext context, {Map<String, String>? namedArgs}) {

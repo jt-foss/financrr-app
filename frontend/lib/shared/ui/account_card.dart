@@ -38,8 +38,7 @@ class AccountCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
-      onTap:
-          !interactive ? null : () => context.goPath(AccountPage.pagePath.build(params: {'accountId': id.toString()})),
+      onTap: !interactive ? null : () => context.goPath(AccountPage.pagePath.build(params: {'accountId': id.toString()})),
       child: Card.outlined(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),

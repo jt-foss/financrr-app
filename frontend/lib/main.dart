@@ -84,8 +84,7 @@ class FinancrrApp extends StatefulHookConsumerWidget {
   final AppTheme currentLightTheme;
   final AppTheme currentDarkTheme;
 
-  const FinancrrApp(
-      {super.key, required this.themeMode, required this.currentLightTheme, required this.currentDarkTheme});
+  const FinancrrApp({super.key, required this.themeMode, required this.currentLightTheme, required this.currentDarkTheme});
 
   @override
   ConsumerState<FinancrrApp> createState() => FinancrrAppState();
@@ -124,8 +123,7 @@ class FinancrrAppState extends ConsumerState<FinancrrApp> {
 class CustomHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
-    return super.createHttpClient(context)
-      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+    return super.createHttpClient(context)..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
   }
 }
 

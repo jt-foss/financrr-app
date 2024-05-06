@@ -102,7 +102,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         destination: L10nSettingsPage.pagePath,
       ),
     ]),
-    SettingsItemGroup(title: L10nKey.settingsCategoryDeveloper, items: [
+    const SettingsItemGroup(title: L10nKey.settingsCategoryDeveloper, items: [
       SettingsItem(
         title: L10nKey.settingsItemLocalStorage,
         iconData: Icons.sd_storage_outlined,

@@ -105,9 +105,7 @@ class RegisterPageState extends ConsumerState<RegisterPage> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: _handleRegistration,
-                    child: _isLoading
-                        ? const CircularProgressIndicator()
-                        : L10nKey.commonRegister.toText(),
+                    child: _isLoading ? const CircularProgressIndicator() : L10nKey.commonRegister.toText(),
                   ),
                 )),
             Padding(

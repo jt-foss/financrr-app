@@ -16,8 +16,7 @@ class PaginatedWrapper<T> extends StatefulWidget {
   final Widget Function(BuildContext, AsyncSnapshot<PaginatedDataResult<T>>)? onLoading;
   final Widget Function(BuildContext, AsyncSnapshot<PaginatedDataResult<T>>)? onError;
 
-  const PaginatedWrapper(
-      {super.key, required this.initialPageFunction, required this.onSuccess, this.onLoading, this.onError});
+  const PaginatedWrapper({super.key, required this.initialPageFunction, required this.onSuccess, this.onLoading, this.onError});
 
   @override
   State<PaginatedWrapper<T>> createState() => PaginatedWrapperState<T>();

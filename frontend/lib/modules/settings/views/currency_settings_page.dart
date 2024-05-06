@@ -1,6 +1,8 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:financrr_frontend/modules/auth/providers/authentication.provider.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
@@ -51,12 +53,13 @@ class _CurrencySettingsPageState extends ConsumerState<CurrencySettingsPage> {
                     TextButton.icon(
                       onPressed: () => context.goPath(CurrencyCreatePage.pagePath.build()),
                       icon: const Icon(Icons.add),
-                      label: const Text('Create'),
+                      label: L10nKey.commonCreate.toText(),
                     ),
                     ValueListenableBuilder(
                       valueListenable: _amount,
                       builder: (context, value, child) {
-                        return Text('${_amount.value} currencies');
+                        // TODO: add plurals
+                        return Text('${_amount.value} currencies').tr();
                       },
                     ),
                   ],
@@ -64,8 +67,7 @@ class _CurrencySettingsPageState extends ConsumerState<CurrencySettingsPage> {
                 const Divider(),
                 PaginatedWrapper(
                   key: _paginatedCurrencyKey,
-                  initialPageFunction: (forceRetrieve) =>
-                      _api.retrieveAllCurrencies(limit: 10, forceRetrieve: forceRetrieve),
+                  initialPageFunction: (forceRetrieve) => _api.retrieveAllCurrencies(limit: 10, forceRetrieve: forceRetrieve),
                   onSuccess: (context, snap) {
                     final PaginatedDataResult<Currency> currencies = snap.data!;
                     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -76,13 +78,12 @@ class _CurrencySettingsPageState extends ConsumerState<CurrencySettingsPage> {
                         for (Currency c in currencies.items)
                           Padding(
                             padding: const EdgeInsets.only(bottom: 10),
-                            child: CurrencyCard(
-                                currency: c, onDelete: c is! CustomCurrency ? null : () => _deleteCurrency(c)),
+                            child: CurrencyCard(currency: c, onDelete: c is! CustomCurrency ? null : () => _deleteCurrency(c)),
                           ),
                         if (currencies.nextPage != null)
                           TextButton(
                             onPressed: () => currencies.nextPage!(_api),
-                            child: const Text('Load more'),
+                            child: L10nKey.commonLoadMore.toText(),
                           ),
                       ],
                     );

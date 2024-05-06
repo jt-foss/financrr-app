@@ -107,8 +107,7 @@ class TransactionPageState extends ConsumerState<TransactionPage> {
                               color: transaction.type == TransactionType.deposit
                                   ? ref.themeData.primaryColor
                                   : ref.themeData.colorScheme.error)),
-                      Text(transaction.description ??
-                          StoreKey.dateTimeFormat.readSync()!.format(transaction.executedAt)),
+                      Text(transaction.description ?? StoreKey.dateTimeFormat.readSync()!.format(transaction.executedAt)),
                     ],
                   ),
                   const Divider(),
@@ -139,8 +138,7 @@ class TransactionPageState extends ConsumerState<TransactionPage> {
                         _buildTableRow('Description', transaction.description ?? 'N/A'),
                         _buildTableRow('From', transaction.sourceId?.get()?.name ?? 'N/A'),
                         _buildTableRow('To', transaction.destinationId?.get()?.name ?? 'N/A'),
-                        _buildTableRow(
-                            'Executed at', StoreKey.dateTimeFormat.readSync()!.format(transaction.executedAt)),
+                        _buildTableRow('Executed at', StoreKey.dateTimeFormat.readSync()!.format(transaction.executedAt)),
                         _buildTableRow('Created at', StoreKey.dateTimeFormat.readSync()!.format(transaction.createdAt)),
                       ],
                     ),

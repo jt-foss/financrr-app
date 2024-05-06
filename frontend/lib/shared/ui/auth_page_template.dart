@@ -68,8 +68,7 @@ class AuthPageTemplateState extends ConsumerState<AuthPageTemplate> {
                   width: 100, colorFilter: ColorFilter.mode(ref.themeData.primaryColor, BlendMode.srcIn)),
             ),
             _getRandomMessageKey().toText(
-                textAlign: TextAlign.center,
-                style: ref.textTheme.titleLarge?.copyWith(color: ref.themeData.primaryColor)),
+                textAlign: TextAlign.center, style: ref.textTheme.titleLarge?.copyWith(color: ref.themeData.primaryColor)),
             widget.child
           ]),
         )));

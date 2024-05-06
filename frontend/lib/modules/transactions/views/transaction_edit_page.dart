@@ -166,8 +166,7 @@ class TransactionEditPageState extends ConsumerState<TransactionEditPage> {
     );
   }
 
-  Future<void> _editTransaction(Account account, Transaction transaction, TransactionType type,
-      {Account? secondary}) async {
+  Future<void> _editTransaction(Account account, Transaction transaction, TransactionType type, {Account? secondary}) async {
     if (!_isValid) return;
     final (Id?, Id?) sourceAndDest = switch (_type) {
       TransactionType.deposit => (null, account.id.value),
