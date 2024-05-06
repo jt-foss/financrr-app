@@ -1,6 +1,5 @@
 {
   "auth_config_check_url": "Check URL",
-  "auth_host_status": "Status: {hostStatus}, v{apiVersion}",
   "auth_login_failed": "Login failed. Please try again later",
   "auth_login_message_1": "Good to see you!",
   "auth_login_message_2": "Welcome back!",
