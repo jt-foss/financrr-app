@@ -18,6 +18,7 @@
   "common_username_required": "Please provide a username",
   "settings_appearance": "Appearance",
   "settings_currency": "Currency",
+  "settings_language": "Language",
   "settings_logout": "Log out",
   "theme_dark": "Dark",
   "theme_light": "Light",
