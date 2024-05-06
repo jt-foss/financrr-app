@@ -1,4 +1,5 @@
 import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -83,9 +84,10 @@ class _LogSettingsPageState extends ConsumerState<LogSettingsPage> {
                 sortEntries();
               }),
               icon: Icon(_sortTimeAscending ? Icons.arrow_downward : Icons.arrow_upward, size: 17),
-              label: Text(_sortTimeAscending ? 'Oldest first' : 'Newest first'),
+              label: (_sortTimeAscending ? L10nKey.commonSortOldestFirst : L10nKey.commonSortNewestFirst).toText(),
             ),
             const Spacer(),
+            // TODO: add plurals
             Text('${_entries.length} entries'),
             IconButton(
                 onPressed: () => setState(() {

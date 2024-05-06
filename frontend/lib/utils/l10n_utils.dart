@@ -45,6 +45,8 @@ enum L10nKey {
   commonRegister('common_register'),
   commonSave('common_save'),
   commonSaveSuccess('common_save_success'),
+  commonSortNewestFirst('common_sort_newest_first'),
+  commonSortOldestFirst('common_sort_oldest_first'),
   commonUrlInvalid('common_url_invalid'),
   commonUsername('common_username'),
   commonUsernameRequired('common_username_required'),
