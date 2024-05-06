@@ -1,4 +1,5 @@
 import 'package:financrr_frontend/utils/extensions.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -15,49 +16,49 @@ class ScaffoldNavBarShell extends StatefulWidget {
 }
 
 class ScaffoldNavBarShellState extends State<ScaffoldNavBarShell> {
-  static const List<NavigationDestination> _navBarDestinations = [
+  static final List<NavigationDestination> _navBarDestinations = [
     NavigationDestination(
-      icon: Icon(Icons.dashboard_outlined),
-      selectedIcon: Icon(Icons.dashboard_rounded),
-      label: 'Dashboard',
+      icon: const Icon(Icons.dashboard_outlined),
+      selectedIcon: const Icon(Icons.dashboard_rounded),
+      label: L10nKey.navigationDashboard.toString(),
     ),
     NavigationDestination(
-      icon: Icon(Icons.account_balance_wallet_outlined),
-      selectedIcon: Icon(Icons.account_balance_wallet_rounded),
-      label: 'Accounts',
+      icon: const Icon(Icons.account_balance_wallet_outlined),
+      selectedIcon: const Icon(Icons.account_balance_wallet_rounded),
+      label: L10nKey.navigationAccounts.toString(),
     ),
     NavigationDestination(
-      icon: Icon(Icons.leaderboard_outlined),
-      selectedIcon: Icon(Icons.leaderboard_rounded),
-      label: 'Statistics',
+      icon: const Icon(Icons.leaderboard_outlined),
+      selectedIcon: const Icon(Icons.leaderboard_rounded),
+      label: L10nKey.navigationStatistics.toString()
     ),
     NavigationDestination(
-      icon: Icon(Icons.settings_outlined),
-      selectedIcon: Icon(Icons.settings_rounded),
-      label: 'Settings',
+      icon: const Icon(Icons.settings_outlined),
+      selectedIcon: const Icon(Icons.settings_rounded),
+      label: L10nKey.navigationSettings.toString()
     ),
   ];
 
-  static const List<NavigationRailDestination> _navRailDestinations = [
+  static final List<NavigationRailDestination> _navRailDestinations = [
     NavigationRailDestination(
-      icon: Icon(Icons.dashboard_outlined),
-      selectedIcon: Icon(Icons.dashboard_rounded),
-      label: Text('Dashboard'),
+      icon: const Icon(Icons.dashboard_outlined),
+      selectedIcon: const Icon(Icons.dashboard_rounded),
+      label: L10nKey.navigationDashboard.toText(),
     ),
     NavigationRailDestination(
-      icon: Icon(Icons.account_balance_wallet_outlined),
-      selectedIcon: Icon(Icons.account_balance_wallet_rounded),
-      label: Text('Accounts'),
+      icon: const Icon(Icons.account_balance_wallet_outlined),
+      selectedIcon: const Icon(Icons.account_balance_wallet_rounded),
+      label: L10nKey.navigationAccounts.toText(),
     ),
     NavigationRailDestination(
-      icon: Icon(Icons.leaderboard_outlined),
-      selectedIcon: Icon(Icons.leaderboard_rounded),
-      label: Text('Statistics'),
+      icon: const Icon(Icons.leaderboard_outlined),
+      selectedIcon: const Icon(Icons.leaderboard_rounded),
+      label: L10nKey.navigationStatistics.toText(),
     ),
     NavigationRailDestination(
-      icon: Icon(Icons.settings_outlined),
-      selectedIcon: Icon(Icons.settings_rounded),
-      label: Text('Settings'),
+      icon: const Icon(Icons.settings_outlined),
+      selectedIcon: const Icon(Icons.settings_rounded),
+      label: L10nKey.navigationSettings.toText(),
     ),
   ];
 
@@ -94,7 +95,7 @@ class ScaffoldNavBarShellState extends State<ScaffoldNavBarShell> {
       appBar: AppBar(
         title: GestureDetector(
           onTap: () => resetLocation(index: 0),
-          child: const Text('financrr'),
+          child: L10nKey.brandName.toText(),
         ),
         centerTitle: isMobile,
         leading: canPop()
