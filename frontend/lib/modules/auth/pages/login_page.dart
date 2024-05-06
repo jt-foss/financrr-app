@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:financrr_frontend/modules/auth/pages/register_page.dart';
 import 'package:financrr_frontend/shared/ui/auth_page_template.dart';
 import 'package:financrr_frontend/modules/auth/providers/authentication.provider.dart';
 import 'package:financrr_frontend/modules/auth/models/authentication.state.dart';
@@ -57,7 +58,7 @@ class LoginPageState extends ConsumerState<LoginPage> {
                       child: TextFormField(
                         controller: _usernameController,
                         decoration: InputDecoration(labelText: 'common_username'.tr()),
-                        autofillHints: const [AutofillHints.username],
+                        autofillHints: const [AutofillHints.username, AutofillHints.newUsername],
                         validator: (value) => value!.isEmpty ? 'common_username_required'.tr() : null,
                       ),
                     ),
@@ -87,6 +88,16 @@ class LoginPageState extends ConsumerState<LoginPage> {
                     child: const Text('common_login').tr(),
                   ),
                 )),
+            Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: TextButton(
+                    onPressed: () => context.goPath(RegisterPage.pagePath.build(), extra: widget.hostUri),
+                    child: const Text('Don\'t have an account?'),
+                  ),
+                )),
           ],
         ));
   }
@@ -98,7 +109,7 @@ class LoginPageState extends ConsumerState<LoginPage> {
       return;
     }
     final String password = _passwordController.text;
-    if (username.isEmpty) {
+    if (password.isEmpty) {
       context.showSnackBar('common_password_required'.tr());
       return;
     }
