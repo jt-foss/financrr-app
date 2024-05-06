@@ -18,7 +18,6 @@
   "brand_name": "financrr",
   "common_create": "Create",
   "common_create_object": "Create \"{object}\"",
-  "common_create_success_object": "Successfully created \"{object}\"",
   "common_edit_object": "Edit \"{object}\"",
   "common_edit_object_success": "Successfully edited \"{object}\"",
   "common_load_more": "Load more",
