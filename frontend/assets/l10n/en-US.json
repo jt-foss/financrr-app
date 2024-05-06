@@ -46,7 +46,6 @@
   "currency_not_found": "Could not find currency",
   "l10n_date_format": "Date Format",
   "l10n_decimal_separator": "Decimal Separator",
-  "l10n_thousand_separator": "Thousand Separator",
   "settings_category_account": "Account",
   "settings_category_app": "App",
   "settings_category_developer": "Developer",
