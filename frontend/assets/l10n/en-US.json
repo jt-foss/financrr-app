@@ -13,6 +13,7 @@
   "brand_name": "financrr",
   "common_password": "Password",
   "common_password_required": "Please provide a password",
+  "common_register": "Register",
   "common_username": "Username",
   "common_username_required": "Please provide a username",
   "settings_appearance": "Appearance",
