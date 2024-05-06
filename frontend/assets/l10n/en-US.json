@@ -16,6 +16,14 @@
   "auth_register_message_4": "Let's sign you up!",
   "auth_register_message_5": "This one must be new",
   "brand_name": "financrr",
+  "common_amount_currencies": {
+    "one": "{} currency",
+    "many": "{} currencies"
+  },
+  "common_amount_sessions": {
+    "one": "{} session",
+    "many": "{} sessions"
+  },
   "common_login": "Log In",
   "common_logout": "Log Out",
   "common_next": "Next",
