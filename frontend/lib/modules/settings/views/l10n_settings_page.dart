@@ -1,4 +1,4 @@
-import 'package:financrr_frontend/utils/extensions.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -57,7 +57,7 @@ class _L10nSettingsPageState extends State<L10nSettingsPage> {
             children: [
               Card.outlined(
                 child: ListTile(
-                  leading: const Text('Preview'),
+                  leading: L10nKey.commonPreview.toText(),
                   title: Text(TextUtils.formatBalance(
                       123456789, 2, _decimalSeparatorController.text, _thousandSeparatorController.text)),
                 ),
@@ -67,8 +67,8 @@ class _L10nSettingsPageState extends State<L10nSettingsPage> {
                 child: TextFormField(
                   controller: _decimalSeparatorController,
                   onChanged: (_) => setState(() {}),
-                  decoration: const InputDecoration(
-                    labelText: 'Decimal Separator',
+                  decoration: InputDecoration(
+                    labelText: L10nKey.l10nDecimalSeparator.toString(),
                   ),
                   inputFormatters: [LengthLimitingTextInputFormatter(1)],
                 ),
@@ -78,8 +78,8 @@ class _L10nSettingsPageState extends State<L10nSettingsPage> {
                 child: TextFormField(
                   controller: _thousandSeparatorController,
                   onChanged: (_) => setState(() {}),
-                  decoration: const InputDecoration(
-                    labelText: 'Thousand Separator',
+                  decoration: InputDecoration(
+                    labelText: L10nKey.l10nThousandsSeparator.toString(),
                   ),
                   inputFormatters: [LengthLimitingTextInputFormatter(1)],
                 ),
@@ -89,7 +89,7 @@ class _L10nSettingsPageState extends State<L10nSettingsPage> {
                 padding: const EdgeInsets.only(top: 10),
                 child: Card.outlined(
                   child: ListTile(
-                    leading: const Text('Preview'),
+                    leading: L10nKey.commonPreview.toText(),
                     title: Text(DateFormat(_dateTimeFormatController.text).format(DateTime.now())),
                   ),
                 ),
@@ -99,15 +99,15 @@ class _L10nSettingsPageState extends State<L10nSettingsPage> {
                 child: TextFormField(
                     controller: _dateTimeFormatController,
                     onChanged: (_) => setState(() {}),
-                    decoration: const InputDecoration(
-                      labelText: 'Date Format',
+                    decoration: InputDecoration(
+                      labelText: L10nKey.l10nDateFormat.toString(),
                     )),
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 20),
                 child: TextButton(
                   onPressed: _isDifferent() ? () => _save() : null,
-                  child: const Text('Save'),
+                  child: L10nKey.commonSave.toText(),
                 ),
               ),
             ],
@@ -138,6 +138,6 @@ class _L10nSettingsPageState extends State<L10nSettingsPage> {
       _thousandSeparator = _thousandSeparatorController.text;
       _dateTimeFormat = _dateTimeFormatController.text;
     });
-    context.showSnackBar('Successfully saved changes!');
+    L10nKey.commonSaveSuccess.showSnack(context);
   }
 }

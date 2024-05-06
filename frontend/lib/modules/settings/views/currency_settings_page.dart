@@ -101,7 +101,7 @@ class _CurrencySettingsPageState extends ConsumerState<CurrencySettingsPage> {
     try {
       await currency.delete();
       if (!mounted) return;
-      context.showSnackBar('Successfully deleted "${currency.name}"');
+      L10nKey.commonDeleteObjectSuccess.showSnack(context, namedArgs: {'object': currency.name});
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);
     }

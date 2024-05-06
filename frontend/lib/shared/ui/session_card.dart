@@ -1,4 +1,5 @@
 import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
@@ -44,7 +45,8 @@ class SessionCard extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(name ?? '${isCurrent ? 'Current' : 'Unnamed'} Session', style: ref.textTheme.titleSmall),
+                  Text(name ?? (isCurrent ? L10nKey.sessionCurrent : L10nKey.sessionUnnamed).toString(),
+                      style: ref.textTheme.titleSmall),
                   Text('${StoreKey.dateTimeFormat.readSync()!.format(createdAt)} ($id)'),
                 ],
               ),

@@ -1,4 +1,5 @@
 import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -38,14 +39,14 @@ class _ThemeSettingsPageState extends ConsumerState<ThemeSettingsPage> {
           child: ListView(
             children: [
               ListTile(
-                  title: const Text('Use Device Theme'),
+                  title: L10nKey.appearanceUseDeviceTheme.toText(),
                   trailing: Switch(
                     value: themeState.mode == ThemeMode.system,
                     onChanged: (value) =>
                         ref.read(themeProvider.notifier).setMode(value ? ThemeMode.system : ref.currentTheme.themeMode),
                   ),
-                  subtitle:
-                      Text('Current device theme: ${WidgetsBinding.instance.platformDispatcher.platformBrightness.name}')),
+                  subtitle: L10nKey.appearanceCurrentDeviceTheme
+                      .toText(namedArgs: {'deviceTheme': WidgetsBinding.instance.platformDispatcher.platformBrightness.name})),
               const Divider(),
               for (AppTheme theme in AppThemeLoader.themes) _buildThemePreview(theme, themeState)
             ],
@@ -83,7 +84,7 @@ class _ThemeSettingsPageState extends ConsumerState<ThemeSettingsPage> {
               color: theme.themeMode == ThemeMode.light ? Colors.black : Colors.white),
         ),
         subtitle: activeLight || activeDark
-            ? Text('selected ${activeLight ? 'light' : activeDark ? 'dark' : ''} theme')
+            ? (activeLight ? L10nKey.appearanceCurrentLightTheme : L10nKey.appearanceCurrentDarkTheme).toText()
             : null,
         trailing: currentTheme ? const Icon(Icons.check) : null,
       ),
