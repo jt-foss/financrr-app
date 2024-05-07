@@ -71,6 +71,7 @@ class TransactionPageState extends ConsumerState<TransactionPage> {
       stream: _accountStreamController.stream,
       onSuccess: (ctx, snap) => _handleTransactionStream(snap.data!, size),
       onLoading: (_, __) => const Center(child: CircularProgressIndicator()),
+      // TODO: localize
       onError: (_, __) => const Text('Could not find account'),
     );
   }
@@ -80,6 +81,7 @@ class TransactionPageState extends ConsumerState<TransactionPage> {
       stream: _transactionStreamController.stream,
       onSuccess: (ctx, snap) => _buildVerticalLayout(account, snap.data!, size),
       onLoading: (_, __) => const Center(child: CircularProgressIndicator()),
+      // TODO: localize
       onError: (_, __) => const Text('Could not find transaction'),
     );
   }
@@ -132,13 +134,21 @@ class TransactionPageState extends ConsumerState<TransactionPage> {
                     child: Table(
                       border: TableBorder.all(color: ref.themeData.dividerColor),
                       children: [
+                        // TODO: localize
                         _buildTableRow('Type', transaction.type.name),
+                        // TODO: localize
                         _buildTableRow('Amount', amountStr),
+                        // TODO: localize
                         _buildTableRow('Name', transaction.name),
+                        // TODO: localize
                         _buildTableRow('Description', transaction.description ?? 'N/A'),
+                        // TODO: localize
                         _buildTableRow('From', transaction.sourceId?.get()?.name ?? 'N/A'),
+                        // TODO: localize
                         _buildTableRow('To', transaction.destinationId?.get()?.name ?? 'N/A'),
+                        // TODO: localize
                         _buildTableRow('Executed at', StoreKey.dateTimeFormat.readSync()!.format(transaction.executedAt)),
+                        // TODO: localize
                         _buildTableRow('Created at', StoreKey.dateTimeFormat.readSync()!.format(transaction.createdAt)),
                       ],
                     ),
@@ -168,6 +178,7 @@ class TransactionPageState extends ConsumerState<TransactionPage> {
       await transaction.delete();
       if (!mounted) return;
       context.pop();
+      // TODO: localize
       context.showSnackBar('Successfully deleted "${transaction.description ?? 'transaction'}"');
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);

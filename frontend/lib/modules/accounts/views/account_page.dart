@@ -67,6 +67,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
         return const Center(child: CircularProgressIndicator());
       },
       onError: (ctx, snap) {
+        // TODO: localize
         return const Text('Could not find account');
       },
     );
@@ -101,13 +102,16 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                         onPressed: () => context
                             .goPath(TransactionCreatePage.pagePath.build(params: {'accountId': account.id.value.toString()})),
                         icon: const Icon(Icons.add, size: 17),
+                        // TODO: localize
                         label: const Text('Create Transaction')),
                     const Spacer(),
                     IconButton(
+                        // TODO: localize
                         tooltip: 'Delete Account',
                         onPressed: () => _deleteAccount(account),
                         icon: const Icon(Icons.delete_rounded, size: 17)),
                     IconButton(
+                        // TODO: localize
                         tooltip: 'Edit Account',
                         onPressed: () =>
                             context.goPath(AccountEditPage.pagePath.build(params: {'accountId': account.id.value.toString()})),
@@ -130,6 +134,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // TODO: localize
         Text('Latest Transactions', style: ref.textTheme.titleMedium),
         Padding(
           padding: const EdgeInsets.only(top: 10),
@@ -164,6 +169,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
     try {
       await account.delete();
       if (!mounted) return;
+      // TODO: localize
       context.showSnackBar('Successfully deleted "${account.name}"');
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);

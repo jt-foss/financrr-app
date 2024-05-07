@@ -96,6 +96,7 @@ class TransactionEditPageState extends ConsumerState<TransactionEditPage> {
       stream: _accountStreamController.stream,
       onSuccess: (ctx, snap) => _handleTransactionStream(snap.data!, size),
       onLoading: (_, __) => const Center(child: CircularProgressIndicator()),
+      // TODO: localize
       onError: (_, __) => const Text('Could not find account'),
     );
   }
@@ -105,6 +106,7 @@ class TransactionEditPageState extends ConsumerState<TransactionEditPage> {
       stream: _transactionStreamController.stream,
       onSuccess: (ctx, snap) => _buildVerticalLayout(account, snap.data!, size),
       onLoading: (_, __) => const Center(child: CircularProgressIndicator()),
+      // TODO: localize
       onError: (_, __) => const Text('Could not find transaction'),
     );
   }
@@ -155,6 +157,7 @@ class TransactionEditPageState extends ConsumerState<TransactionEditPage> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: _isValid ? () => _editTransaction(account, transaction, _type) : null,
+                    // TODO: localize
                     child: const Text('Edit Transaction'),
                   ),
                 ),
@@ -183,6 +186,7 @@ class TransactionEditPageState extends ConsumerState<TransactionEditPage> {
           executedAt: _executedAt,
           currencyId: account.currencyId.value);
       if (!mounted) return;
+      // TODO: localize
       context.showSnackBar('Successfully edited transaction');
       context.pop();
     } on RestrrException catch (e) {

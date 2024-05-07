@@ -25,18 +25,22 @@ class FallbackErrorApp extends StatelessWidget {
                 children: [
                   const Icon(Icons.error_outline_rounded),
                   const SizedBox(height: 10),
+                  // TODO: localize
                   const Text('An error occurred while initializing the app',
                       textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.w700)),
                   Text.rich(
                       textAlign: TextAlign.center,
                       TextSpan(
+                        // TODO: localize
                         text: 'If this error persists, please create an',
                         children: [
                           WidgetSpan(
                             child: GestureDetector(
                                 onTap: () => launchUrl(Uri.parse(githubIssueUrl)),
+                                // TODO: localize
                                 child: const Text(' issue on our GitHub repository', style: TextStyle(color: Colors.blue))),
                           ),
+                          // TODO: localize
                           const TextSpan(text: ' or contact us via support@financrr.app')
                         ],
                       )),
@@ -48,6 +52,7 @@ class FallbackErrorApp extends StatelessWidget {
                       final PackageInfo info = snap.data!;
                       return Align(
                         alignment: Alignment.centerRight,
+                        // TODO: localize
                         child: Text('v${info.version}+${info.buildNumber}', textAlign: TextAlign.center),
                       );
                     },

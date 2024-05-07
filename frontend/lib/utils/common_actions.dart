@@ -17,6 +17,7 @@ class CommonActions {
 
   static Future<void> copyToClipboard(State state, String text, {bool showCopiedValue = false}) async {
     await Clipboard.setData(ClipboardData(text: text));
+    // TODO: localize
     if (state.mounted) state.context.showSnackBar('Copied ${showCopiedValue ? '"$text" ' : ''}to clipboard!');
   }
 }

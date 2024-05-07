@@ -60,11 +60,13 @@ class CurrencyCard extends ConsumerWidget {
                 return [
                   PopupMenuItem(
                     onTap: () => context.goPath(CurrencyEditPage.pagePath.build(params: {'currencyId': id.toString()})),
+                    // TODO: localize
                     child: const Text('Edit'),
                   ),
                   if (onDelete != null)
                     PopupMenuItem(
                       onTap: onDelete,
+                      // TODO: localize
                       child: const Text('Delete'),
                     ),
                 ];

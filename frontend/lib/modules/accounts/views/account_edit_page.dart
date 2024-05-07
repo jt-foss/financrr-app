@@ -88,6 +88,7 @@ class AccountEditPageState extends ConsumerState<AccountEditPage> {
         return const Center(child: CircularProgressIndicator());
       },
       onError: (ctx, snap) {
+        // TODO: localize
         return const Text('Could not find account');
       },
     );
@@ -128,6 +129,7 @@ class AccountEditPageState extends ConsumerState<AccountEditPage> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: _isValid ? () => _editAccount(account) : null,
+                    // TODO: localize
                     child: Text(_nameController.text.isEmpty ? 'Edit Account' : 'Edit "${_nameController.text}"'),
                   ),
                 ),
@@ -150,6 +152,7 @@ class AccountEditPageState extends ConsumerState<AccountEditPage> {
         currencyId: _currency!.id.value,
       );
       if (!mounted) return;
+      // TODO: localize
       context.showSnackBar('Successfully edited "${_nameController.text}"');
       context.pop();
     } on RestrrException catch (e) {

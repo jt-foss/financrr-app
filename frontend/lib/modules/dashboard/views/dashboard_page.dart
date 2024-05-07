@@ -62,6 +62,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    // TODO: localize
                     Text('Account and Cards', style: ref.textTheme.titleSmall),
                     PopupMenuButton(
                         icon: const Icon(Icons.more_horiz),
@@ -69,12 +70,14 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                           return [
                             PopupMenuItem(
                                 child: ListTile(
+                              // TODO: localize
                               title: const Text('Manage Accounts'),
                               leading: const Icon(Icons.manage_accounts_rounded),
                               onTap: () => context.goPath(AccountsOverviewPage.pagePath.build()),
                             )),
                             PopupMenuItem(
                                 child: ListTile(
+                              // TODO: localize
                               title: const Text('Create Account'),
                               leading: const Icon(Icons.add),
                               onTap: () => context.goPath(AccountCreatePage.pagePath.build()),
@@ -88,7 +91,9 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                 if (_api.getAccounts().isEmpty)
                   Center(
                       child: NoticeCard(
+                          // TODO: localize
                           title: 'No accounts found',
+                          // TODO: localize
                           description: 'Create an account to get started',
                           onTap: () => context.goPath(AccountCreatePage.pagePath.build()))),
                 if (_api.getAccounts().isNotEmpty) _buildTransactionSection()
@@ -104,6 +109,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
       children: [
         Padding(
           padding: const EdgeInsets.only(top: 20),
+          // TODO: localize
           child: Text('Latest Transactions', style: ref.textTheme.titleSmall),
         ),
         const Divider(),
@@ -115,7 +121,11 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
               final List<Transaction> transactions = snap.data!.items;
               if (transactions.isEmpty) {
                 return const Center(
-                    child: NoticeCard(title: 'No transactions found', description: 'Your transactions will appear here'));
+                    // TODO: localize
+                    child: NoticeCard(
+                        title: 'No transactions found',
+                        // TODO: localize
+                        description: 'Your transactions will appear here'));
               }
               return Column(
                 children: [

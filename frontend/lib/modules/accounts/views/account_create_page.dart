@@ -92,6 +92,7 @@ class _AccountCreatePageState extends ConsumerState<AccountCreatePage> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: _isValid ? () => _createAccount() : null,
+                    // TODO: localize
                     child: Text(_nameController.text.isEmpty ? 'Create Account' : 'Create "${_nameController.text}"'),
                   ),
                 ),
@@ -114,6 +115,7 @@ class _AccountCreatePageState extends ConsumerState<AccountCreatePage> {
         currencyId: _currency!.id.value,
       );
       if (!mounted) return;
+      // TODO: localize
       context.showSnackBar('Successfully created "${_nameController.text}"');
       context.pop();
     } on RestrrException catch (e) {

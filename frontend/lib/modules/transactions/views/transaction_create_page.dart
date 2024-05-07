@@ -77,6 +77,7 @@ class _TransactionCreatePageState extends ConsumerState<TransactionCreatePage> {
         return const Center(child: CircularProgressIndicator());
       },
       onError: (ctx, snap) {
+        // TODO: localize
         return const Text('Could not find account');
       },
     );
@@ -125,6 +126,7 @@ class _TransactionCreatePageState extends ConsumerState<TransactionCreatePage> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: _isValid ? () => _createTransaction(account, _type) : null,
+                    // TODO: localize
                     child: const Text('Create Transaction'),
                   ),
                 ),
@@ -153,6 +155,7 @@ class _TransactionCreatePageState extends ConsumerState<TransactionCreatePage> {
           executedAt: _executedAt,
           currencyId: account.currencyId.value);
       if (!mounted) return;
+      // TODO: localize
       context.showSnackBar('Successfully created transaction');
       context.pop();
     } on RestrrException catch (e) {

@@ -28,15 +28,13 @@ class ScaffoldNavBarShellState extends State<ScaffoldNavBarShell> {
       label: L10nKey.navigationAccounts.toString(),
     ),
     NavigationDestination(
-      icon: const Icon(Icons.leaderboard_outlined),
-      selectedIcon: const Icon(Icons.leaderboard_rounded),
-      label: L10nKey.navigationStatistics.toString()
-    ),
+        icon: const Icon(Icons.leaderboard_outlined),
+        selectedIcon: const Icon(Icons.leaderboard_rounded),
+        label: L10nKey.navigationStatistics.toString()),
     NavigationDestination(
-      icon: const Icon(Icons.settings_outlined),
-      selectedIcon: const Icon(Icons.settings_rounded),
-      label: L10nKey.navigationSettings.toString()
-    ),
+        icon: const Icon(Icons.settings_outlined),
+        selectedIcon: const Icon(Icons.settings_rounded),
+        label: L10nKey.navigationSettings.toString()),
   ];
 
   static final List<NavigationRailDestination> _navRailDestinations = [

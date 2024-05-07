@@ -26,6 +26,7 @@ extension SnackBarExtension on BuildContext {
 extension StreamControllerExtension<T> on StreamController<T> {
   Future<T?> fetchData(String? id, Future<T?> Function(Id) dataFunction) async {
     if (id == null) {
+      // TODO: localize
       sink.addError('Encountered null id!');
       return null;
     }
@@ -34,6 +35,7 @@ extension StreamControllerExtension<T> on StreamController<T> {
 
   Future<T?> _checkData(T? data) async {
     if (data == null) {
+      // TODO: localize
       sink.addError('Could not retrieve Data');
       return null;
     }

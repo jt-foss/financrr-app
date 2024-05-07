@@ -32,8 +32,11 @@ class FormFields {
           child: SegmentedButton(
             onSelectionChanged: onSelectionChanged,
             segments: const [
+              // TODO: localize
               ButtonSegment(label: Text('Deposit'), value: TransactionType.deposit),
+              // TODO: localize
               ButtonSegment(label: Text('Withdrawal'), value: TransactionType.withdrawal),
+              // TODO: localize
               ButtonSegment(label: Text('Transfer'), value: TransactionType.transfer),
             ],
             selected: {selectedType},
@@ -44,7 +47,9 @@ class FormFields {
         Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: DropdownButtonFormField(
+              // TODO: localize
               decoration: const InputDecoration(labelText: 'Transfer To'),
+              // TODO: localize
               validator: (value) => InputValidators.nonNull('Transfer To', value?.id.value.toString()),
               items: currentAccount.api
                   .getAccounts()
@@ -61,7 +66,9 @@ class FormFields {
         padding: const EdgeInsets.symmetric(vertical: 10),
         child: TextFormField(
           controller: amountController,
+          // TODO: localize
           decoration: const InputDecoration(labelText: 'Amount'),
+          // TODO: localize
           validator: (value) => InputValidators.nonNull('Amount', value),
           inputFormatters: [
             FilteringTextInputFormatter.digitsOnly,
@@ -73,7 +80,9 @@ class FormFields {
         padding: const EdgeInsets.only(bottom: 10),
         child: TextFormField(
           controller: nameController,
+          // TODO: localize
           decoration: const InputDecoration(labelText: 'Name'),
+          // TODO: localize
           validator: (value) => InputValidators.nonNull('Name', value),
           inputFormatters: [
             LengthLimitingTextInputFormatter(32),
@@ -126,7 +135,9 @@ class FormFields {
         padding: const EdgeInsets.symmetric(vertical: 10),
         child: TextFormField(
           controller: nameController,
+          // TODO: localize
           decoration: const InputDecoration(labelText: 'Name'),
+          // TODO: localize
           validator: (value) => InputValidators.nonNull('Name', value),
           inputFormatters: [
             LengthLimitingTextInputFormatter(32),
@@ -160,7 +171,9 @@ class FormFields {
         padding: const EdgeInsets.only(bottom: 10),
         child: TextFormField(
           controller: originalBalanceController,
+          // TODO: localize
           decoration: const InputDecoration(labelText: 'Original Balance'),
+          // TODO: localize
           validator: (value) => InputValidators.nonNull('Original Balance', value),
           inputFormatters: [
             FilteringTextInputFormatter.digitsOnly,
@@ -170,7 +183,9 @@ class FormFields {
       Padding(
         padding: const EdgeInsets.only(bottom: 10),
         child: DropdownButtonFormField(
+            // TODO: localize
             decoration: const InputDecoration(labelText: 'Currency'),
+            // TODO: localize
             validator: (value) => InputValidators.nonNull('Currency', value?.id.value.toString()),
             value: initialCurrency,
             items: api.getCurrencies().map((currency) {
@@ -196,7 +211,9 @@ class FormFields {
         child: TextFormField(
           controller: nameController,
           readOnly: readOnly,
+          // TODO: localize
           decoration: const InputDecoration(labelText: 'Name'),
+          // TODO: localize
           validator: (value) => InputValidators.nonNull('Name', value),
           inputFormatters: [
             LengthLimitingTextInputFormatter(32),
@@ -208,7 +225,9 @@ class FormFields {
         child: TextFormField(
           controller: symbolController,
           readOnly: readOnly,
+          // TODO: localize
           decoration: const InputDecoration(labelText: 'Symbol'),
+          // TODO: localize
           validator: (value) => InputValidators.nonNull('Symbol', value),
           inputFormatters: [
             LengthLimitingTextInputFormatter(6),
@@ -220,6 +239,7 @@ class FormFields {
         child: TextFormField(
           controller: isoCodeController,
           readOnly: readOnly,
+          // TODO: localize
           decoration: const InputDecoration(labelText: 'ISO Code'),
           inputFormatters: [
             LengthLimitingTextInputFormatter(3),
@@ -231,7 +251,9 @@ class FormFields {
         child: TextFormField(
           controller: decimalPlacesController,
           readOnly: readOnly,
+          // TODO: localize
           decoration: const InputDecoration(labelText: 'Decimal Places'),
+          // TODO: localize
           validator: (value) => InputValidators.nonNull('Decimal Places', value),
           inputFormatters: [
             FilteringTextInputFormatter.digitsOnly,
