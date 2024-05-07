@@ -97,6 +97,7 @@ impl From<Option<permissions::Model>> for Permissions {
     }
 }
 
+#[allow(unused)]
 pub(crate) trait Permission: PermissionByIds + WrapperEntity {
     fn get_permissions(&self, user_id: i32) -> impl Future<Output = Result<Permissions, ApiError>> {
         async move { Self::get_permissions_by_id(self.get_id(), user_id).await }
@@ -129,6 +130,7 @@ pub(crate) trait HasPermissionOrError: Permission {
     }
 }
 
+#[allow(unused)]
 pub(crate) trait PermissionByIds: TableName {
     fn get_permissions_by_id(entity_id: i32, user_id: i32) -> impl Future<Output = Result<Permissions, ApiError>> {
         async move {
