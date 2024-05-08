@@ -89,7 +89,6 @@
   "theme_light": "Light",
   "theme_midnight": "Midnight",
   "transaction_create": "Create Transaction",
-  "transaction_create_amount": "Amount",
   "transaction_create_deposit": "Deposit",
   "transaction_create_transfer": "Transfer",
   "transaction_create_transfer_to": "Transfer to",
