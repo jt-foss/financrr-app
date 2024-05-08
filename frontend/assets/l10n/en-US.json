@@ -81,6 +81,5 @@
   "theme_dark": "Dark",
   "theme_light": "Light",
   "theme_midnight": "Midnight",
-  "transaction_create": "Create Transaction",
-  "transaction_latest": "Latest Transactions"
+  "transaction_create": "Create Transaction"
 }
