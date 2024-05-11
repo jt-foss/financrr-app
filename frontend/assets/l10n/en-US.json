@@ -42,6 +42,7 @@
   "common_edit": "Edit",
   "common_edit_object": "Edit \"{object}\"",
   "common_edit_object_success": "Successfully edited \"{object}\"",
+  "common_iban_invalid": "Please provide a valid IBAN!",
   "common_load_more": "Load more",
   "common_login": "Log In",
   "common_logout": "Log Out",
