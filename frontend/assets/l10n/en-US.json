@@ -54,6 +54,7 @@
   "common_password_weak": "Your password is too weak!",
   "common_preview": "Preview",
   "common_register": "Register",
+  "common_required_object": "{object} is required!",
   "common_save": "Save",
   "common_save_success": "Successfully saved changes!",
   "common_sort_newest_first": "Newest first",
