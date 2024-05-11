@@ -1,6 +1,5 @@
 import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/utils/l10n_utils.dart';
-import 'package:financrr_frontend/utils/text_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -149,9 +148,7 @@ class FormFields {
         child: TextFormField(
           controller: ibanController,
           decoration: InputDecoration(labelText: L10nKey.accountPropertiesIban.toString()),
-          validator: (value) =>
-          // TODO: localize
-              value == null || value.trim().isEmpty || TextUtils.formatIBAN(value) != null ? null : 'Invalid IBAN',
+          validator: (value) => InputValidators.iban(value),
           inputFormatters: [
             FilteringTextInputFormatter.deny(RegExp(r'\s')),
             LengthLimitingTextInputFormatter(22),

@@ -184,8 +184,7 @@ class TransactionEditPageState extends ConsumerState<TransactionEditPage> {
           executedAt: _executedAt,
           currencyId: account.currencyId.value);
       if (!mounted) return;
-      // TODO: localize
-      context.showSnackBar('Successfully edited transaction');
+      L10nKey.commonEditObjectSuccess.showSnack(context, namedArgs: {'object': transaction.name});
       context.pop();
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);

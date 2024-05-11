@@ -70,8 +70,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                           return [
                             PopupMenuItem(
                                 child: ListTile(
-                              // TODO: localize
-                              title: const Text('Manage Accounts'),
+                              title: L10nKey.accountListManage.toText(),
                               leading: const Icon(Icons.manage_accounts_rounded),
                               onTap: () => context.goPath(AccountsOverviewPage.pagePath.build()),
                             )),

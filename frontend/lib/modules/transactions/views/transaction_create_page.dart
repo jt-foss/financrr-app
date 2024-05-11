@@ -139,7 +139,7 @@ class _TransactionCreatePageState extends ConsumerState<TransactionCreatePage> {
       TransactionType.transfer => (account.id.value, secondary!.id.value),
     };
     try {
-      await _api.createTransaction(
+      Transaction transaction = await _api.createTransaction(
           sourceId: sourceAndDest.$1,
           destinationId: sourceAndDest.$2,
           amount: int.parse(_amountController.text),
@@ -148,8 +148,7 @@ class _TransactionCreatePageState extends ConsumerState<TransactionCreatePage> {
           executedAt: _executedAt,
           currencyId: account.currencyId.value);
       if (!mounted) return;
-      // TODO: localize
-      context.showSnackBar('Successfully created transaction');
+      L10nKey.commonCreateObjectSuccess.showSnack(context, namedArgs: {'object': transaction.name});
       context.pop();
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);

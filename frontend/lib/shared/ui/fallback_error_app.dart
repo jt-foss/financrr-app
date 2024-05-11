@@ -2,7 +2,6 @@ import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class FallbackErrorApp extends StatelessWidget {
   static const String githubIssueUrl =
@@ -30,20 +29,8 @@ class FallbackErrorApp extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: const TextStyle(fontWeight: FontWeight.w700),
                   ),
-                  // TODO: localize
-                  Text.rich(
-                      textAlign: TextAlign.center,
-                      TextSpan(
-                        text: 'If this error persists, please create an',
-                        children: [
-                          WidgetSpan(
-                            child: GestureDetector(
-                                onTap: () => launchUrl(Uri.parse(githubIssueUrl)),
-                                child: const Text(' issue on our GitHub repository', style: TextStyle(color: Colors.blue))),
-                          ),
-                          const TextSpan(text: ' or contact us via support@financrr.app')
-                        ],
-                      )),
+                  // TODO: parse URL & email to clickable links
+                  L10nKey.startupErrorSubtitle.toText(textAlign: TextAlign.center),
                   const SizedBox(height: 20),
                   FutureBuilder(
                     future: PackageInfo.fromPlatform(),
