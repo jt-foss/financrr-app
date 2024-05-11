@@ -2,6 +2,7 @@
   "account_create": "Create Account",
   "account_delete": "Delete Account",
   "account_edit": "Edit Account",
+  "account_list_manage": "Manage Accounts",
   "account_none_found_body": "Create an account to get started",
   "account_none_found_title": "No accounts found",
   "account_not_found": "Could not find account",
