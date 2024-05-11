@@ -30,48 +30,48 @@ class AuthPageTemplateState extends ConsumerState<AuthPageTemplate> {
   Widget build(BuildContext context) {
     var theme = ref.watch(themeProvider);
 
+    buildVerticalLayout(Size size, ThemeState theme) {
+      return SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Center(
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width / 1.2,
+                child: Column(children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20),
+                    child: Row(
+                      mainAxisAlignment: widget.showBackButton ? MainAxisAlignment.spaceBetween : MainAxisAlignment.end,
+                      children: [
+                        if (widget.showBackButton)
+                          IconButton(
+                              tooltip: 'Change Server Configuration',
+                              onPressed: () => context.goPath(ServerConfigPage.pagePath.build()),
+                              icon: Icon(Icons.arrow_back, color: Colors.grey[400])),
+                        IconButton(
+                            tooltip: 'Toggle theme',
+                            onPressed: () => ref
+                                .read(themeProvider.notifier)
+                                .setMode(theme.mode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light),
+                            icon: Icon(context.lightMode ? Icons.nightlight_round : Icons.wb_sunny, color: Colors.grey[400])),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: SvgPicture.asset(theme.getCurrent().logoPath,
+                        width: 100, colorFilter: ColorFilter.mode(theme.themeData.primaryColor, BlendMode.srcIn)),
+                  ),
+                  _getRandomMessageKey().toText(
+                      textAlign: TextAlign.center, style: theme.textTheme.titleLarge?.copyWith(color: theme.themeData.primaryColor)),
+                  widget.child
+                ]),
+              )));
+    }
+
     return AdaptiveScaffold(
       resizeToAvoidBottomInset: false,
-      verticalBuilder: (_, __, size) => SafeArea(child: _buildVerticalLayout(size, theme)),
+      verticalBuilder: (_, __, size) => SafeArea(child: buildVerticalLayout(size, theme)),
     );
-  }
-
-  Widget _buildVerticalLayout(Size size, ThemeState theme) {
-    return SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Center(
-            child: SizedBox(
-          width: MediaQuery.of(context).size.width / 1.2,
-          child: Column(children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 20),
-              child: Row(
-                mainAxisAlignment: widget.showBackButton ? MainAxisAlignment.spaceBetween : MainAxisAlignment.end,
-                children: [
-                  if (widget.showBackButton)
-                    IconButton(
-                        tooltip: 'Change Server Configuration',
-                        onPressed: () => context.goPath(ServerConfigPage.pagePath.build()),
-                        icon: Icon(Icons.arrow_back, color: Colors.grey[400])),
-                  IconButton(
-                      tooltip: 'Toggle theme',
-                      onPressed: () => ref
-                          .read(themeProvider.notifier)
-                          .setMode(theme.mode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light),
-                      icon: Icon(context.lightMode ? Icons.nightlight_round : Icons.wb_sunny, color: Colors.grey[400])),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: SvgPicture.asset(ref.currentTheme.logoPath,
-                  width: 100, colorFilter: ColorFilter.mode(ref.themeData.primaryColor, BlendMode.srcIn)),
-            ),
-            _getRandomMessageKey().toText(
-                textAlign: TextAlign.center, style: ref.textTheme.titleLarge?.copyWith(color: ref.themeData.primaryColor)),
-            widget.child
-          ]),
-        )));
   }
 
   L10nKey _getRandomMessageKey() {

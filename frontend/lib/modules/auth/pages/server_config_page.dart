@@ -47,48 +47,44 @@ class ServerConfigPageState extends ConsumerState<ServerConfigPage> {
 
   @override
   Widget build(BuildContext context) {
-    return AdaptiveScaffold(
-      resizeToAvoidBottomInset: false,
-      verticalBuilder: (_, __, size) => SafeArea(child: _buildVerticalLayout(size)),
-    );
-  }
+    var theme = ref.watch(themeProvider);
 
-  Widget _buildVerticalLayout(Size size) {
-    return AuthPageTemplate(
-        child: Column(
-      children: [
-        Form(
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 20),
-                  child: TextFormField(
-                    controller: _urlController,
-                    decoration: const InputDecoration(labelText: 'Server URL'),
-                    autofillHints: const [AutofillHints.username],
-                    validator: (value) => InputValidators.url(value),
-                    onChanged: (_) => setState(() {
-                      _isValid = false;
-                      _apiVersion = null;
-                    }),
-                  ),
-                ),
-                if (_isValid && _apiVersion != null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 5),
-                    child: L10nKey.authConfigStatus.toText(
-                        namedArgs: {'hostStatus': 'Healthy', 'apiVersion': '$_apiVersion'},
-                        style: ref.textTheme.labelMedium?.copyWith(color: ref.themeData.primaryColor)),
-                  )
-              ],
-            )),
-        Padding(
-            padding: const EdgeInsets.only(top: 20, bottom: 20),
-            child: _isLoading
-                ? const CircularProgressIndicator()
-                : TextButton.icon(
+    buildVerticalLayout(Size size) {
+      return AuthPageTemplate(
+          child: Column(
+            children: [
+              Form(
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 20),
+                        child: TextFormField(
+                          controller: _urlController,
+                          decoration: const InputDecoration(labelText: 'Server URL'),
+                          autofillHints: const [AutofillHints.username],
+                          validator: (value) => InputValidators.url(value),
+                          onChanged: (_) => setState(() {
+                            _isValid = false;
+                            _apiVersion = null;
+                          }),
+                        ),
+                      ),
+                      if (_isValid && _apiVersion != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 5),
+                          child: L10nKey.authConfigStatus.toText(
+                              namedArgs: {'hostStatus': 'Healthy', 'apiVersion': '$_apiVersion'},
+                              style: theme.textTheme.labelMedium?.copyWith(color: theme.themeData.primaryColor)),
+                        )
+                    ],
+                  )),
+              Padding(
+                  padding: const EdgeInsets.only(top: 20, bottom: 20),
+                  child: _isLoading
+                      ? const CircularProgressIndicator()
+                      : TextButton.icon(
                     onPressed: () {
                       if (_isValid) {
                         context.goPath(LoginPage.pagePath.build(), extra: _hostUri);
@@ -99,8 +95,14 @@ class ServerConfigPageState extends ConsumerState<ServerConfigPage> {
                     label: const Icon(Icons.arrow_forward, size: 18),
                     icon: (_isValid ? L10nKey.commonNext : L10nKey.authConfigCheckUrl).toText(),
                   )),
-      ],
-    ));
+            ],
+          ));
+    }
+
+    return AdaptiveScaffold(
+      resizeToAvoidBottomInset: false,
+      verticalBuilder: (_, __, size) => SafeArea(child: buildVerticalLayout(size)),
+    );
   }
 
   Future<void> _handleUrlCheck() async {

@@ -11,6 +11,7 @@ import '../../../routing/page_path.dart';
 import '../../../shared/ui/account_card.dart';
 import '../../../utils/form_fields.dart';
 import '../../../utils/text_utils.dart';
+import '../../settings/providers/theme.provider.dart';
 import 'accounts_overview_page.dart';
 
 class AccountCreatePage extends StatefulHookConsumerWidget {
@@ -53,57 +54,61 @@ class _AccountCreatePageState extends ConsumerState<AccountCreatePage> {
 
   @override
   Widget build(BuildContext context) {
+    var theme = ref.watch(themeProvider);
+
+    buildVerticalLayout(Size size) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 10, bottom: 20),
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: SizedBox(
+            width: size.width / 1.1,
+            child: SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  onChanged: () => setState(() => _isValid = _formKey.currentState?.validate() ?? false),
+                  child: Column(
+                    children: [
+                      AccountCard.fromData(
+                        id: 0,
+                        name: _nameController.text,
+                        iban: _ibanController.text,
+                        description: _descriptionController.text,
+                        balance: int.tryParse(_originalBalanceController.text) ?? 0,
+                        currency: _currency ?? _api.getCurrencies().first,
+                      ),
+                      const Divider(),
+                      ...FormFields.account(ref,
+                          theme,
+                          api: _api,
+                          nameController: _nameController,
+                          descriptionController: _descriptionController,
+                          ibanController: _ibanController,
+                          originalBalanceController: _originalBalanceController,
+                          onCurrencyChanged: (currency) => _currency = currency!),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: _isValid ? () => _createAccount() : null,
+                          // TODO: localize
+                          child: Text(_nameController.text.isEmpty ? 'Create Account' : 'Create "${_nameController.text}"'),
+                        ),
+                      ),
+                    ],
+                  ),
+                )),
+          ),
+        ),
+      );
+    }
+
     return AdaptiveScaffold(
       resizeToAvoidBottomInset: false,
-      verticalBuilder: (_, __, size) => SafeArea(child: _buildVerticalLayout(size)),
+      verticalBuilder: (_, __, size) => SafeArea(child: buildVerticalLayout(size)),
     );
   }
 
-  Widget _buildVerticalLayout(Size size) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10, bottom: 20),
-      child: Align(
-        alignment: Alignment.topCenter,
-        child: SizedBox(
-          width: size.width / 1.1,
-          child: SingleChildScrollView(
-              child: Form(
-            key: _formKey,
-            onChanged: () => setState(() => _isValid = _formKey.currentState?.validate() ?? false),
-            child: Column(
-              children: [
-                AccountCard.fromData(
-                  id: 0,
-                  name: _nameController.text,
-                  iban: _ibanController.text,
-                  description: _descriptionController.text,
-                  balance: int.tryParse(_originalBalanceController.text) ?? 0,
-                  currency: _currency ?? _api.getCurrencies().first,
-                ),
-                const Divider(),
-                ...FormFields.account(ref,
-                    api: _api,
-                    nameController: _nameController,
-                    descriptionController: _descriptionController,
-                    ibanController: _ibanController,
-                    originalBalanceController: _originalBalanceController,
-                    onCurrencyChanged: (currency) => _currency = currency!),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _isValid ? () => _createAccount() : null,
-                    // TODO: localize
-                    child: Text(_nameController.text.isEmpty ? 'Create Account' : 'Create "${_nameController.text}"'),
-                  ),
-                ),
-              ],
-            ),
-          )),
-        ),
-      ),
-    );
-  }
 
   Future<void> _createAccount() async {
     if (!_isValid || _currency == null) return;

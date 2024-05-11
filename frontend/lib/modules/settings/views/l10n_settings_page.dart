@@ -4,12 +4,11 @@ import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:intl/intl.dart';
 
-import '../../../shared/models/store.dart';
 import '../../../shared/ui/adaptive_scaffold.dart';
 import '../../../routing/page_path.dart';
 import '../../../utils/text_utils.dart';
+import '../providers/l10n.provider.dart';
 import 'settings_page.dart';
 
 class L10nSettingsPage extends StatefulHookConsumerWidget {
@@ -27,16 +26,17 @@ class _L10nSettingsPageState extends ConsumerState<L10nSettingsPage> {
   late final TextEditingController _dateTimeFormatController;
 
   Locale? _locale;
-  late String _decimalSeparator;
-  late String _thousandSeparator;
-  late String _dateTimeFormat;
+  late String? _decimalSeparator;
+  late String? _thousandSeparator;
+  late String? _dateTimeFormat;
 
   @override
   void initState() {
     super.initState();
-    _decimalSeparator = StoreKey.decimalSeparator.readSync()!;
-    _thousandSeparator = StoreKey.thousandSeparator.readSync()!;
-    _dateTimeFormat = StoreKey.dateTimeFormat.readSync()!.pattern!;
+    var l10n = ref.read(l10nProvider);
+    _decimalSeparator = l10n.decimalSeparator;
+    _thousandSeparator = l10n.thousandSeparator;
+    _dateTimeFormat = l10n.dateFormat.pattern;
 
     _decimalSeparatorController = TextEditingController(text: _decimalSeparator);
     _thousandSeparatorController = TextEditingController(text: _thousandSeparator);
@@ -45,6 +45,8 @@ class _L10nSettingsPageState extends ConsumerState<L10nSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    var theme = ref.watch(themeProvider);
+
     buildLocaleCard(Locale locale) {
       return ListTile(
         title: Text(locale.toLanguageTag()),
@@ -68,7 +70,7 @@ class _L10nSettingsPageState extends ConsumerState<L10nSettingsPage> {
                   ),
                 ),
                 const Divider(),
-                L10nKey.commonPreview.toText(style: ref.textTheme.titleSmall),
+                L10nKey.commonPreview.toText(style: theme.textTheme.titleSmall),
                 Text(TextUtils.formatBalance(
                     123456789, 2, _decimalSeparatorController.text, _thousandSeparatorController.text)),
                 Text(DateFormat(_dateTimeFormatController.text).format(DateTime.now())),
@@ -140,14 +142,15 @@ class _L10nSettingsPageState extends ConsumerState<L10nSettingsPage> {
     if (_locale != null && context.locale != _locale) {
       await context.setLocale(_locale!);
     }
+    var l10nNotifier = ref.read(l10nProvider.notifier);
     if (_decimalSeparatorController.text != _decimalSeparator) {
-      StoreKey.decimalSeparator.write(_decimalSeparatorController.text);
+      l10nNotifier.setDecimalSeparator(_decimalSeparatorController.text);
     }
     if (_thousandSeparatorController.text != _thousandSeparator) {
-      StoreKey.thousandSeparator.write(_thousandSeparatorController.text);
+      l10nNotifier.setThousandSeparator(_thousandSeparatorController.text);
     }
     if (_dateTimeFormatController.text != _dateTimeFormat) {
-      StoreKey.dateTimeFormat.write(DateFormat(_dateTimeFormatController.text));
+      l10nNotifier.setDateFormat(DateFormat(_dateTimeFormatController.text));
     }
     setState(() {
       _locale = context.locale;
@@ -155,6 +158,7 @@ class _L10nSettingsPageState extends ConsumerState<L10nSettingsPage> {
       _thousandSeparator = _thousandSeparatorController.text;
       _dateTimeFormat = _dateTimeFormatController.text;
     });
+    if (!mounted) return;
     L10nKey.commonSaveSuccess.showSnack(context);
   }
 }

@@ -1,14 +1,11 @@
+import 'package:financrr_frontend/modules/settings/models/l10n.state.dart';
 import 'package:restrr/restrr.dart';
-
-import '../shared/models/store.dart';
 
 class TextUtils {
   const TextUtils._();
 
-  static String formatBalanceWithCurrency(int amount, Currency currency) {
-    final String decimalSeparator = StoreKey.decimalSeparator.readSync()!;
-    final String thousandSeparator = StoreKey.thousandSeparator.readSync()!;
-    return '${formatBalance(amount, currency.decimalPlaces, decimalSeparator, thousandSeparator)}${currency.symbol}';
+  static String formatBalanceWithCurrency(L10nState l10n, int amount, Currency currency) {
+    return '${formatBalance(amount, currency.decimalPlaces, l10n.decimalSeparator, l10n.thousandSeparator)}${currency.symbol}';
   }
 
   static String formatBalance(int amount, int decimalPlaces, String decimalSeparator, String thousandSeparator) {

@@ -6,6 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../modules/accounts/views/account_page.dart';
+import '../../modules/settings/providers/l10n.provider.dart';
 import '../../utils/text_utils.dart';
 
 class AccountCard extends ConsumerWidget {
@@ -37,6 +38,9 @@ class AccountCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    var theme = ref.watch(themeProvider);
+    var l10n = ref.watch(l10nProvider);
+
     return GestureDetector(
       onTap: !interactive ? null : () => context.goPath(AccountPage.pagePath.build(params: {'accountId': id.toString()})),
       child: Card.outlined(
@@ -50,13 +54,13 @@ class AccountCard extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(name, style: ref.textTheme.titleSmall),
+                    Text(name, style: theme.textTheme.titleSmall),
                     if (iban != null || description != null) Text(TextUtils.formatIBAN(iban) ?? description!),
                   ],
                 ),
               ),
-              Text(TextUtils.formatBalanceWithCurrency(balance, currency!),
-                  style: ref.textTheme.titleSmall?.copyWith(color: ref.themeData.primaryColor))
+              Text(TextUtils.formatBalanceWithCurrency(l10n, balance, currency!),
+                  style: theme.textTheme.titleSmall?.copyWith(color: theme.themeData.primaryColor))
             ],
           ),
         ),

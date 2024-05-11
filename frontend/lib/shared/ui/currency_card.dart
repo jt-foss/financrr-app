@@ -39,6 +39,8 @@ class CurrencyCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    var theme = ref.watch(themeProvider);
+
     return Card.outlined(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -50,7 +52,7 @@ class CurrencyCard extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(name, style: ref.textTheme.titleSmall),
+                  Text(name, style: theme.textTheme.titleSmall),
                   if (isoCode != null) Text(isoCode!),
                 ],
               ),

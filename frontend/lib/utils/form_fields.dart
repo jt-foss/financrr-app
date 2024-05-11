@@ -1,10 +1,10 @@
-import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
+import '../modules/settings/models/theme.state.dart';
 import '../shared/models/store.dart';
 import 'input_utils.dart';
 
@@ -14,6 +14,7 @@ class FormFields {
   const FormFields._();
 
   static List<Widget> transaction(ConsumerState state,
+      ThemeState theme,
       {required Account currentAccount,
       required TextEditingController nameController,
       required TextEditingController amountController,
@@ -52,7 +53,7 @@ class FormFields {
                   .map((account) {
                 return DropdownMenuItem(
                   value: account,
-                  child: Text(account.name, style: state.ref.textTheme.bodyMedium),
+                  child: Text(account.name, style: theme.textTheme.bodyMedium),
                 );
               }).toList(),
               onChanged: onSecondaryChanged,
@@ -114,6 +115,7 @@ class FormFields {
   }
 
   static List<Widget> account(WidgetRef ref,
+      ThemeState theme,
       {required Restrr api,
       required TextEditingController nameController,
       required TextEditingController descriptionController,
@@ -175,7 +177,7 @@ class FormFields {
             items: api.getCurrencies().map((currency) {
               return DropdownMenuItem(
                 value: currency,
-                child: Text('${currency.name} (${currency.symbol})', style: ref.textTheme.bodyMedium),
+                child: Text('${currency.name} (${currency.symbol})', style: theme.textTheme.bodyMedium),
               );
             }).toList(),
             onChanged: onCurrencyChanged),

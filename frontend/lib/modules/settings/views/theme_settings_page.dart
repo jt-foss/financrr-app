@@ -24,7 +24,7 @@ class _ThemeSettingsPageState extends ConsumerState<ThemeSettingsPage> {
     var theme = ref.watch(themeProvider);
 
     buildThemePreview(AppTheme appTheme) {
-      final bool currentTheme = ref.currentTheme.id == appTheme.id;
+      final bool currentTheme = theme.getCurrent().id == appTheme.id;
       final bool activeLight = theme.lightTheme.id == appTheme.id;
       final bool activeDark = theme.darkTheme.id == appTheme.id;
       return Card.outlined(
@@ -45,8 +45,8 @@ class _ThemeSettingsPageState extends ConsumerState<ThemeSettingsPage> {
                 activeLight
                     ? Icons.wb_sunny
                     : activeDark
-                    ? Icons.nightlight_round
-                    : null,
+                        ? Icons.nightlight_round
+                        : null,
                 size: 17,
                 color: appTheme.themeMode == ThemeMode.light ? Colors.black : Colors.white),
           ),
@@ -70,11 +70,13 @@ class _ThemeSettingsPageState extends ConsumerState<ThemeSettingsPage> {
                     title: L10nKey.appearanceUseDeviceTheme.toText(),
                     trailing: Switch(
                       value: theme.mode == ThemeMode.system,
-                      onChanged: (value) =>
-                          ref.read(themeProvider.notifier).setMode(value ? ThemeMode.system : ref.currentTheme.themeMode),
+                      onChanged: (value) => ref
+                          .read(themeProvider.notifier)
+                          .setMode(value ? ThemeMode.system : theme.getCurrent().themeMode),
                     ),
-                    subtitle: L10nKey.appearanceCurrentDeviceTheme
-                        .toText(namedArgs: {'deviceTheme': WidgetsBinding.instance.platformDispatcher.platformBrightness.name})),
+                    subtitle: L10nKey.appearanceCurrentDeviceTheme.toText(namedArgs: {
+                      'deviceTheme': WidgetsBinding.instance.platformDispatcher.platformBrightness.name
+                    })),
                 const Divider(),
                 for (AppTheme theme in AppThemeLoader.themes) buildThemePreview(theme)
               ],

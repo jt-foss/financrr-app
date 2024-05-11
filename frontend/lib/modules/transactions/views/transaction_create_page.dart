@@ -15,6 +15,7 @@ import '../../../shared/ui/async_wrapper.dart';
 import '../../../shared/ui/transaction_card.dart';
 import '../../../utils/form_fields.dart';
 import '../../accounts/views/account_page.dart';
+import '../../settings/providers/theme.provider.dart';
 
 class TransactionCreatePage extends StatefulHookConsumerWidget {
   static const PagePathBuilder pagePath = PagePathBuilder.child(parent: AccountPage.pagePath, path: 'transactions/create');
@@ -65,70 +66,73 @@ class _TransactionCreatePageState extends ConsumerState<TransactionCreatePage> {
 
   @override
   Widget build(BuildContext context) {
-    return AdaptiveScaffold(verticalBuilder: (_, __, size) => SafeArea(child: _handleAccountStream(size)));
-  }
+    var theme = ref.watch(themeProvider);
 
-  Widget _handleAccountStream(Size size) {
-    return StreamWrapper(
-      stream: _accountStreamController.stream,
-      onSuccess: (_, snap) => _buildVerticalLayout(snap.data!, size),
-      onLoading: (_, __) => const Center(child: CircularProgressIndicator()),
-      onError: (ctx, snap) => L10nKey.accountNotFound.toText(),
-    );
-  }
-
-  Widget _buildVerticalLayout(Account account, Size size) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10, bottom: 20),
-      child: Align(
-        alignment: Alignment.topCenter,
-        child: SizedBox(
-          width: size.width / 1.1,
-          child: SingleChildScrollView(
-              child: Form(
-            key: _formKey,
-            onChanged: () => setState(() => _isValid = _formKey.currentState?.validate() ?? false),
-            child: Column(
-              children: [
-                TransactionCard.fromData(
-                  id: 0,
-                  amount: int.tryParse(_amountController.text) ?? 0,
-                  account: account,
-                  name: _nameController.text,
-                  description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
-                  type: _type,
-                  createdAt: DateTime.now(),
-                  executedAt: _executedAt,
-                  interactive: false,
-                ),
-                const Divider(),
-                ...FormFields.transaction(
-                  this,
-                  currentAccount: account,
-                  nameController: _nameController,
-                  amountController: _amountController,
-                  descriptionController: _descriptionController,
-                  executedAtController: _executedAtController,
-                  selectedType: _type,
-                  onSelectionChanged: (types) {
-                    setState(() => _type = types.first);
-                  },
-                  onExecutedAtChanged: (date) => setState(() => _executedAt = date),
-                ),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _isValid ? () => _createTransaction(account, _type) : null,
-                    child: L10nKey.transactionCreate.toText(),
+    buildVerticalLayout(Account account, Size size) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 10, bottom: 20),
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: SizedBox(
+            width: size.width / 1.1,
+            child: SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  onChanged: () => setState(() => _isValid = _formKey.currentState?.validate() ?? false),
+                  child: Column(
+                    children: [
+                      TransactionCard.fromData(
+                        id: 0,
+                        amount: int.tryParse(_amountController.text) ?? 0,
+                        account: account,
+                        name: _nameController.text,
+                        description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
+                        type: _type,
+                        createdAt: DateTime.now(),
+                        executedAt: _executedAt,
+                        interactive: false,
+                      ),
+                      const Divider(),
+                      ...FormFields.transaction(
+                        this,
+                        theme,
+                        currentAccount: account,
+                        nameController: _nameController,
+                        amountController: _amountController,
+                        descriptionController: _descriptionController,
+                        executedAtController: _executedAtController,
+                        selectedType: _type,
+                        onSelectionChanged: (types) {
+                          setState(() => _type = types.first);
+                        },
+                        onExecutedAtChanged: (date) => setState(() => _executedAt = date),
+                      ),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: _isValid ? () => _createTransaction(account, _type) : null,
+                          child: L10nKey.transactionCreate.toText(),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-          )),
+                )),
+          ),
         ),
-      ),
-    );
+      );
+    }
+
+    handleAccountStream(Size size) {
+      return StreamWrapper(
+        stream: _accountStreamController.stream,
+        onSuccess: (_, snap) => buildVerticalLayout(snap.data!, size),
+        onLoading: (_, __) => const Center(child: CircularProgressIndicator()),
+        onError: (ctx, snap) => L10nKey.accountNotFound.toText(),
+      );
+    }
+
+    return AdaptiveScaffold(verticalBuilder: (_, __, size) => SafeArea(child: handleAccountStream(size)));
   }
 
   Future<void> _createTransaction(Account account, TransactionType type, {Account? secondary}) async {

@@ -15,6 +15,7 @@ import '../../../shared/ui/adaptive_scaffold.dart';
 import '../../../routing/page_path.dart';
 import '../../../shared/ui/text_circle_avatar.dart';
 import '../../../utils/common_actions.dart';
+import '../models/theme.state.dart';
 import 'currency_settings_page.dart';
 import 'log_settings_page.dart';
 
@@ -67,13 +68,14 @@ class SettingsPage extends StatefulHookConsumerWidget {
 class _SettingsPageState extends ConsumerState<SettingsPage> {
   late final Restrr _api = api;
 
-  late final List<SettingsItemGroup> _items = [
+  List<SettingsItemGroup> _buildItems(ThemeState theme) {
+    return [
     SettingsItemGroup(items: [
       SettingsItem.fromChild(
         showCategory: false,
         child: ListTile(
           leading: TextCircleAvatar(text: _api.selfUser.effectiveDisplayName, radius: 25),
-          title: Text(_api.selfUser.effectiveDisplayName, style: ref.textTheme.titleSmall),
+          title: Text(_api.selfUser.effectiveDisplayName, style: theme.textTheme.titleSmall),
           subtitle: const Text('placeholder@financrr.app'),
         ),
       ),
@@ -145,47 +147,51 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           )),
     ])
   ];
+  }
 
   @override
   Widget build(BuildContext context) {
+    var theme = ref.watch(themeProvider);
+
+    buildVerticalLayout(Size size) {
+      final List<SettingsItemGroup> items = _buildItems(theme);
+      return Padding(
+        padding: const EdgeInsets.only(top: 10),
+        child: Center(
+          child: SizedBox(
+            width: size.width / 1.1,
+            child: Scaffold(
+                body: ListView.separated(
+                  itemCount: items.length,
+                  itemBuilder: (_, index) {
+                    final SettingsItemGroup group = items[index];
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (group.title != null) ...[
+                          Padding(
+                            padding: const EdgeInsets.only(top: 5),
+                            child: group.title!.toText(style: theme.textTheme.titleSmall),
+                          ),
+                          const Divider()
+                        ],
+                        if (group.groupInCard)
+                          Card.outlined(child: Column(children: group.items.map((item) => item.build(context)).toList()))
+                        else
+                          Column(children: group.items.map((item) => item.build(context)).toList()),
+                      ],
+                    );
+                  },
+                  separatorBuilder: (_, index) => const Padding(padding: EdgeInsets.symmetric(vertical: 5)),
+                )),
+          ),
+        ),
+      );
+    }
+
     return AdaptiveScaffold(
       resizeToAvoidBottomInset: false,
-      verticalBuilder: (_, __, size) => SafeArea(child: _buildVerticalLayout(size)),
-    );
-  }
-
-  Widget _buildVerticalLayout(Size size) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10),
-      child: Center(
-        child: SizedBox(
-          width: size.width / 1.1,
-          child: Scaffold(
-              body: ListView.separated(
-            itemCount: _items.length,
-            itemBuilder: (_, index) {
-              final SettingsItemGroup group = _items[index];
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (group.title != null) ...[
-                    Padding(
-                      padding: const EdgeInsets.only(top: 5),
-                      child: group.title!.toText(style: ref.textTheme.titleSmall),
-                    ),
-                    const Divider()
-                  ],
-                  if (group.groupInCard)
-                    Card.outlined(child: Column(children: group.items.map((item) => item.build(context)).toList()))
-                  else
-                    Column(children: group.items.map((item) => item.build(context)).toList()),
-                ],
-              );
-            },
-            separatorBuilder: (_, index) => const Padding(padding: EdgeInsets.symmetric(vertical: 5)),
-          )),
-        ),
-      ),
+      verticalBuilder: (_, __, size) => SafeArea(child: buildVerticalLayout(size)),
     );
   }
 }
