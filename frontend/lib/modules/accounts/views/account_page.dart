@@ -5,6 +5,7 @@ import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart
 import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/shared/ui/async_wrapper.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
@@ -169,8 +170,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
     try {
       await account.delete();
       if (!mounted) return;
-      // TODO: localize
-      context.showSnackBar('Successfully deleted "${account.name}"');
+      L10nKey.commonDeleteObjectSuccess.showSnack(context, namedArgs: {'object': account.name});
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);
     }

@@ -1,5 +1,6 @@
 import 'package:financrr_frontend/modules/auth/providers/authentication.provider.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -115,8 +116,7 @@ class _AccountCreatePageState extends ConsumerState<AccountCreatePage> {
         currencyId: _currency!.id.value,
       );
       if (!mounted) return;
-      // TODO: localize
-      context.showSnackBar('Successfully created "${_nameController.text}"');
+      L10nKey.commonCreateObjectSuccess.showSnack(context, namedArgs: {'object': _nameController.text});
       context.pop();
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);

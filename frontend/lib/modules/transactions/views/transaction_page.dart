@@ -5,6 +5,7 @@ import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart
 import 'package:financrr_frontend/modules/transactions/views/transaction_edit_page.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -178,8 +179,7 @@ class TransactionPageState extends ConsumerState<TransactionPage> {
       await transaction.delete();
       if (!mounted) return;
       context.pop();
-      // TODO: localize
-      context.showSnackBar('Successfully deleted "${transaction.description ?? 'transaction'}"');
+      L10nKey.commonDeleteObjectSuccess.showSnack(context, namedArgs: {'object': transaction.description ?? 'transaction'});
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);
     }
