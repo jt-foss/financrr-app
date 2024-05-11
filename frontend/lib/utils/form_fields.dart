@@ -13,8 +13,7 @@ import 'input_utils.dart';
 class FormFields {
   const FormFields._();
 
-  static List<Widget> transaction(ConsumerState state,
-      ThemeState theme,
+  static List<Widget> transaction(ConsumerState state, ThemeState theme,
       {required Account currentAccount,
       required TextEditingController nameController,
       required TextEditingController amountController,
@@ -46,7 +45,8 @@ class FormFields {
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: DropdownButtonFormField(
               decoration: InputDecoration(labelText: L10nKey.transactionCreateTransferTo.toString()),
-              validator: (value) => InputValidators.nonNull(L10nKey.transactionCreateTransferTo.toString(), value?.id.value.toString()),
+              validator: (value) =>
+                  InputValidators.nonNull(L10nKey.transactionCreateTransferTo.toString(), value?.id.value.toString()),
               items: currentAccount.api
                   .getAccounts()
                   .where((account) => account.id.value != currentAccount.id.value)
@@ -114,8 +114,7 @@ class FormFields {
     ];
   }
 
-  static List<Widget> account(WidgetRef ref,
-      ThemeState theme,
+  static List<Widget> account(WidgetRef ref, ThemeState theme,
       {required Restrr api,
       required TextEditingController nameController,
       required TextEditingController descriptionController,
@@ -172,7 +171,8 @@ class FormFields {
         padding: const EdgeInsets.only(bottom: 10),
         child: DropdownButtonFormField(
             decoration: InputDecoration(labelText: L10nKey.accountPropertiesCurrency.toString()),
-            validator: (value) => InputValidators.nonNull(L10nKey.accountPropertiesCurrency.toString(), value?.id.value.toString()),
+            validator: (value) =>
+                InputValidators.nonNull(L10nKey.accountPropertiesCurrency.toString(), value?.id.value.toString()),
             value: initialCurrency,
             items: api.getCurrencies().map((currency) {
               return DropdownMenuItem(

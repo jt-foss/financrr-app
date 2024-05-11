@@ -28,7 +28,7 @@ class ThemeState {
       ThemeMode.light => lightTheme,
       ThemeMode.dark => darkTheme,
       ThemeMode.system =>
-      WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.light ? lightTheme : darkTheme
+        WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.light ? lightTheme : darkTheme
     };
   }
 

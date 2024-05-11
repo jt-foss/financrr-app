@@ -85,41 +85,40 @@ class AccountEditPageState extends ConsumerState<AccountEditPage> {
             width: size.width / 1.1,
             child: SingleChildScrollView(
                 child: Form(
-                  key: _formKey,
-                  onChanged: () => setState(() => _isValid = _formKey.currentState?.validate() ?? false),
-                  child: Column(
-                    children: [
-                      AccountCard.fromData(
-                        id: 0,
-                        name: _nameController.text,
-                        iban: _ibanController.text,
-                        description: _descriptionController.text,
-                        balance: int.tryParse(_originalBalanceController.text) ?? 0,
-                        currency: _currency ?? _api.getCurrencies().first,
-                      ),
-                      const Divider(),
-                      ...FormFields.account(ref,
-                          theme,
-                          api: _api,
-                          nameController: _nameController,
-                          descriptionController: _descriptionController,
-                          ibanController: _ibanController,
-                          originalBalanceController: _originalBalanceController,
-                          onCurrencyChanged: (currency) => _currency = currency!,
-                          initialCurrency: _currency),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: ElevatedButton(
-                          onPressed: _isValid ? () => _editAccount(account) : null,
-                          child: _nameController.text.isEmpty
-                              ? L10nKey.accountEdit.toText()
-                              : L10nKey.commonEditObject.toText(namedArgs: {'object': _nameController.text}),
-                        ),
-                      ),
-                    ],
+              key: _formKey,
+              onChanged: () => setState(() => _isValid = _formKey.currentState?.validate() ?? false),
+              child: Column(
+                children: [
+                  AccountCard.fromData(
+                    id: 0,
+                    name: _nameController.text,
+                    iban: _ibanController.text,
+                    description: _descriptionController.text,
+                    balance: int.tryParse(_originalBalanceController.text) ?? 0,
+                    currency: _currency ?? _api.getCurrencies().first,
                   ),
-                )),
+                  const Divider(),
+                  ...FormFields.account(ref, theme,
+                      api: _api,
+                      nameController: _nameController,
+                      descriptionController: _descriptionController,
+                      ibanController: _ibanController,
+                      originalBalanceController: _originalBalanceController,
+                      onCurrencyChanged: (currency) => _currency = currency!,
+                      initialCurrency: _currency),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: _isValid ? () => _editAccount(account) : null,
+                      child: _nameController.text.isEmpty
+                          ? L10nKey.accountEdit.toText()
+                          : L10nKey.commonEditObject.toText(namedArgs: {'object': _nameController.text}),
+                    ),
+                  ),
+                ],
+              ),
+            )),
           ),
         ),
       );
@@ -130,8 +129,7 @@ class AccountEditPageState extends ConsumerState<AccountEditPage> {
           stream: _accountStreamController.stream,
           onSuccess: (_, snap) => buildVerticalLayout(snap.data!, size),
           onLoading: (_, __) => const Center(child: CircularProgressIndicator()),
-          onError: (_, __) => L10nKey.accountNotFound.toText()
-      );
+          onError: (_, __) => L10nKey.accountNotFound.toText());
     }
 
     return AdaptiveScaffold(
@@ -139,8 +137,6 @@ class AccountEditPageState extends ConsumerState<AccountEditPage> {
       verticalBuilder: (_, __, size) => SafeArea(child: handleAccountStream(size)),
     );
   }
-
-
 
   Future<void> _editAccount(Account account) async {
     if (!_isValid || _currency == null) return;

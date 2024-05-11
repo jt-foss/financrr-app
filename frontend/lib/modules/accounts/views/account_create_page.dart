@@ -65,40 +65,39 @@ class _AccountCreatePageState extends ConsumerState<AccountCreatePage> {
             width: size.width / 1.1,
             child: SingleChildScrollView(
                 child: Form(
-                  key: _formKey,
-                  onChanged: () => setState(() => _isValid = _formKey.currentState?.validate() ?? false),
-                  child: Column(
-                    children: [
-                      AccountCard.fromData(
-                        id: 0,
-                        name: _nameController.text,
-                        iban: _ibanController.text,
-                        description: _descriptionController.text,
-                        balance: int.tryParse(_originalBalanceController.text) ?? 0,
-                        currency: _currency ?? _api.getCurrencies().first,
-                      ),
-                      const Divider(),
-                      ...FormFields.account(ref,
-                          theme,
-                          api: _api,
-                          nameController: _nameController,
-                          descriptionController: _descriptionController,
-                          ibanController: _ibanController,
-                          originalBalanceController: _originalBalanceController,
-                          onCurrencyChanged: (currency) => _currency = currency!),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: ElevatedButton(
-                          onPressed: _isValid ? () => _createAccount() : null,
-                          child: _nameController.text.isEmpty
-                              ? L10nKey.accountCreate.toText()
-                              : L10nKey.commonCreateObject.toText(namedArgs: {'object': _nameController.text}),
-                        ),
-                      ),
-                    ],
+              key: _formKey,
+              onChanged: () => setState(() => _isValid = _formKey.currentState?.validate() ?? false),
+              child: Column(
+                children: [
+                  AccountCard.fromData(
+                    id: 0,
+                    name: _nameController.text,
+                    iban: _ibanController.text,
+                    description: _descriptionController.text,
+                    balance: int.tryParse(_originalBalanceController.text) ?? 0,
+                    currency: _currency ?? _api.getCurrencies().first,
                   ),
-                )),
+                  const Divider(),
+                  ...FormFields.account(ref, theme,
+                      api: _api,
+                      nameController: _nameController,
+                      descriptionController: _descriptionController,
+                      ibanController: _ibanController,
+                      originalBalanceController: _originalBalanceController,
+                      onCurrencyChanged: (currency) => _currency = currency!),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: _isValid ? () => _createAccount() : null,
+                      child: _nameController.text.isEmpty
+                          ? L10nKey.accountCreate.toText()
+                          : L10nKey.commonCreateObject.toText(namedArgs: {'object': _nameController.text}),
+                    ),
+                  ),
+                ],
+              ),
+            )),
           ),
         ),
       );
@@ -109,7 +108,6 @@ class _AccountCreatePageState extends ConsumerState<AccountCreatePage> {
       verticalBuilder: (_, __, size) => SafeArea(child: buildVerticalLayout(size)),
     );
   }
-
 
   Future<void> _createAccount() async {
     if (!_isValid || _currency == null) return;

@@ -70,13 +70,11 @@ class _ThemeSettingsPageState extends ConsumerState<ThemeSettingsPage> {
                     title: L10nKey.appearanceUseDeviceTheme.toText(),
                     trailing: Switch(
                       value: theme.mode == ThemeMode.system,
-                      onChanged: (value) => ref
-                          .read(themeProvider.notifier)
-                          .setMode(value ? ThemeMode.system : theme.getCurrent().themeMode),
+                      onChanged: (value) =>
+                          ref.read(themeProvider.notifier).setMode(value ? ThemeMode.system : theme.getCurrent().themeMode),
                     ),
-                    subtitle: L10nKey.appearanceCurrentDeviceTheme.toText(namedArgs: {
-                      'deviceTheme': WidgetsBinding.instance.platformDispatcher.platformBrightness.name
-                    })),
+                    subtitle: L10nKey.appearanceCurrentDeviceTheme.toText(
+                        namedArgs: {'deviceTheme': WidgetsBinding.instance.platformDispatcher.platformBrightness.name})),
                 const Divider(),
                 for (AppTheme theme in AppThemeLoader.themes) buildThemePreview(theme)
               ],

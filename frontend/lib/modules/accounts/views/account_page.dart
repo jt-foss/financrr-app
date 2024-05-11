@@ -75,11 +75,11 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                 if (transactions.isEmpty) {
                   return Center(
                       child: NoticeCard(
-                        title: L10nKey.transactionNoneFoundTitle.toString(),
-                        description: L10nKey.transactionNoneFoundBody.toString(),
-                        onTap: () =>
-                            context.goPath(TransactionCreatePage.pagePath.build(params: {'accountId': account.id.value.toString()})),
-                      ));
+                    title: L10nKey.transactionNoneFoundTitle.toString(),
+                    description: L10nKey.transactionNoneFoundBody.toString(),
+                    onTap: () => context
+                        .goPath(TransactionCreatePage.pagePath.build(params: {'accountId': account.id.value.toString()})),
+                  ));
                 }
                 return Column(
                   children: transactions.map((t) {
@@ -130,8 +130,8 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                           icon: const Icon(Icons.delete_rounded, size: 17)),
                       IconButton(
                           tooltip: L10nKey.accountEdit.toString(),
-                          onPressed: () =>
-                              context.goPath(AccountEditPage.pagePath.build(params: {'accountId': account.id.value.toString()})),
+                          onPressed: () => context
+                              .goPath(AccountEditPage.pagePath.build(params: {'accountId': account.id.value.toString()})),
                           icon: const Icon(Icons.create, size: 17))
                     ],
                   ),
@@ -152,16 +152,11 @@ class _AccountPageState extends ConsumerState<AccountPage> {
           stream: _accountStreamController.stream,
           onSuccess: (_, snap) => buildVerticalLayout(snap.data!, size),
           onLoading: (_, __) => const Center(child: CircularProgressIndicator()),
-          onError: (_, __) => L10nKey.accountNotFound.toText()
-      );
+          onError: (_, __) => L10nKey.accountNotFound.toText());
     }
 
     return AdaptiveScaffold(verticalBuilder: (_, __, size) => SafeArea(child: handleAccountStream(size)));
   }
-
-
-
-
 
   void _deleteAccount(Account account) async {
     try {

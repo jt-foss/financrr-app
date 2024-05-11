@@ -118,9 +118,9 @@ class TransactionPageState extends ConsumerState<TransactionPage> {
                         IconButton(
                             tooltip: 'Edit Transaction',
                             onPressed: () => context.goPath(TransactionEditPage.pagePath.build(params: {
-                              'accountId': account.id.value.toString(),
-                              'transactionId': transaction.id.value.toString()
-                            })),
+                                  'accountId': account.id.value.toString(),
+                                  'transactionId': transaction.id.value.toString()
+                                })),
                             icon: const Icon(Icons.create_rounded, size: 17))
                       ],
                     ),
@@ -135,8 +135,10 @@ class TransactionPageState extends ConsumerState<TransactionPage> {
                           buildTableRow(L10nKey.transactionPropertiesDescription, transaction.description ?? 'N/A'),
                           buildTableRow(L10nKey.transactionPropertiesFrom, transaction.sourceId?.get()?.name ?? 'N/A'),
                           buildTableRow(L10nKey.transactionPropertiesTo, transaction.destinationId?.get()?.name ?? 'N/A'),
-                          buildTableRow(L10nKey.transactionPropertiesExecutedAt, StoreKey.dateTimeFormat.readSync()!.format(transaction.executedAt)),
-                          buildTableRow(L10nKey.transactionPropertiesCreatedAt, StoreKey.dateTimeFormat.readSync()!.format(transaction.createdAt)),
+                          buildTableRow(L10nKey.transactionPropertiesExecutedAt,
+                              StoreKey.dateTimeFormat.readSync()!.format(transaction.executedAt)),
+                          buildTableRow(L10nKey.transactionPropertiesCreatedAt,
+                              StoreKey.dateTimeFormat.readSync()!.format(transaction.createdAt)),
                         ],
                       ),
                     )
@@ -152,8 +154,7 @@ class TransactionPageState extends ConsumerState<TransactionPage> {
           stream: _transactionStreamController.stream,
           onSuccess: (_, snap) => buildVerticalLayout(account, snap.data!, size),
           onLoading: (_, __) => const Center(child: CircularProgressIndicator()),
-          onError: (_, __) => L10nKey.transactionNotFound.toText()
-      );
+          onError: (_, __) => L10nKey.transactionNotFound.toText());
     }
 
     handleAccountStream(Size size) {
@@ -161,8 +162,7 @@ class TransactionPageState extends ConsumerState<TransactionPage> {
           stream: _accountStreamController.stream,
           onSuccess: (_, snap) => handleTransactionStream(snap.data!, size),
           onLoading: (_, __) => const Center(child: CircularProgressIndicator()),
-          onError: (_, __) => L10nKey.accountNotFound.toText()
-      );
+          onError: (_, __) => L10nKey.accountNotFound.toText());
     }
 
     return AdaptiveScaffold(verticalBuilder: (_, __, size) => SafeArea(child: handleAccountStream(size)));

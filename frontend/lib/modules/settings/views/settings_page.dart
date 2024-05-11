@@ -70,83 +70,83 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
   List<SettingsItemGroup> _buildItems(ThemeState theme) {
     return [
-    SettingsItemGroup(items: [
-      SettingsItem.fromChild(
-        showCategory: false,
-        child: ListTile(
-          leading: TextCircleAvatar(text: _api.selfUser.effectiveDisplayName, radius: 25),
-          title: Text(_api.selfUser.effectiveDisplayName, style: theme.textTheme.titleSmall),
-          subtitle: const Text('placeholder@financrr.app'),
-        ),
-      ),
-    ]),
-    const SettingsItemGroup(title: L10nKey.settingsCategoryAccount, items: [
-      SettingsItem(
-        title: L10nKey.settingsItemCurrencies,
-        iconData: Icons.currency_exchange_rounded,
-        destination: CurrencySettingsPage.pagePath,
-      ),
-      SettingsItem(
-        title: L10nKey.settingsItemSessions,
-        iconData: Icons.devices_rounded,
-        destination: SessionSettingsPage.pagePath,
-      ),
-    ]),
-    const SettingsItemGroup(title: L10nKey.settingsCategoryApp, items: [
-      SettingsItem(
-        title: L10nKey.settingsItemAppearance,
-        iconData: Icons.palette_outlined,
-        destination: ThemeSettingsPage.pagePath,
-      ),
-      SettingsItem(
-        title: L10nKey.settingsItemLanguage,
-        iconData: Icons.language_rounded,
-        destination: L10nSettingsPage.pagePath,
-      ),
-    ]),
-    const SettingsItemGroup(title: L10nKey.settingsCategoryDeveloper, items: [
-      SettingsItem(
-        title: L10nKey.settingsItemLocalStorage,
-        iconData: Icons.sd_storage_outlined,
-        destination: LocalStorageSettingsPage.pagePath,
-      ),
-      SettingsItem(
-        title: L10nKey.settingsItemLogs,
-        iconData: Icons.format_align_left_rounded,
-        destination: LogSettingsPage.pagePath,
-      ),
-    ]),
-    SettingsItemGroup(items: [
-      SettingsItem(
-        showCategory: false,
-        title: L10nKey.commonLogout,
-        iconData: Icons.logout,
-        onTap: () => CommonActions.logOut(this, ref),
-      ),
-    ]),
-    SettingsItemGroup(groupInCard: false, items: [
-      SettingsItem.fromChild(
+      SettingsItemGroup(items: [
+        SettingsItem.fromChild(
           showCategory: false,
-          child: FutureBuilder(
-            future: PackageInfo.fromPlatform(),
-            builder: (context, AsyncSnapshot<PackageInfo> snapshot) {
-              if (!snapshot.hasData) return const SizedBox();
-              final PackageInfo info = snapshot.data!;
-              return SizedBox(
-                width: double.infinity,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    L10nKey.settingsFooter.toText(),
-                    L10nKey.commonVersion.toText(namedArgs: {'version': '${info.version}+${info.buildNumber}'})
-                  ],
-                ),
-              );
-            },
-          )),
-    ])
-  ];
+          child: ListTile(
+            leading: TextCircleAvatar(text: _api.selfUser.effectiveDisplayName, radius: 25),
+            title: Text(_api.selfUser.effectiveDisplayName, style: theme.textTheme.titleSmall),
+            subtitle: const Text('placeholder@financrr.app'),
+          ),
+        ),
+      ]),
+      const SettingsItemGroup(title: L10nKey.settingsCategoryAccount, items: [
+        SettingsItem(
+          title: L10nKey.settingsItemCurrencies,
+          iconData: Icons.currency_exchange_rounded,
+          destination: CurrencySettingsPage.pagePath,
+        ),
+        SettingsItem(
+          title: L10nKey.settingsItemSessions,
+          iconData: Icons.devices_rounded,
+          destination: SessionSettingsPage.pagePath,
+        ),
+      ]),
+      const SettingsItemGroup(title: L10nKey.settingsCategoryApp, items: [
+        SettingsItem(
+          title: L10nKey.settingsItemAppearance,
+          iconData: Icons.palette_outlined,
+          destination: ThemeSettingsPage.pagePath,
+        ),
+        SettingsItem(
+          title: L10nKey.settingsItemLanguage,
+          iconData: Icons.language_rounded,
+          destination: L10nSettingsPage.pagePath,
+        ),
+      ]),
+      const SettingsItemGroup(title: L10nKey.settingsCategoryDeveloper, items: [
+        SettingsItem(
+          title: L10nKey.settingsItemLocalStorage,
+          iconData: Icons.sd_storage_outlined,
+          destination: LocalStorageSettingsPage.pagePath,
+        ),
+        SettingsItem(
+          title: L10nKey.settingsItemLogs,
+          iconData: Icons.format_align_left_rounded,
+          destination: LogSettingsPage.pagePath,
+        ),
+      ]),
+      SettingsItemGroup(items: [
+        SettingsItem(
+          showCategory: false,
+          title: L10nKey.commonLogout,
+          iconData: Icons.logout,
+          onTap: () => CommonActions.logOut(this, ref),
+        ),
+      ]),
+      SettingsItemGroup(groupInCard: false, items: [
+        SettingsItem.fromChild(
+            showCategory: false,
+            child: FutureBuilder(
+              future: PackageInfo.fromPlatform(),
+              builder: (context, AsyncSnapshot<PackageInfo> snapshot) {
+                if (!snapshot.hasData) return const SizedBox();
+                final PackageInfo info = snapshot.data!;
+                return SizedBox(
+                  width: double.infinity,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      L10nKey.settingsFooter.toText(),
+                      L10nKey.commonVersion.toText(namedArgs: {'version': '${info.version}+${info.buildNumber}'})
+                    ],
+                  ),
+                );
+              },
+            )),
+      ])
+    ];
   }
 
   @override
@@ -162,28 +162,28 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             width: size.width / 1.1,
             child: Scaffold(
                 body: ListView.separated(
-                  itemCount: items.length,
-                  itemBuilder: (_, index) {
-                    final SettingsItemGroup group = items[index];
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (group.title != null) ...[
-                          Padding(
-                            padding: const EdgeInsets.only(top: 5),
-                            child: group.title!.toText(style: theme.textTheme.titleSmall),
-                          ),
-                          const Divider()
-                        ],
-                        if (group.groupInCard)
-                          Card.outlined(child: Column(children: group.items.map((item) => item.build(context)).toList()))
-                        else
-                          Column(children: group.items.map((item) => item.build(context)).toList()),
-                      ],
-                    );
-                  },
-                  separatorBuilder: (_, index) => const Padding(padding: EdgeInsets.symmetric(vertical: 5)),
-                )),
+              itemCount: items.length,
+              itemBuilder: (_, index) {
+                final SettingsItemGroup group = items[index];
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (group.title != null) ...[
+                      Padding(
+                        padding: const EdgeInsets.only(top: 5),
+                        child: group.title!.toText(style: theme.textTheme.titleSmall),
+                      ),
+                      const Divider()
+                    ],
+                    if (group.groupInCard)
+                      Card.outlined(child: Column(children: group.items.map((item) => item.build(context)).toList()))
+                    else
+                      Column(children: group.items.map((item) => item.build(context)).toList()),
+                  ],
+                );
+              },
+              separatorBuilder: (_, index) => const Padding(padding: EdgeInsets.symmetric(vertical: 5)),
+            )),
           ),
         ),
       );

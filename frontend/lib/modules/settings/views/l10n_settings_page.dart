@@ -71,8 +71,8 @@ class _L10nSettingsPageState extends ConsumerState<L10nSettingsPage> {
                 ),
                 const Divider(),
                 L10nKey.commonPreview.toText(style: theme.textTheme.titleSmall),
-                Text(TextUtils.formatBalance(
-                    123456789, 2, _decimalSeparatorController.text, _thousandSeparatorController.text)),
+                Text(
+                    TextUtils.formatBalance(123456789, 2, _decimalSeparatorController.text, _thousandSeparatorController.text)),
                 Text(DateFormat(_dateTimeFormatController.text).format(DateTime.now())),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 20),

@@ -90,58 +90,58 @@ class _CurrencyEditPageState extends ConsumerState<CurrencyEditPage> {
             width: size.width / 1.1,
             child: SingleChildScrollView(
                 child: Form(
-                  key: _formKey,
-                  onChanged: () => setState(() => _isValid = _formKey.currentState?.validate() ?? false),
-                  child: Column(
-                    children: [
-                      ...CurrencyCreatePage.buildCurrencyPreview(
-                          size: size,
-                          symbol: _symbolController.text,
-                          name: _nameController.text,
-                          isoCode: _isoCodeController.text,
-                          decimalPlaces: _decimalPlacesController.text,
-                          previewAmount: _randomNumber),
-                      const Divider(),
-                      ...FormFields.currency(
-                          nameController: _nameController,
-                          symbolController: _symbolController,
-                          isoCodeController: _isoCodeController,
-                          decimalPlacesController: _decimalPlacesController,
-                          readOnly: !_isCustom),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: ElevatedButton(
-                          onPressed: _isValid && _isCustom ? () => _editCurrency(currency as CustomCurrency) : null,
-                          child: _nameController.text.isEmpty
-                              ? L10nKey.currencyEdit.toText()
-                              : L10nKey.commonEditObject.toText(namedArgs: {'object': _nameController.text}),
+              key: _formKey,
+              onChanged: () => setState(() => _isValid = _formKey.currentState?.validate() ?? false),
+              child: Column(
+                children: [
+                  ...CurrencyCreatePage.buildCurrencyPreview(
+                      size: size,
+                      symbol: _symbolController.text,
+                      name: _nameController.text,
+                      isoCode: _isoCodeController.text,
+                      decimalPlaces: _decimalPlacesController.text,
+                      previewAmount: _randomNumber),
+                  const Divider(),
+                  ...FormFields.currency(
+                      nameController: _nameController,
+                      symbolController: _symbolController,
+                      isoCodeController: _isoCodeController,
+                      decimalPlacesController: _decimalPlacesController,
+                      readOnly: !_isCustom),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: _isValid && _isCustom ? () => _editCurrency(currency as CustomCurrency) : null,
+                      child: _nameController.text.isEmpty
+                          ? L10nKey.currencyEdit.toText()
+                          : L10nKey.commonEditObject.toText(namedArgs: {'object': _nameController.text}),
+                    ),
+                  ),
+                  if (!_isCustom)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: SizedBox(
+                        width: size.width,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.warning_amber_rounded),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 10),
+                                child: L10nKey.currencyNotEditable
+                                    .toText(style: theme.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700)),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      if (!_isCustom)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 10),
-                          child: SizedBox(
-                            width: size.width,
-                            child: Row(
-                              mainAxisSize: MainAxisSize.max,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(Icons.warning_amber_rounded),
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(left: 10),
-                                    child: L10nKey.currencyNotEditable
-                                        .toText(style: theme.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700)),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        )
-                    ],
-                  ),
-                )),
+                    )
+                ],
+              ),
+            )),
           ),
         ),
       );

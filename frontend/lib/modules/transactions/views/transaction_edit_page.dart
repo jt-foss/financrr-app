@@ -101,50 +101,50 @@ class TransactionEditPageState extends ConsumerState<TransactionEditPage> {
             width: size.width / 1.1,
             child: SingleChildScrollView(
                 child: Form(
-                  key: _formKey,
-                  onChanged: () => setState(() => _isValid = _formKey.currentState?.validate() ?? false),
-                  child: Column(
-                    children: [
-                      TransactionCard.fromData(
-                        id: 0,
-                        amount: int.tryParse(_amountController.text) ?? 0,
-                        account: account,
-                        name: _nameController.text,
-                        description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
-                        type: _type,
-                        createdAt: DateTime.now(),
-                        executedAt: _executedAt,
-                        interactive: false,
-                      ),
-                      const Divider(),
-                      ...FormFields.transaction(
-                        this,
-                        theme,
-                        currentAccount: account,
-                        nameController: _nameController,
-                        amountController: _amountController,
-                        descriptionController: _descriptionController,
-                        executedAtController: _executedAtController,
-                        selectedType: _type,
-                        executedAt: _executedAt,
-                        onSelectionChanged: (types) {
-                          setState(() => _type = types.first);
-                        },
-                        onExecutedAtChanged: (date) {
-                          setState(() => _executedAt = date);
-                        },
-                      ),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: ElevatedButton(
-                          onPressed: _isValid ? () => _editTransaction(account, transaction, _type) : null,
-                          child: L10nKey.transactionEdit.toText(),
-                        ),
-                      ),
-                    ],
+              key: _formKey,
+              onChanged: () => setState(() => _isValid = _formKey.currentState?.validate() ?? false),
+              child: Column(
+                children: [
+                  TransactionCard.fromData(
+                    id: 0,
+                    amount: int.tryParse(_amountController.text) ?? 0,
+                    account: account,
+                    name: _nameController.text,
+                    description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
+                    type: _type,
+                    createdAt: DateTime.now(),
+                    executedAt: _executedAt,
+                    interactive: false,
                   ),
-                )),
+                  const Divider(),
+                  ...FormFields.transaction(
+                    this,
+                    theme,
+                    currentAccount: account,
+                    nameController: _nameController,
+                    amountController: _amountController,
+                    descriptionController: _descriptionController,
+                    executedAtController: _executedAtController,
+                    selectedType: _type,
+                    executedAt: _executedAt,
+                    onSelectionChanged: (types) {
+                      setState(() => _type = types.first);
+                    },
+                    onExecutedAtChanged: (date) {
+                      setState(() => _executedAt = date);
+                    },
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: _isValid ? () => _editTransaction(account, transaction, _type) : null,
+                      child: L10nKey.transactionEdit.toText(),
+                    ),
+                  ),
+                ],
+              ),
+            )),
           ),
         ),
       );
@@ -155,8 +155,7 @@ class TransactionEditPageState extends ConsumerState<TransactionEditPage> {
           stream: _transactionStreamController.stream,
           onSuccess: (_, snap) => buildVerticalLayout(account, snap.data!, size),
           onLoading: (_, __) => const Center(child: CircularProgressIndicator()),
-          onError: (_, __) => L10nKey.transactionNotFound.toText()
-      );
+          onError: (_, __) => L10nKey.transactionNotFound.toText());
     }
 
     handleAccountStream(Size size) {
@@ -164,8 +163,7 @@ class TransactionEditPageState extends ConsumerState<TransactionEditPage> {
           stream: _accountStreamController.stream,
           onSuccess: (_, snap) => handleTransactionStream(snap.data!, size),
           onLoading: (_, __) => const Center(child: CircularProgressIndicator()),
-          onError: (_, __) => L10nKey.accountNotFound.toText()
-      );
+          onError: (_, __) => L10nKey.accountNotFound.toText());
     }
 
     return AdaptiveScaffold(verticalBuilder: (_, __, size) => SafeArea(child: handleAccountStream(size)));

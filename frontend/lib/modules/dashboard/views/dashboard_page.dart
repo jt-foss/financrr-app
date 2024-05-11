@@ -97,16 +97,16 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                             return [
                               PopupMenuItem(
                                   child: ListTile(
-                                    title: L10nKey.accountListManage.toText(),
-                                    leading: const Icon(Icons.manage_accounts_rounded),
-                                    onTap: () => context.goPath(AccountsOverviewPage.pagePath.build()),
-                                  )),
+                                title: L10nKey.accountListManage.toText(),
+                                leading: const Icon(Icons.manage_accounts_rounded),
+                                onTap: () => context.goPath(AccountsOverviewPage.pagePath.build()),
+                              )),
                               PopupMenuItem(
                                   child: ListTile(
-                                    title: L10nKey.accountCreate.toText(),
-                                    leading: const Icon(Icons.add),
-                                    onTap: () => context.goPath(AccountCreatePage.pagePath.build()),
-                                  ))
+                                title: L10nKey.accountCreate.toText(),
+                                leading: const Icon(Icons.add),
+                                onTap: () => context.goPath(AccountCreatePage.pagePath.build()),
+                              ))
                             ];
                           })
                     ],
@@ -131,6 +131,4 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
       verticalBuilder: (_, __, size) => SafeArea(child: buildVerticalLayout(size)),
     );
   }
-
-
 }

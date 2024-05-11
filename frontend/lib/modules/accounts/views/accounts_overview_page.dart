@@ -52,8 +52,9 @@ class _AccountsOverviewPageState extends ConsumerState<AccountsOverviewPage> {
                 setState(() {
                   _currencies = _api.getAccounts().fold(
                     {},
-                        (map, account) {
-                      map.update(account.currencyId.get()!, (value) => value + account.balance, ifAbsent: () => account.balance);
+                    (map, account) {
+                      map.update(account.currencyId.get()!, (value) => value + account.balance,
+                          ifAbsent: () => account.balance);
                       return map;
                     },
                   );
@@ -107,17 +108,17 @@ class _AccountsOverviewPageState extends ConsumerState<AccountsOverviewPage> {
                                   return [
                                     PopupMenuItem(
                                         child: ListTile(
-                                          title: L10nKey.accountEdit.toText(),
-                                          leading: const Icon(Icons.edit_rounded),
-                                          onTap: () => context.goPath(
-                                              AccountEditPage.pagePath.build(params: {'accountId': account.id.value.toString()})),
-                                        )),
+                                      title: L10nKey.accountEdit.toText(),
+                                      leading: const Icon(Icons.edit_rounded),
+                                      onTap: () => context.goPath(
+                                          AccountEditPage.pagePath.build(params: {'accountId': account.id.value.toString()})),
+                                    )),
                                     PopupMenuItem(
                                         child: ListTile(
-                                          title: L10nKey.accountDelete.toText(),
-                                          leading: const Icon(Icons.delete_rounded),
-                                          onTap: () => _deleteAccount(account),
-                                        ))
+                                      title: L10nKey.accountDelete.toText(),
+                                      leading: const Icon(Icons.delete_rounded),
+                                      onTap: () => _deleteAccount(account),
+                                    ))
                                   ];
                                 })
                           ],

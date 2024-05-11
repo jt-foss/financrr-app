@@ -77,47 +77,47 @@ class _TransactionCreatePageState extends ConsumerState<TransactionCreatePage> {
             width: size.width / 1.1,
             child: SingleChildScrollView(
                 child: Form(
-                  key: _formKey,
-                  onChanged: () => setState(() => _isValid = _formKey.currentState?.validate() ?? false),
-                  child: Column(
-                    children: [
-                      TransactionCard.fromData(
-                        id: 0,
-                        amount: int.tryParse(_amountController.text) ?? 0,
-                        account: account,
-                        name: _nameController.text,
-                        description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
-                        type: _type,
-                        createdAt: DateTime.now(),
-                        executedAt: _executedAt,
-                        interactive: false,
-                      ),
-                      const Divider(),
-                      ...FormFields.transaction(
-                        this,
-                        theme,
-                        currentAccount: account,
-                        nameController: _nameController,
-                        amountController: _amountController,
-                        descriptionController: _descriptionController,
-                        executedAtController: _executedAtController,
-                        selectedType: _type,
-                        onSelectionChanged: (types) {
-                          setState(() => _type = types.first);
-                        },
-                        onExecutedAtChanged: (date) => setState(() => _executedAt = date),
-                      ),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: ElevatedButton(
-                          onPressed: _isValid ? () => _createTransaction(account, _type) : null,
-                          child: L10nKey.transactionCreate.toText(),
-                        ),
-                      ),
-                    ],
+              key: _formKey,
+              onChanged: () => setState(() => _isValid = _formKey.currentState?.validate() ?? false),
+              child: Column(
+                children: [
+                  TransactionCard.fromData(
+                    id: 0,
+                    amount: int.tryParse(_amountController.text) ?? 0,
+                    account: account,
+                    name: _nameController.text,
+                    description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
+                    type: _type,
+                    createdAt: DateTime.now(),
+                    executedAt: _executedAt,
+                    interactive: false,
                   ),
-                )),
+                  const Divider(),
+                  ...FormFields.transaction(
+                    this,
+                    theme,
+                    currentAccount: account,
+                    nameController: _nameController,
+                    amountController: _amountController,
+                    descriptionController: _descriptionController,
+                    executedAtController: _executedAtController,
+                    selectedType: _type,
+                    onSelectionChanged: (types) {
+                      setState(() => _type = types.first);
+                    },
+                    onExecutedAtChanged: (date) => setState(() => _executedAt = date),
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: _isValid ? () => _createTransaction(account, _type) : null,
+                      child: L10nKey.transactionCreate.toText(),
+                    ),
+                  ),
+                ],
+              ),
+            )),
           ),
         ),
       );

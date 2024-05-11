@@ -88,9 +88,9 @@ class _LogSettingsPageState extends ConsumerState<LogSettingsPage> {
               Text('${_entries.length} entries'),
               IconButton(
                   onPressed: () => setState(() {
-                    LogEntryStore().clear();
-                    _entries.clear();
-                  }),
+                        LogEntryStore().clear();
+                        _entries.clear();
+                      }),
                   icon: const Icon(Icons.delete_sweep_outlined))
             ],
           ),
@@ -106,8 +106,8 @@ class _LogSettingsPageState extends ConsumerState<LogSettingsPage> {
           child: SizedBox(
             width: size.width / 1.1,
             child: ListView.separated(
-              // +1 for the divider
-              // +1 for the notice card if there are no logs
+                // +1 for the divider
+                // +1 for the notice card if there are no logs
                 itemCount: _entries.length + 1,
                 separatorBuilder: (_, index) => index == 0 ? const SizedBox() : const Divider(),
                 itemBuilder: (context, index) {
