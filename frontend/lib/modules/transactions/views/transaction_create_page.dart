@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:financrr_frontend/modules/auth/providers/authentication.provider.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -70,16 +71,9 @@ class _TransactionCreatePageState extends ConsumerState<TransactionCreatePage> {
   Widget _handleAccountStream(Size size) {
     return StreamWrapper(
       stream: _accountStreamController.stream,
-      onSuccess: (ctx, snap) {
-        return _buildVerticalLayout(snap.data!, size);
-      },
-      onLoading: (ctx, snap) {
-        return const Center(child: CircularProgressIndicator());
-      },
-      onError: (ctx, snap) {
-        // TODO: localize
-        return const Text('Could not find account');
-      },
+      onSuccess: (_, snap) => _buildVerticalLayout(snap.data!, size),
+      onLoading: (_, __) => const Center(child: CircularProgressIndicator()),
+      onError: (ctx, snap) => L10nKey.accountNotFound.toText(),
     );
   }
 
@@ -126,8 +120,7 @@ class _TransactionCreatePageState extends ConsumerState<TransactionCreatePage> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: _isValid ? () => _createTransaction(account, _type) : null,
-                    // TODO: localize
-                    child: const Text('Create Transaction'),
+                    child: L10nKey.transactionCreate.toText(),
                   ),
                 ),
               ],

@@ -1,6 +1,7 @@
 import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/shared/ui/text_circle_avatar.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
@@ -60,14 +61,12 @@ class CurrencyCard extends ConsumerWidget {
                 return [
                   PopupMenuItem(
                     onTap: () => context.goPath(CurrencyEditPage.pagePath.build(params: {'currencyId': id.toString()})),
-                    // TODO: localize
-                    child: const Text('Edit'),
+                    child: L10nKey.commonEdit.toText(),
                   ),
                   if (onDelete != null)
                     PopupMenuItem(
                       onTap: onDelete,
-                      // TODO: localize
-                      child: const Text('Delete'),
+                      child: L10nKey.commonDelete.toText(),
                     ),
                 ];
               },

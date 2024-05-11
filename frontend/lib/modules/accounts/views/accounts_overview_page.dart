@@ -76,8 +76,7 @@ class _AccountsOverviewPageState extends ConsumerState<AccountsOverviewPage> {
                       }).toList(),
                     ),
                     TextButton.icon(
-                      // TODO: localize
-                      label: const Text('Create Account'),
+                      label: L10nKey.accountCreate.toText(),
                       icon: const Icon(Icons.add, size: 17),
                       onPressed: () => context.goPath(AccountCreatePage.pagePath.build()),
                     ),
@@ -87,10 +86,8 @@ class _AccountsOverviewPageState extends ConsumerState<AccountsOverviewPage> {
               if (_api.getAccounts().isEmpty)
                 Center(
                   child: NoticeCard(
-                    // TODO: localize
-                    title: 'No accounts found',
-                    // TODO: localize
-                    description: 'Create an account to get started',
+                    title: L10nKey.accountNoneFoundTitle.toString(),
+                    description: L10nKey.accountNoneFoundBody.toString(),
                     onTap: () => context.goPath(AccountCreatePage.pagePath.build()),
                   ),
                 ),
@@ -112,16 +109,14 @@ class _AccountsOverviewPageState extends ConsumerState<AccountsOverviewPage> {
                                 return [
                                   PopupMenuItem(
                                       child: ListTile(
-                                    // TODO: localize
-                                    title: const Text('Edit Account'),
+                                    title: L10nKey.accountEdit.toText(),
                                     leading: const Icon(Icons.edit_rounded),
                                     onTap: () => context.goPath(
                                         AccountEditPage.pagePath.build(params: {'accountId': account.id.value.toString()})),
                                   )),
                                   PopupMenuItem(
                                       child: ListTile(
-                                    // TODO: localize
-                                    title: const Text('Delete Account'),
+                                    title: L10nKey.accountDelete.toText(),
                                     leading: const Icon(Icons.delete_rounded),
                                     onTap: () => _deleteAccount(account),
                                   ))

@@ -61,16 +61,9 @@ class _AccountPageState extends ConsumerState<AccountPage> {
   Widget _handleAccountStream(Size size) {
     return StreamWrapper(
       stream: _accountStreamController.stream,
-      onSuccess: (ctx, snap) {
-        return _buildVerticalLayout(snap.data!, size);
-      },
-      onLoading: (ctx, snap) {
-        return const Center(child: CircularProgressIndicator());
-      },
-      onError: (ctx, snap) {
-        // TODO: localize
-        return const Text('Could not find account');
-      },
+      onSuccess: (_, snap) => _buildVerticalLayout(snap.data!, size),
+      onLoading: (_, __) => const Center(child: CircularProgressIndicator()),
+      onError: (_, __) => L10nKey.accountNotFound.toText()
     );
   }
 
@@ -103,17 +96,14 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                         onPressed: () => context
                             .goPath(TransactionCreatePage.pagePath.build(params: {'accountId': account.id.value.toString()})),
                         icon: const Icon(Icons.add, size: 17),
-                        // TODO: localize
-                        label: const Text('Create Transaction')),
+                        label: L10nKey.transactionCreate.toText()),
                     const Spacer(),
                     IconButton(
-                        // TODO: localize
-                        tooltip: 'Delete Account',
+                        tooltip: L10nKey.accountDelete.toString(),
                         onPressed: () => _deleteAccount(account),
                         icon: const Icon(Icons.delete_rounded, size: 17)),
                     IconButton(
-                        // TODO: localize
-                        tooltip: 'Edit Account',
+                        tooltip: L10nKey.accountEdit.toString(),
                         onPressed: () =>
                             context.goPath(AccountEditPage.pagePath.build(params: {'accountId': account.id.value.toString()})),
                         icon: const Icon(Icons.create, size: 17))
@@ -135,8 +125,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // TODO: localize
-        Text('Latest Transactions', style: ref.textTheme.titleMedium),
+        L10nKey.dashboardTransactions.toText(style: ref.textTheme.titleMedium),
         Padding(
           padding: const EdgeInsets.only(top: 10),
           child: PaginatedWrapper(
@@ -148,8 +137,8 @@ class _AccountPageState extends ConsumerState<AccountPage> {
               if (transactions.isEmpty) {
                 return Center(
                     child: NoticeCard(
-                  title: 'No transactions found',
-                  description: 'Create a transaction to get started',
+                  title: L10nKey.transactionNoneFoundTitle.toString(),
+                  description: L10nKey.transactionNoneFoundBody.toString(),
                   onTap: () =>
                       context.goPath(TransactionCreatePage.pagePath.build(params: {'accountId': account.id.value.toString()})),
                 ));

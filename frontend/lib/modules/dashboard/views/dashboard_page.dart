@@ -5,6 +5,7 @@ import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart
 import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/shared/ui/async_wrapper.dart';
 import 'package:financrr_frontend/shared/ui/account_card.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
@@ -62,8 +63,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // TODO: localize
-                    Text('Account and Cards', style: ref.textTheme.titleSmall),
+                    L10nKey.dashboardAccounts.toText(style: ref.textTheme.titleSmall),
                     PopupMenuButton(
                         icon: const Icon(Icons.more_horiz),
                         itemBuilder: (context) {
@@ -77,8 +77,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                             )),
                             PopupMenuItem(
                                 child: ListTile(
-                              // TODO: localize
-                              title: const Text('Create Account'),
+                              title: L10nKey.accountCreate.toText(),
                               leading: const Icon(Icons.add),
                               onTap: () => context.goPath(AccountCreatePage.pagePath.build()),
                             ))
@@ -91,10 +90,8 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                 if (_api.getAccounts().isEmpty)
                   Center(
                       child: NoticeCard(
-                          // TODO: localize
-                          title: 'No accounts found',
-                          // TODO: localize
-                          description: 'Create an account to get started',
+                          title: L10nKey.accountNoneFoundTitle.toString(),
+                          description: L10nKey.accountNoneFoundBody.toString(),
                           onTap: () => context.goPath(AccountCreatePage.pagePath.build()))),
                 if (_api.getAccounts().isNotEmpty) _buildTransactionSection()
               ]),
@@ -109,23 +106,20 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
       children: [
         Padding(
           padding: const EdgeInsets.only(top: 20),
-          // TODO: localize
-          child: Text('Latest Transactions', style: ref.textTheme.titleSmall),
+          child: L10nKey.dashboardTransactions.toText(style: ref.textTheme.titleMedium),
         ),
         const Divider(),
         StreamWrapper(
             stream: _transactionStreamController.stream,
-            onError: (context, snap) => const Text('Error'),
-            onLoading: (context, snap) => const Center(child: CircularProgressIndicator()),
+            onError: (_, __) => const Text('Error'),
+            onLoading: (_, __) => const Center(child: CircularProgressIndicator()),
             onSuccess: (context, snap) {
               final List<Transaction> transactions = snap.data!.items;
               if (transactions.isEmpty) {
-                return const Center(
-                    // TODO: localize
+                return Center(
                     child: NoticeCard(
-                        title: 'No transactions found',
-                        // TODO: localize
-                        description: 'Your transactions will appear here'));
+                        title: L10nKey.transactionNoneFoundTitle.toString(),
+                        description: L10nKey.transactionNoneFoundBody.toString()));
               }
               return Column(
                 children: [

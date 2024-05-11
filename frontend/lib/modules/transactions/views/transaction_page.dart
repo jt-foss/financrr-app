@@ -70,20 +70,18 @@ class TransactionPageState extends ConsumerState<TransactionPage> {
   Widget _handleAccountStream(Size size) {
     return StreamWrapper(
       stream: _accountStreamController.stream,
-      onSuccess: (ctx, snap) => _handleTransactionStream(snap.data!, size),
+      onSuccess: (_, snap) => _handleTransactionStream(snap.data!, size),
       onLoading: (_, __) => const Center(child: CircularProgressIndicator()),
-      // TODO: localize
-      onError: (_, __) => const Text('Could not find account'),
+      onError: (_, __) => L10nKey.accountNotFound.toText()
     );
   }
 
   Widget _handleTransactionStream(Account account, Size size) {
     return StreamWrapper(
       stream: _transactionStreamController.stream,
-      onSuccess: (ctx, snap) => _buildVerticalLayout(account, snap.data!, size),
+      onSuccess: (_, snap) => _buildVerticalLayout(account, snap.data!, size),
       onLoading: (_, __) => const Center(child: CircularProgressIndicator()),
-      // TODO: localize
-      onError: (_, __) => const Text('Could not find transaction'),
+      onError: (_, __) => L10nKey.transactionNotFound.toText()
     );
   }
 
@@ -135,22 +133,14 @@ class TransactionPageState extends ConsumerState<TransactionPage> {
                     child: Table(
                       border: TableBorder.all(color: ref.themeData.dividerColor),
                       children: [
-                        // TODO: localize
-                        _buildTableRow('Type', transaction.type.name),
-                        // TODO: localize
-                        _buildTableRow('Amount', amountStr),
-                        // TODO: localize
-                        _buildTableRow('Name', transaction.name),
-                        // TODO: localize
-                        _buildTableRow('Description', transaction.description ?? 'N/A'),
-                        // TODO: localize
-                        _buildTableRow('From', transaction.sourceId?.get()?.name ?? 'N/A'),
-                        // TODO: localize
-                        _buildTableRow('To', transaction.destinationId?.get()?.name ?? 'N/A'),
-                        // TODO: localize
-                        _buildTableRow('Executed at', StoreKey.dateTimeFormat.readSync()!.format(transaction.executedAt)),
-                        // TODO: localize
-                        _buildTableRow('Created at', StoreKey.dateTimeFormat.readSync()!.format(transaction.createdAt)),
+                        _buildTableRow(L10nKey.transactionPropertiesType, transaction.type.name),
+                        _buildTableRow(L10nKey.transactionPropertiesAmount, amountStr),
+                        _buildTableRow(L10nKey.transactionPropertiesName, transaction.name),
+                        _buildTableRow(L10nKey.transactionPropertiesDescription, transaction.description ?? 'N/A'),
+                        _buildTableRow(L10nKey.transactionPropertiesFrom, transaction.sourceId?.get()?.name ?? 'N/A'),
+                        _buildTableRow(L10nKey.transactionPropertiesTo, transaction.destinationId?.get()?.name ?? 'N/A'),
+                        _buildTableRow(L10nKey.transactionPropertiesExecutedAt, StoreKey.dateTimeFormat.readSync()!.format(transaction.executedAt)),
+                        _buildTableRow(L10nKey.transactionPropertiesCreatedAt, StoreKey.dateTimeFormat.readSync()!.format(transaction.createdAt)),
                       ],
                     ),
                   )
@@ -161,11 +151,11 @@ class TransactionPageState extends ConsumerState<TransactionPage> {
     );
   }
 
-  TableRow _buildTableRow(String label, String value) {
+  TableRow _buildTableRow(L10nKey label, String value) {
     return TableRow(children: [
       Padding(
         padding: const EdgeInsets.all(10),
-        child: Text(label),
+        child: label.toText(),
       ),
       Padding(
         padding: const EdgeInsets.all(10),

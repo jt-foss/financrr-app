@@ -82,16 +82,9 @@ class AccountEditPageState extends ConsumerState<AccountEditPage> {
   Widget _handleAccountStream(Size size) {
     return StreamWrapper(
       stream: _accountStreamController.stream,
-      onSuccess: (ctx, snap) {
-        return _buildVerticalLayout(snap.data!, size);
-      },
-      onLoading: (ctx, snap) {
-        return const Center(child: CircularProgressIndicator());
-      },
-      onError: (ctx, snap) {
-        // TODO: localize
-        return const Text('Could not find account');
-      },
+      onSuccess: (_, snap) => _buildVerticalLayout(snap.data!, size),
+      onLoading: (_, __) => const Center(child: CircularProgressIndicator()),
+      onError: (_, __) => L10nKey.accountNotFound.toText()
     );
   }
 
@@ -130,8 +123,9 @@ class AccountEditPageState extends ConsumerState<AccountEditPage> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: _isValid ? () => _editAccount(account) : null,
-                    // TODO: localize
-                    child: Text(_nameController.text.isEmpty ? 'Edit Account' : 'Edit "${_nameController.text}"'),
+                    child: _nameController.text.isEmpty
+                        ? L10nKey.accountEdit.toText()
+                        : L10nKey.commonEditObject.toText(namedArgs: {'object': _nameController.text}),
                   ),
                 ),
               ],
