@@ -1,6 +1,9 @@
+import 'package:easy_localization/easy_localization.dart';
+import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../shared/models/store.dart';
@@ -9,20 +12,21 @@ import '../../../routing/page_path.dart';
 import '../../../utils/text_utils.dart';
 import 'settings_page.dart';
 
-class L10nSettingsPage extends StatefulWidget {
+class L10nSettingsPage extends StatefulHookConsumerWidget {
   static const PagePathBuilder pagePath = PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'languages');
 
   const L10nSettingsPage({super.key});
 
   @override
-  State<StatefulWidget> createState() => _L10nSettingsPageState();
+  ConsumerState<L10nSettingsPage> createState() => _L10nSettingsPageState();
 }
 
-class _L10nSettingsPageState extends State<L10nSettingsPage> {
+class _L10nSettingsPageState extends ConsumerState<L10nSettingsPage> {
   late final TextEditingController _decimalSeparatorController;
   late final TextEditingController _thousandSeparatorController;
   late final TextEditingController _dateTimeFormatController;
 
+  Locale? _locale;
   late String _decimalSeparator;
   late String _thousandSeparator;
   late String _dateTimeFormat;
@@ -41,89 +45,101 @@ class _L10nSettingsPageState extends State<L10nSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return AdaptiveScaffold(
-      resizeToAvoidBottomInset: false,
-      verticalBuilder: (_, __, size) => SafeArea(child: _buildVerticalLayout(size)),
-    );
-  }
+    buildLocaleCard(Locale locale) {
+      return ListTile(
+        title: Text(locale.toLanguageTag()),
+        onTap: () => setState(() => _locale = locale),
+      );
+    }
 
-  Widget _buildVerticalLayout(Size size) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10),
-      child: Center(
-        child: SizedBox(
-          width: size.width / 1.1,
-          child: ListView(
-            children: [
-              Card.outlined(
-                child: ListTile(
-                  leading: L10nKey.commonPreview.toText(),
-                  title: Text(TextUtils.formatBalance(
-                      123456789, 2, _decimalSeparatorController.text, _thousandSeparatorController.text)),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 20),
-                child: TextFormField(
-                  controller: _decimalSeparatorController,
-                  onChanged: (_) => setState(() {}),
-                  decoration: InputDecoration(
-                    labelText: L10nKey.l10nDecimalSeparator.toString(),
-                  ),
-                  inputFormatters: [LengthLimitingTextInputFormatter(1)],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                child: TextFormField(
-                  controller: _thousandSeparatorController,
-                  onChanged: (_) => setState(() {}),
-                  decoration: InputDecoration(
-                    labelText: L10nKey.l10nThousandsSeparator.toString(),
-                  ),
-                  inputFormatters: [LengthLimitingTextInputFormatter(1)],
-                ),
-              ),
-              const Divider(),
-              Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: Card.outlined(
-                  child: ListTile(
-                    leading: L10nKey.commonPreview.toText(),
-                    title: Text(DateFormat(_dateTimeFormatController.text).format(DateTime.now())),
+    buildVerticalLayout(Size size) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 10),
+        child: Center(
+          child: SizedBox(
+            width: size.width / 1.1,
+            child: ListView(
+              children: [
+                Card.outlined(
+                  child: Column(
+                    children: [
+                      for (Locale locale in context.supportedLocales) buildLocaleCard(locale),
+                    ],
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 20),
-                child: TextFormField(
+                const Divider(),
+                L10nKey.commonPreview.toText(style: ref.textTheme.titleSmall),
+                Text(TextUtils.formatBalance(
+                    123456789, 2, _decimalSeparatorController.text, _thousandSeparatorController.text)),
+                Text(DateFormat(_dateTimeFormatController.text).format(DateTime.now())),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Row(
+                      children: [
+                        Flexible(
+                          child: TextFormField(
+                            controller: _decimalSeparatorController,
+                            onChanged: (_) => setState(() {}),
+                            decoration: InputDecoration(
+                              labelText: L10nKey.l10nDecimalSeparator.toString(),
+                            ),
+                            inputFormatters: [LengthLimitingTextInputFormatter(1)],
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Flexible(
+                          child: TextFormField(
+                            controller: _thousandSeparatorController,
+                            onChanged: (_) => setState(() {}),
+                            decoration: InputDecoration(
+                              labelText: L10nKey.l10nThousandsSeparator.toString(),
+                            ),
+                            inputFormatters: [LengthLimitingTextInputFormatter(1)],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                TextFormField(
                     controller: _dateTimeFormatController,
                     onChanged: (_) => setState(() {}),
                     decoration: InputDecoration(
                       labelText: L10nKey.l10nDateFormat.toString(),
                     )),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 20),
-                child: TextButton(
-                  onPressed: _isDifferent() ? () => _save() : null,
-                  child: L10nKey.commonSave.toText(),
+                Padding(
+                  padding: const EdgeInsets.only(top: 20),
+                  child: TextButton(
+                    onPressed: _isDifferent() ? () => _save() : null,
+                    child: L10nKey.commonSave.toText(),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
+      );
+    }
+
+    return AdaptiveScaffold(
+      resizeToAvoidBottomInset: false,
+      verticalBuilder: (_, __, size) => SafeArea(child: buildVerticalLayout(size)),
     );
   }
 
   bool _isDifferent() {
-    return _decimalSeparatorController.text != _decimalSeparator ||
+    return (_locale != null && context.locale != _locale) ||
+        _decimalSeparatorController.text != _decimalSeparator ||
         _thousandSeparatorController.text != _thousandSeparator ||
         _dateTimeFormatController.text != _dateTimeFormat;
   }
 
-  void _save() {
+  void _save() async {
+    if (_locale != null && context.locale != _locale) {
+      await context.setLocale(_locale!);
+    }
     if (_decimalSeparatorController.text != _decimalSeparator) {
       StoreKey.decimalSeparator.write(_decimalSeparatorController.text);
     }
@@ -134,6 +150,7 @@ class _L10nSettingsPageState extends State<L10nSettingsPage> {
       StoreKey.dateTimeFormat.write(DateFormat(_dateTimeFormatController.text));
     }
     setState(() {
+      _locale = context.locale;
       _decimalSeparator = _decimalSeparatorController.text;
       _thousandSeparator = _thousandSeparatorController.text;
       _dateTimeFormat = _dateTimeFormatController.text;
