@@ -144,7 +144,7 @@ impl RecurringTransaction {
         }));
 
         let mut scheduler = binding.lock().expect("Failed to lock scheduler mutex");
-        scheduler.schedule_job(cron, job);
+        scheduler.schedule_job(cron, Arc::new(job));
 
         Ok(())
     }
