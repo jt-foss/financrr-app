@@ -157,6 +157,7 @@ pub(crate) trait HasPermissionOrError: Permission {
     }
 }
 
+#[allow(unused)]
 pub(crate) trait PermissionByIds: TableName {
     fn get_permissions_by_id(entity_id: i32, user_id: i32) -> impl Future<Output = Result<Permissions, ApiError>> {
         async move {
