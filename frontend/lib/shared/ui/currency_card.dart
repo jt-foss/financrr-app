@@ -1,6 +1,7 @@
 import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/shared/ui/text_circle_avatar.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
@@ -38,6 +39,8 @@ class CurrencyCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    var theme = ref.watch(themeProvider);
+
     return Card.outlined(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -49,7 +52,7 @@ class CurrencyCard extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(name, style: ref.textTheme.titleSmall),
+                  Text(name, style: theme.textTheme.titleSmall),
                   if (isoCode != null) Text(isoCode!),
                 ],
               ),
@@ -60,12 +63,12 @@ class CurrencyCard extends ConsumerWidget {
                 return [
                   PopupMenuItem(
                     onTap: () => context.goPath(CurrencyEditPage.pagePath.build(params: {'currencyId': id.toString()})),
-                    child: const Text('Edit'),
+                    child: L10nKey.commonEdit.toText(),
                   ),
                   if (onDelete != null)
                     PopupMenuItem(
                       onTap: onDelete,
-                      child: const Text('Delete'),
+                      child: L10nKey.commonDelete.toText(),
                     ),
                 ];
               },

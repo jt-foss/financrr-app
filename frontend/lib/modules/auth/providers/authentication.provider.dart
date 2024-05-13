@@ -37,6 +37,17 @@ class AuthenticationNotifier extends StateNotifier<AuthenticationState> {
     return await _authFailure();
   }
 
+  Future<AuthenticationState> register(String username, String password, Uri hostUrl) async {
+    try {
+      final RestrrBuilder builder = _getRestrrBuilder(hostUrl);
+      final String? sessionName = await PlatformUtils.getPlatformDescription();
+      return _authSuccess(await builder.register(username: username, password: password, sessionName: sessionName));
+    } catch (e) {
+      _log.warning('Could not register: $e');
+      return await _authFailure();
+    }
+  }
+
   Future<AuthenticationState> login(String username, String password, Uri hostUrl) async {
     try {
       final RestrrBuilder builder = _getRestrrBuilder(hostUrl);

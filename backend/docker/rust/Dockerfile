@@ -1,11 +1,16 @@
-FROM rust:1.77.2-alpine3.19 AS builder
+FROM rust:1.78.0-alpine3.19 AS builder
 
-RUN apk add --no-cache musl-dev
+RUN apk add --no-cache \
+    musl-dev \
+    openssl-dev
+
+# Update package repositories
+RUN apk update
 
 WORKDIR /usr/src/financrr
 COPY . .
 
-RUN cargo build --release
+RUN RUSTFLAGS='-C target-feature=-crt-static' cargo build --release
 
 # Final stage: create a minimal runtime image
 FROM alpine:3.19.1

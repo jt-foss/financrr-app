@@ -18,6 +18,8 @@ class NoticeCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    var theme = ref.watch(themeProvider);
+
     return Card.outlined(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -40,11 +42,11 @@ class NoticeCard extends ConsumerWidget {
                                 WidgetSpan(
                                     child: Padding(
                                   padding: const EdgeInsets.only(left: 5),
-                                  child: Icon(Icons.arrow_forward_rounded, size: 17, color: ref.themeData.primaryColor),
+                                  child: Icon(Icons.arrow_forward_rounded, size: 17, color: theme.themeData.primaryColor),
                                 ))
                               ],
-                              style: ref.textTheme.bodyMedium
-                                  ?.copyWith(color: ref.themeData.primaryColor, fontWeight: FontWeight.w500))),
+                              style: theme.textTheme.bodyMedium
+                                  ?.copyWith(color: theme.themeData.primaryColor, fontWeight: FontWeight.w500))),
                         ),
                 ],
               ),

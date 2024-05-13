@@ -4,6 +4,7 @@ import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart
 import 'package:financrr_frontend/shared/ui/auth_page_template.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -46,65 +47,68 @@ class ServerConfigPageState extends ConsumerState<ServerConfigPage> {
 
   @override
   Widget build(BuildContext context) {
+    var theme = ref.watch(themeProvider);
+
+    buildVerticalLayout(Size size) {
+      return AuthPageTemplate(
+          child: Column(
+        children: [
+          Form(
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20),
+                    child: TextFormField(
+                      controller: _urlController,
+                      decoration: const InputDecoration(labelText: 'Server URL'),
+                      autofillHints: const [AutofillHints.username],
+                      validator: (value) => InputValidators.url(value),
+                      onChanged: (_) => setState(() {
+                        _isValid = false;
+                        _apiVersion = null;
+                      }),
+                    ),
+                  ),
+                  if (_isValid && _apiVersion != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 5),
+                      child: L10nKey.authConfigStatus.toText(
+                          namedArgs: {'hostStatus': 'Healthy', 'apiVersion': '$_apiVersion'},
+                          style: theme.textTheme.labelMedium?.copyWith(color: theme.themeData.primaryColor)),
+                    )
+                ],
+              )),
+          Padding(
+              padding: const EdgeInsets.only(top: 20, bottom: 20),
+              child: _isLoading
+                  ? const CircularProgressIndicator()
+                  : TextButton.icon(
+                      onPressed: () {
+                        if (_isValid) {
+                          context.goPath(LoginPage.pagePath.build(), extra: _hostUri);
+                        } else {
+                          _handleUrlCheck();
+                        }
+                      },
+                      label: const Icon(Icons.arrow_forward, size: 18),
+                      icon: (_isValid ? L10nKey.commonNext : L10nKey.authConfigCheckUrl).toText(),
+                    )),
+        ],
+      ));
+    }
+
     return AdaptiveScaffold(
       resizeToAvoidBottomInset: false,
-      verticalBuilder: (_, __, size) => SafeArea(child: _buildVerticalLayout(size)),
+      verticalBuilder: (_, __, size) => buildVerticalLayout(size),
     );
-  }
-
-  Widget _buildVerticalLayout(Size size) {
-    return AuthPageTemplate(
-        child: Column(
-      children: [
-        Form(
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 20),
-                  child: TextFormField(
-                    controller: _urlController,
-                    decoration: const InputDecoration(labelText: 'Server URL'),
-                    autofillHints: const [AutofillHints.username],
-                    validator: (value) => InputValidators.url(value),
-                    onChanged: (_) => setState(() {
-                      _isValid = false;
-                      _apiVersion = null;
-                    }),
-                  ),
-                ),
-                if (_isValid && _apiVersion != null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 5),
-                    child: Text('Status: Healthy, v$_apiVersion',
-                        style: ref.textTheme.labelMedium?.copyWith(color: ref.themeData.primaryColor)),
-                  )
-              ],
-            )),
-        Padding(
-            padding: const EdgeInsets.only(top: 20, bottom: 20),
-            child: _isLoading
-                ? const CircularProgressIndicator()
-                : TextButton.icon(
-                    onPressed: () {
-                      if (_isValid) {
-                        context.goPath(LoginPage.pagePath.build(), extra: _hostUri);
-                      } else {
-                        _handleUrlCheck();
-                      }
-                    },
-                    label: const Icon(Icons.arrow_forward, size: 18),
-                    icon: Text(_isValid ? 'Next' : 'Check URL'),
-                  )),
-      ],
-    ));
   }
 
   Future<void> _handleUrlCheck() async {
     final String url = _urlController.text;
     if (InputValidators.url(url) != null) {
-      context.showSnackBar('Please provide a valid URL');
+      L10nKey.commonUrlInvalid.showSnack(context);
       return;
     }
     setState(() {

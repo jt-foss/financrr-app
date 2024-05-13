@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
+import '../../modules/settings/providers/l10n.provider.dart';
 import '../../modules/transactions/views/transaction_page.dart';
 import '../../utils/text_utils.dart';
-import '../models/store.dart';
 
 class TransactionCard extends ConsumerWidget {
   final Id id;
@@ -50,6 +50,9 @@ class TransactionCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    var theme = ref.watch(themeProvider);
+    var l10n = ref.watch(l10nProvider);
+
     return GestureDetector(
       onTap: !interactive
           ? null
@@ -61,21 +64,21 @@ class TransactionCard extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(name, style: ref.textTheme.titleSmall),
-              if (description != null) Text(description!, style: ref.textTheme.bodyMedium),
+              Text(name, style: theme.textTheme.titleSmall),
+              if (description != null) Text(description!, style: theme.textTheme.bodyMedium),
               Text(TextUtils.formatIBAN(account.iban) ?? account.name),
               const SizedBox(height: 10),
               Row(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(StoreKey.dateTimeFormat.readSync()!.format(executedAt)),
+                  Text(l10n.dateFormat.format(executedAt)),
                   Text(
-                      '${type == TransactionType.deposit ? '' : '-'}${TextUtils.formatBalanceWithCurrency(amount, account.currencyId.get()!)}',
-                      style: ref.textTheme.titleMedium?.copyWith(
+                      '${type == TransactionType.deposit ? '' : '-'}${TextUtils.formatBalanceWithCurrency(l10n, amount, account.currencyId.get()!)}',
+                      style: theme.textTheme.titleMedium?.copyWith(
                           color: type == TransactionType.deposit
-                              ? ref.themeData.primaryColor
-                              : ref.themeData.colorScheme.error)),
+                              ? theme.themeData.primaryColor
+                              : theme.themeData.colorScheme.error)),
                 ],
               ),
             ],

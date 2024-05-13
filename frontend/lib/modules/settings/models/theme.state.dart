@@ -19,14 +19,16 @@ class ThemeState {
         darkTheme = AppThemeLoader.getById(StoreKey.currentDarkThemeId.readSync() ?? 'DARK')!,
         mode = StoreKey.themeMode.readSync() ?? ThemeMode.system;
 
-  AppTheme getActive() {
+  ThemeData get themeData => getCurrent().themeData;
+  TextTheme get textTheme => themeData.textTheme;
+  ColorScheme get colorScheme => themeData.colorScheme;
+
+  AppTheme getCurrent() {
     return switch (mode) {
       ThemeMode.light => lightTheme,
       ThemeMode.dark => darkTheme,
       ThemeMode.system =>
-      WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.light
-          ? lightTheme
-          : darkTheme
+        WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.light ? lightTheme : darkTheme
     };
   }
 
