@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
-import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
+import 'package:financrr_frontend/routing/navbar_shell.dart';
+import 'package:financrr_frontend/utils/extensions.dart';
 import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,12 +10,12 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../shared/ui/adaptive_scaffold.dart';
 import '../../../routing/page_path.dart';
-import '../../../utils/text_utils.dart';
 import '../providers/l10n.provider.dart';
 import 'settings_page.dart';
 
 class L10nSettingsPage extends StatefulHookConsumerWidget {
-  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'languages');
+  static const PagePathBuilder pagePath =
+      PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'language');
 
   const L10nSettingsPage({super.key});
 
@@ -25,32 +28,40 @@ class _L10nSettingsPageState extends ConsumerState<L10nSettingsPage> {
   late final TextEditingController _thousandSeparatorController;
   late final TextEditingController _dateTimeFormatController;
 
-  Locale? _locale;
-  late String? _decimalSeparator;
-  late String? _thousandSeparator;
-  late String? _dateTimeFormat;
-
   @override
   void initState() {
     super.initState();
     var l10n = ref.read(l10nProvider);
-    _decimalSeparator = l10n.decimalSeparator;
-    _thousandSeparator = l10n.thousandSeparator;
-    _dateTimeFormat = l10n.dateFormat.pattern;
+    _decimalSeparatorController =
+        TextEditingController(text: l10n.decimalSeparator);
+    _thousandSeparatorController =
+        TextEditingController(text: l10n.thousandSeparator);
+    _dateTimeFormatController =
+        TextEditingController(text: l10n.dateFormat.pattern);
+  }
 
-    _decimalSeparatorController = TextEditingController(text: _decimalSeparator);
-    _thousandSeparatorController = TextEditingController(text: _thousandSeparator);
-    _dateTimeFormatController = TextEditingController(text: _dateTimeFormat);
+  @override
+  void dispose() {
+    _decimalSeparatorController.dispose();
+    _thousandSeparatorController.dispose();
+    _dateTimeFormatController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    var theme = ref.watch(themeProvider);
+    var l10n = ref.watch(l10nProvider);
 
     buildLocaleCard(Locale locale) {
-      return ListTile(
-        title: Text(locale.toLanguageTag()),
-        onTap: () => setState(() => _locale = locale),
+      return Card.outlined(
+        child: ListTile(
+          onTap: () {
+            context.setLocale(locale);
+            ScaffoldNavBarShell.maybeOf(context)?.refresh();
+          },
+          title: Text(locale.getLocaleName()),
+          trailing: context.locale == locale ? const Icon(Icons.check) : null,
+        ),
       );
     }
 
@@ -62,62 +73,86 @@ class _L10nSettingsPageState extends ConsumerState<L10nSettingsPage> {
             width: size.width / 1.1,
             child: ListView(
               children: [
-                Card.outlined(
-                  child: Column(
-                    children: [
-                      for (Locale locale in context.supportedLocales) buildLocaleCard(locale),
-                    ],
-                  ),
+                for (Locale locale in context.supportedLocales)
+                  buildLocaleCard(locale),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 5),
+                  child: Divider(),
                 ),
-                const Divider(),
-                L10nKey.commonPreview.toText(style: theme.textTheme.titleSmall),
-                Text(
-                    TextUtils.formatBalance(123456789, 2, _decimalSeparatorController.text, _thousandSeparatorController.text)),
-                Text(DateFormat(_dateTimeFormatController.text).format(DateTime.now())),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: Row(
-                      children: [
-                        Flexible(
-                          child: TextFormField(
-                            controller: _decimalSeparatorController,
-                            onChanged: (_) => setState(() {}),
-                            decoration: InputDecoration(
-                              labelText: L10nKey.l10nDecimalSeparator.toString(),
-                            ),
-                            inputFormatters: [LengthLimitingTextInputFormatter(1)],
-                          ),
+                ExpansionTile(
+                  title: L10nKey.l10nDecimalSeparator.toText(),
+                  subtitle: Text('1${l10n.decimalSeparator}234'),
+                  expandedCrossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: TextFormField(
+                        controller: _decimalSeparatorController,
+                        onChanged: (value) {
+                          if (value.trim().isEmpty || value.length > 1) return;
+                          ref
+                              .read(l10nProvider.notifier)
+                              .setDecimalSeparator(value);
+                        },
+                        decoration: InputDecoration(
+                          labelText: L10nKey.l10nDecimalSeparator.toString(),
                         ),
-                        const SizedBox(width: 10),
-                        Flexible(
-                          child: TextFormField(
-                            controller: _thousandSeparatorController,
-                            onChanged: (_) => setState(() {}),
-                            decoration: InputDecoration(
-                              labelText: L10nKey.l10nThousandsSeparator.toString(),
-                            ),
-                            inputFormatters: [LengthLimitingTextInputFormatter(1)],
-                          ),
-                        ),
-                      ],
+                        inputFormatters: [LengthLimitingTextInputFormatter(1)],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-                TextFormField(
-                    controller: _dateTimeFormatController,
-                    onChanged: (_) => setState(() {}),
-                    decoration: InputDecoration(
-                      labelText: L10nKey.l10nDateFormat.toString(),
-                    )),
-                Padding(
-                  padding: const EdgeInsets.only(top: 20),
-                  child: TextButton(
-                    onPressed: _isDifferent() ? () => _save() : null,
-                    child: L10nKey.commonSave.toText(),
-                  ),
+                ExpansionTile(
+                  title: L10nKey.l10nThousandsSeparator.toText(),
+                  subtitle: Text(
+                      '1${l10n.thousandSeparator}234${l10n.thousandSeparator}567'),
+                  expandedCrossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: TextFormField(
+                        controller: _thousandSeparatorController,
+                        onChanged: (value) {
+                          if (value.trim().isEmpty || value.length > 1) return;
+                          ref
+                              .read(l10nProvider.notifier)
+                              .setThousandSeparator(value);
+                        },
+                        decoration: InputDecoration(
+                          labelText: L10nKey.l10nThousandsSeparator.toString(),
+                        ),
+                        inputFormatters: [LengthLimitingTextInputFormatter(1)],
+                      ),
+                    ),
+                  ],
                 ),
+                ExpansionTile(
+                  title: L10nKey.l10nDateFormat.toText(),
+                  subtitle: StatefulBuilder(builder: (context, setState) {
+                    Timer(const Duration(seconds: 1), () {
+                      if (context.mounted) {
+                        setState(() {});
+                      }
+                    });
+                    return Text(l10n.dateFormat.format(DateTime.now()));
+                  }),
+                  expandedCrossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: TextFormField(
+                          controller: _dateTimeFormatController,
+                          onChanged: (value) {
+                            ref
+                                .read(l10nProvider.notifier)
+                                .setDateFormat(DateFormat(value));
+                          },
+                          decoration: InputDecoration(
+                            labelText: L10nKey.l10nDateFormat.toString(),
+                          )),
+                    ),
+                  ],
+                )
               ],
             ),
           ),
@@ -127,38 +162,8 @@ class _L10nSettingsPageState extends ConsumerState<L10nSettingsPage> {
 
     return AdaptiveScaffold(
       resizeToAvoidBottomInset: false,
-      verticalBuilder: (_, __, size) => SafeArea(child: buildVerticalLayout(size)),
+      verticalBuilder: (_, __, size) =>
+          SafeArea(child: buildVerticalLayout(size)),
     );
-  }
-
-  bool _isDifferent() {
-    return (_locale != null && context.locale != _locale) ||
-        _decimalSeparatorController.text != _decimalSeparator ||
-        _thousandSeparatorController.text != _thousandSeparator ||
-        _dateTimeFormatController.text != _dateTimeFormat;
-  }
-
-  void _save() async {
-    if (_locale != null && context.locale != _locale) {
-      await context.setLocale(_locale!);
-    }
-    var l10nNotifier = ref.read(l10nProvider.notifier);
-    if (_decimalSeparatorController.text != _decimalSeparator) {
-      l10nNotifier.setDecimalSeparator(_decimalSeparatorController.text);
-    }
-    if (_thousandSeparatorController.text != _thousandSeparator) {
-      l10nNotifier.setThousandSeparator(_thousandSeparatorController.text);
-    }
-    if (_dateTimeFormatController.text != _dateTimeFormat) {
-      l10nNotifier.setDateFormat(DateFormat(_dateTimeFormatController.text));
-    }
-    setState(() {
-      _locale = context.locale;
-      _decimalSeparator = _decimalSeparatorController.text;
-      _thousandSeparator = _thousandSeparatorController.text;
-      _dateTimeFormat = _dateTimeFormatController.text;
-    });
-    if (!mounted) return;
-    L10nKey.commonSaveSuccess.showSnack(context);
   }
 }

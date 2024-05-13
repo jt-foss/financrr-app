@@ -16,55 +16,13 @@ class ScaffoldNavBarShell extends StatefulWidget {
 }
 
 class ScaffoldNavBarShellState extends State<ScaffoldNavBarShell> {
-  static final List<NavigationDestination> _navBarDestinations = [
-    NavigationDestination(
-      icon: const Icon(Icons.dashboard_outlined),
-      selectedIcon: const Icon(Icons.dashboard_rounded),
-      label: L10nKey.navigationDashboard.toString(),
-    ),
-    NavigationDestination(
-      icon: const Icon(Icons.account_balance_wallet_outlined),
-      selectedIcon: const Icon(Icons.account_balance_wallet_rounded),
-      label: L10nKey.navigationAccounts.toString(),
-    ),
-    NavigationDestination(
-        icon: const Icon(Icons.leaderboard_outlined),
-        selectedIcon: const Icon(Icons.leaderboard_rounded),
-        label: L10nKey.navigationStatistics.toString()),
-    NavigationDestination(
-        icon: const Icon(Icons.settings_outlined),
-        selectedIcon: const Icon(Icons.settings_rounded),
-        label: L10nKey.navigationSettings.toString()),
-  ];
-
-  static final List<NavigationRailDestination> _navRailDestinations = [
-    NavigationRailDestination(
-      icon: const Icon(Icons.dashboard_outlined),
-      selectedIcon: const Icon(Icons.dashboard_rounded),
-      label: L10nKey.navigationDashboard.toText(),
-    ),
-    NavigationRailDestination(
-      icon: const Icon(Icons.account_balance_wallet_outlined),
-      selectedIcon: const Icon(Icons.account_balance_wallet_rounded),
-      label: L10nKey.navigationAccounts.toText(),
-    ),
-    NavigationRailDestination(
-      icon: const Icon(Icons.leaderboard_outlined),
-      selectedIcon: const Icon(Icons.leaderboard_rounded),
-      label: L10nKey.navigationStatistics.toText(),
-    ),
-    NavigationRailDestination(
-      icon: const Icon(Icons.settings_outlined),
-      selectedIcon: const Icon(Icons.settings_rounded),
-      label: L10nKey.navigationSettings.toText(),
-    ),
-  ];
-
   bool _isHovered = false;
+
+  void refresh() => setState(() {});
 
   @override
   Widget build(BuildContext context) {
-    final isMobile = context.isMobile;
+    final bool isMobile = context.isMobile;
     final Widget shell = kIsWeb ? SelectionArea(child: widget.navigationShell) : widget.navigationShell;
     return Scaffold(
       body: SafeArea(
@@ -78,7 +36,7 @@ class ScaffoldNavBarShellState extends State<ScaffoldNavBarShell> {
                       onEnter: (event) => setState(() => _isHovered = true),
                       onExit: (event) => setState(() => _isHovered = false),
                       child: NavigationRail(
-                          destinations: _navRailDestinations,
+                          destinations: getNavRailDestinations(),
                           extended: context.isWidescreen || _isHovered,
                           onDestinationSelected: (index) => goToBranch(index),
                           selectedIndex: widget.navigationShell.currentIndex),
@@ -107,10 +65,54 @@ class ScaffoldNavBarShellState extends State<ScaffoldNavBarShell> {
           ? NavigationBar(
               onDestinationSelected: (index) => goToBranch(index),
               selectedIndex: widget.navigationShell.currentIndex,
-              destinations: _navBarDestinations)
+              destinations: getNavBarDestinations())
           : null,
     );
   }
+
+  List<NavigationDestination> getNavBarDestinations() => [
+    NavigationDestination(
+      icon: const Icon(Icons.dashboard_outlined),
+      selectedIcon: const Icon(Icons.dashboard_rounded),
+      label: L10nKey.navigationDashboard.toString(),
+    ),
+    NavigationDestination(
+      icon: const Icon(Icons.account_balance_wallet_outlined),
+      selectedIcon: const Icon(Icons.account_balance_wallet_rounded),
+      label: L10nKey.navigationAccounts.toString(),
+    ),
+    NavigationDestination(
+        icon: const Icon(Icons.leaderboard_outlined),
+        selectedIcon: const Icon(Icons.leaderboard_rounded),
+        label: L10nKey.navigationStatistics.toString()),
+    NavigationDestination(
+        icon: const Icon(Icons.settings_outlined),
+        selectedIcon: const Icon(Icons.settings_rounded),
+        label: L10nKey.navigationSettings.toString()),
+  ];
+
+  List<NavigationRailDestination> getNavRailDestinations() => [
+    NavigationRailDestination(
+      icon: const Icon(Icons.dashboard_outlined),
+      selectedIcon: const Icon(Icons.dashboard_rounded),
+      label: L10nKey.navigationDashboard.toText(),
+    ),
+    NavigationRailDestination(
+      icon: const Icon(Icons.account_balance_wallet_outlined),
+      selectedIcon: const Icon(Icons.account_balance_wallet_rounded),
+      label: L10nKey.navigationAccounts.toText(),
+    ),
+    NavigationRailDestination(
+      icon: const Icon(Icons.leaderboard_outlined),
+      selectedIcon: const Icon(Icons.leaderboard_rounded),
+      label: L10nKey.navigationStatistics.toText(),
+    ),
+    NavigationRailDestination(
+      icon: const Icon(Icons.settings_outlined),
+      selectedIcon: const Icon(Icons.settings_rounded),
+      label: L10nKey.navigationSettings.toText(),
+    ),
+  ];
 
   bool canPop() {
     final GoRouterState state = GoRouterState.of(context);

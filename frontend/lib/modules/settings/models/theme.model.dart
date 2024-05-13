@@ -106,6 +106,9 @@ class AppTheme {
           ),
           border: const OutlineInputBorder(),
         ),
+        expansionTileTheme: const ExpansionTileThemeData(
+          shape: Border()
+        ),
         // theme data
         appBarTheme: appBarTheme,
         navigationBarTheme: navigationBarTheme,

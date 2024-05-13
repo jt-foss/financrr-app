@@ -4,6 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:restrr/restrr.dart';
 
+extension LocaleExtension on Locale {
+  String getLocaleName() {
+    return switch (languageCode) {
+      'en' => 'English',
+      'de' => 'Deutsch',
+      _ => 'Unknown'
+    };
+  }
+}
+
 extension LayoutExtension on BuildContext {
   bool get isMobile => MediaQuery.of(this).size.width < 550;
   bool get isWidescreen => MediaQuery.of(this).size.width >= 1100;
