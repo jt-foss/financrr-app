@@ -24,17 +24,17 @@ pub(crate) fn account_controller(cfg: &mut web::ServiceConfig) {
 }
 
 #[utoipa::path(get,
-responses(
-(status = 200, description = "Successfully retrieved all Accounts.", content_type = "application/json", body = PaginatedAccount),
-ValidationError,
-Unauthorized,
-),
-params(PageSizeParam),
-security(
-("bearer_token" = [])
-),
-path = "/api/v1/account",
-tag = "Account")]
+    responses(
+        (status = 200, description = "Successfully retrieved all Accounts.", content_type = "application/json", body = PaginatedAccount),
+        ValidationError,
+        Unauthorized,
+    ),
+    params(PageSizeParam),
+    security(
+        ("bearer_token" = [])
+    ),
+    path = "/api/v1/account",
+    tag = "Account")]
 #[get("")]
 pub(crate) async fn get_all_accounts(
     user: Phantom<User>,
@@ -48,17 +48,17 @@ pub(crate) async fn get_all_accounts(
 }
 
 #[utoipa::path(get,
-responses(
-(status = 200, description = "Successfully retrieved Account.", content_type = "application/json", body = Account),
-Unauthorized,
-ResourceNotFound,
-InternalServerError,
-),
-security(
-("bearer_token" = [])
-),
-path = "/api/v1/account/{account_id}",
-tag = "Account")]
+    responses(
+        (status = 200, description = "Successfully retrieved Account.", content_type = "application/json", body = Account),
+        Unauthorized,
+        ResourceNotFound,
+        InternalServerError,
+    ),
+    security(
+        ("bearer_token" = [])
+    ),
+    path = "/api/v1/account/{account_id}",
+    tag = "Account")]
 #[get("/{account_id}")]
 pub(crate) async fn get_one_account(user: Phantom<User>, account_id: Path<i32>) -> Result<impl Responder, ApiError> {
     let account = Account::find_by_id(account_id.into_inner()).await?;
@@ -68,18 +68,18 @@ pub(crate) async fn get_one_account(user: Phantom<User>, account_id: Path<i32>) 
 }
 
 #[utoipa::path(get,
-responses(
-(status = 200, description = "Successfully retrieved all Transactions.", content_type = "application/json", body = PaginatedTransaction),
-Unauthorized,
-ResourceNotFound,
-InternalServerError,
-),
-params(PageSizeParam),
-security(
-("bearer_token" = [])
-),
-path = "/api/v1/account/{account_id}/transactions",
-tag = "Account")]
+    responses(
+        (status = 200, description = "Successfully retrieved all Transactions.", content_type = "application/json", body = PaginatedTransaction),
+        Unauthorized,
+        ResourceNotFound,
+        InternalServerError,
+    ),
+    params(PageSizeParam),
+    security(
+        ("bearer_token" = [])
+    ),
+    path = "/api/v1/account/{account_id}/transactions",
+    tag = "Account")]
 #[get("/{account_id}/transactions")]
 pub(crate) async fn get_transactions_from_account(
     user: Phantom<User>,
@@ -117,17 +117,17 @@ pub(crate) async fn create_account(user: Phantom<User>, account: AccountDTO) -> 
 }
 
 #[utoipa::path(delete,
-responses(
-(status = 204, description = "Successfully deleted an Account."),
-Unauthorized,
-ResourceNotFound,
-InternalServerError,
-),
-security(
-("bearer_token" = [])
-),
-path = "/api/v1/account/{account_id}",
-tag = "Account")]
+    responses(
+        (status = 204, description = "Successfully deleted an Account."),
+        Unauthorized,
+        ResourceNotFound,
+        InternalServerError,
+    ),
+    security(
+        ("bearer_token" = [])
+    ),
+    path = "/api/v1/account/{account_id}",
+    tag = "Account")]
 #[delete("/{account_id}")]
 pub(crate) async fn delete_account(user: Phantom<User>, account_id: Path<i32>) -> Result<impl Responder, ApiError> {
     let account = Account::find_by_id(account_id.into_inner()).await?;

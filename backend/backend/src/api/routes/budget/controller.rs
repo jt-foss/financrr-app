@@ -25,18 +25,18 @@ pub(crate) fn budget_controller(cfg: &mut web::ServiceConfig) {
 }
 
 #[utoipa::path(get,
-responses(
-(status = 200, description = "Successfully retrieved the Budgets.", content_type = "application/json", body = PaginatedBudget),
-ValidationError,
-Unauthorized,
-InternalServerError,
-),
-params(PageSizeParam),
-security(
-("bearer_token" = [])
-),
-path = "/api/v1/budget",
-tag = "Budget"
+    responses(
+        (status = 200, description = "Successfully retrieved the Budgets.", content_type = "application/json", body = PaginatedBudget),
+        ValidationError,
+        Unauthorized,
+        InternalServerError,
+    ),
+    params(PageSizeParam),
+    security(
+        ("bearer_token" = [])
+    ),
+    path = "/api/v1/budget",
+    tag = "Budget"
 )]
 #[get("")]
 pub(crate) async fn get_all_budgets(
@@ -51,17 +51,17 @@ pub(crate) async fn get_all_budgets(
 }
 
 #[utoipa::path(get,
-responses(
-(status = 200, description = "Successfully retrieved the Budget.", content_type = "application/json", body = Budget),
-Unauthorized,
-ResourceNotFound,
-InternalServerError,
-),
-security(
-("bearer_token" = [])
-),
-path = "/api/v1/budget/{budget_id}",
-tag = "Budget"
+    responses(
+        (status = 200, description = "Successfully retrieved the Budget.", content_type = "application/json", body = Budget),
+        Unauthorized,
+        ResourceNotFound,
+        InternalServerError,
+    ),
+    security(
+        ("bearer_token" = [])
+    ),
+    path = "/api/v1/budget/{budget_id}",
+    tag = "Budget"
 )]
 #[get("/{budget_id}")]
 pub(crate) async fn get_one_budget(user: Phantom<User>, budget_id: Path<i32>) -> Result<impl Responder, ApiError> {
@@ -72,18 +72,18 @@ pub(crate) async fn get_one_budget(user: Phantom<User>, budget_id: Path<i32>) ->
 }
 
 #[utoipa::path(get,
-responses(
-(status = 200, description = "Successfully retrieved the Transactions.", content_type = "application/json", body = PaginatedTransaction),
-Unauthorized,
-ResourceNotFound,
-InternalServerError,
-),
-params(PageSizeParam),
-security(
-("bearer_token" = [])
-),
-path = "/api/v1/budget/{budget_id}/transactions",
-tag = "Budget"
+    responses(
+        (status = 200, description = "Successfully retrieved the Transactions.", content_type = "application/json", body = PaginatedTransaction),
+        Unauthorized,
+        ResourceNotFound,
+        InternalServerError,
+    ),
+    params(PageSizeParam),
+    security(
+        ("bearer_token" = [])
+    ),
+    path = "/api/v1/budget/{budget_id}/transactions",
+    tag = "Budget"
 )]
 #[get("/{budget_id}/transactions")]
 pub(crate) async fn get_transactions_from_budget(
@@ -102,17 +102,17 @@ pub(crate) async fn get_transactions_from_budget(
 }
 
 #[utoipa::path(post,
-responses(
-(status = 201, description = "Successfully created the Budget.", content_type = "application/json", body = Budget),
-ValidationError,
-Unauthorized,
-InternalServerError,
-),
-security(
-("bearer_token" = [])
-),
-path = "/api/v1/budget",
-tag = "Budget"
+    responses(
+        (status = 201, description = "Successfully created the Budget.", content_type = "application/json", body = Budget),
+        ValidationError,
+        Unauthorized,
+        InternalServerError,
+    ),
+    security(
+        ("bearer_token" = [])
+    ),
+    path = "/api/v1/budget",
+    tag = "Budget"
 )]
 #[post("")]
 pub(crate) async fn create_budget(user: Phantom<User>, budget: Json<BudgetDTO>) -> Result<impl Responder, ApiError> {
@@ -122,17 +122,17 @@ pub(crate) async fn create_budget(user: Phantom<User>, budget: Json<BudgetDTO>) 
 }
 
 #[utoipa::path(delete,
-responses(
-(status = 204, description = "Successfully deleted the Budget."),
-Unauthorized,
-ResourceNotFound,
-InternalServerError,
-),
-security(
-("bearer_token" = [])
-),
-path = "/api/v1/budget/{budget_id}",
-tag = "Budget"
+    responses(
+        (status = 204, description = "Successfully deleted the Budget."),
+        Unauthorized,
+        ResourceNotFound,
+        InternalServerError,
+    ),
+    security(
+        ("bearer_token" = [])
+    ),
+    path = "/api/v1/budget/{budget_id}",
+    tag = "Budget"
 )]
 #[delete("/{budget_id}")]
 pub(crate) async fn delete_budget(user: Phantom<User>, budget_id: Path<i32>) -> Result<impl Responder, ApiError> {
@@ -145,18 +145,18 @@ pub(crate) async fn delete_budget(user: Phantom<User>, budget_id: Path<i32>) -> 
 }
 
 #[utoipa::path(patch,
-responses(
-(status = 200, description = "Successfully updated the Budget.", content_type = "application/json", body = Budget),
-ValidationError,
-Unauthorized,
-ResourceNotFound,
-InternalServerError,
-),
-security(
-("bearer_token" = [])
-),
-path = "/api/v1/budget/{budget_id}",
-tag = "Budget"
+    responses(
+        (status = 200, description = "Successfully updated the Budget.", content_type = "application/json", body = Budget),
+        ValidationError,
+        Unauthorized,
+        ResourceNotFound,
+        InternalServerError,
+    ),
+    security(
+        ("bearer_token" = [])
+    ),
+    path = "/api/v1/budget/{budget_id}",
+    tag = "Budget"
 )]
 #[patch("/{budget_id}")]
 pub(crate) async fn update_budget(

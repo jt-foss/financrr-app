@@ -23,18 +23,18 @@ pub(crate) fn transaction_template_controller(cfg: &mut ServiceConfig) {
 }
 
 #[utoipa::path(get,
-responses(
-(status = 200, description = "Successfully retrieved all Transactions.", content_type = "application/json", body = PaginatedTransactionTemplate),
-ValidationError,
-Unauthorized,
-InternalServerError,
-),
-params(PageSizeParam),
-security(
-("bearer_token" = [])
-),
-path = "/api/v1/transaction/template",
-tag = "Transaction-Template")]
+    responses(
+        (status = 200, description = "Successfully retrieved all Transactions.", content_type = "application/json", body = PaginatedTransactionTemplate),
+        ValidationError,
+        Unauthorized,
+        InternalServerError,
+    ),
+    params(PageSizeParam),
+    security(
+        ("bearer_token" = [])
+    ),
+    path = "/api/v1/transaction/template",
+    tag = "Transaction-Template")]
 #[get("")]
 pub(crate) async fn get_all_transaction_templates(
     user: Phantom<User>,
@@ -48,16 +48,16 @@ pub(crate) async fn get_all_transaction_templates(
 }
 
 #[utoipa::path(get,
-responses(
-(status = 200, description = "Successfully retrieved Transaction.", content_type = "application/json", body = TransactionTemplate),
-Unauthorized,
-InternalServerError,
-),
-security(
-("bearer_token" = [])
-),
-path = "/api/v1/transaction/template/{template_id}",
-tag = "Transaction-Template")]
+    responses(
+        (status = 200, description = "Successfully retrieved Transaction.", content_type = "application/json", body = TransactionTemplate),
+        Unauthorized,
+        InternalServerError,
+    ),
+    security(
+        ("bearer_token" = [])
+    ),
+    path = "/api/v1/transaction/template/{template_id}",
+    tag = "Transaction-Template")]
 #[get("/{template_id}")]
 pub(crate) async fn get_one_transaction_template(
     user: Phantom<User>,
@@ -95,16 +95,16 @@ pub(crate) async fn create_transaction_template(
 }
 
 #[utoipa::path(delete,
-responses(
-(status = 204, description = "Successfully deleted the TransactionTemplate."),
-Unauthorized,
-InternalServerError,
-),
-security(
-("bearer_token" = [])
-),
-path = "/api/v1/transaction/template/{template_id}",
-tag = "Transaction-Template")]
+    responses(
+        (status = 204, description = "Successfully deleted the TransactionTemplate."),
+        Unauthorized,
+        InternalServerError,
+    ),
+    security(
+        ("bearer_token" = [])
+    ),
+    path = "/api/v1/transaction/template/{template_id}",
+    tag = "Transaction-Template")]
 #[delete("/{template_id}")]
 pub(crate) async fn delete_transaction_template(
     user: Phantom<User>,

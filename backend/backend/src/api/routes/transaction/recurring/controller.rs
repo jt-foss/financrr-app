@@ -1,6 +1,6 @@
 use actix_web::http::Uri;
 use actix_web::web::{Path, ServiceConfig};
-use actix_web::{get, post, web, HttpResponse, Responder};
+use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
 
 use crate::api::documentation::response::{InternalServerError, Unauthorized};
 use crate::api::error::api::ApiError;
@@ -16,22 +16,24 @@ pub(crate) fn recurring_transaction_controller(cfg: &mut ServiceConfig) {
         web::scope("/recurring")
             .service(get_one_recurring_transaction)
             .service(get_all_recurring_transactions)
-            .service(create_recurring_transaction),
+            .service(create_recurring_transaction)
+            .service(delete_recurring_transaction)
+            .service(update_recurring_transaction),
     );
 }
 
 #[utoipa::path(get,
-responses(
-(status = 200, description = "Successfully retrieved all Recurring Transactions.", content_type = "application/json", body = PaginatedRecurringTransaction),
-Unauthorized,
-InternalServerError,
-),
-params(PageSizeParam),
-security(
-("bearer_token" = [])
-),
-path = "/api/v1/transaction/recurring",
-tag = "Recurring-Transaction")]
+    responses(
+        (status = 200, description = "Successfully retrieved all Recurring Transactions.", content_type = "application/json", body = PaginatedRecurringTransaction),
+        Unauthorized,
+        InternalServerError,
+    ),
+    params(PageSizeParam),
+    security(
+        ("bearer_token" = [])
+    ),
+    path = "/api/v1/transaction/recurring",
+    tag = "Recurring-Transaction")]
 #[get("")]
 pub(crate) async fn get_all_recurring_transactions(
     user: Phantom<User>,
@@ -45,16 +47,16 @@ pub(crate) async fn get_all_recurring_transactions(
 }
 
 #[utoipa::path(get,
-responses(
-(status = 200, description = "Successfully retrieved Recurring Transaction.", content_type = "application/json", body = RecurringTransaction),
-Unauthorized,
-InternalServerError,
-),
-security(
-("bearer_token" = [])
-),
-path = "/api/v1/transaction/recurring/{recurring_transaction_id}",
-tag = "Recurring-Transaction")]
+    responses(
+        (status = 200, description = "Successfully retrieved Recurring Transaction.", content_type = "application/json", body = RecurringTransaction),
+        Unauthorized,
+        InternalServerError,
+    ),
+    security(
+        ("bearer_token" = [])
+    ),
+    path = "/api/v1/transaction/recurring/{recurring_transaction_id}",
+    tag = "Recurring-Transaction")]
 #[get("/{recurring_transaction_id}")]
 pub(crate) async fn get_one_recurring_transaction(
     user: Phantom<User>,
@@ -91,6 +93,56 @@ pub(crate) async fn create_recurring_transaction(
         .await?;
 
     let transaction = RecurringTransaction::new(recurring_transaction_dto).await?;
+
+    Ok(HttpResponse::Ok().json(transaction))
+}
+
+#[utoipa::path(delete,
+    responses(
+        (status = 204, description = "Successfully deleted Recurring Transaction."),
+        Unauthorized,
+        InternalServerError,
+    ),
+    security(
+        ("bearer_token" = [])
+    ),
+    path = "/api/v1/transaction/recurring/{recurring_transaction_id}",
+    tag = "Recurring-Transaction")]
+#[delete("/{recurring_transaction_id}")]
+pub(crate) async fn delete_recurring_transaction(
+    user: Phantom<User>,
+    recurring_transaction_id: Path<i32>,
+) -> Result<impl Responder, ApiError> {
+    let transaction = RecurringTransaction::find_by_id(recurring_transaction_id.into_inner()).await?;
+    transaction.has_permission_or_error(user.get_id(), Permissions::DELETE).await?;
+
+    transaction.delete().await?;
+
+    Ok(HttpResponse::NoContent())
+}
+
+#[utoipa::path(patch,
+responses(
+(status = 200, description = "Successfully updated Recurring Transaction.", content_type = "application/json", body = RecurringTransaction),
+Unauthorized,
+InternalServerError,
+),
+security(
+("bearer_token" = [])
+),
+path = "/api/v1/transaction/recurring/{recurring_transaction_id}",
+request_body = RecurringTransactionDTO,
+tag = "Recurring-Transaction")]
+#[patch("/{recurring_transaction_id}")]
+pub(crate) async fn update_recurring_transaction(
+    user: Phantom<User>,
+    recurring_transaction_id: Path<i32>,
+    recurring_transaction_dto: RecurringTransactionDTO,
+) -> Result<impl Responder, ApiError> {
+    let transaction = RecurringTransaction::find_by_id(recurring_transaction_id.into_inner()).await?;
+    transaction.has_permission_or_error(user.get_id(), Permissions::READ_WRITE).await?;
+
+    let transaction = transaction.update(recurring_transaction_dto).await?;
 
     Ok(HttpResponse::Ok().json(transaction))
 }

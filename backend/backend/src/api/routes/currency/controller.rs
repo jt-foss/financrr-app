@@ -24,18 +24,18 @@ pub(crate) fn currency_controller(cfg: &mut web::ServiceConfig) {
 }
 
 #[utoipa::path(get,
-responses(
-(status = 200, description = "Successfully retrieved all Currencies.", content_type = "application/json", body = PaginatedCurrency),
-ValidationError,
-Unauthorized,
-InternalServerError,
-),
-security(
-("bearer_token" = [])
-),
-params(PageSizeParam),
-path = "/api/v1/currency",
-tag = "Currency")]
+    responses(
+        (status = 200, description = "Successfully retrieved all Currencies.", content_type = "application/json", body = PaginatedCurrency),
+        ValidationError,
+        Unauthorized,
+        InternalServerError,
+    ),
+    security(
+        ("bearer_token" = [])
+    ),
+    params(PageSizeParam),
+    path = "/api/v1/currency",
+    tag = "Currency")]
 #[get("")]
 pub(crate) async fn get_all_currencies(
     user: Option<Phantom<User>>,
@@ -56,17 +56,17 @@ pub(crate) async fn get_all_currencies(
 }
 
 #[utoipa::path(get,
-responses(
-(status = 200, description = "Successfully retrieved the Currency.", content_type = "application/json", body = Currency),
-Unauthorized,
-ResourceNotFound,
-InternalServerError,
-),
-security(
-("bearer_token" = [])
-),
-path = "/api/v1/currency/{currency_id}",
-tag = "Currency")]
+    responses(
+        (status = 200, description = "Successfully retrieved the Currency.", content_type = "application/json", body = Currency),
+        Unauthorized,
+        ResourceNotFound,
+        InternalServerError,
+    ),
+    security(
+        ("bearer_token" = [])
+    ),
+    path = "/api/v1/currency/{currency_id}",
+    tag = "Currency")]
 #[get("/{currency_id}")]
 pub(crate) async fn get_one_currency(
     user: Option<Phantom<User>>,
@@ -99,17 +99,17 @@ pub(crate) async fn create_currency(
 }
 
 #[utoipa::path(delete,
-responses(
-(status = 200, description = "Successfully deleted the Currency."),
-Unauthorized,
-ResourceNotFound,
-InternalServerError,
-),
-security(
-("bearer_token" = [])
-),
-path = "/api/v1/currency/{currency_id}",
-tag = "Currency")]
+    responses(
+        (status = 200, description = "Successfully deleted the Currency."),
+        Unauthorized,
+        ResourceNotFound,
+        InternalServerError,
+    ),
+    security(
+        ("bearer_token" = [])
+    ),
+    path = "/api/v1/currency/{currency_id}",
+    tag = "Currency")]
 #[delete("/{currency_id}")]
 pub(crate) async fn delete_currency(user: Phantom<User>, currency_id: Path<i32>) -> Result<impl Responder, ApiError> {
     let currency = Currency::find_by_id(currency_id.into_inner()).await?;

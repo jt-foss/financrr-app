@@ -30,17 +30,17 @@ pub(crate) fn session_controller(cfg: &mut web::ServiceConfig) {
 }
 
 #[utoipa::path(get,
-responses(
-(status = 200, description = "Successfully retrieved the current Session.", content_type = "application/json", body = Session),
-Unauthorized,
-ResourceNotFound,
-InternalServerError,
-),
-security(
-("bearer_token" = [])
-),
-path = "/api/v1/session/current",
-tag = "Session"
+    responses(
+        (status = 200, description = "Successfully retrieved the current Session.", content_type = "application/json", body = Session),
+        Unauthorized,
+        ResourceNotFound,
+        InternalServerError,
+    ),
+    security(
+        ("bearer_token" = [])
+    ),
+    path = "/api/v1/session/current",
+    tag = "Session"
 )]
 #[get("/current")]
 pub(crate) async fn get_current_session(session: Session) -> Result<impl Responder, ApiError> {
@@ -48,17 +48,17 @@ pub(crate) async fn get_current_session(session: Session) -> Result<impl Respond
 }
 
 #[utoipa::path(get,
-responses(
-(status = 200, description = "Successfully retrieved the Session.", content_type = "application/json", body = PublicSession),
-Unauthorized,
-ResourceNotFound,
-InternalServerError,
-),
-security(
-("bearer_token" = [])
-),
-path = "/api/v1/session/{session_id}",
-tag = "Session"
+    responses(
+        (status = 200, description = "Successfully retrieved the Session.", content_type = "application/json", body = PublicSession),
+        Unauthorized,
+        ResourceNotFound,
+        InternalServerError,
+    ),
+    security(
+        ("bearer_token" = [])
+    ),
+    path = "/api/v1/session/{session_id}",
+    tag = "Session"
 )]
 #[get("/{session_id}")]
 pub(crate) async fn get_one_session(user: Phantom<User>, session_id: Path<i32>) -> Result<impl Responder, ApiError> {
@@ -69,18 +69,18 @@ pub(crate) async fn get_one_session(user: Phantom<User>, session_id: Path<i32>) 
 }
 
 #[utoipa::path(get,
-responses(
-(status = 200, description = "Successfully retrieved all Sessions.", content_type = "application/json", body = PaginatedSession),
-ValidationError,
-Unauthorized,
-InternalServerError,
-),
-params(PageSizeParam),
-security(
-("bearer_token" = [])
-),
-path = "/api/v1/session",
-tag = "Session"
+    responses(
+        (status = 200, description = "Successfully retrieved all Sessions.", content_type = "application/json", body = PaginatedSession),
+        ValidationError,
+        Unauthorized,
+        InternalServerError,
+    ),
+    params(PageSizeParam),
+    security(
+        ("bearer_token" = [])
+    ),
+    path = "/api/v1/session",
+    tag = "Session"
 )]
 #[get("")]
 pub(crate) async fn get_all_sessions(
@@ -96,16 +96,16 @@ pub(crate) async fn get_all_sessions(
 }
 
 #[utoipa::path(patch,
-responses(
-(status = 200, description = "Successfully renewed the current Session.", content_type = "application/json", body = Session),
-Unauthorized,
-InternalServerError,
-),
-security(
-("bearer_token" = [])
-),
-path = "/api/v1/session/refresh",
-tag = "Session"
+    responses(
+        (status = 200, description = "Successfully renewed the current Session.", content_type = "application/json", body = Session),
+        Unauthorized,
+        InternalServerError,
+    ),
+    security(
+        ("bearer_token" = [])
+    ),
+    path = "/api/v1/session/refresh",
+    tag = "Session"
 )]
 #[patch("/refresh")]
 pub(crate) async fn refresh_session(session: Session) -> Result<impl Responder, ApiError> {
@@ -115,16 +115,16 @@ pub(crate) async fn refresh_session(session: Session) -> Result<impl Responder, 
 }
 
 #[utoipa::path(delete,
-responses(
-(status = 204, description = "Successfully deleted the current Session."),
-Unauthorized,
-InternalServerError,
-),
-security(
-("bearer_token" = [])
-),
-path = "/api/v1/session/current",
-tag = "Session"
+    responses(
+        (status = 204, description = "Successfully deleted the current Session."),
+        Unauthorized,
+        InternalServerError,
+    ),
+    security(
+        ("bearer_token" = [])
+    ),
+    path = "/api/v1/session/current",
+    tag = "Session"
 )]
 #[delete("/current")]
 pub(crate) async fn delete_current_session(session: Session) -> Result<impl Responder, ApiError> {
@@ -134,17 +134,17 @@ pub(crate) async fn delete_current_session(session: Session) -> Result<impl Resp
 }
 
 #[utoipa::path(delete,
-responses(
-(status = 204, description = "Successfully deleted the Session."),
-Unauthorized,
-ResourceNotFound,
-InternalServerError,
-),
-security(
-("bearer_token" = [])
-),
-path = "/api/v1/session/{session_id}",
-tag = "Session"
+    responses(
+        (status = 204, description = "Successfully deleted the Session."),
+        Unauthorized,
+        ResourceNotFound,
+        InternalServerError,
+    ),
+    security(
+        ("bearer_token" = [])
+    ),
+    path = "/api/v1/session/{session_id}",
+    tag = "Session"
 )]
 #[delete("/{session_id}")]
 pub(crate) async fn delete_session(user: Phantom<User>, session_id: Path<i32>) -> Result<impl Responder, ApiError> {
@@ -157,16 +157,16 @@ pub(crate) async fn delete_session(user: Phantom<User>, session_id: Path<i32>) -
 }
 
 #[utoipa::path(delete,
-responses(
-(status = 204, description = "Successfully deleted all Sessions."),
-Unauthorized,
-InternalServerError,
-),
-security(
-("bearer_token" = [])
-),
-path = "/api/v1/session",
-tag = "Session"
+    responses(
+        (status = 204, description = "Successfully deleted all Sessions."),
+        Unauthorized,
+        InternalServerError,
+    ),
+    security(
+        ("bearer_token" = [])
+    ),
+    path = "/api/v1/session",
+    tag = "Session"
 )]
 #[delete("")]
 pub(crate) async fn delete_all_sessions(user: Phantom<User>) -> Result<impl Responder, ApiError> {
@@ -176,14 +176,14 @@ pub(crate) async fn delete_all_sessions(user: Phantom<User>) -> Result<impl Resp
 }
 
 #[utoipa::path(post,
-responses(
-(status = 201, description = "Successfully created a new Session.", content_type = "application/json", body = Session),
-ValidationError,
-Unauthorized,
-InternalServerError,
-),
-path = "/api/v1/session",
-tag = "Session"
+    responses(
+        (status = 201, description = "Successfully created a new Session.", content_type = "application/json", body = Session),
+        ValidationError,
+        Unauthorized,
+        InternalServerError,
+    ),
+    path = "/api/v1/session",
+    tag = "Session"
 )]
 #[post("")]
 pub(crate) async fn create_session(credentials: Json<Credentials>) -> Result<impl Responder, ApiError> {

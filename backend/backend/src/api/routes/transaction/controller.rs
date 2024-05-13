@@ -28,18 +28,18 @@ pub(crate) fn transaction_controller(cfg: &mut web::ServiceConfig) {
 }
 
 #[utoipa::path(get,
-responses(
-(status = 200, description = "Successfully retrieved all Transactions.", content_type = "application/json", body = PaginatedTransaction),
-ValidationError,
-Unauthorized,
-InternalServerError,
-),
-params(PageSizeParam),
-security(
-("bearer_token" = [])
-),
-path = "/api/v1/transaction",
-tag = "Transaction")]
+    responses(
+        (status = 200, description = "Successfully retrieved all Transactions.", content_type = "application/json", body = PaginatedTransaction),
+        ValidationError,
+        Unauthorized,
+        InternalServerError,
+    ),
+    params(PageSizeParam),
+    security(
+        ("bearer_token" = [])
+    ),
+    path = "/api/v1/transaction",
+    tag = "Transaction")]
 #[get("")]
 pub(crate) async fn get_all_transactions(
     user: Phantom<User>,
@@ -53,16 +53,16 @@ pub(crate) async fn get_all_transactions(
 }
 
 #[utoipa::path(get,
-responses(
-(status = 200, description = "Successfully retrieved Transaction.", content_type = "application/json", body = Transaction),
-Unauthorized,
-InternalServerError,
-),
-security(
-("bearer_token" = [])
-),
-path = "/api/v1/transaction/{transaction_id}",
-tag = "Transaction")]
+    responses(
+        (status = 200, description = "Successfully retrieved Transaction.", content_type = "application/json", body = Transaction),
+        Unauthorized,
+        InternalServerError,
+    ),
+    security(
+        ("bearer_token" = [])
+    ),
+    path = "/api/v1/transaction/{transaction_id}",
+    tag = "Transaction")]
 #[get("/{transaction_id}")]
 pub(crate) async fn get_one_transaction(
     user: Phantom<User>,
@@ -124,16 +124,16 @@ pub(crate) async fn create_from_transaction_template(
 }
 
 #[utoipa::path(delete,
-responses(
-(status = 204, description = "Successfully deleted Transaction."),
-Unauthorized,
-InternalServerError,
-),
-security(
-("bearer_token" = [])
-),
-path = "/api/v1/transaction/{transaction_id}",
-tag = "Transaction")]
+    responses(
+        (status = 204, description = "Successfully deleted Transaction."),
+        Unauthorized,
+        InternalServerError,
+    ),
+    security(
+        ("bearer_token" = [])
+    ),
+    path = "/api/v1/transaction/{transaction_id}",
+    tag = "Transaction")]
 #[delete("/{transaction_id}")]
 pub(crate) async fn delete_transaction(
     user: Phantom<User>,

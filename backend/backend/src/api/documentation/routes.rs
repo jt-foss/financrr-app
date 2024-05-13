@@ -1,9 +1,9 @@
 #[utoipa::path(get,
-responses(
-(status = 200, description = "Successfully retrieved prometheus metrics.", content_type = "text/plain; version=0.0.4"),
-),
-path = "/metrics",
-tag = "Metrics",
+    responses(
+        (status = 200, description = "Successfully retrieved prometheus metrics.", content_type = "text/plain; version=0.0.4"),
+    ),
+    path = "/metrics",
+    tag = "Metrics",
 )]
 #[allow(dead_code)]
 pub(crate) async fn metrics() {

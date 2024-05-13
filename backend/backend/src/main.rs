@@ -58,22 +58,22 @@ pub(crate) static CONFIG: OnceLock<Config> = OnceLock::new();
 #[utoipauto(paths = "./backend/src")]
 #[derive(OpenApi)]
 #[openapi(
-schemas(
-crate::wrapper::permission::Permissions,
-),
-tags(
-(name = "Status", description = "Endpoints that contain information about the health status of the server."),
-(name = "Metrics", description = "Endpoints for prometheus metrics."),
-(name = "Session", description = "Endpoints for session management."),
-(name = "User", description = "Endpoints for user management."),
-(name = "Account", description = "Endpoints for finance-account management."),
-(name = "Currency", description = "Endpoints for currency management."),
-(name = "Transaction", description = "Endpoints for transaction management."),
-(name = "Transaction-Template", description = "Endpoints for transaction template management."),
-(name = "Recurring-Transaction", description = "Endpoints for recurring transaction management."),
-(name = "Budget", description = "Endpoints for budget management.")
-),
-modifiers(& BearerTokenAddon)
+    schemas(
+        crate::wrapper::permission::Permissions,
+    ),
+    tags(
+        (name = "Status", description = "Endpoints that contain information about the health status of the server."),
+        (name = "Metrics", description = "Endpoints for prometheus metrics."),
+        (name = "Session", description = "Endpoints for session management."),
+        (name = "User", description = "Endpoints for user management."),
+        (name = "Account", description = "Endpoints for finance-account management."),
+        (name = "Currency", description = "Endpoints for currency management."),
+        (name = "Transaction", description = "Endpoints for transaction management."),
+        (name = "Transaction-Template", description = "Endpoints for transaction template management."),
+        (name = "Recurring-Transaction", description = "Endpoints for recurring transaction management."),
+        (name = "Budget", description = "Endpoints for budget management.")
+    ),
+    modifiers(& BearerTokenAddon)
 )]
 pub(crate) struct ApiDoc;
 
