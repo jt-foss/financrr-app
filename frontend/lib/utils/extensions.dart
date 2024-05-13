@@ -6,11 +6,7 @@ import 'package:restrr/restrr.dart';
 
 extension LocaleExtension on Locale {
   String getLocaleName() {
-    return switch (languageCode) {
-      'en' => 'English',
-      'de' => 'Deutsch',
-      _ => 'Unknown'
-    };
+    return switch (languageCode) { 'en' => 'English', 'de' => 'Deutsch', _ => 'Unknown' };
   }
 }
 

@@ -14,8 +14,7 @@ import '../providers/l10n.provider.dart';
 import 'settings_page.dart';
 
 class L10nSettingsPage extends StatefulHookConsumerWidget {
-  static const PagePathBuilder pagePath =
-      PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'language');
+  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'language');
 
   const L10nSettingsPage({super.key});
 
@@ -32,12 +31,9 @@ class _L10nSettingsPageState extends ConsumerState<L10nSettingsPage> {
   void initState() {
     super.initState();
     var l10n = ref.read(l10nProvider);
-    _decimalSeparatorController =
-        TextEditingController(text: l10n.decimalSeparator);
-    _thousandSeparatorController =
-        TextEditingController(text: l10n.thousandSeparator);
-    _dateTimeFormatController =
-        TextEditingController(text: l10n.dateFormat.pattern);
+    _decimalSeparatorController = TextEditingController(text: l10n.decimalSeparator);
+    _thousandSeparatorController = TextEditingController(text: l10n.thousandSeparator);
+    _dateTimeFormatController = TextEditingController(text: l10n.dateFormat.pattern);
   }
 
   @override
@@ -73,8 +69,7 @@ class _L10nSettingsPageState extends ConsumerState<L10nSettingsPage> {
             width: size.width / 1.1,
             child: ListView(
               children: [
-                for (Locale locale in context.supportedLocales)
-                  buildLocaleCard(locale),
+                for (Locale locale in context.supportedLocales) buildLocaleCard(locale),
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 5),
                   child: Divider(),
@@ -90,9 +85,7 @@ class _L10nSettingsPageState extends ConsumerState<L10nSettingsPage> {
                         controller: _decimalSeparatorController,
                         onChanged: (value) {
                           if (value.trim().isEmpty || value.length > 1) return;
-                          ref
-                              .read(l10nProvider.notifier)
-                              .setDecimalSeparator(value);
+                          ref.read(l10nProvider.notifier).setDecimalSeparator(value);
                         },
                         decoration: InputDecoration(
                           labelText: L10nKey.l10nDecimalSeparator.toString(),
@@ -104,8 +97,7 @@ class _L10nSettingsPageState extends ConsumerState<L10nSettingsPage> {
                 ),
                 ExpansionTile(
                   title: L10nKey.l10nThousandsSeparator.toText(),
-                  subtitle: Text(
-                      '1${l10n.thousandSeparator}234${l10n.thousandSeparator}567'),
+                  subtitle: Text('1${l10n.thousandSeparator}234${l10n.thousandSeparator}567'),
                   expandedCrossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
@@ -114,9 +106,7 @@ class _L10nSettingsPageState extends ConsumerState<L10nSettingsPage> {
                         controller: _thousandSeparatorController,
                         onChanged: (value) {
                           if (value.trim().isEmpty || value.length > 1) return;
-                          ref
-                              .read(l10nProvider.notifier)
-                              .setThousandSeparator(value);
+                          ref.read(l10nProvider.notifier).setThousandSeparator(value);
                         },
                         decoration: InputDecoration(
                           labelText: L10nKey.l10nThousandsSeparator.toString(),
@@ -143,9 +133,7 @@ class _L10nSettingsPageState extends ConsumerState<L10nSettingsPage> {
                       child: TextFormField(
                           controller: _dateTimeFormatController,
                           onChanged: (value) {
-                            ref
-                                .read(l10nProvider.notifier)
-                                .setDateFormat(DateFormat(value));
+                            ref.read(l10nProvider.notifier).setDateFormat(DateFormat(value));
                           },
                           decoration: InputDecoration(
                             labelText: L10nKey.l10nDateFormat.toString(),
@@ -162,8 +150,7 @@ class _L10nSettingsPageState extends ConsumerState<L10nSettingsPage> {
 
     return AdaptiveScaffold(
       resizeToAvoidBottomInset: false,
-      verticalBuilder: (_, __, size) =>
-          SafeArea(child: buildVerticalLayout(size)),
+      verticalBuilder: (_, __, size) => SafeArea(child: buildVerticalLayout(size)),
     );
   }
 }
