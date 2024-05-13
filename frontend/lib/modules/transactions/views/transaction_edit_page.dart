@@ -166,7 +166,7 @@ class TransactionEditPageState extends ConsumerState<TransactionEditPage> {
           onError: (_, __) => L10nKey.accountNotFound.toText());
     }
 
-    return AdaptiveScaffold(verticalBuilder: (_, __, size) => SafeArea(child: handleAccountStream(size)));
+    return AdaptiveScaffold(verticalBuilder: (_, __, size) => handleAccountStream(size));
   }
 
   Future<void> _editTransaction(Account account, Transaction transaction, TransactionType type, {Account? secondary}) async {

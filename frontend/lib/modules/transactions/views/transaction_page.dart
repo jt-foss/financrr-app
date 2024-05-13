@@ -165,7 +165,7 @@ class TransactionPageState extends ConsumerState<TransactionPage> {
           onError: (_, __) => L10nKey.accountNotFound.toText());
     }
 
-    return AdaptiveScaffold(verticalBuilder: (_, __, size) => SafeArea(child: handleAccountStream(size)));
+    return AdaptiveScaffold(verticalBuilder: (_, __, size) => handleAccountStream(size));
   }
 
   void _deleteTransaction(Transaction transaction) async {

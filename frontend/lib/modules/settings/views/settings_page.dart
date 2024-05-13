@@ -190,8 +190,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     }
 
     return AdaptiveScaffold(
-      resizeToAvoidBottomInset: false,
-      verticalBuilder: (_, __, size) => SafeArea(child: buildVerticalLayout(size)),
+      verticalBuilder: (_, __, size) => buildVerticalLayout(size),
     );
   }
 }

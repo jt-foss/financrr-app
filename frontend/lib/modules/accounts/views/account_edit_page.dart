@@ -134,7 +134,7 @@ class AccountEditPageState extends ConsumerState<AccountEditPage> {
 
     return AdaptiveScaffold(
       resizeToAvoidBottomInset: false,
-      verticalBuilder: (_, __, size) => SafeArea(child: handleAccountStream(size)),
+      verticalBuilder: (_, __, size) => handleAccountStream(size),
     );
   }
 

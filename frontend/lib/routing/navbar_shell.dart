@@ -25,6 +25,25 @@ class ScaffoldNavBarShellState extends State<ScaffoldNavBarShell> {
     final bool isMobile = context.isMobile;
     final Widget shell = kIsWeb ? SelectionArea(child: widget.navigationShell) : widget.navigationShell;
     return Scaffold(
+      appBar: AppBar(
+        title: GestureDetector(
+          onTap: () => resetLocation(index: 0),
+          child: L10nKey.brandName.toText(),
+        ),
+        centerTitle: isMobile,
+        leading: canPop()
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => context.pop(),
+              )
+            : null,
+      ),
+      bottomNavigationBar: isMobile
+          ? NavigationBar(
+              onDestinationSelected: (index) => goToBranch(index),
+              selectedIndex: widget.navigationShell.currentIndex,
+              destinations: getNavBarDestinations())
+          : null,
       body: SafeArea(
         top: false,
         child: isMobile
@@ -48,25 +67,6 @@ class ScaffoldNavBarShellState extends State<ScaffoldNavBarShell> {
                 ],
               ),
       ),
-      appBar: AppBar(
-        title: GestureDetector(
-          onTap: () => resetLocation(index: 0),
-          child: L10nKey.brandName.toText(),
-        ),
-        centerTitle: isMobile,
-        leading: canPop()
-            ? IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () => context.pop(),
-              )
-            : null,
-      ),
-      bottomNavigationBar: isMobile
-          ? NavigationBar(
-              onDestinationSelected: (index) => goToBranch(index),
-              selectedIndex: widget.navigationShell.currentIndex,
-              destinations: getNavBarDestinations())
-          : null,
     );
   }
 

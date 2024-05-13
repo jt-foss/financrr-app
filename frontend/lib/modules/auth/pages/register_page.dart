@@ -37,7 +37,7 @@ class RegisterPageState extends ConsumerState<RegisterPage> {
   Widget build(BuildContext context) {
     return AdaptiveScaffold(
       resizeToAvoidBottomInset: false,
-      verticalBuilder: (_, __, size) => SafeArea(child: _buildVerticalLayout(size)),
+      verticalBuilder: (_, __, size) => _buildVerticalLayout(size),
     );
   }
 

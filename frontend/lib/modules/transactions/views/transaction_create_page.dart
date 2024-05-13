@@ -132,7 +132,7 @@ class _TransactionCreatePageState extends ConsumerState<TransactionCreatePage> {
       );
     }
 
-    return AdaptiveScaffold(verticalBuilder: (_, __, size) => SafeArea(child: handleAccountStream(size)));
+    return AdaptiveScaffold(verticalBuilder: (_, __, size) => handleAccountStream(size));
   }
 
   Future<void> _createTransaction(Account account, TransactionType type, {Account? secondary}) async {
