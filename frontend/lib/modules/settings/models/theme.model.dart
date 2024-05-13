@@ -3,6 +3,11 @@ import 'package:flutter/material.dart';
 
 import '../../../utils/json_utils.dart';
 
+/// Represents a custom theme for the app.
+/// This is used over Flutter's theme system to allow for more customization, especially as we're using
+/// custom widgets.
+/// This also allows for defining the actual themes in a separate JSON file,
+/// making it easier to add and adjust themes - à la "If you can't make it perfect, make it adjustable."
 class AppTheme {
   static const String fontFamily = 'Montserrat';
   static const List<String> fontFamilyFallback = ['Arial', 'sans-serif'];
