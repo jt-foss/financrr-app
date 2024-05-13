@@ -1,18 +1,17 @@
 import 'dart:async';
 
-import 'package:easy_localization/easy_localization.dart';
 import 'package:financrr_frontend/modules/auth/pages/login_page.dart';
 import 'package:financrr_frontend/shared/ui/auth_page_template.dart';
 import 'package:financrr_frontend/modules/auth/providers/authentication.provider.dart';
 import 'package:financrr_frontend/modules/auth/models/authentication.state.dart';
 import 'package:financrr_frontend/modules/dashboard/views/dashboard_page.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
-import 'package:financrr_frontend/utils/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../shared/ui/adaptive_scaffold.dart';
 import '../../../routing/page_path.dart';
+import '../../../utils/l10n_utils.dart';
 
 class RegisterPage extends StatefulHookConsumerWidget {
   static const PagePathBuilder pagePath = PagePathBuilder('/register');
@@ -32,12 +31,13 @@ class RegisterPageState extends ConsumerState<RegisterPage> {
 
   bool _obscureText = true;
   bool _obscureRepeatText = true;
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
     return AdaptiveScaffold(
       resizeToAvoidBottomInset: false,
-      verticalBuilder: (_, __, size) => SafeArea(child: _buildVerticalLayout(size)),
+      verticalBuilder: (_, __, size) => _buildVerticalLayout(size),
     );
   }
 
@@ -60,9 +60,9 @@ class RegisterPageState extends ConsumerState<RegisterPage> {
                       padding: const EdgeInsets.symmetric(vertical: 20),
                       child: TextFormField(
                         controller: _usernameController,
-                        decoration: InputDecoration(labelText: 'common_username'.tr()),
+                        decoration: InputDecoration(labelText: L10nKey.commonUsername.toString()),
                         autofillHints: const [AutofillHints.newUsername],
-                        validator: (value) => value!.isEmpty ? 'common_username_required'.tr() : null,
+                        validator: (value) => value!.isEmpty ? L10nKey.commonUsernameRequired.toString() : null,
                       ),
                     ),
                     Padding(
@@ -70,7 +70,7 @@ class RegisterPageState extends ConsumerState<RegisterPage> {
                       child: TextFormField(
                         controller: _passwordController,
                         decoration: InputDecoration(
-                            labelText: 'common_password'.tr(),
+                            labelText: L10nKey.commonPassword.toString(),
                             suffixIcon: Padding(
                               padding: const EdgeInsets.only(right: 10),
                               child: IconButton(
@@ -79,13 +79,13 @@ class RegisterPageState extends ConsumerState<RegisterPage> {
                             )),
                         obscureText: _obscureText,
                         autofillHints: const [AutofillHints.newPassword],
-                        validator: (value) => value!.isEmpty ? 'common_password_required'.tr() : null,
+                        validator: (value) => value!.isEmpty ? L10nKey.commonPasswordRequired.toString() : null,
                       ),
                     ),
                     TextFormField(
                       controller: _passwordRepeatController,
                       decoration: InputDecoration(
-                          labelText: 'common_repeat_password'.tr(),
+                          labelText: L10nKey.commonPasswordRepeat.toString(),
                           suffixIcon: Padding(
                             padding: const EdgeInsets.only(right: 10),
                             child: IconButton(
@@ -94,7 +94,7 @@ class RegisterPageState extends ConsumerState<RegisterPage> {
                           )),
                       obscureText: _obscureRepeatText,
                       autofillHints: const [AutofillHints.newPassword],
-                      validator: (value) => value!.isEmpty ? 'common_password_required'.tr() : null,
+                      validator: (value) => value!.isEmpty ? L10nKey.commonPasswordRepeatRequired.toString() : null,
                     ),
                   ],
                 )),
@@ -105,7 +105,7 @@ class RegisterPageState extends ConsumerState<RegisterPage> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: _handleRegistration,
-                    child: const Text('common_register').tr(),
+                    child: _isLoading ? const CircularProgressIndicator() : L10nKey.commonRegister.toText(),
                   ),
                 )),
             Padding(
@@ -114,8 +114,13 @@ class RegisterPageState extends ConsumerState<RegisterPage> {
                   width: double.infinity,
                   height: 50,
                   child: TextButton(
-                    onPressed: () => context.goPath(LoginPage.pagePath.build(), extra: widget.hostUri),
-                    child: const Text('Already have an account?'),
+                    onPressed: () {
+                      if (_isLoading) {
+                        return;
+                      }
+                      context.goPath(LoginPage.pagePath.build(), extra: widget.hostUri);
+                    },
+                    child: L10nKey.authRegisterExistingAccount.toText(),
                   ),
                 )),
           ],
@@ -123,26 +128,51 @@ class RegisterPageState extends ConsumerState<RegisterPage> {
   }
 
   Future<void> _handleRegistration() async {
+    if (_isLoading) {
+      return;
+    }
+    // check if username is empty
     final String username = _usernameController.text;
     if (username.isEmpty) {
-      context.showSnackBar('common_username_required'.tr());
+      L10nKey.commonUsernameRequired.showSnack(context);
       return;
     }
+    // validate password
     final String password = _passwordController.text;
-    if (password.isEmpty) {
-      context.showSnackBar('common_password_required'.tr());
+    final L10nKey? passwordError = _validatePassword(password, _passwordRepeatController.text);
+    if (passwordError != null) {
+      passwordError.showSnack(context);
       return;
     }
-    if (password != _passwordRepeatController.text) {
-      context.showSnackBar('common_passwords_do_not_match'.tr());
-      return;
-    }
+
+    setState(() => _isLoading = true);
     final AuthenticationState state = await ref.read(authProvider.notifier).register(username, password, widget.hostUri);
+    setState(() => _isLoading = false);
     if (!mounted) return;
     if (state.status == AuthenticationStatus.authenticated) {
       context.goPath(DashboardPage.pagePath.build());
     } else {
-      context.showSnackBar('common_registration_failed'.tr());
+      L10nKey.authRegisterFailed.showSnack(context);
     }
+  }
+
+  L10nKey? _validatePassword(String password, String repeated) {
+    // check if password is empty
+    if (password.isEmpty) {
+      return L10nKey.commonPasswordRequired;
+    }
+    // TODO: implement password strength check
+    if (password.length < 16) {
+      return L10nKey.commonPasswordWeak;
+    }
+    // check if repeat password is empty
+    if (repeated.isEmpty) {
+      return L10nKey.commonPasswordRequired;
+    }
+    // check if passwords match
+    if (password != repeated) {
+      return L10nKey.commonPasswordNoMatch;
+    }
+    return null;
   }
 }

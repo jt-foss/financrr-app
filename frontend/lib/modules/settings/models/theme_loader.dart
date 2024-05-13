@@ -12,9 +12,8 @@ class AppThemeLoader {
   static Future<void> init() async {
     final String manifestContent = await rootBundle.loadString('AssetManifest.json');
     final Map<String, dynamic> manifest = jsonDecode(manifestContent);
-    final List<String> filtered = manifest.keys
-        .where((path) => path.startsWith('assets/themes/') && path.endsWith('.financrr-theme.json'))
-        .toList();
+    final List<String> filtered =
+        manifest.keys.where((path) => path.startsWith('assets/themes/') && path.endsWith('.financrr-theme.json')).toList();
     for (String path in filtered) {
       final Map<String, dynamic> json = jsonDecode(await rootBundle.loadString(path));
       final AppTheme? theme = AppTheme.tryFromJson(json);

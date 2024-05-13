@@ -5,6 +5,7 @@ import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart
 import 'package:financrr_frontend/modules/transactions/views/transaction_edit_page.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -16,6 +17,7 @@ import '../../../../../routing/page_path.dart';
 import '../../../shared/ui/async_wrapper.dart';
 import '../../../utils/text_utils.dart';
 import '../../accounts/views/account_page.dart';
+import '../../settings/providers/l10n.provider.dart';
 
 class TransactionPage extends StatefulHookConsumerWidget {
   static const PagePathBuilder pagePath =
@@ -63,106 +65,107 @@ class TransactionPageState extends ConsumerState<TransactionPage> {
 
   @override
   Widget build(BuildContext context) {
-    return AdaptiveScaffold(verticalBuilder: (_, __, size) => SafeArea(child: _handleAccountStream(size)));
-  }
+    var theme = ref.watch(themeProvider);
+    var l10n = ref.watch(l10nProvider);
 
-  Widget _handleAccountStream(Size size) {
-    return StreamWrapper(
-      stream: _accountStreamController.stream,
-      onSuccess: (ctx, snap) => _handleTransactionStream(snap.data!, size),
-      onLoading: (_, __) => const Center(child: CircularProgressIndicator()),
-      onError: (_, __) => const Text('Could not find account'),
-    );
-  }
+    buildTableRow(L10nKey label, String value) {
+      return TableRow(children: [
+        Padding(
+          padding: const EdgeInsets.all(10),
+          child: label.toText(),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(10),
+          child: Text(value),
+        ),
+      ]);
+    }
 
-  Widget _handleTransactionStream(Account account, Size size) {
-    return StreamWrapper(
-      stream: _transactionStreamController.stream,
-      onSuccess: (ctx, snap) => _buildVerticalLayout(account, snap.data!, size),
-      onLoading: (_, __) => const Center(child: CircularProgressIndicator()),
-      onError: (_, __) => const Text('Could not find transaction'),
-    );
-  }
-
-  Widget _buildVerticalLayout(Account account, Transaction transaction, Size size) {
-    final String amountStr = (transaction.type == TransactionType.deposit ? '' : '-') +
-        TextUtils.formatBalanceWithCurrency(transaction.amount, account.currencyId.get()!);
-    return Padding(
-      padding: const EdgeInsets.only(top: 10, bottom: 20),
-      child: Align(
-        alignment: Alignment.topCenter,
-        child: SizedBox(
-          width: size.width / 1.1,
-          child: RefreshIndicator(
-              onRefresh: () async {
-                await _fetchAccount(forceRetrieve: true);
-                await _fetchTransaction(forceRetrieve: true);
-              },
-              child: ListView(
-                children: [
-                  Column(
-                    children: [
-                      Text(amountStr,
-                          style: ref.textTheme.titleLarge?.copyWith(
-                              color: transaction.type == TransactionType.deposit
-                                  ? ref.themeData.primaryColor
-                                  : ref.themeData.colorScheme.error)),
-                      Text(transaction.description ??
-                          StoreKey.dateTimeFormat.readSync()!.format(transaction.executedAt)),
-                    ],
-                  ),
-                  const Divider(),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      IconButton(
-                          tooltip: 'Delete Transaction',
-                          onPressed: () => _deleteTransaction(transaction),
-                          icon: const Icon(Icons.delete_rounded, size: 17)),
-                      IconButton(
-                          tooltip: 'Edit Transaction',
-                          onPressed: () => context.goPath(TransactionEditPage.pagePath.build(params: {
-                                'accountId': account.id.value.toString(),
-                                'transactionId': transaction.id.value.toString()
-                              })),
-                          icon: const Icon(Icons.create_rounded, size: 17))
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10),
-                    child: Table(
-                      border: TableBorder.all(color: ref.themeData.dividerColor),
+    buildVerticalLayout(Account account, Transaction transaction, Size size) {
+      final String amountStr = (transaction.type == TransactionType.deposit ? '' : '-') +
+          TextUtils.formatBalanceWithCurrency(l10n, transaction.amount, account.currencyId.get()!);
+      return Padding(
+        padding: const EdgeInsets.only(top: 10, bottom: 20),
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: SizedBox(
+            width: size.width / 1.1,
+            child: RefreshIndicator(
+                onRefresh: () async {
+                  await _fetchAccount(forceRetrieve: true);
+                  await _fetchTransaction(forceRetrieve: true);
+                },
+                child: ListView(
+                  children: [
+                    Column(
                       children: [
-                        _buildTableRow('Type', transaction.type.name),
-                        _buildTableRow('Amount', amountStr),
-                        _buildTableRow('Name', transaction.name),
-                        _buildTableRow('Description', transaction.description ?? 'N/A'),
-                        _buildTableRow('From', transaction.sourceId?.get()?.name ?? 'N/A'),
-                        _buildTableRow('To', transaction.destinationId?.get()?.name ?? 'N/A'),
-                        _buildTableRow(
-                            'Executed at', StoreKey.dateTimeFormat.readSync()!.format(transaction.executedAt)),
-                        _buildTableRow('Created at', StoreKey.dateTimeFormat.readSync()!.format(transaction.createdAt)),
+                        Text(amountStr,
+                            style: theme.textTheme.titleLarge?.copyWith(
+                                color: transaction.type == TransactionType.deposit
+                                    ? theme.themeData.primaryColor
+                                    : theme.themeData.colorScheme.error)),
+                        Text(transaction.description ?? StoreKey.dateTimeFormat.readSync()!.format(transaction.executedAt)),
                       ],
                     ),
-                  )
-                ],
-              )),
+                    const Divider(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        IconButton(
+                            tooltip: 'Delete Transaction',
+                            onPressed: () => _deleteTransaction(transaction),
+                            icon: const Icon(Icons.delete_rounded, size: 17)),
+                        IconButton(
+                            tooltip: 'Edit Transaction',
+                            onPressed: () => context.goPath(TransactionEditPage.pagePath.build(params: {
+                                  'accountId': account.id.value.toString(),
+                                  'transactionId': transaction.id.value.toString()
+                                })),
+                            icon: const Icon(Icons.create_rounded, size: 17))
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Table(
+                        border: TableBorder.all(color: theme.themeData.dividerColor),
+                        children: [
+                          buildTableRow(L10nKey.transactionPropertiesType, transaction.type.name),
+                          buildTableRow(L10nKey.transactionPropertiesAmount, amountStr),
+                          buildTableRow(L10nKey.transactionPropertiesName, transaction.name),
+                          buildTableRow(L10nKey.transactionPropertiesDescription, transaction.description ?? 'N/A'),
+                          buildTableRow(L10nKey.transactionPropertiesFrom, transaction.sourceId?.get()?.name ?? 'N/A'),
+                          buildTableRow(L10nKey.transactionPropertiesTo, transaction.destinationId?.get()?.name ?? 'N/A'),
+                          buildTableRow(L10nKey.transactionPropertiesExecutedAt,
+                              StoreKey.dateTimeFormat.readSync()!.format(transaction.executedAt)),
+                          buildTableRow(L10nKey.transactionPropertiesCreatedAt,
+                              StoreKey.dateTimeFormat.readSync()!.format(transaction.createdAt)),
+                        ],
+                      ),
+                    )
+                  ],
+                )),
+          ),
         ),
-      ),
-    );
-  }
+      );
+    }
 
-  TableRow _buildTableRow(String label, String value) {
-    return TableRow(children: [
-      Padding(
-        padding: const EdgeInsets.all(10),
-        child: Text(label),
-      ),
-      Padding(
-        padding: const EdgeInsets.all(10),
-        child: Text(value),
-      ),
-    ]);
+    handleTransactionStream(Account account, Size size) {
+      return StreamWrapper(
+          stream: _transactionStreamController.stream,
+          onSuccess: (_, snap) => buildVerticalLayout(account, snap.data!, size),
+          onLoading: (_, __) => const Center(child: CircularProgressIndicator()),
+          onError: (_, __) => L10nKey.transactionNotFound.toText());
+    }
+
+    handleAccountStream(Size size) {
+      return StreamWrapper(
+          stream: _accountStreamController.stream,
+          onSuccess: (_, snap) => handleTransactionStream(snap.data!, size),
+          onLoading: (_, __) => const Center(child: CircularProgressIndicator()),
+          onError: (_, __) => L10nKey.accountNotFound.toText());
+    }
+
+    return AdaptiveScaffold(verticalBuilder: (_, __, size) => handleAccountStream(size));
   }
 
   void _deleteTransaction(Transaction transaction) async {
@@ -170,7 +173,7 @@ class TransactionPageState extends ConsumerState<TransactionPage> {
       await transaction.delete();
       if (!mounted) return;
       context.pop();
-      context.showSnackBar('Successfully deleted "${transaction.description ?? 'transaction'}"');
+      L10nKey.commonDeleteObjectSuccess.showSnack(context, namedArgs: {'object': transaction.description ?? 'transaction'});
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);
     }

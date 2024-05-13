@@ -1,4 +1,4 @@
-import 'package:easy_localization/easy_localization.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 
 import '../../../utils/json_utils.dart';
@@ -9,7 +9,7 @@ class AppTheme {
 
   final String id;
   final String logoPath;
-  final String? translationKey;
+  final L10nKey? translationKey;
   final String? fallbackName;
   final Color previewColor;
   final ThemeMode themeMode;
@@ -24,7 +24,7 @@ class AppTheme {
       required this.themeMode,
       required this.themeData});
 
-  String get effectiveName => translationKey?.tr() ?? fallbackName ?? id;
+  String get effectiveName => translationKey?.toString() ?? fallbackName ?? id;
 
   static AppTheme? tryFromJson(Map<String, dynamic> json) {
     final AppThemeColor? previewColor = AppThemeColor.tryFromJson(json['preview_color']);
@@ -38,14 +38,14 @@ class AppTheme {
         JsonUtils.isInvalidType(json, 'theme_data', Map)) {
       return null;
     }
-    if ((json['translation_key'] != null && json['fallback_name'] != null) ||
-        json['translation_key'] == null && json['fallback_name'] == null) {
+    final L10nKey? translationKey = L10nKey.fromKey(json['translation_key']!);
+    if (translationKey == null && json['fallback_name'] == null) {
       throw StateError('Either translation_key or fallback_name must be set!');
     }
     return AppTheme(
         id: json['id'],
         logoPath: json['logo_path'],
-        translationKey: json['translation_key'],
+        translationKey: translationKey,
         fallbackName: json['fallback_name'],
         previewColor: previewColor.toColor(json),
         themeMode: themeMode,
@@ -66,8 +66,7 @@ class AppTheme {
         _tryNavigationRailThemeDataFromJson(fullJson, json['navigation_rail_theme_data']);
     final ElevatedButtonThemeData? elevatedButtonTheme =
         _tryElevatedButtonThemeDataFromJson(fullJson, json['elevated_button_theme_data']);
-    final TextButtonThemeData? textButtonTheme =
-        _tryTextButtonThemeDataFromJson(fullJson, json['text_button_theme_data']);
+    final TextButtonThemeData? textButtonTheme = _tryTextButtonThemeDataFromJson(fullJson, json['text_button_theme_data']);
     final TextSelectionThemeData? textSelectionTheme =
         _tryTextSelectionThemeDataFromJson(fullJson, json['text_selection_theme_data']);
     final SwitchThemeData? switchTheme = _trySwitchThemeDataFromJson(fullJson, json['switch_theme_data']);
@@ -107,6 +106,7 @@ class AppTheme {
           ),
           border: const OutlineInputBorder(),
         ),
+        expansionTileTheme: const ExpansionTileThemeData(shape: Border()),
         // theme data
         appBarTheme: appBarTheme,
         navigationBarTheme: navigationBarTheme,
@@ -187,8 +187,7 @@ class AppTheme {
         centerTitle: true);
   }
 
-  static NavigationBarThemeData? _tryNavigationBarThemeDataFromJson(
-      Map<String, dynamic> fullJson, Map<String, dynamic>? json) {
+  static NavigationBarThemeData? _tryNavigationBarThemeDataFromJson(Map<String, dynamic> fullJson, Map<String, dynamic>? json) {
     if (json == null) {
       return null;
     }
@@ -204,8 +203,8 @@ class AppTheme {
       iconTheme: MaterialStatePropertyAll(IconThemeData(color: iconColor.toColor(fullJson))),
       backgroundColor: backgroundColor.toColor(fullJson),
       surfaceTintColor: Colors.transparent,
-      labelTextStyle: MaterialStatePropertyAll(
-          TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: labelColor.toColor(fullJson))),
+      labelTextStyle:
+          MaterialStatePropertyAll(TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: labelColor.toColor(fullJson))),
     );
   }
 
@@ -263,8 +262,7 @@ class AppTheme {
     );
   }
 
-  static TextButtonThemeData? _tryTextButtonThemeDataFromJson(
-      Map<String, dynamic> fullJson, Map<String, dynamic>? json) {
+  static TextButtonThemeData? _tryTextButtonThemeDataFromJson(Map<String, dynamic> fullJson, Map<String, dynamic>? json) {
     if (json == null) {
       return null;
     }
@@ -279,8 +277,7 @@ class AppTheme {
     );
   }
 
-  static TextSelectionThemeData? _tryTextSelectionThemeDataFromJson(
-      Map<String, dynamic> fullJson, Map<String, dynamic>? json) {
+  static TextSelectionThemeData? _tryTextSelectionThemeDataFromJson(Map<String, dynamic> fullJson, Map<String, dynamic>? json) {
     if (json == null) {
       return null;
     }
@@ -358,8 +355,7 @@ class AppThemeColor {
     if (options == null) {
       return null;
     }
-    if ((options.hex == null && options.copyFromPath == null) ||
-        (options.hex != null && options.copyFromPath != null)) {
+    if ((options.hex == null && options.copyFromPath == null) || (options.hex != null && options.copyFromPath != null)) {
       throw StateError('Either hex or copy_from_path must be set!');
     }
     return AppThemeColor(options: options);
@@ -424,8 +420,7 @@ class AppThemeColorOptions {
         JsonUtils.isInvalidType(json, 'opacity', double, nullable: true)) {
       return null;
     }
-    if ((json['hex'] == null && json['copy_from_path'] == null) ||
-        (json['hex'] != null && json['copy_from_path'] != null)) {
+    if ((json['hex'] == null && json['copy_from_path'] == null) || (json['hex'] != null && json['copy_from_path'] != null)) {
       return null;
     }
     return AppThemeColorOptions(hex: json['hex'], copyFromPath: json['copy_from_path'], opacity: json['opacity']);
