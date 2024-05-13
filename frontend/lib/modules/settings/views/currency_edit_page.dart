@@ -156,7 +156,7 @@ class _CurrencyEditPageState extends ConsumerState<CurrencyEditPage> {
       );
     }
 
-    return AdaptiveScaffold(verticalBuilder: (_, __, size) => SafeArea(child: handleCurrencyStream(size)));
+    return AdaptiveScaffold(verticalBuilder: (_, __, size) => handleCurrencyStream(size));
   }
 
   Future<void> _editCurrency(CustomCurrency currency) async {

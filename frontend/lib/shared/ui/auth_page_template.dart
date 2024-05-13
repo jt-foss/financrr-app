@@ -71,7 +71,7 @@ class AuthPageTemplateState extends ConsumerState<AuthPageTemplate> {
 
     return AdaptiveScaffold(
       resizeToAvoidBottomInset: false,
-      verticalBuilder: (_, __, size) => SafeArea(child: buildVerticalLayout(size, theme)),
+      verticalBuilder: (_, __, size) => buildVerticalLayout(size, theme),
     );
   }
 

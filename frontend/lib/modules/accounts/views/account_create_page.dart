@@ -105,7 +105,7 @@ class _AccountCreatePageState extends ConsumerState<AccountCreatePage> {
 
     return AdaptiveScaffold(
       resizeToAvoidBottomInset: false,
-      verticalBuilder: (_, __, size) => SafeArea(child: buildVerticalLayout(size)),
+      verticalBuilder: (_, __, size) => buildVerticalLayout(size),
     );
   }
 
