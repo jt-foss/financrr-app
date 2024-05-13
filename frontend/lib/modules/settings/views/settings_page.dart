@@ -5,6 +5,7 @@ import 'package:financrr_frontend/modules/settings/views/l10n_settings_page.dart
 import 'package:financrr_frontend/modules/settings/views/session_settings_page.dart';
 import 'package:financrr_frontend/modules/settings/views/theme_settings_page.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -14,11 +15,12 @@ import '../../../shared/ui/adaptive_scaffold.dart';
 import '../../../routing/page_path.dart';
 import '../../../shared/ui/text_circle_avatar.dart';
 import '../../../utils/common_actions.dart';
+import '../models/theme.state.dart';
 import 'currency_settings_page.dart';
 import 'log_settings_page.dart';
 
 class SettingsItemGroup {
-  final String? title;
+  final L10nKey? title;
   final List<SettingsItem> items;
   final bool groupInCard;
 
@@ -27,9 +29,31 @@ class SettingsItemGroup {
 
 class SettingsItem {
   final bool showCategory;
-  final Widget child;
+  final Widget? child;
+  final L10nKey? title;
+  final IconData? iconData;
+  final PagePathBuilder? destination;
+  final Function()? onTap;
 
-  const SettingsItem({this.showCategory = true, required this.child});
+  const SettingsItem({this.showCategory = true, required this.title, required this.iconData, this.destination, this.onTap})
+      : child = null;
+
+  const SettingsItem.fromChild({this.showCategory = true, required this.child})
+      : title = null,
+        iconData = null,
+        destination = null,
+        onTap = null;
+
+  Widget build(BuildContext context) {
+    if (child != null) {
+      return child!;
+    }
+    return ListTile(
+      onTap: () => destination == null ? onTap?.call() : context.goPath(destination!.build()),
+      leading: Icon(iconData),
+      title: title!.toText(),
+    );
+  }
 }
 
 class SettingsPage extends StatefulHookConsumerWidget {
@@ -44,131 +68,130 @@ class SettingsPage extends StatefulHookConsumerWidget {
 class _SettingsPageState extends ConsumerState<SettingsPage> {
   late final Restrr _api = api;
 
-  late final List<SettingsItemGroup> _items = [
-    SettingsItemGroup(items: [
-      SettingsItem(
-        showCategory: false,
-        child: ListTile(
-          leading: TextCircleAvatar(text: _api.selfUser.effectiveDisplayName, radius: 25),
-          title: Text(_api.selfUser.effectiveDisplayName, style: ref.textTheme.titleSmall),
-          subtitle: const Text('placeholder@financrr.app'),
-        ),
-      ),
-    ]),
-    SettingsItemGroup(title: 'Account', items: [
-      SettingsItem(
-        child: ListTile(
-          onTap: () => context.goPath(CurrencySettingsPage.pagePath.build()),
-          leading: const Icon(Icons.currency_exchange_rounded),
-          title: const Text('Currencies'),
-        ),
-      ),
-      SettingsItem(
-        child: ListTile(
-          onTap: () => context.goPath(SessionSettingsPage.pagePath.build()),
-          leading: const Icon(Icons.devices_rounded),
-          title: const Text('Sessions'),
-        ),
-      ),
-    ]),
-    SettingsItemGroup(title: 'App', items: [
-      SettingsItem(
-        child: ListTile(
-          onTap: () => context.goPath(ThemeSettingsPage.pagePath.build()),
-          leading: const Icon(Icons.brightness_4_outlined),
-          title: const Text('Themes'),
-        ),
-      ),
-      SettingsItem(
-        child: ListTile(
-          onTap: () => context.goPath(L10nSettingsPage.pagePath.build()),
-          leading: const Icon(Icons.language_rounded),
-          title: const Text('Language'),
-        ),
-      ),
-    ]),
-    SettingsItemGroup(title: 'Developer', items: [
-      SettingsItem(
-        child: ListTile(
-          onTap: () => context.goPath(LocalStorageSettingsPage.pagePath.build()),
-          leading: const Icon(Icons.sd_storage_outlined),
-          title: const Text('Local Storage'),
-        ),
-      ),
-      SettingsItem(
-        child: ListTile(
-          onTap: () => context.goPath(LogSettingsPage.pagePath.build()),
-          leading: const Icon(Icons.format_align_left_rounded),
-          title: const Text('Logs'),
-        ),
-      ),
-    ]),
-    SettingsItemGroup(items: [
-      SettingsItem(
-        showCategory: false,
-        child: ListTile(
-          onTap: () => CommonActions.logOut(this, ref),
-          leading: const Icon(Icons.logout),
-          title: const Text('Logout'),
-        ),
-      ),
-    ]),
-    SettingsItemGroup(groupInCard: false, items: [
-      SettingsItem(
+  List<SettingsItemGroup> _buildItems(ThemeState theme) {
+    return [
+      SettingsItemGroup(items: [
+        SettingsItem.fromChild(
           showCategory: false,
-          child: FutureBuilder(
-            future: PackageInfo.fromPlatform(),
-            builder: (context, AsyncSnapshot<PackageInfo> snapshot) {
-              if (!snapshot.hasData) return const SizedBox();
-              final PackageInfo info = snapshot.data!;
-              return Align(
-                child: Text('made with ❤️\nv${info.version}+${info.buildNumber}', textAlign: TextAlign.center),
-              );
-            },
-          )),
-    ])
-  ];
+          child: ListTile(
+            leading: TextCircleAvatar(text: _api.selfUser.effectiveDisplayName, radius: 25),
+            title: Text(_api.selfUser.effectiveDisplayName, style: theme.textTheme.titleSmall),
+            subtitle: const Text('placeholder@financrr.app'),
+          ),
+        ),
+      ]),
+      const SettingsItemGroup(title: L10nKey.settingsCategoryAccount, items: [
+        SettingsItem(
+          title: L10nKey.settingsItemCurrencies,
+          iconData: Icons.currency_exchange_rounded,
+          destination: CurrencySettingsPage.pagePath,
+        ),
+        SettingsItem(
+          title: L10nKey.settingsItemSessions,
+          iconData: Icons.devices_rounded,
+          destination: SessionSettingsPage.pagePath,
+        ),
+      ]),
+      const SettingsItemGroup(title: L10nKey.settingsCategoryApp, items: [
+        SettingsItem(
+          title: L10nKey.settingsItemAppearance,
+          iconData: Icons.palette_outlined,
+          destination: ThemeSettingsPage.pagePath,
+        ),
+        SettingsItem(
+          title: L10nKey.settingsItemLanguage,
+          iconData: Icons.language_rounded,
+          destination: L10nSettingsPage.pagePath,
+        ),
+      ]),
+      const SettingsItemGroup(title: L10nKey.settingsCategoryDeveloper, items: [
+        SettingsItem(
+          title: L10nKey.settingsItemLocalStorage,
+          iconData: Icons.sd_storage_outlined,
+          destination: LocalStorageSettingsPage.pagePath,
+        ),
+        SettingsItem(
+          title: L10nKey.settingsItemLogs,
+          iconData: Icons.format_align_left_rounded,
+          destination: LogSettingsPage.pagePath,
+        ),
+      ]),
+      SettingsItemGroup(items: [
+        SettingsItem(
+          showCategory: false,
+          title: L10nKey.commonLogout,
+          iconData: Icons.logout,
+          onTap: () => CommonActions.logOut(this, ref),
+        ),
+      ]),
+      SettingsItemGroup(groupInCard: false, items: [
+        SettingsItem.fromChild(
+            showCategory: false,
+            child: FutureBuilder(
+              future: PackageInfo.fromPlatform(),
+              builder: (context, AsyncSnapshot<PackageInfo> snapshot) {
+                if (!snapshot.hasData) return const SizedBox();
+                final PackageInfo info = snapshot.data!;
+                return SizedBox(
+                  width: double.infinity,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      L10nKey.settingsFooter.toText(),
+                      L10nKey.commonVersion.toText(namedArgs: {'version': '${info.version}+${info.buildNumber}'})
+                    ],
+                  ),
+                );
+              },
+            )),
+      ])
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
+    var theme = ref.watch(themeProvider);
+
+    buildVerticalLayout(Size size) {
+      final List<SettingsItemGroup> items = _buildItems(theme);
+      return Padding(
+        padding: const EdgeInsets.only(top: 10),
+        child: Center(
+          child: SizedBox(
+            width: size.width / 1.1,
+            child: Scaffold(
+                body: ListView.separated(
+              itemCount: items.length,
+              itemBuilder: (_, index) {
+                final SettingsItemGroup group = items[index];
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (group.title != null) ...[
+                      Padding(
+                        padding: const EdgeInsets.only(top: 5),
+                        child: group.title!.toText(style: theme.textTheme.titleSmall),
+                      ),
+                      const Divider()
+                    ],
+                    if (group.groupInCard)
+                      Card.outlined(child: Column(children: group.items.map((item) => item.build(context)).toList()))
+                    else
+                      Column(children: group.items.map((item) => item.build(context)).toList()),
+                  ],
+                );
+              },
+              separatorBuilder: (_, index) => const Padding(padding: EdgeInsets.symmetric(vertical: 5)),
+            )),
+          ),
+        ),
+      );
+    }
+
     return AdaptiveScaffold(
       resizeToAvoidBottomInset: false,
-      verticalBuilder: (_, __, size) => SafeArea(child: _buildVerticalLayout(size)),
-    );
-  }
-
-  Widget _buildVerticalLayout(Size size) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10),
-      child: Center(
-        child: SizedBox(
-          width: size.width / 1.1,
-          child: Scaffold(
-              body: ListView.separated(
-            itemCount: _items.length,
-            itemBuilder: (_, index) {
-              final SettingsItemGroup group = _items[index];
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (group.title != null) ...[
-                    Padding(
-                      padding: const EdgeInsets.only(top: 5),
-                      child: Text(group.title!, style: ref.textTheme.titleSmall),
-                    ),
-                    const Divider()
-                  ],
-                  if (group.groupInCard)
-                    Card.outlined(child: Column(children: group.items.map((item) => item.child).toList()))
-                  else
-                    Column(children: group.items.map((item) => item.child).toList()),
-                ],
-              );
-            },
-            separatorBuilder: (_, index) => const Padding(padding: EdgeInsets.symmetric(vertical: 5)),
-          )),
-        ),
-      ),
+      verticalBuilder: (_, __, size) => SafeArea(child: buildVerticalLayout(size)),
     );
   }
 }

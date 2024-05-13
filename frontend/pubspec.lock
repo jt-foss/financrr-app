@@ -754,8 +754,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "feature/user-registration"
-      resolved-ref: "6f07dfb29d687f12bd674458d2f656e9966968bf"
+      ref: development
+      resolved-ref: ffc8b4e7b53a903ea3cfebda140901116fb3665c
       url: "https://github.com/financrr/restrr.git"
     source: git
     version: "0.10.0"

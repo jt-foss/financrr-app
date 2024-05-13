@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:financrr_frontend/modules/auth/providers/authentication.provider.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -12,6 +13,7 @@ import '../../../routing/page_path.dart';
 import '../../../shared/ui/async_wrapper.dart';
 import '../../../shared/ui/account_card.dart';
 import '../../../utils/form_fields.dart';
+import '../../settings/providers/theme.provider.dart';
 import 'account_page.dart';
 
 class AccountEditPage extends StatefulHookConsumerWidget {
@@ -72,70 +74,67 @@ class AccountEditPageState extends ConsumerState<AccountEditPage> {
 
   @override
   Widget build(BuildContext context) {
+    var theme = ref.watch(themeProvider);
+
+    buildVerticalLayout(Account account, Size size) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 10, bottom: 20),
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: SizedBox(
+            width: size.width / 1.1,
+            child: SingleChildScrollView(
+                child: Form(
+              key: _formKey,
+              onChanged: () => setState(() => _isValid = _formKey.currentState?.validate() ?? false),
+              child: Column(
+                children: [
+                  AccountCard.fromData(
+                    id: 0,
+                    name: _nameController.text,
+                    iban: _ibanController.text,
+                    description: _descriptionController.text,
+                    balance: int.tryParse(_originalBalanceController.text) ?? 0,
+                    currency: _currency ?? _api.getCurrencies().first,
+                  ),
+                  const Divider(),
+                  ...FormFields.account(ref, theme,
+                      api: _api,
+                      nameController: _nameController,
+                      descriptionController: _descriptionController,
+                      ibanController: _ibanController,
+                      originalBalanceController: _originalBalanceController,
+                      onCurrencyChanged: (currency) => _currency = currency!,
+                      initialCurrency: _currency),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: _isValid ? () => _editAccount(account) : null,
+                      child: _nameController.text.isEmpty
+                          ? L10nKey.accountEdit.toText()
+                          : L10nKey.commonEditObject.toText(namedArgs: {'object': _nameController.text}),
+                    ),
+                  ),
+                ],
+              ),
+            )),
+          ),
+        ),
+      );
+    }
+
+    handleAccountStream(Size size) {
+      return StreamWrapper(
+          stream: _accountStreamController.stream,
+          onSuccess: (_, snap) => buildVerticalLayout(snap.data!, size),
+          onLoading: (_, __) => const Center(child: CircularProgressIndicator()),
+          onError: (_, __) => L10nKey.accountNotFound.toText());
+    }
+
     return AdaptiveScaffold(
       resizeToAvoidBottomInset: false,
-      verticalBuilder: (_, __, size) => SafeArea(child: _handleAccountStream(size)),
-    );
-  }
-
-  Widget _handleAccountStream(Size size) {
-    return StreamWrapper(
-      stream: _accountStreamController.stream,
-      onSuccess: (ctx, snap) {
-        return _buildVerticalLayout(snap.data!, size);
-      },
-      onLoading: (ctx, snap) {
-        return const Center(child: CircularProgressIndicator());
-      },
-      onError: (ctx, snap) {
-        return const Text('Could not find account');
-      },
-    );
-  }
-
-  Widget _buildVerticalLayout(Account account, Size size) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10, bottom: 20),
-      child: Align(
-        alignment: Alignment.topCenter,
-        child: SizedBox(
-          width: size.width / 1.1,
-          child: SingleChildScrollView(
-              child: Form(
-            key: _formKey,
-            onChanged: () => setState(() => _isValid = _formKey.currentState?.validate() ?? false),
-            child: Column(
-              children: [
-                AccountCard.fromData(
-                  id: 0,
-                  name: _nameController.text,
-                  iban: _ibanController.text,
-                  description: _descriptionController.text,
-                  balance: int.tryParse(_originalBalanceController.text) ?? 0,
-                  currency: _currency ?? _api.getCurrencies().first,
-                ),
-                const Divider(),
-                ...FormFields.account(ref,
-                    api: _api,
-                    nameController: _nameController,
-                    descriptionController: _descriptionController,
-                    ibanController: _ibanController,
-                    originalBalanceController: _originalBalanceController,
-                    onCurrencyChanged: (currency) => _currency = currency!,
-                    initialCurrency: _currency),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _isValid ? () => _editAccount(account) : null,
-                    child: Text(_nameController.text.isEmpty ? 'Edit Account' : 'Edit "${_nameController.text}"'),
-                  ),
-                ),
-              ],
-            ),
-          )),
-        ),
-      ),
+      verticalBuilder: (_, __, size) => SafeArea(child: handleAccountStream(size)),
     );
   }
 
@@ -150,7 +149,7 @@ class AccountEditPageState extends ConsumerState<AccountEditPage> {
         currencyId: _currency!.id.value,
       );
       if (!mounted) return;
-      context.showSnackBar('Successfully edited "${_nameController.text}"');
+      L10nKey.commonEditObjectSuccess.showSnack(context, namedArgs: {'object': _nameController.text});
       context.pop();
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);

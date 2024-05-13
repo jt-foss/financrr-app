@@ -3,6 +3,9 @@
 .gradle/
 build/
 
+# Weblate
+.weblate
+
 # Local configuration file (sdk path, etc)
 local.properties
 

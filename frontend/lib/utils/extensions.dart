@@ -4,6 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:restrr/restrr.dart';
 
+extension LocaleExtension on Locale {
+  String getLocaleName() {
+    return switch (languageCode) { 'en' => 'English', 'de' => 'Deutsch', _ => 'Unknown' };
+  }
+}
+
 extension LayoutExtension on BuildContext {
   bool get isMobile => MediaQuery.of(this).size.width < 550;
   bool get isWidescreen => MediaQuery.of(this).size.width >= 1100;
@@ -14,8 +20,7 @@ extension ThemeExtension on BuildContext {
 
   bool get darkMode => Theme.of(this).brightness == Brightness.dark;
 
-  SystemUiOverlayStyle get effectiveSystemUiOverlayStyle =>
-      lightMode ? SystemUiOverlayStyle.dark : SystemUiOverlayStyle.light;
+  SystemUiOverlayStyle get effectiveSystemUiOverlayStyle => lightMode ? SystemUiOverlayStyle.dark : SystemUiOverlayStyle.light;
 }
 
 extension SnackBarExtension on BuildContext {

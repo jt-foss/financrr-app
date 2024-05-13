@@ -1,5 +1,6 @@
 import 'package:financrr_frontend/modules/auth/providers/authentication.provider.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
@@ -50,12 +51,13 @@ class _SessionSettingsPageState extends ConsumerState<SessionSettingsPage> {
                   children: [
                     TextButton.icon(
                       onPressed: () => _deleteAllSessions(),
-                      label: const Text('Delete all'),
+                      label: L10nKey.commonDeleteAll.toText(),
                       icon: const Icon(Icons.delete_sweep_rounded),
                     ),
                     ValueListenableBuilder(
                         valueListenable: _amount,
                         builder: (context, value, child) {
+                          // TODO: add plurals
                           return Text('${_amount.value} session(s)');
                         })
                   ],
@@ -63,8 +65,7 @@ class _SessionSettingsPageState extends ConsumerState<SessionSettingsPage> {
                 const Divider(),
                 PaginatedWrapper(
                   key: _paginatedSessionKey,
-                  initialPageFunction: (forceRetrieve) =>
-                      _api.retrieveAllSessions(limit: 10, forceRetrieve: forceRetrieve),
+                  initialPageFunction: (forceRetrieve) => _api.retrieveAllSessions(limit: 10, forceRetrieve: forceRetrieve),
                   onError: (context, snap) {
                     if (snap.error is ServerException) {
                       CommonActions.logOut(this, ref);
@@ -87,7 +88,7 @@ class _SessionSettingsPageState extends ConsumerState<SessionSettingsPage> {
                         if (sessions.nextPage != null)
                           TextButton(
                             onPressed: () => sessions.nextPage!(_api),
-                            child: const Text('Load more'),
+                            child: L10nKey.commonLoadMore.toText(),
                           ),
                       ],
                     );
@@ -105,7 +106,8 @@ class _SessionSettingsPageState extends ConsumerState<SessionSettingsPage> {
     try {
       await session.delete();
       if (!mounted) return;
-      context.showSnackBar('Successfully deleted "${session.name ?? 'Session ${session.id.value}'}"');
+      L10nKey.commonDeleteObjectSuccess
+          .showSnack(context, namedArgs: {'object': session.name ?? 'Session ${session.id.value}'});
       if (session.id.value == _api.session.id.value) {
         CommonActions.logOut(this, ref);
       }
@@ -118,7 +120,7 @@ class _SessionSettingsPageState extends ConsumerState<SessionSettingsPage> {
     try {
       await _api.deleteAllSessions();
       if (!mounted) return;
-      context.showSnackBar('Successfully deleted all Sessions!');
+      L10nKey.sessionDeleteAllSuccess.showSnack(context);
       CommonActions.logOut(this, ref);
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);

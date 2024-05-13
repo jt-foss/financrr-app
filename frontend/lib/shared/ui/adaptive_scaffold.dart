@@ -54,8 +54,7 @@ class AdaptiveScaffoldState extends State<AdaptiveScaffold> {
             return Center(
                 child: AspectRatio(
                     aspectRatio: 9 / 12,
-                    child:
-                        widget.verticalBuilder.call(context, constraints, Size(size.height / (12 / 9), size.height))));
+                    child: widget.verticalBuilder.call(context, constraints, Size(size.height / (12 / 9), size.height))));
           };
     }
     return layout.call(context, constraints, MediaQuery.of(context).size);

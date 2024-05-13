@@ -36,7 +36,7 @@ dependencies:
   restrr:
     git:
       url: https://github.com/financrr/restrr.git
-      ref: feature/user-registration
+      ref: development
   # L10n
   intl: ^0.18.1
   easy_localization: ^3.0.6

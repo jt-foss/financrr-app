@@ -1,4 +1,5 @@
 import 'package:financrr_frontend/utils/extensions.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -8,65 +9,20 @@ class ScaffoldNavBarShell extends StatefulWidget {
 
   const ScaffoldNavBarShell({super.key, required this.navigationShell});
 
-  static ScaffoldNavBarShellState? maybeOf(BuildContext context) =>
-      context.findAncestorStateOfType<ScaffoldNavBarShellState>();
+  static ScaffoldNavBarShellState? maybeOf(BuildContext context) => context.findAncestorStateOfType<ScaffoldNavBarShellState>();
 
   @override
   State<StatefulWidget> createState() => ScaffoldNavBarShellState();
 }
 
 class ScaffoldNavBarShellState extends State<ScaffoldNavBarShell> {
-  static const List<NavigationDestination> _navBarDestinations = [
-    NavigationDestination(
-      icon: Icon(Icons.dashboard_outlined),
-      selectedIcon: Icon(Icons.dashboard_rounded),
-      label: 'Dashboard',
-    ),
-    NavigationDestination(
-      icon: Icon(Icons.account_balance_wallet_outlined),
-      selectedIcon: Icon(Icons.account_balance_wallet_rounded),
-      label: 'Accounts',
-    ),
-    NavigationDestination(
-      icon: Icon(Icons.leaderboard_outlined),
-      selectedIcon: Icon(Icons.leaderboard_rounded),
-      label: 'Statistics',
-    ),
-    NavigationDestination(
-      icon: Icon(Icons.settings_outlined),
-      selectedIcon: Icon(Icons.settings_rounded),
-      label: 'Settings',
-    ),
-  ];
-
-  static const List<NavigationRailDestination> _navRailDestinations = [
-    NavigationRailDestination(
-      icon: Icon(Icons.dashboard_outlined),
-      selectedIcon: Icon(Icons.dashboard_rounded),
-      label: Text('Dashboard'),
-    ),
-    NavigationRailDestination(
-      icon: Icon(Icons.account_balance_wallet_outlined),
-      selectedIcon: Icon(Icons.account_balance_wallet_rounded),
-      label: Text('Accounts'),
-    ),
-    NavigationRailDestination(
-      icon: Icon(Icons.leaderboard_outlined),
-      selectedIcon: Icon(Icons.leaderboard_rounded),
-      label: Text('Statistics'),
-    ),
-    NavigationRailDestination(
-      icon: Icon(Icons.settings_outlined),
-      selectedIcon: Icon(Icons.settings_rounded),
-      label: Text('Settings'),
-    ),
-  ];
-
   bool _isHovered = false;
+
+  void refresh() => setState(() {});
 
   @override
   Widget build(BuildContext context) {
-    final isMobile = context.isMobile;
+    final bool isMobile = context.isMobile;
     final Widget shell = kIsWeb ? SelectionArea(child: widget.navigationShell) : widget.navigationShell;
     return Scaffold(
       body: SafeArea(
@@ -80,7 +36,7 @@ class ScaffoldNavBarShellState extends State<ScaffoldNavBarShell> {
                       onEnter: (event) => setState(() => _isHovered = true),
                       onExit: (event) => setState(() => _isHovered = false),
                       child: NavigationRail(
-                          destinations: _navRailDestinations,
+                          destinations: getNavRailDestinations(),
                           extended: context.isWidescreen || _isHovered,
                           onDestinationSelected: (index) => goToBranch(index),
                           selectedIndex: widget.navigationShell.currentIndex),
@@ -95,7 +51,7 @@ class ScaffoldNavBarShellState extends State<ScaffoldNavBarShell> {
       appBar: AppBar(
         title: GestureDetector(
           onTap: () => resetLocation(index: 0),
-          child: const Text('financrr'),
+          child: L10nKey.brandName.toText(),
         ),
         centerTitle: isMobile,
         leading: canPop()
@@ -109,10 +65,54 @@ class ScaffoldNavBarShellState extends State<ScaffoldNavBarShell> {
           ? NavigationBar(
               onDestinationSelected: (index) => goToBranch(index),
               selectedIndex: widget.navigationShell.currentIndex,
-              destinations: _navBarDestinations)
+              destinations: getNavBarDestinations())
           : null,
     );
   }
+
+  List<NavigationDestination> getNavBarDestinations() => [
+        NavigationDestination(
+          icon: const Icon(Icons.dashboard_outlined),
+          selectedIcon: const Icon(Icons.dashboard_rounded),
+          label: L10nKey.navigationDashboard.toString(),
+        ),
+        NavigationDestination(
+          icon: const Icon(Icons.account_balance_wallet_outlined),
+          selectedIcon: const Icon(Icons.account_balance_wallet_rounded),
+          label: L10nKey.navigationAccounts.toString(),
+        ),
+        NavigationDestination(
+            icon: const Icon(Icons.leaderboard_outlined),
+            selectedIcon: const Icon(Icons.leaderboard_rounded),
+            label: L10nKey.navigationStatistics.toString()),
+        NavigationDestination(
+            icon: const Icon(Icons.settings_outlined),
+            selectedIcon: const Icon(Icons.settings_rounded),
+            label: L10nKey.navigationSettings.toString()),
+      ];
+
+  List<NavigationRailDestination> getNavRailDestinations() => [
+        NavigationRailDestination(
+          icon: const Icon(Icons.dashboard_outlined),
+          selectedIcon: const Icon(Icons.dashboard_rounded),
+          label: L10nKey.navigationDashboard.toText(),
+        ),
+        NavigationRailDestination(
+          icon: const Icon(Icons.account_balance_wallet_outlined),
+          selectedIcon: const Icon(Icons.account_balance_wallet_rounded),
+          label: L10nKey.navigationAccounts.toText(),
+        ),
+        NavigationRailDestination(
+          icon: const Icon(Icons.leaderboard_outlined),
+          selectedIcon: const Icon(Icons.leaderboard_rounded),
+          label: L10nKey.navigationStatistics.toText(),
+        ),
+        NavigationRailDestination(
+          icon: const Icon(Icons.settings_outlined),
+          selectedIcon: const Icon(Icons.settings_rounded),
+          label: L10nKey.navigationSettings.toText(),
+        ),
+      ];
 
   bool canPop() {
     final GoRouterState state = GoRouterState.of(context);
