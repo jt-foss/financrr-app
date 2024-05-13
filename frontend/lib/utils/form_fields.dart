@@ -1,10 +1,10 @@
-import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
-import 'package:financrr_frontend/utils/text_utils.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
+import '../modules/settings/models/theme.state.dart';
 import '../shared/models/store.dart';
 import 'input_utils.dart';
 
@@ -13,7 +13,7 @@ import 'input_utils.dart';
 class FormFields {
   const FormFields._();
 
-  static List<Widget> transaction(ConsumerState state,
+  static List<Widget> transaction(ConsumerState state, ThemeState theme,
       {required Account currentAccount,
       required TextEditingController nameController,
       required TextEditingController amountController,
@@ -31,10 +31,10 @@ class FormFields {
           width: double.infinity,
           child: SegmentedButton(
             onSelectionChanged: onSelectionChanged,
-            segments: const [
-              ButtonSegment(label: Text('Deposit'), value: TransactionType.deposit),
-              ButtonSegment(label: Text('Withdrawal'), value: TransactionType.withdrawal),
-              ButtonSegment(label: Text('Transfer'), value: TransactionType.transfer),
+            segments: [
+              ButtonSegment(label: L10nKey.transactionCreateDeposit.toText(), value: TransactionType.deposit),
+              ButtonSegment(label: L10nKey.transactionCreateWithdrawal.toText(), value: TransactionType.withdrawal),
+              ButtonSegment(label: L10nKey.transactionCreateTransfer.toText(), value: TransactionType.transfer),
             ],
             selected: {selectedType},
           ),
@@ -44,15 +44,16 @@ class FormFields {
         Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: DropdownButtonFormField(
-              decoration: const InputDecoration(labelText: 'Transfer To'),
-              validator: (value) => InputValidators.nonNull('Transfer To', value?.id.value.toString()),
+              decoration: InputDecoration(labelText: L10nKey.transactionCreateTransferTo.toString()),
+              validator: (value) =>
+                  InputValidators.nonNull(L10nKey.transactionCreateTransferTo.toString(), value?.id.value.toString()),
               items: currentAccount.api
                   .getAccounts()
                   .where((account) => account.id.value != currentAccount.id.value)
                   .map((account) {
                 return DropdownMenuItem(
                   value: account,
-                  child: Text(account.name, style: state.ref.textTheme.bodyMedium),
+                  child: Text(account.name, style: theme.textTheme.bodyMedium),
                 );
               }).toList(),
               onChanged: onSecondaryChanged,
@@ -61,8 +62,8 @@ class FormFields {
         padding: const EdgeInsets.symmetric(vertical: 10),
         child: TextFormField(
           controller: amountController,
-          decoration: const InputDecoration(labelText: 'Amount'),
-          validator: (value) => InputValidators.nonNull('Amount', value),
+          decoration: InputDecoration(labelText: L10nKey.transactionPropertiesAmount.toString()),
+          validator: (value) => InputValidators.nonNull(L10nKey.transactionPropertiesAmount.toString(), value),
           inputFormatters: [
             FilteringTextInputFormatter.digitsOnly,
             LengthLimitingTextInputFormatter(6),
@@ -73,8 +74,8 @@ class FormFields {
         padding: const EdgeInsets.only(bottom: 10),
         child: TextFormField(
           controller: nameController,
-          decoration: const InputDecoration(labelText: 'Name'),
-          validator: (value) => InputValidators.nonNull('Name', value),
+          decoration: InputDecoration(labelText: L10nKey.transactionPropertiesName.toString()),
+          validator: (value) => InputValidators.nonNull(L10nKey.transactionPropertiesName.toString(), value),
           inputFormatters: [
             LengthLimitingTextInputFormatter(32),
           ],
@@ -84,7 +85,7 @@ class FormFields {
         padding: const EdgeInsets.only(bottom: 10),
         child: TextFormField(
           controller: descriptionController,
-          decoration: const InputDecoration(labelText: 'Description'),
+          decoration: InputDecoration(labelText: L10nKey.transactionPropertiesDescription.toString()),
           inputFormatters: [
             LengthLimitingTextInputFormatter(32),
           ],
@@ -101,20 +102,19 @@ class FormFields {
             );
             if (date == null || !state.mounted) return;
             final TimeOfDay? time = await showTimePicker(
-                context: state.context,
-                initialTime: executedAt != null ? TimeOfDay.fromDateTime(executedAt) : TimeOfDay.now());
+                context: state.context, initialTime: executedAt != null ? TimeOfDay.fromDateTime(executedAt) : TimeOfDay.now());
             if (time == null) return;
             onExecutedAtChanged?.call(date.copyWith(hour: time.hour, minute: time.minute));
           },
           initialValue: StoreKey.dateTimeFormat.readSync()!.format(executedAt ?? DateTime.now()),
           readOnly: true,
-          decoration: const InputDecoration(labelText: 'Executed At'),
+          decoration: InputDecoration(labelText: L10nKey.transactionPropertiesExecutedAt.toString()),
         ),
       )
     ];
   }
 
-  static List<Widget> account(WidgetRef ref,
+  static List<Widget> account(WidgetRef ref, ThemeState theme,
       {required Restrr api,
       required TextEditingController nameController,
       required TextEditingController descriptionController,
@@ -127,8 +127,8 @@ class FormFields {
         padding: const EdgeInsets.symmetric(vertical: 10),
         child: TextFormField(
           controller: nameController,
-          decoration: const InputDecoration(labelText: 'Name'),
-          validator: (value) => InputValidators.nonNull('Name', value),
+          decoration: InputDecoration(labelText: L10nKey.accountPropertiesName.toString()),
+          validator: (value) => InputValidators.nonNull(L10nKey.accountPropertiesName.toString(), value),
           inputFormatters: [
             LengthLimitingTextInputFormatter(32),
           ],
@@ -138,7 +138,7 @@ class FormFields {
         padding: const EdgeInsets.only(bottom: 10),
         child: TextFormField(
           controller: descriptionController,
-          decoration: const InputDecoration(labelText: 'Description'),
+          decoration: InputDecoration(labelText: L10nKey.accountPropertiesDescription.toString()),
           inputFormatters: [
             LengthLimitingTextInputFormatter(64),
           ],
@@ -148,9 +148,8 @@ class FormFields {
         padding: const EdgeInsets.only(bottom: 10),
         child: TextFormField(
           controller: ibanController,
-          decoration: const InputDecoration(labelText: 'IBAN'),
-          validator: (value) =>
-              value == null || value.trim().isEmpty || TextUtils.formatIBAN(value) != null ? null : 'Invalid IBAN',
+          decoration: InputDecoration(labelText: L10nKey.accountPropertiesIban.toString()),
+          validator: (value) => InputValidators.iban(value),
           inputFormatters: [
             FilteringTextInputFormatter.deny(RegExp(r'\s')),
             LengthLimitingTextInputFormatter(22),
@@ -161,8 +160,8 @@ class FormFields {
         padding: const EdgeInsets.only(bottom: 10),
         child: TextFormField(
           controller: originalBalanceController,
-          decoration: const InputDecoration(labelText: 'Original Balance'),
-          validator: (value) => InputValidators.nonNull('Original Balance', value),
+          decoration: InputDecoration(labelText: L10nKey.accountPropertiesOriginalBalance.toString()),
+          validator: (value) => InputValidators.nonNull(L10nKey.accountPropertiesOriginalBalance.toString(), value),
           inputFormatters: [
             FilteringTextInputFormatter.digitsOnly,
           ],
@@ -171,13 +170,14 @@ class FormFields {
       Padding(
         padding: const EdgeInsets.only(bottom: 10),
         child: DropdownButtonFormField(
-            decoration: const InputDecoration(labelText: 'Currency'),
-            validator: (value) => InputValidators.nonNull('Currency', value?.id.value.toString()),
+            decoration: InputDecoration(labelText: L10nKey.accountPropertiesCurrency.toString()),
+            validator: (value) =>
+                InputValidators.nonNull(L10nKey.accountPropertiesCurrency.toString(), value?.id.value.toString()),
             value: initialCurrency,
             items: api.getCurrencies().map((currency) {
               return DropdownMenuItem(
                 value: currency,
-                child: Text('${currency.name} (${currency.symbol})', style: ref.textTheme.bodyMedium),
+                child: Text('${currency.name} (${currency.symbol})', style: theme.textTheme.bodyMedium),
               );
             }).toList(),
             onChanged: onCurrencyChanged),
@@ -197,8 +197,8 @@ class FormFields {
         child: TextFormField(
           controller: nameController,
           readOnly: readOnly,
-          decoration: const InputDecoration(labelText: 'Name'),
-          validator: (value) => InputValidators.nonNull('Name', value),
+          decoration: InputDecoration(labelText: L10nKey.currencyPropertiesName.toString()),
+          validator: (value) => InputValidators.nonNull(L10nKey.currencyPropertiesName.toString(), value),
           inputFormatters: [
             LengthLimitingTextInputFormatter(32),
           ],
@@ -209,8 +209,8 @@ class FormFields {
         child: TextFormField(
           controller: symbolController,
           readOnly: readOnly,
-          decoration: const InputDecoration(labelText: 'Symbol'),
-          validator: (value) => InputValidators.nonNull('Symbol', value),
+          decoration: InputDecoration(labelText: L10nKey.currencyPropertiesSymbol.toString()),
+          validator: (value) => InputValidators.nonNull(L10nKey.currencyPropertiesSymbol.toString(), value),
           inputFormatters: [
             LengthLimitingTextInputFormatter(6),
           ],
@@ -221,7 +221,7 @@ class FormFields {
         child: TextFormField(
           controller: isoCodeController,
           readOnly: readOnly,
-          decoration: const InputDecoration(labelText: 'ISO Code'),
+          decoration: InputDecoration(labelText: L10nKey.currencyPropertiesIsoCode.toString()),
           inputFormatters: [
             LengthLimitingTextInputFormatter(3),
           ],
@@ -232,8 +232,8 @@ class FormFields {
         child: TextFormField(
           controller: decimalPlacesController,
           readOnly: readOnly,
-          decoration: const InputDecoration(labelText: 'Decimal Places'),
-          validator: (value) => InputValidators.nonNull('Decimal Places', value),
+          decoration: InputDecoration(labelText: L10nKey.currencyPropertiesDecimalPlaces.toString()),
+          validator: (value) => InputValidators.nonNull(L10nKey.currencyPropertiesDecimalPlaces.toString(), value),
           inputFormatters: [
             FilteringTextInputFormatter.digitsOnly,
             LengthLimitingTextInputFormatter(1),

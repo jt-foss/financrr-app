@@ -1,9 +1,10 @@
 import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
-import '../models/store.dart';
+import '../../modules/settings/providers/l10n.provider.dart';
 
 class SessionCard extends ConsumerWidget {
   final Id id;
@@ -33,6 +34,9 @@ class SessionCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    var theme = ref.watch(themeProvider);
+    var l10n = ref.watch(l10nProvider);
+
     return Card.outlined(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -44,8 +48,9 @@ class SessionCard extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(name ?? '${isCurrent ? 'Current' : 'Unnamed'} Session', style: ref.textTheme.titleSmall),
-                  Text('${StoreKey.dateTimeFormat.readSync()!.format(createdAt)} ($id)'),
+                  Text(name ?? (isCurrent ? L10nKey.sessionCurrent : L10nKey.sessionUnnamed).toString(),
+                      style: theme.textTheme.titleSmall),
+                  Text('${l10n.dateFormat.format(createdAt)} ($id)'),
                 ],
               ),
             ),

@@ -20,12 +20,10 @@ class Guards {
     return null;
   }
 
-  FutureOr<String?> redirectPath(ProviderRef<Object?> ref, GoRouterState state) async =>
-      (await redirect(ref, state))?.path;
+  FutureOr<String?> redirectPath(ProviderRef<Object?> ref, GoRouterState state) async => (await redirect(ref, state))?.path;
 }
 
 abstract class Guard {
   FutureOr<PagePathBuilder?> redirect(ProviderRef<Object?> ref, GoRouterState state);
-  FutureOr<String?> redirectPath(ProviderRef<Object?> ref, GoRouterState state) async =>
-      (await redirect(ref, state))?.path;
+  FutureOr<String?> redirectPath(ProviderRef<Object?> ref, GoRouterState state) async => (await redirect(ref, state))?.path;
 }

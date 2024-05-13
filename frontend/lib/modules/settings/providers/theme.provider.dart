@@ -7,14 +7,6 @@ import '../models/theme.state.dart';
 
 final StateNotifierProvider<ThemeNotifier, ThemeState> themeProvider = StateNotifierProvider((_) => ThemeNotifier());
 
-extension ConsumerStateThemeExtension on WidgetRef {
-  AppTheme get currentTheme => read(themeProvider).getActive();
-
-  ThemeData get themeData => currentTheme.themeData;
-  TextTheme get textTheme => themeData.textTheme;
-  ColorScheme get colorScheme => themeData.colorScheme;
-}
-
 class ThemeNotifier extends StateNotifier<ThemeState> {
   ThemeNotifier() : super(ThemeState.initial());
 

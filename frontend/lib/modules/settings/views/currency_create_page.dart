@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:financrr_frontend/modules/auth/providers/authentication.provider.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -31,7 +32,7 @@ class CurrencyCreatePage extends StatefulHookConsumerWidget {
     return [
       Card.outlined(
         child: ListTile(
-          leading: const Text('Preview'),
+          leading: L10nKey.commonPreview.toText(),
           title: Text('${previewAmount.toStringAsFixed(int.tryParse(decimalPlaces) ?? 0)} $symbol'),
         ),
       ),
@@ -87,7 +88,7 @@ class _CurrencyCreatePageState extends ConsumerState<CurrencyCreatePage> {
   Widget build(BuildContext context) {
     return AdaptiveScaffold(
       resizeToAvoidBottomInset: false,
-      verticalBuilder: (_, __, size) => SafeArea(child: _buildVerticalLayout(size)),
+      verticalBuilder: (_, __, size) => _buildVerticalLayout(size),
     );
   }
 
@@ -122,7 +123,9 @@ class _CurrencyCreatePageState extends ConsumerState<CurrencyCreatePage> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: _isValid ? () => _createCurrency() : null,
-                    child: Text(_nameController.text.isEmpty ? 'Create Currency' : 'Create "${_nameController.text}"'),
+                    child: _nameController.text.isEmpty
+                        ? L10nKey.currencyCreate.toText()
+                        : L10nKey.commonCreateObject.toText(namedArgs: {'object': _nameController.text}),
                   ),
                 ),
               ],
@@ -143,7 +146,7 @@ class _CurrencyCreatePageState extends ConsumerState<CurrencyCreatePage> {
         isoCode: _isoCodeController.text.isEmpty ? null : _isoCodeController.text,
       );
       if (!mounted) return;
-      context.showSnackBar('Successfully created "${_nameController.text}"');
+      L10nKey.commonCreateObjectSuccess.showSnack(context, namedArgs: {'object': _nameController.text});
       context.pop();
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);
