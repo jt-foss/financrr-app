@@ -9,26 +9,25 @@ class AppTheme {
 
   final String id;
   final String logoPath;
-  final L10nKey translationKey;
+  final L10nKey? translationKey;
+  final String? fallbackName;
   final Color previewColor;
   final ThemeMode themeMode;
   final ThemeData themeData;
 
-  final AppColorsTheme colors;
-  final AppTextTheme text;
-
   const AppTheme(
       {required this.id,
       required this.logoPath,
-      required this.translationKey,
+      this.translationKey,
+      this.fallbackName,
       required this.previewColor,
       required this.themeMode,
-      required this.themeData,
-      required this.colors,
-      required this.text});
+      required this.themeData});
+
+  String get effectiveName => translationKey?.toString() ?? fallbackName ?? id;
 
   static AppTheme? tryFromJson(Map<String, dynamic> json) {
-    final AppColor? previewColor = AppColor.tryFromJson(json['preview_color']);
+    final AppThemeColor? previewColor = AppThemeColor.tryFromJson(json['preview_color']);
     final ThemeMode? themeMode = JsonUtils.tryEnum(json['theme_mode'], ThemeMode.values);
     if (JsonUtils.isInvalidType(json, 'id', String) ||
         JsonUtils.isInvalidType(json, 'logo_path', String) ||
@@ -40,34 +39,25 @@ class AppTheme {
       return null;
     }
     final L10nKey? translationKey = L10nKey.fromKey(json['translation_key']!);
-    if (translationKey == null) {
+    if (translationKey == null && json['fallback_name'] == null) {
       throw StateError('Either translation_key or fallback_name must be set!');
-    }
-    final AppColorsTheme? colors = AppColorsTheme.tryFromJson(json['colors']);
-    if (colors == null) {
-      throw StateError('colors must be set!');
-    }
-    final AppTextTheme? text = AppTextTheme.tryFromJson(json['text'], defaultFontColor: colors.font);
-    if (text == null) {
-      throw StateError('text must be set!');
     }
     return AppTheme(
         id: json['id'],
         logoPath: json['logo_path'],
         translationKey: translationKey,
+        fallbackName: json['fallback_name'],
         previewColor: previewColor.toColor(json),
         themeMode: themeMode,
-        colors: colors,
-        text: text,
         themeData: _buildThemeDataFromJson(json, json['theme_data']));
   }
 
   static ThemeData _buildThemeDataFromJson(Map<String, dynamic> fullJson, Map<String, dynamic> json) {
     final Brightness? brightness = JsonUtils.tryEnum(json['brightness'], Brightness.values);
-    final Color? primaryColor = AppColor.tryFromJson(json['primary_color'])?.toColor(fullJson);
-    final AppColor? backgroundColor = AppColor.tryFromJson(json['background_color']);
-    final AppColor? hintColor = AppColor.tryFromJson(json['hint_color']);
-    final AppColor? cardColor = AppColor.tryFromJson(json['card_color']);
+    final Color? primaryColor = AppThemeColor.tryFromJson(json['primary_color'])?.toColor(fullJson);
+    final AppThemeColor? backgroundColor = AppThemeColor.tryFromJson(json['background_color']);
+    final AppThemeColor? hintColor = AppThemeColor.tryFromJson(json['hint_color']);
+    final AppThemeColor? cardColor = AppThemeColor.tryFromJson(json['card_color']);
     final TextTheme textTheme = _buildTextTheme(primaryColor);
     final AppBarTheme? appBarTheme = _tryAppBarThemeFromJson(fullJson, json['app_bar_theme_data']);
     final NavigationBarThemeData? navigationBarTheme =
@@ -177,9 +167,9 @@ class AppTheme {
     if (json == null) {
       return null;
     }
-    final AppColor? foregroundColor = AppColor.tryFromJson(json['foreground_color']);
-    final AppColor? titleColor = AppColor.tryFromJson(json['title_color']);
-    final AppColor? backgroundColor = AppColor.tryFromJson(json['background_color']);
+    final AppThemeColor? foregroundColor = AppThemeColor.tryFromJson(json['foreground_color']);
+    final AppThemeColor? titleColor = AppThemeColor.tryFromJson(json['title_color']);
+    final AppThemeColor? backgroundColor = AppThemeColor.tryFromJson(json['background_color']);
     if (foregroundColor == null || titleColor == null || backgroundColor == null) {
       return null;
     }
@@ -201,10 +191,10 @@ class AppTheme {
     if (json == null) {
       return null;
     }
-    final AppColor? indicatorColor = AppColor.tryFromJson(json['indicator_color']);
-    final AppColor? iconColor = AppColor.tryFromJson(json['icon_color']);
-    final AppColor? backgroundColor = AppColor.tryFromJson(json['background_color']);
-    final AppColor? labelColor = AppColor.tryFromJson(json['label_color']);
+    final AppThemeColor? indicatorColor = AppThemeColor.tryFromJson(json['indicator_color']);
+    final AppThemeColor? iconColor = AppThemeColor.tryFromJson(json['icon_color']);
+    final AppThemeColor? backgroundColor = AppThemeColor.tryFromJson(json['background_color']);
+    final AppThemeColor? labelColor = AppThemeColor.tryFromJson(json['label_color']);
     if (indicatorColor == null || iconColor == null || backgroundColor == null || labelColor == null) {
       return null;
     }
@@ -223,11 +213,11 @@ class AppTheme {
     if (json == null) {
       return null;
     }
-    final AppColor? indicatorColor = AppColor.tryFromJson(json['indicator_color']);
-    final AppColor? selectedIconColor = AppColor.tryFromJson(json['selected_icon_color']);
-    final AppColor? backgroundColor = AppColor.tryFromJson(json['background_color']);
-    final AppColor? selectedLabelColor = AppColor.tryFromJson(json['selected_label_color']);
-    final AppColor? unselectedLabelColor = AppColor.tryFromJson(json['unselected_label_color']);
+    final AppThemeColor? indicatorColor = AppThemeColor.tryFromJson(json['indicator_color']);
+    final AppThemeColor? selectedIconColor = AppThemeColor.tryFromJson(json['selected_icon_color']);
+    final AppThemeColor? backgroundColor = AppThemeColor.tryFromJson(json['background_color']);
+    final AppThemeColor? selectedLabelColor = AppThemeColor.tryFromJson(json['selected_label_color']);
+    final AppThemeColor? unselectedLabelColor = AppThemeColor.tryFromJson(json['unselected_label_color']);
     if (indicatorColor == null ||
         selectedIconColor == null ||
         backgroundColor == null ||
@@ -259,8 +249,8 @@ class AppTheme {
     if (json == null) {
       return null;
     }
-    final AppColor? foregroundColor = AppColor.tryFromJson(json['foreground_color']);
-    final AppColor? backgroundColor = AppColor.tryFromJson(json['background_color']);
+    final AppThemeColor? foregroundColor = AppThemeColor.tryFromJson(json['foreground_color']);
+    final AppThemeColor? backgroundColor = AppThemeColor.tryFromJson(json['background_color']);
     if (foregroundColor == null || backgroundColor == null) {
       return null;
     }
@@ -276,7 +266,7 @@ class AppTheme {
     if (json == null) {
       return null;
     }
-    final AppColor? foregroundColor = AppColor.tryFromJson(json['foreground_color']);
+    final AppThemeColor? foregroundColor = AppThemeColor.tryFromJson(json['foreground_color']);
     if (foregroundColor == null) {
       return null;
     }
@@ -291,7 +281,7 @@ class AppTheme {
     if (json == null) {
       return null;
     }
-    final AppColor? selectionColor = AppColor.tryFromJson(json['selection_color']);
+    final AppThemeColor? selectionColor = AppThemeColor.tryFromJson(json['selection_color']);
     if (selectionColor == null) {
       return null;
     }
@@ -304,8 +294,8 @@ class AppTheme {
     if (json == null) {
       return null;
     }
-    final AppColor? thumbColor = AppColor.tryFromJson(json['thumb_color']);
-    final AppColor? trackColor = AppColor.tryFromJson(json['track_color']);
+    final AppThemeColor? thumbColor = AppThemeColor.tryFromJson(json['thumb_color']);
+    final AppThemeColor? trackColor = AppThemeColor.tryFromJson(json['track_color']);
     if (thumbColor == null || trackColor == null) {
       return null;
     }
@@ -320,8 +310,8 @@ class AppTheme {
     if (json == null) {
       return null;
     }
-    final AppColor? contentTextColor = AppColor.tryFromJson(json['content_text_color']);
-    final AppColor? backgroundColor = AppColor.tryFromJson(json['background_color']);
+    final AppThemeColor? contentTextColor = AppThemeColor.tryFromJson(json['content_text_color']);
+    final AppThemeColor? backgroundColor = AppThemeColor.tryFromJson(json['background_color']);
     if (contentTextColor == null || backgroundColor == null) {
       return null;
     }
@@ -339,8 +329,8 @@ class AppTheme {
     if (json == null) {
       return null;
     }
-    final AppColor? backgroundColor = AppColor.tryFromJson(json['background_color']);
-    final AppColor? scrimColor = AppColor.tryFromJson(json['scrim_color']);
+    final AppThemeColor? backgroundColor = AppThemeColor.tryFromJson(json['background_color']);
+    final AppThemeColor? scrimColor = AppThemeColor.tryFromJson(json['scrim_color']);
     if (backgroundColor == null || scrimColor == null) {
       return null;
     }
@@ -351,192 +341,24 @@ class AppTheme {
   }
 }
 
-class AppColorsTheme {
-  final AppColor primary;
-  final AppColor secondary;
-  final AppColor background;
-  final AppColor backgroundTone1;
-  final AppColor backgroundTone2;
-  final AppColor backgroundTone3;
-  final AppColor font;
-
-  const AppColorsTheme(
-      {required this.primary,
-      required this.secondary,
-      required this.background,
-      required this.backgroundTone1,
-      required this.backgroundTone2,
-      required this.backgroundTone3,
-      required this.font});
-
-  static AppColorsTheme? tryFromJson(Map<String, dynamic> json) {
-    final AppColor? primary = AppColor.tryFromJson(json['primary']);
-    final AppColor? secondary = AppColor.tryFromJson(json['secondary']);
-    final AppColor? background = AppColor.tryFromJson(json['background']);
-    final AppColor? backgroundTone1 = AppColor.tryFromJson(json['background_tone_1']);
-    final AppColor? backgroundTone2 = AppColor.tryFromJson(json['background_tone_2']);
-    final AppColor? backgroundTone3 = AppColor.tryFromJson(json['background_tone_3']);
-    final AppColor? font = AppColor.tryFromJson(json['font']);
-    if (primary == null ||
-        secondary == null ||
-        background == null ||
-        backgroundTone1 == null ||
-        backgroundTone2 == null ||
-        backgroundTone3 == null ||
-        font == null) {
-      return null;
-    }
-    return AppColorsTheme(
-      primary: primary,
-      secondary: secondary,
-      background: background,
-      backgroundTone1: backgroundTone1,
-      backgroundTone2: backgroundTone2,
-      backgroundTone3: backgroundTone3,
-      font: font,
-    );
-  }
-}
-
-class AppTextTheme {
-  final String defaultFontFamily;
-  final List<String> defaultFontFamilyFallback;
-
-  final AppText displayLarge;
-  final AppText displayMedium;
-  final AppText displaySmall;
-  final AppText titleLarge;
-  final AppText titleMedium;
-  final AppText titleSmall;
-  final AppText bodyLarge;
-  final AppText bodyMedium;
-  final AppText bodySmall;
-  final AppText labelLarge;
-  final AppText labelMedium;
-  final AppText labelSmall;
-
-  const AppTextTheme(
-      {required this.defaultFontFamily,
-      required this.defaultFontFamilyFallback,
-      required this.displayLarge,
-      required this.displayMedium,
-      required this.displaySmall,
-      required this.titleLarge,
-      required this.titleMedium,
-      required this.titleSmall,
-      required this.bodyLarge,
-      required this.bodyMedium,
-      required this.bodySmall,
-      required this.labelLarge,
-      required this.labelMedium,
-      required this.labelSmall});
-
-  static AppTextTheme? tryFromJson(Map<String, dynamic> json, {AppColor? defaultFontColor}) {
-    if (JsonUtils.isInvalidType(json, 'default_font_family', String, nullable: true) ||
-        JsonUtils.isInvalidType(json, 'default_font_family_fallback', List, nullable: true)) {
-      return null;
-    }
-    final String? defaultFontFamily = json['default_font_family'];
-    final List<String>? defaultFontFamilyFallback = json['default_font_family_fallback'];
-
-    AppText? tryAppTextFromJson(String name) {
-      return AppText.tryFromJson(json[name],
-          defaultColor: defaultFontColor,
-          defaultFontFamily: defaultFontFamily,
-          defaultFontFamilyFallback: defaultFontFamilyFallback);
-    }
-
-    final AppText? displayLarge = tryAppTextFromJson('display_large');
-    final AppText? displayMedium = tryAppTextFromJson('display_medium');
-    final AppText? displaySmall = tryAppTextFromJson('display_small');
-    final AppText? titleLarge = tryAppTextFromJson('title_large');
-    final AppText? titleMedium = tryAppTextFromJson('title_medium');
-    final AppText? titleSmall = tryAppTextFromJson('title_small');
-    final AppText? bodyLarge = tryAppTextFromJson('body_large');
-    final AppText? bodyMedium = tryAppTextFromJson('body_medium');
-    final AppText? bodySmall = tryAppTextFromJson('body_small');
-    final AppText? labelLarge = tryAppTextFromJson('label_large');
-    final AppText? labelMedium = tryAppTextFromJson('label_medium');
-    final AppText? labelSmall = tryAppTextFromJson('label_small');
-    if (displayLarge == null ||
-        displayMedium == null ||
-        displaySmall == null ||
-        titleLarge == null ||
-        titleMedium == null ||
-        titleSmall == null ||
-        bodyLarge == null ||
-        bodyMedium == null ||
-        bodySmall == null ||
-        labelLarge == null ||
-        labelMedium == null ||
-        labelSmall == null) {
-      return null;
-    }
-    return AppTextTheme(
-      defaultFontFamily: defaultFontFamily ?? 'Montserrat',
-      defaultFontFamilyFallback: defaultFontFamilyFallback ?? ['Arial', 'sans-serif'],
-      displayLarge: displayLarge,
-      displayMedium: displayMedium,
-      displaySmall: displaySmall,
-      titleLarge: titleLarge,
-      titleMedium: titleMedium,
-      titleSmall: titleSmall,
-      bodyLarge: bodyLarge,
-      bodyMedium: bodyMedium,
-      bodySmall: bodySmall,
-      labelLarge: labelLarge,
-      labelMedium: labelMedium,
-      labelSmall: labelSmall,
-    );
-  }
-}
-
-class AppText {
-  final String? fontFamily;
-  final List<String>? fontFamilyFallback;
-  final double? fontSize;
-  final FontWeight? fontWeight;
-  final AppColor? color;
-
-  const AppText({this.fontFamily, this.fontFamilyFallback, this.fontSize, this.fontWeight, this.color});
-
-  static AppText? tryFromJson(Map<String, dynamic> json,
-      {AppColor? defaultColor, String? defaultFontFamily, List<String>? defaultFontFamilyFallback}) {
-    if (JsonUtils.isInvalidType(json, 'font_family', String, nullable: true) ||
-        JsonUtils.isInvalidType(json, 'font_family_fallback', List, nullable: true) ||
-        JsonUtils.isInvalidType(json, 'font_size', double, nullable: true) ||
-        JsonUtils.isInvalidType(json, 'font_weight', String, nullable: true) ||
-        JsonUtils.isInvalidType(json, 'color', String, nullable: true)) {
-      return null;
-    }
-    return AppText(
-      fontFamily: json['font_family'] ?? defaultFontFamily,
-      fontFamilyFallback: json['font_family_fallback'] ?? defaultFontFamilyFallback,
-      fontSize: json['font_size'],
-      fontWeight: json['font_weight'] == 'bold' ? FontWeight.bold : FontWeight.normal,
-      color: AppColor.tryFromJson(json['color']) ?? defaultColor,
-    );
-  }
-}
-
-class AppColor {
+class AppThemeColor {
   final String? value;
-  final AppColorOptions? options;
+  final AppThemeColorOptions? options;
 
-  const AppColor({this.value, this.options});
+  const AppThemeColor({this.value, this.options});
 
-  static AppColor? tryFromJson(dynamic json) {
+  static AppThemeColor? tryFromJson(dynamic json) {
     if (json is String) {
-      return AppColor(value: json);
+      return AppThemeColor(value: json);
     }
-    final AppColorOptions? options = AppColorOptions.tryFromJson(json);
+    final AppThemeColorOptions? options = AppThemeColorOptions.tryFromJson(json);
     if (options == null) {
       return null;
     }
     if ((options.hex == null && options.copyFromPath == null) || (options.hex != null && options.copyFromPath != null)) {
       throw StateError('Either hex or copy_from_path must be set!');
     }
-    return AppColor(options: options);
+    return AppThemeColor(options: options);
   }
 
   Color toColor(Map<String, dynamic> json) {
@@ -544,7 +366,7 @@ class AppColor {
       return _parseColor(value!);
     }
     if (options != null) {
-      final AppColorOptions colorOptions = options!;
+      final AppThemeColorOptions colorOptions = options!;
       final double opacity = colorOptions.opacity ?? 1;
       if (colorOptions.hex != null) {
         return _parseColor(colorOptions.hex!).withOpacity(opacity);
@@ -556,7 +378,7 @@ class AppColor {
         for (String split in path.split('/')) {
           if (current[split] is Map) {
             final Map<String, dynamic> newMap = current[split];
-            final AppColor? color = AppColor.tryFromJson(current[split]);
+            final AppThemeColor? color = AppThemeColor.tryFromJson(current[split]);
             if (color == null) {
               current = newMap;
             } else {
@@ -585,14 +407,14 @@ class AppColor {
   }
 }
 
-class AppColorOptions {
+class AppThemeColorOptions {
   final String? hex;
   final String? copyFromPath;
   final double? opacity;
 
-  const AppColorOptions({this.hex, this.copyFromPath, this.opacity});
+  const AppThemeColorOptions({this.hex, this.copyFromPath, this.opacity});
 
-  static AppColorOptions? tryFromJson(Map<String, dynamic> json) {
+  static AppThemeColorOptions? tryFromJson(Map<String, dynamic> json) {
     if (JsonUtils.isInvalidType(json, 'hex', String, nullable: true) ||
         JsonUtils.isInvalidType(json, 'copy_from_path', String, nullable: true) ||
         JsonUtils.isInvalidType(json, 'opacity', double, nullable: true)) {
@@ -601,6 +423,6 @@ class AppColorOptions {
     if ((json['hex'] == null && json['copy_from_path'] == null) || (json['hex'] != null && json['copy_from_path'] != null)) {
       return null;
     }
-    return AppColorOptions(hex: json['hex'], copyFromPath: json['copy_from_path'], opacity: json['opacity']);
+    return AppThemeColorOptions(hex: json['hex'], copyFromPath: json['copy_from_path'], opacity: json['opacity']);
   }
 }
