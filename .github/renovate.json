@@ -9,6 +9,10 @@
         "frontend/macos/",
         "frontend/ios/"
     ],
-    "prHourlyLimit": 0
-    "lockFileMaintenance": { "enabled": true }
+    "prHourlyLimit": 0,
+    "updateLockFiles": true,
+    "lockFileMaintenance": { 
+        "enabled": true,
+        "schedule": ["at any time"]
+    }
 }
