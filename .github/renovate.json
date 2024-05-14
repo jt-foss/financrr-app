@@ -5,6 +5,8 @@
     ],
     "rangeStrategy": "bump",
     "ignorePaths": [
-        "frontend/android/"
+        "frontend/android/",
+        "frontend/macos/",
+        "frontend/ios/"
     ]
 }
