@@ -28,11 +28,6 @@ This rule will execute the transaction every day.
 We use [croner-rust](https://github.com/hexagon/croner-rust) to parse the recurring rule.  
 Check out their [repository](https://github.com/hexagon/croner-rust) to see what is supported.
 
-**How to use it easily**
-
-You should be able to use a cron builder to create the recurring rule.  
-Simply build the cron and extract the `day_of_month`, `month`, and `day_of_week` from the cron string.
-
 ### Special rules
 
 There are some special rules that can be used instead of the cron pattern.  
@@ -43,6 +38,11 @@ The special rules are:
 - `@monthly`: Execute the transaction every month.
 - `@weekly`: Execute the transaction every week.
 - `@daily`: Execute the transaction every day.
+
+### How to use it easily
+
+You should be able to use a cron builder to create the recurring rule.  
+Simply build the cron and extract the `day_of_month`, `month`, and `day_of_week` from the cron string.
 
 ## Examples
 
