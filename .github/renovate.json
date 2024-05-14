@@ -10,4 +10,5 @@
         "frontend/ios/"
     ],
     "prHourlyLimit": 0
+    "lockFileMaintenance": { "enabled": true }
 }
