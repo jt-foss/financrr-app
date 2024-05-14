@@ -48,7 +48,7 @@ dependencies:
   riverpod: ^2.5.1
   hooks_riverpod: ^2.5.1
   # Other
-  flutter_svg: ^2.0.9
+  flutter_svg: ^2.0.10+1
   logging: ^1.2.0
   device_info_plus: ^10.1.0
   package_info_plus: ^8.0.0
