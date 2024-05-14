@@ -33,6 +33,17 @@ Check out their [repository](https://github.com/hexagon/croner-rust) to see what
 You should be able to use a cron builder to create the recurring rule.  
 Simply build the cron and extract the `day_of_month`, `month`, and `day_of_week` from the cron string.
 
+### Special rules
+
+There are some special rules that can be used instead of the cron pattern.  
+The special rules are:
+
+- `@yearly`: Execute the transaction every year.
+- `@annually`: Execute the transaction every year.
+- `@monthly`: Execute the transaction every month.
+- `@weekly`: Execute the transaction every week.
+- `@daily`: Execute the transaction every day.
+
 ## Examples
 
 ### repeat every day
