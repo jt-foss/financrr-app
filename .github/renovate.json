@@ -8,5 +8,6 @@
         "frontend/android/",
         "frontend/macos/",
         "frontend/ios/"
-    ]
+    ],
+    "prHourlyLimit": 0
 }
