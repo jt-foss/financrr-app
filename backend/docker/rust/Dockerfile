@@ -10,7 +10,7 @@ RUN apk update
 WORKDIR /usr/src/financrr
 COPY . .
 
-RUN RUSTFLAGS='-C target-feature=-crt-static' cargo build --release
+RUN cargo build --release
 
 # Final stage: create a minimal runtime image
 FROM alpine:3.19.1
