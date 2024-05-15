@@ -148,7 +148,7 @@ class FinancrrNavigationBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var theme = ref.watch(themeProvider);
-    final ThemeData themeData = theme.getActive().themeData;
+    final ThemeData themeData = theme.getCurrent().themeData;
 
     Widget buildNavBarItem({required NavigationDestination destination, required int index, bool isSelected = false}) {
       final IconData iconData = (destination.icon as Icon).icon!;

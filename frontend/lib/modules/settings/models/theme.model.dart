@@ -1,11 +1,12 @@
+import 'dart:ui';
+
+import 'package:financrr_frontend/utils/extensions.dart' hide ThemeExtension;
 import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 
 import '../../../utils/json_utils.dart';
 
 /// Represents a custom theme for the app.
-/// This is used over Flutter's theme system to allow for more customization, especially as we're using
-/// custom widgets.
 /// This also allows for defining the actual themes in a separate JSON file,
 /// making it easier to add and adjust themes - à la "If you can't make it perfect, make it adjustable."
 class AppTheme {
@@ -19,18 +20,13 @@ class AppTheme {
   final ThemeMode themeMode;
   final ThemeData themeData;
 
-  final AppColorsTheme colors;
-  final AppTextTheme text;
-
   const AppTheme(
       {required this.id,
         required this.logoPath,
         required this.translationKey,
         required this.previewColor,
         required this.themeMode,
-        required this.themeData,
-        required this.colors,
-        required this.text});
+        required this.themeData,});
 
   static AppTheme? tryFromJson(Map<String, dynamic> json) {
     final AppColor? previewColor = AppColor.tryFromJson(json['preview_color']);
@@ -48,22 +44,12 @@ class AppTheme {
     if (translationKey == null) {
       throw StateError('Either translation_key or fallback_name must be set!');
     }
-    final AppColorsTheme? colors = AppColorsTheme.tryFromJson(json['colors']);
-    if (colors == null) {
-      throw StateError('colors must be set!');
-    }
-    final AppTextTheme? text = AppTextTheme.tryFromJson(json['text'], defaultFontColor: colors.font);
-    if (text == null) {
-      throw StateError('text must be set!');
-    }
     return AppTheme(
         id: json['id'],
         logoPath: json['logo_path'],
         translationKey: translationKey,
         previewColor: previewColor.toColor(json),
         themeMode: themeMode,
-        colors: colors,
-        text: text,
         themeData: _buildThemeDataFromJson(json, json['theme_data']));
   }
 
@@ -87,16 +73,24 @@ class AppTheme {
     final SwitchThemeData? switchTheme = _trySwitchThemeDataFromJson(fullJson, json['switch_theme_data']);
     final SnackBarThemeData? snackBarTheme = _trySnackBarThemeDataFromJson(fullJson, json['snack_bar_theme_data']);
     final DrawerThemeData? drawerTheme = _tryDrawerThemeData(fullJson, json['drawer_theme_data']);
+
+    FinancrrAppThemeExtension? themeExtension = FinancrrAppThemeExtension.tryFromJson(fullJson['colors']);
+    if (themeExtension == null) {
+      throw StateError('Theme extension must be set!');
+    }
     return ThemeData(
+        extensions: [themeExtension],
         useMaterial3: true,
         brightness: brightness,
-        primaryColor: primaryColor,
-        scaffoldBackgroundColor: backgroundColor?.toColor(fullJson),
-        hintColor: hintColor?.toColor(fullJson),
-        cardColor: cardColor?.toColor(fullJson),
         fontFamily: fontFamily,
         fontFamilyFallback: fontFamilyFallback,
         textTheme: textTheme,
+        primaryColor: themeExtension.primary.toColor(fullJson),
+        scaffoldBackgroundColor: themeExtension.background.toColor(fullJson),
+
+        // TODO: remove everything below
+        hintColor: hintColor?.toColor(fullJson),
+        cardColor: cardColor?.toColor(fullJson),
         popupMenuTheme: const PopupMenuThemeData(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -215,11 +209,11 @@ class AppTheme {
     }
     return NavigationBarThemeData(
       indicatorColor: indicatorColor.toColor(fullJson),
-      iconTheme: MaterialStatePropertyAll(IconThemeData(color: iconColor.toColor(fullJson))),
+      iconTheme: WidgetStatePropertyAll(IconThemeData(color: iconColor.toColor(fullJson))),
       backgroundColor: backgroundColor.toColor(fullJson),
       surfaceTintColor: Colors.transparent,
       labelTextStyle:
-      MaterialStatePropertyAll(TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: labelColor.toColor(fullJson))),
+      WidgetStatePropertyAll(TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: labelColor.toColor(fullJson))),
     );
   }
 
@@ -315,9 +309,9 @@ class AppTheme {
       return null;
     }
     return SwitchThemeData(
-      thumbColor: MaterialStatePropertyAll(thumbColor.toColor(fullJson)),
-      trackColor: MaterialStatePropertyAll(trackColor.toColor(fullJson)),
-      trackOutlineColor: const MaterialStatePropertyAll(Colors.transparent),
+      thumbColor: WidgetStatePropertyAll(thumbColor.toColor(fullJson)),
+      trackColor: WidgetStatePropertyAll(trackColor.toColor(fullJson)),
+      trackOutlineColor: const WidgetStatePropertyAll(Colors.transparent),
     );
   }
 
@@ -356,144 +350,67 @@ class AppTheme {
   }
 }
 
-class AppColorsTheme {
+class FinancrrAppThemeExtension extends ThemeExtension<FinancrrAppThemeExtension> {
   final AppColor primary;
-  final AppColor secondary;
   final AppColor background;
   final AppColor backgroundTone1;
   final AppColor backgroundTone2;
   final AppColor backgroundTone3;
-  final AppColor font;
 
-  const AppColorsTheme(
-      {required this.primary,
-        required this.secondary,
-        required this.background,
-        required this.backgroundTone1,
-        required this.backgroundTone2,
-        required this.backgroundTone3,
-        required this.font});
+  const FinancrrAppThemeExtension({required this.primary, required this.background, required this.backgroundTone1, required this.backgroundTone2, required this.backgroundTone3});
 
-  static AppColorsTheme? tryFromJson(Map<String, dynamic> json) {
+  static FinancrrAppThemeExtension? tryFromJson(Map<String, dynamic> json) {
     final AppColor? primary = AppColor.tryFromJson(json['primary']);
-    final AppColor? secondary = AppColor.tryFromJson(json['secondary']);
     final AppColor? background = AppColor.tryFromJson(json['background']);
-    final AppColor? backgroundTone1 = AppColor.tryFromJson(json['background_tone_1']);
-    final AppColor? backgroundTone2 = AppColor.tryFromJson(json['background_tone_2']);
-    final AppColor? backgroundTone3 = AppColor.tryFromJson(json['background_tone_3']);
-    final AppColor? font = AppColor.tryFromJson(json['font']);
-    if (primary == null ||
-        secondary == null ||
-        background == null ||
-        backgroundTone1 == null ||
-        backgroundTone2 == null ||
-        backgroundTone3 == null ||
-        font == null) {
+    final AppColor? backgroundTone1 = AppColor.tryFromJson(json['background_tone1']);
+    final AppColor? backgroundTone2 = AppColor.tryFromJson(json['background_tone2']);
+    final AppColor? backgroundTone3 = AppColor.tryFromJson(json['background_tone3']);
+    if (primary == null || background == null || backgroundTone1 == null || backgroundTone2 == null || backgroundTone3 == null) {
       return null;
     }
-    return AppColorsTheme(
+    return FinancrrAppThemeExtension(
       primary: primary,
-      secondary: secondary,
       background: background,
       backgroundTone1: backgroundTone1,
       backgroundTone2: backgroundTone2,
       backgroundTone3: backgroundTone3,
-      font: font,
+    );
+  }
+
+  @override
+  ThemeExtension<FinancrrAppThemeExtension> copyWith({
+    AppColor? primary,
+    AppColor? background,
+    AppColor? backgroundTone1,
+    AppColor? backgroundTone2,
+    AppColor? backgroundTone3,
+  }) {
+    return FinancrrAppThemeExtension(
+      primary: primary ?? this.primary,
+      background: background ?? this.background,
+      backgroundTone1: backgroundTone1 ?? this.backgroundTone1,
+      backgroundTone2: backgroundTone2 ?? this.backgroundTone2,
+      backgroundTone3: backgroundTone3 ?? this.backgroundTone3,
+    );
+  }
+
+  @override
+  ThemeExtension<FinancrrAppThemeExtension> lerp(covariant FinancrrAppThemeExtension? other, double t) {
+    if (other == null) {
+      return this;
+    }
+    return FinancrrAppThemeExtension(
+      primary: primary.lerp(other.primary, t),
+      background: background.lerp(other.background, t),
+      backgroundTone1: backgroundTone1.lerp(other.backgroundTone1, t),
+      backgroundTone2: backgroundTone2.lerp(other.backgroundTone2, t),
+      backgroundTone3: backgroundTone3.lerp(other.backgroundTone3, t),
     );
   }
 }
 
 class AppTextTheme {
-  final String defaultFontFamily;
-  final List<String> defaultFontFamilyFallback;
 
-  final AppText displayLarge;
-  final AppText displayMedium;
-  final AppText displaySmall;
-  final AppText titleLarge;
-  final AppText titleMedium;
-  final AppText titleSmall;
-  final AppText bodyLarge;
-  final AppText bodyMedium;
-  final AppText bodySmall;
-  final AppText labelLarge;
-  final AppText labelMedium;
-  final AppText labelSmall;
-
-  const AppTextTheme(
-      {required this.defaultFontFamily,
-        required this.defaultFontFamilyFallback,
-        required this.displayLarge,
-        required this.displayMedium,
-        required this.displaySmall,
-        required this.titleLarge,
-        required this.titleMedium,
-        required this.titleSmall,
-        required this.bodyLarge,
-        required this.bodyMedium,
-        required this.bodySmall,
-        required this.labelLarge,
-        required this.labelMedium,
-        required this.labelSmall});
-
-  static AppTextTheme? tryFromJson(Map<String, dynamic> json, {AppColor? defaultFontColor}) {
-    if (JsonUtils.isInvalidType(json, 'default_font_family', String, nullable: true) ||
-        JsonUtils.isInvalidType(json, 'default_font_family_fallback', List, nullable: true)) {
-      return null;
-    }
-    final String? defaultFontFamily = json['default_font_family'];
-    final List<String>? defaultFontFamilyFallback = json['default_font_family_fallback'];
-
-    AppText? tryAppTextFromJson(String name) {
-      return AppText.tryFromJson(json[name],
-          defaultColor: defaultFontColor,
-          defaultFontFamily: defaultFontFamily,
-          defaultFontFamilyFallback: defaultFontFamilyFallback);
-    }
-
-    final AppText? displayLarge = tryAppTextFromJson('display_large');
-    final AppText? displayMedium = tryAppTextFromJson('display_medium');
-    final AppText? displaySmall = tryAppTextFromJson('display_small');
-    final AppText? titleLarge = tryAppTextFromJson('title_large');
-    final AppText? titleMedium = tryAppTextFromJson('title_medium');
-    final AppText? titleSmall = tryAppTextFromJson('title_small');
-    final AppText? bodyLarge = tryAppTextFromJson('body_large');
-    final AppText? bodyMedium = tryAppTextFromJson('body_medium');
-    final AppText? bodySmall = tryAppTextFromJson('body_small');
-    final AppText? labelLarge = tryAppTextFromJson('label_large');
-    final AppText? labelMedium = tryAppTextFromJson('label_medium');
-    final AppText? labelSmall = tryAppTextFromJson('label_small');
-    if (displayLarge == null ||
-        displayMedium == null ||
-        displaySmall == null ||
-        titleLarge == null ||
-        titleMedium == null ||
-        titleSmall == null ||
-        bodyLarge == null ||
-        bodyMedium == null ||
-        bodySmall == null ||
-        labelLarge == null ||
-        labelMedium == null ||
-        labelSmall == null) {
-      return null;
-    }
-    return AppTextTheme(
-      defaultFontFamily: defaultFontFamily ?? 'Montserrat',
-      defaultFontFamilyFallback: defaultFontFamilyFallback ?? ['Arial', 'sans-serif'],
-      displayLarge: displayLarge,
-      displayMedium: displayMedium,
-      displaySmall: displaySmall,
-      titleLarge: titleLarge,
-      titleMedium: titleMedium,
-      titleSmall: titleSmall,
-      bodyLarge: bodyLarge,
-      bodyMedium: bodyMedium,
-      bodySmall: bodySmall,
-      labelLarge: labelLarge,
-      labelMedium: labelMedium,
-      labelSmall: labelSmall,
-    );
-  }
 }
 
 class AppText {
@@ -579,6 +496,20 @@ class AppColor {
       }
     }
     throw StateError('Either value or options must be set!');
+  }
+
+  AppColor lerp(covariant AppColor other, double t) {
+    return AppColor(
+      value: value == null || other.value == null ? null : Color.lerp(_parseColor(value!), _parseColor(other.value!), t)?.toHex(),
+      options: options == null || options?.hex == null || other.options == null || other.options?.hex == null
+          ? null
+          : AppColorOptions(
+        hex: Color.lerp(_parseColor(options!.hex!), _parseColor(other.options!.hex!), t)?.toHex(),
+        opacity: options!.opacity == null || other.options!.opacity == null
+            ? null
+            : lerpDouble(options!.opacity!, other.options!.opacity!, t),
+      )
+    );
   }
 
   Color _parseColor(String rawHex) {
