@@ -20,6 +20,7 @@ bash bin/hurl/start-up.bash
 
 echo "Waiting for the server to start..."
 sleep 10
+wait
 
 # Setting admin token
 echo "Setting admin token..."
