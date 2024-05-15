@@ -78,15 +78,33 @@ class AppTheme {
     if (themeExtension == null) {
       throw StateError('Theme extension must be set!');
     }
+    AppTextTheme appTextTheme = AppTextTheme.fromJson(json['text_theme'], defaultColor: themeExtension.font, defaultFontFamily: fontFamily, defaultFontFamilyFallback: fontFamilyFallback);
+
     return ThemeData(
         extensions: [themeExtension],
         useMaterial3: true,
         brightness: brightness,
         fontFamily: fontFamily,
         fontFamilyFallback: fontFamilyFallback,
-        textTheme: textTheme,
         primaryColor: themeExtension.primary.toColor(fullJson),
         scaffoldBackgroundColor: themeExtension.background.toColor(fullJson),
+        textTheme: TextTheme(
+          displayLarge: appTextTheme.displayLarge.toTextStyle(),
+          displayMedium: appTextTheme.displayMedium.toTextStyle(),
+          displaySmall: appTextTheme.displaySmall.toTextStyle(),
+          headlineLarge: appTextTheme.headlineLarge.toTextStyle(),
+          headlineMedium: appTextTheme.headlineMedium.toTextStyle(),
+          headlineSmall: appTextTheme.headlineSmall.toTextStyle(),
+          titleLarge: appTextTheme.titleLarge.toTextStyle(),
+          titleMedium: appTextTheme.titleMedium.toTextStyle(),
+          titleSmall: appTextTheme.titleSmall.toTextStyle(),
+          labelLarge: appTextTheme.labelLarge.toTextStyle(),
+          labelMedium: appTextTheme.labelMedium.toTextStyle(),
+          labelSmall: appTextTheme.labelSmall.toTextStyle(),
+          bodyLarge: appTextTheme.bodyLarge.toTextStyle(),
+          bodyMedium: appTextTheme.bodyMedium.toTextStyle(),
+          bodySmall: appTextTheme.bodySmall.toTextStyle(),
+        ),
 
         // TODO: remove everything below
         hintColor: hintColor?.toColor(fullJson),
@@ -352,24 +370,27 @@ class AppTheme {
 
 class FinancrrAppThemeExtension extends ThemeExtension<FinancrrAppThemeExtension> {
   final AppColor primary;
+  final AppColor font;
   final AppColor background;
   final AppColor backgroundTone1;
   final AppColor backgroundTone2;
   final AppColor backgroundTone3;
 
-  const FinancrrAppThemeExtension({required this.primary, required this.background, required this.backgroundTone1, required this.backgroundTone2, required this.backgroundTone3});
+  const FinancrrAppThemeExtension({required this.primary, required this.font, required this.background, required this.backgroundTone1, required this.backgroundTone2, required this.backgroundTone3});
 
   static FinancrrAppThemeExtension? tryFromJson(Map<String, dynamic> json) {
     final AppColor? primary = AppColor.tryFromJson(json['primary']);
+    final AppColor? font = AppColor.tryFromJson(json['font']);
     final AppColor? background = AppColor.tryFromJson(json['background']);
     final AppColor? backgroundTone1 = AppColor.tryFromJson(json['background_tone1']);
     final AppColor? backgroundTone2 = AppColor.tryFromJson(json['background_tone2']);
     final AppColor? backgroundTone3 = AppColor.tryFromJson(json['background_tone3']);
-    if (primary == null || background == null || backgroundTone1 == null || backgroundTone2 == null || backgroundTone3 == null) {
+    if (primary == null || font == null || background == null || backgroundTone1 == null || backgroundTone2 == null || backgroundTone3 == null) {
       return null;
     }
     return FinancrrAppThemeExtension(
       primary: primary,
+      font: font,
       background: background,
       backgroundTone1: backgroundTone1,
       backgroundTone2: backgroundTone2,
@@ -380,6 +401,7 @@ class FinancrrAppThemeExtension extends ThemeExtension<FinancrrAppThemeExtension
   @override
   ThemeExtension<FinancrrAppThemeExtension> copyWith({
     AppColor? primary,
+    AppColor? font,
     AppColor? background,
     AppColor? backgroundTone1,
     AppColor? backgroundTone2,
@@ -387,6 +409,7 @@ class FinancrrAppThemeExtension extends ThemeExtension<FinancrrAppThemeExtension
   }) {
     return FinancrrAppThemeExtension(
       primary: primary ?? this.primary,
+      font: font ?? this.font,
       background: background ?? this.background,
       backgroundTone1: backgroundTone1 ?? this.backgroundTone1,
       backgroundTone2: backgroundTone2 ?? this.backgroundTone2,
@@ -401,6 +424,7 @@ class FinancrrAppThemeExtension extends ThemeExtension<FinancrrAppThemeExtension
     }
     return FinancrrAppThemeExtension(
       primary: primary.lerp(other.primary, t),
+      font: font.lerp(other.font, t),
       background: background.lerp(other.background, t),
       backgroundTone1: backgroundTone1.lerp(other.backgroundTone1, t),
       backgroundTone2: backgroundTone2.lerp(other.backgroundTone2, t),
@@ -410,33 +434,97 @@ class FinancrrAppThemeExtension extends ThemeExtension<FinancrrAppThemeExtension
 }
 
 class AppTextTheme {
+  final AppText displayLarge;
+  final AppText displayMedium;
+  final AppText displaySmall;
+  final AppText headlineLarge;
+  final AppText headlineMedium;
+  final AppText headlineSmall;
+  final AppText titleLarge;
+  final AppText titleMedium;
+  final AppText titleSmall;
+  final AppText labelLarge;
+  final AppText labelMedium;
+  final AppText labelSmall;
+  final AppText bodyLarge;
+  final AppText bodyMedium;
+  final AppText bodySmall;
 
+  const AppTextTheme({
+    required this.displayLarge,
+    required this.displayMedium,
+    required this.displaySmall,
+    required this.headlineLarge,
+    required this.headlineMedium,
+    required this.headlineSmall,
+    required this.titleLarge,
+    required this.titleMedium,
+    required this.titleSmall,
+    required this.labelLarge,
+    required this.labelMedium,
+    required this.labelSmall,
+    required this.bodyLarge,
+    required this.bodyMedium,
+    required this.bodySmall,
+  });
+
+  static AppTextTheme fromJson(Map<String, dynamic>? json, {AppColor? defaultColor, String? defaultFontFamily, List<String>? defaultFontFamilyFallback}) {
+    AppText fromJson(String key, AppText fallback) {
+      if (json == null) {
+        return fallback;
+      }
+      return AppText.tryFromJson(json[key], defaultColor: defaultColor, defaultFontFamily: defaultFontFamily, defaultFontFamilyFallback: defaultFontFamilyFallback) ?? fallback;
+    }
+    return AppTextTheme(
+      displayLarge: fromJson('display_large', const AppText(fontSize: 57, fontWeight: FontWeight.bold)),
+      displayMedium: fromJson('display_medium', const AppText(fontSize: 45, fontWeight: FontWeight.bold)),
+      displaySmall: fromJson('display_small', const AppText(fontSize: 36, fontWeight: FontWeight.bold)),
+      headlineLarge: fromJson('headline_large', const AppText(fontSize: 32)),
+      headlineMedium: fromJson('headline_medium', const AppText(fontSize: 28)),
+      headlineSmall: fromJson('headline_small', const AppText(fontSize: 24)),
+      titleLarge: fromJson('title_large', const AppText(fontSize: 22, fontWeight: FontWeight.bold)),
+      titleMedium: fromJson('title_medium', const AppText(fontSize: 16, fontWeight: FontWeight.bold)),
+      titleSmall: fromJson('title_small', const AppText(fontSize: 14, fontWeight: FontWeight.bold)),
+      labelLarge: fromJson('label_large', const AppText(fontSize: 14, fontWeight: FontWeight.w500)),
+      labelMedium: fromJson('label_medium', const AppText(fontSize: 12, fontWeight: FontWeight.w500)),
+      labelSmall: fromJson('label_small', const AppText(fontSize: 11, fontWeight: FontWeight.w500)),
+      bodyLarge: fromJson('body_large', const AppText(fontSize: 16)),
+      bodyMedium: fromJson('body_medium', const AppText(fontSize: 14)),
+      bodySmall: fromJson('body_small', const AppText(fontSize: 12)),
+    );
+  }
 }
 
 class AppText {
   final String? fontFamily;
   final List<String>? fontFamilyFallback;
   final double? fontSize;
-  final FontWeight? fontWeight;
+  final FontWeight fontWeight;
   final AppColor? color;
 
-  const AppText({this.fontFamily, this.fontFamilyFallback, this.fontSize, this.fontWeight, this.color});
+  const AppText({this.fontFamily, this.fontFamilyFallback, this.fontSize, this.fontWeight = FontWeight.normal, this.color});
 
   static AppText? tryFromJson(Map<String, dynamic> json,
       {AppColor? defaultColor, String? defaultFontFamily, List<String>? defaultFontFamilyFallback}) {
-    if (JsonUtils.isInvalidType(json, 'font_family', String, nullable: true) ||
-        JsonUtils.isInvalidType(json, 'font_family_fallback', List, nullable: true) ||
-        JsonUtils.isInvalidType(json, 'font_size', double, nullable: true) ||
-        JsonUtils.isInvalidType(json, 'font_weight', String, nullable: true) ||
-        JsonUtils.isInvalidType(json, 'color', String, nullable: true)) {
-      return null;
-    }
+    final String? fontFamily = json['font_family'] ?? defaultFontFamily;
+    final List<String>? fontFamilyFallback = json['font_family_fallback'] ?? defaultFontFamilyFallback;
+    final FontWeight fontWeight = FontWeight.values.firstWhere((element) => element.toString().endsWith(json['font_weight']));
     return AppText(
-      fontFamily: json['font_family'] ?? defaultFontFamily,
-      fontFamilyFallback: json['font_family_fallback'] ?? defaultFontFamilyFallback,
+      fontFamily: fontFamily,
+      fontFamilyFallback: fontFamilyFallback,
       fontSize: json['font_size'],
-      fontWeight: json['font_weight'] == 'bold' ? FontWeight.bold : FontWeight.normal,
+      fontWeight: fontWeight,
       color: AppColor.tryFromJson(json['color']) ?? defaultColor,
+    );
+  }
+
+  TextStyle toTextStyle() {
+    return TextStyle(
+      fontFamily: fontFamily,
+      fontFamilyFallback: fontFamilyFallback,
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      color: color?.toColor({}),
     );
   }
 }

@@ -6,6 +6,7 @@
   "theme_mode": "dark",
   "colors": {
     "primary": "0x2C03E6",
+    "font": "0x000000",
     "background": "0xFFFFFF",
     "background_tone1": "0xF2F2F2",
     "background_tone2": "0x9D9D9",
