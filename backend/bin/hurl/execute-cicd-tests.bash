@@ -18,6 +18,9 @@ bash bin/hurl/clean-up.bash
 
 bash bin/hurl/start-up.bash
 
+echo "Waiting for the server to start..."
+sleep 10
+
 # Setting admin token
 echo "Setting admin token..."
 TOKEN_OUTPUT=$(bash bin/hurl/set-admin-token.bash)
