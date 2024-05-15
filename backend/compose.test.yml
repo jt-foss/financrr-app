@@ -9,7 +9,7 @@ services:
       HURL_admin_token: ${HURL_admin_token}
 
   rust:
-    ports:
+    ports: []
     env_file:
       - .env.test
 
@@ -17,12 +17,12 @@ services:
     volumes:
       - postgres-data-test:/var/lib/postgresql/data
       - ./docker/db/postgresql.conf:/etc/postgresql.conf
-    ports:
+    ports: []
 
   cache:
     volumes:
       - dragonflydata-test:/data
-    ports:
+    ports: []
 
 
 volumes:
