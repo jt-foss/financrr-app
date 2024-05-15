@@ -20,6 +20,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install project
+        run: bash bin/install.bash
       - name: Build test containers
         run: bash bin/hurl/build.bash
       - name: Run E2E tests
