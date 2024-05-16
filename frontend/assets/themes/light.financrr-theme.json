@@ -4,6 +4,7 @@
   "translation_key": "theme_light",
   "preview_color": "0xFFFFFF",
   "theme_mode": "light",
+  "brightness": "light",
   "colors": {
     "primary": "0x2C03E6",
     "font": "0x000000",
@@ -11,84 +12,5 @@
     "background_tone1": "0xF2F2F2",
     "background_tone2": "0x9D9D9",
     "background_tone3": "0x1C1B1F"
-  },
-  "theme_data": {
-    "brightness": "light",
-    "primary_color": "0x2C03E6",
-    "background_color": "0xFFFFFF",
-    "secondary_background_color": "0xF6F6F6",
-    "hint_color": "0xB4B4B4",
-    "card_color": "0x656565",
-    "app_bar_theme_data": {
-      "foreground_color": "0x000000",
-      "title_color": "0x000000",
-      "background_color": {
-        "copy_from_path": "theme_data/secondary_background_color"
-      }
-    },
-    "navigation_bar_theme_data": {
-      "indicator_color": {
-        "copy_from_path": "theme_data/primary_color",
-        "opacity": 0.15
-      },
-      "icon_color": "0xA6A6A6",
-      "background_color": {
-        "copy_from_path": "theme_data/secondary_background_color"
-      },
-      "label_color": "0x303030"
-    },
-    "navigation_rail_theme_data": {
-      "indicator_color": {
-        "copy_from_path": "theme_data/navigation_bar_theme_data/indicator_color"
-      },
-      "selected_icon_color": {
-        "copy_from_path": "theme_data/navigation_bar_theme_data/icon_color"
-      },
-      "background_color": {
-        "copy_from_path": "theme_data/secondary_background_color"
-      },
-      "selected_label_color": {
-        "copy_from_path": "theme_data/navigation_bar_theme_data/label_color"
-      },
-      "unselected_label_color": "0x616161"
-    },
-    "elevated_button_theme_data": {
-      "foreground_color": "0xFFFFFF",
-      "background_color": {
-        "copy_from_path": "theme_data/primary_color"
-      }
-    },
-    "text_button_theme_data": {
-      "foreground_color": {
-        "copy_from_path": "theme_data/primary_color"
-      }
-    },
-    "text_selection_theme_data": {
-      "selection_color": {
-        "copy_from_path": "theme_data/primary_color"
-      }
-    },
-    "switch_theme_data": {
-      "thumb_color": {
-        "copy_from_path": "theme_data/primary_color"
-      },
-      "track_color": {
-        "copy_from_path": "theme_data/primary_color",
-        "opacity": 0.5
-      }
-    },
-    "snack_bar_theme_data": {
-      "content_text_color": "0xFFFFFF",
-      "background_color": "0x656565"
-    },
-    "drawer_theme_data": {
-      "background_color": {
-        "copy_from_path": "theme_data/background_color"
-      },
-      "scrim_color": {
-        "hex": "0xFFFFFF",
-        "opacity": 0.1
-      }
-    }
   }
 }

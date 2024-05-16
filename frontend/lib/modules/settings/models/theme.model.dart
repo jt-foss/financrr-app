@@ -37,8 +37,7 @@ class AppTheme {
         JsonUtils.isInvalidType(json, 'translation_key', String, nullable: true) ||
         JsonUtils.isInvalidType(json, 'fallback_name', String, nullable: true) ||
         previewColor == null ||
-        themeMode == null ||
-        JsonUtils.isInvalidType(json, 'theme_data', Map)) {
+        themeMode == null) {
       return null;
     }
     final L10nKey? translationKey = L10nKey.fromKey(json['translation_key']!);
@@ -51,12 +50,12 @@ class AppTheme {
         translationKey: translationKey,
         previewColor: previewColor.toColor(json),
         themeMode: themeMode,
-        themeData: _buildThemeDataFromJson(json, json['theme_data']));
+        themeData: _buildThemeDataFromJson(json));
   }
 
-  static ThemeData _buildThemeDataFromJson(Map<String, dynamic> fullJson, Map<String, dynamic> json) {
+  static ThemeData _buildThemeDataFromJson(Map<String, dynamic> json) {
     final Brightness? brightness = JsonUtils.tryEnum(json['brightness'], Brightness.values);
-    FinancrrAppThemeExtension? themeExtension = FinancrrAppThemeExtension.tryFromJson(fullJson['colors']);
+    FinancrrAppThemeExtension? themeExtension = FinancrrAppThemeExtension.tryFromJson(json['colors']);
     if (themeExtension == null) {
       throw StateError('Theme extension must be set!');
     }
@@ -69,8 +68,8 @@ class AppTheme {
       brightness: brightness,
       fontFamily: fontFamily,
       fontFamilyFallback: fontFamilyFallback,
-      primaryColor: themeExtension.primary.toColor(fullJson),
-      scaffoldBackgroundColor: themeExtension.background.toColor(fullJson),
+      primaryColor: themeExtension.primary.toColor(json),
+      scaffoldBackgroundColor: themeExtension.background.toColor(json),
       textTheme: TextTheme(
         displayLarge: appTextTheme.displayLarge.toTextStyle(),
         displayMedium: appTextTheme.displayMedium.toTextStyle(),
