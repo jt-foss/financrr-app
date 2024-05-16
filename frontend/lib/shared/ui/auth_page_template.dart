@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:financrr_frontend/modules/settings/models/theme.state.dart';
+import 'package:financrr_frontend/modules/settings/models/themes/theme.state.dart';
 import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/utils/extensions.dart';

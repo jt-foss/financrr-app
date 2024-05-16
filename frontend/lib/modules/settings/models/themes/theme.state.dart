@@ -1,5 +1,5 @@
-import 'package:financrr_frontend/modules/settings/models/theme.model.dart';
-import 'package:financrr_frontend/modules/settings/models/theme_loader.dart';
+import 'package:financrr_frontend/modules/settings/models/themes/app_theme.model.dart';
+import 'package:financrr_frontend/modules/settings/models/themes/theme_loader.dart';
 import 'package:financrr_frontend/shared/models/store.dart';
 import 'package:flutter/material.dart';
 

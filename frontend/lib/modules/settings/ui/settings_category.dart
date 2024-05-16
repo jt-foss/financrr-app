@@ -1,3 +1,4 @@
+import 'package:financrr_frontend/modules/settings/models/themes/app_theme_extension.model.dart';
 import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -21,9 +22,8 @@ class SettingsCategory extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = ref.watch(themeProvider);
-    final themeData = theme.getCurrent().themeData;
-    final textTheme = themeData.textTheme;
+    final theme = ref.watch(themeProvider).getCurrent();
+
 
     buildSettingsItem(SettingsItem item) {
       return GestureDetector(
@@ -43,23 +43,28 @@ class SettingsCategory extends ConsumerWidget {
       );
     }
 
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(
-
-        ),
-        borderRadius: BorderRadius.circular(10),
-      ),
+    return Padding(
+      padding: const EdgeInsets.only(top: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (title != null) ...[
+          if (title != null)
             Padding(
-              padding: const EdgeInsets.all(10),
-              child: title!.toText(style: textTheme.titleMedium),
+              padding: const EdgeInsets.only(left: 5, bottom: 5),
+              child: title!.toText(style: theme.themeData.textTheme.titleMedium),
             ),
-          ],
-          for (SettingsItem item in items) buildSettingsItem(item)
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(
+                  width: 3,
+                  color: theme.financrrExtension.backgroundTone1.toColor({})),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: items.map((i) => buildSettingsItem(i)).toList(),
+            ),
+          ),
         ],
       ),
     );

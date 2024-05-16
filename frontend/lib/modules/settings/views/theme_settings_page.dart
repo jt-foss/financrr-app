@@ -5,8 +5,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../shared/ui/adaptive_scaffold.dart';
 import '../../../routing/page_path.dart';
-import '../models/theme.model.dart';
-import '../models/theme_loader.dart';
+import '../models/themes/app_theme.model.dart';
+import '../models/themes/theme_loader.dart';
 import 'settings_page.dart';
 
 class ThemeSettingsPage extends StatefulHookConsumerWidget {

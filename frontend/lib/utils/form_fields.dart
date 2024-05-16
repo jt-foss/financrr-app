@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
-import '../modules/settings/models/theme.state.dart';
+import '../modules/settings/models/themes/theme.state.dart';
 import '../shared/models/store.dart';
 import 'input_utils.dart';
 

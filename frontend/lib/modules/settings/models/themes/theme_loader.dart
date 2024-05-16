@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:financrr_frontend/modules/settings/models/theme.model.dart';
+import 'package:financrr_frontend/modules/settings/models/themes/app_theme.model.dart';
 import 'package:flutter/services.dart';
 
 class AppThemeLoader {

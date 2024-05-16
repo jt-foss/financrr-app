@@ -18,8 +18,8 @@ import 'package:logging/logging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'modules/settings/models/log_entry.model.dart';
-import 'modules/settings/models/theme.model.dart';
-import 'modules/settings/models/theme_loader.dart';
+import 'modules/settings/models/themes/app_theme.model.dart';
+import 'modules/settings/models/themes/theme_loader.dart';
 
 Logger _log = Logger('GenericLogger');
 
