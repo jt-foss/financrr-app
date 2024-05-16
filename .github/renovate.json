@@ -13,6 +13,6 @@
     "updateLockFiles": true,
     "lockFileMaintenance": { 
         "enabled": true,
-        "schedule": ["at any time"]
+        "schedule": ["before 4am"]
     }
 }
