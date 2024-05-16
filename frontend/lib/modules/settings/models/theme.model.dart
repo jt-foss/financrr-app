@@ -20,13 +20,14 @@ class AppTheme {
   final ThemeMode themeMode;
   final ThemeData themeData;
 
-  const AppTheme(
-      {required this.id,
-        required this.logoPath,
-        required this.translationKey,
-        required this.previewColor,
-        required this.themeMode,
-        required this.themeData,});
+  const AppTheme({
+    required this.id,
+    required this.logoPath,
+    required this.translationKey,
+    required this.previewColor,
+    required this.themeMode,
+    required this.themeData,
+  });
 
   static AppTheme? tryFromJson(Map<String, dynamic> json) {
     final AppColor? previewColor = AppColor.tryFromJson(json['preview_color']);
@@ -59,33 +60,34 @@ class AppTheme {
     if (themeExtension == null) {
       throw StateError('Theme extension must be set!');
     }
-    AppTextTheme appTextTheme = AppTextTheme.fromJson(json['text_theme'], defaultColor: themeExtension.font, defaultFontFamily: fontFamily, defaultFontFamilyFallback: fontFamilyFallback);
+    AppTextTheme appTextTheme = AppTextTheme.fromJson(json['text_theme'],
+        defaultColor: themeExtension.font, defaultFontFamily: fontFamily, defaultFontFamilyFallback: fontFamilyFallback);
 
     return ThemeData(
-        extensions: [themeExtension],
-        useMaterial3: true,
-        brightness: brightness,
-        fontFamily: fontFamily,
-        fontFamilyFallback: fontFamilyFallback,
-        primaryColor: themeExtension.primary.toColor(fullJson),
-        scaffoldBackgroundColor: themeExtension.background.toColor(fullJson),
-        textTheme: TextTheme(
-          displayLarge: appTextTheme.displayLarge.toTextStyle(),
-          displayMedium: appTextTheme.displayMedium.toTextStyle(),
-          displaySmall: appTextTheme.displaySmall.toTextStyle(),
-          headlineLarge: appTextTheme.headlineLarge.toTextStyle(),
-          headlineMedium: appTextTheme.headlineMedium.toTextStyle(),
-          headlineSmall: appTextTheme.headlineSmall.toTextStyle(),
-          titleLarge: appTextTheme.titleLarge.toTextStyle(),
-          titleMedium: appTextTheme.titleMedium.toTextStyle(),
-          titleSmall: appTextTheme.titleSmall.toTextStyle(),
-          labelLarge: appTextTheme.labelLarge.toTextStyle(),
-          labelMedium: appTextTheme.labelMedium.toTextStyle(),
-          labelSmall: appTextTheme.labelSmall.toTextStyle(),
-          bodyLarge: appTextTheme.bodyLarge.toTextStyle(),
-          bodyMedium: appTextTheme.bodyMedium.toTextStyle(),
-          bodySmall: appTextTheme.bodySmall.toTextStyle(),
-        ),
+      extensions: [themeExtension],
+      useMaterial3: true,
+      brightness: brightness,
+      fontFamily: fontFamily,
+      fontFamilyFallback: fontFamilyFallback,
+      primaryColor: themeExtension.primary.toColor(fullJson),
+      scaffoldBackgroundColor: themeExtension.background.toColor(fullJson),
+      textTheme: TextTheme(
+        displayLarge: appTextTheme.displayLarge.toTextStyle(),
+        displayMedium: appTextTheme.displayMedium.toTextStyle(),
+        displaySmall: appTextTheme.displaySmall.toTextStyle(),
+        headlineLarge: appTextTheme.headlineLarge.toTextStyle(),
+        headlineMedium: appTextTheme.headlineMedium.toTextStyle(),
+        headlineSmall: appTextTheme.headlineSmall.toTextStyle(),
+        titleLarge: appTextTheme.titleLarge.toTextStyle(),
+        titleMedium: appTextTheme.titleMedium.toTextStyle(),
+        titleSmall: appTextTheme.titleSmall.toTextStyle(),
+        labelLarge: appTextTheme.labelLarge.toTextStyle(),
+        labelMedium: appTextTheme.labelMedium.toTextStyle(),
+        labelSmall: appTextTheme.labelSmall.toTextStyle(),
+        bodyLarge: appTextTheme.bodyLarge.toTextStyle(),
+        bodyMedium: appTextTheme.bodyMedium.toTextStyle(),
+        bodySmall: appTextTheme.bodySmall.toTextStyle(),
+      ),
     );
   }
 }
@@ -98,7 +100,13 @@ class FinancrrAppThemeExtension extends ThemeExtension<FinancrrAppThemeExtension
   final AppColor backgroundTone2;
   final AppColor backgroundTone3;
 
-  const FinancrrAppThemeExtension({required this.primary, required this.font, required this.background, required this.backgroundTone1, required this.backgroundTone2, required this.backgroundTone3});
+  const FinancrrAppThemeExtension(
+      {required this.primary,
+      required this.font,
+      required this.background,
+      required this.backgroundTone1,
+      required this.backgroundTone2,
+      required this.backgroundTone3});
 
   static FinancrrAppThemeExtension? tryFromJson(Map<String, dynamic> json) {
     final AppColor? primary = AppColor.tryFromJson(json['primary']);
@@ -107,7 +115,12 @@ class FinancrrAppThemeExtension extends ThemeExtension<FinancrrAppThemeExtension
     final AppColor? backgroundTone1 = AppColor.tryFromJson(json['background_tone1']);
     final AppColor? backgroundTone2 = AppColor.tryFromJson(json['background_tone2']);
     final AppColor? backgroundTone3 = AppColor.tryFromJson(json['background_tone3']);
-    if (primary == null || font == null || background == null || backgroundTone1 == null || backgroundTone2 == null || backgroundTone3 == null) {
+    if (primary == null ||
+        font == null ||
+        background == null ||
+        backgroundTone1 == null ||
+        backgroundTone2 == null ||
+        backgroundTone3 == null) {
       return null;
     }
     return FinancrrAppThemeExtension(
@@ -190,13 +203,19 @@ class AppTextTheme {
     required this.bodySmall,
   });
 
-  static AppTextTheme fromJson(Map<String, dynamic>? json, {AppColor? defaultColor, String? defaultFontFamily, List<String>? defaultFontFamilyFallback}) {
+  static AppTextTheme fromJson(Map<String, dynamic>? json,
+      {AppColor? defaultColor, String? defaultFontFamily, List<String>? defaultFontFamilyFallback}) {
     AppText fromJson(String key, AppText fallback) {
       if (json == null) {
         return fallback;
       }
-      return AppText.tryFromJson(json[key], defaultColor: defaultColor, defaultFontFamily: defaultFontFamily, defaultFontFamilyFallback: defaultFontFamilyFallback) ?? fallback;
+      return AppText.tryFromJson(json[key],
+              defaultColor: defaultColor,
+              defaultFontFamily: defaultFontFamily,
+              defaultFontFamilyFallback: defaultFontFamilyFallback) ??
+          fallback;
     }
+
     return AppTextTheme(
       displayLarge: fromJson('display_large', const AppText(fontSize: 57, fontWeight: FontWeight.bold)),
       displayMedium: fromJson('display_medium', const AppText(fontSize: 45, fontWeight: FontWeight.bold)),
@@ -310,16 +329,17 @@ class AppColor {
 
   AppColor lerp(covariant AppColor other, double t) {
     return AppColor(
-      value: value == null || other.value == null ? null : Color.lerp(_parseColor(value!), _parseColor(other.value!), t)?.toHex(),
-      options: options == null || options?.hex == null || other.options == null || other.options?.hex == null
-          ? null
-          : AppColorOptions(
-        hex: Color.lerp(_parseColor(options!.hex!), _parseColor(other.options!.hex!), t)?.toHex(),
-        opacity: options!.opacity == null || other.options!.opacity == null
+        value: value == null || other.value == null
             ? null
-            : lerpDouble(options!.opacity!, other.options!.opacity!, t),
-      )
-    );
+            : Color.lerp(_parseColor(value!), _parseColor(other.value!), t)?.toHex(),
+        options: options == null || options?.hex == null || other.options == null || other.options?.hex == null
+            ? null
+            : AppColorOptions(
+                hex: Color.lerp(_parseColor(options!.hex!), _parseColor(other.options!.hex!), t)?.toHex(),
+                opacity: options!.opacity == null || other.options!.opacity == null
+                    ? null
+                    : lerpDouble(options!.opacity!, other.options!.opacity!, t),
+              ));
   }
 
   Color _parseColor(String rawHex) {

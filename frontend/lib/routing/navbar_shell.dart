@@ -72,50 +72,42 @@ class ScaffoldNavBarShellState extends State<ScaffoldNavBarShell> {
   }
 
   List<NavigationDestination> _getNavBarDestinations() => [
-    NavigationDestination(
-      icon: const Icon(Icons.dashboard_outlined),
-      selectedIcon: const Icon(Icons.dashboard_rounded),
-      label: L10nKey.navigationDashboard.toString()
-    ),
-    NavigationDestination(
-      icon: const Icon(Icons.account_balance_wallet_outlined),
-      selectedIcon: const Icon(Icons.account_balance_wallet_rounded),
-      label: L10nKey.navigationAccounts.toString()
-    ),
-    NavigationDestination(
-      icon: const Icon(Icons.leaderboard_outlined),
-      selectedIcon: const Icon(Icons.leaderboard_rounded),
-      label: L10nKey.navigationStatistics.toString()
-    ),
-    NavigationDestination(
-      icon: const Icon(Icons.person_outline_rounded),
-      selectedIcon: const Icon(Icons.person_rounded),
-      label: L10nKey.navigationSettings.toString()
-    ),
-  ];
+        NavigationDestination(
+            icon: const Icon(Icons.dashboard_outlined),
+            selectedIcon: const Icon(Icons.dashboard_rounded),
+            label: L10nKey.navigationDashboard.toString()),
+        NavigationDestination(
+            icon: const Icon(Icons.account_balance_wallet_outlined),
+            selectedIcon: const Icon(Icons.account_balance_wallet_rounded),
+            label: L10nKey.navigationAccounts.toString()),
+        NavigationDestination(
+            icon: const Icon(Icons.leaderboard_outlined),
+            selectedIcon: const Icon(Icons.leaderboard_rounded),
+            label: L10nKey.navigationStatistics.toString()),
+        NavigationDestination(
+            icon: const Icon(Icons.person_outline_rounded),
+            selectedIcon: const Icon(Icons.person_rounded),
+            label: L10nKey.navigationSettings.toString()),
+      ];
 
   List<NavigationRailDestination> _getNavRailDestinations() => [
-    NavigationRailDestination(
-      icon: const Icon(Icons.dashboard_outlined),
-      selectedIcon: const Icon(Icons.dashboard_rounded),
-      label: L10nKey.navigationDashboard.toText()
-    ),
-    NavigationRailDestination(
-      icon: const Icon(Icons.account_balance_wallet_outlined),
-      selectedIcon: const Icon(Icons.account_balance_wallet_rounded),
-      label: L10nKey.navigationAccounts.toText()
-    ),
-    NavigationRailDestination(
-      icon: const Icon(Icons.leaderboard_outlined),
-      selectedIcon: const Icon(Icons.leaderboard_rounded),
-      label: L10nKey.navigationStatistics.toText()
-    ),
-    NavigationRailDestination(
-      icon: const Icon(Icons.settings_outlined),
-      selectedIcon: const Icon(Icons.settings_rounded),
-      label: L10nKey.navigationSettings.toText()
-    ),
-  ];
+        NavigationRailDestination(
+            icon: const Icon(Icons.dashboard_outlined),
+            selectedIcon: const Icon(Icons.dashboard_rounded),
+            label: L10nKey.navigationDashboard.toText()),
+        NavigationRailDestination(
+            icon: const Icon(Icons.account_balance_wallet_outlined),
+            selectedIcon: const Icon(Icons.account_balance_wallet_rounded),
+            label: L10nKey.navigationAccounts.toText()),
+        NavigationRailDestination(
+            icon: const Icon(Icons.leaderboard_outlined),
+            selectedIcon: const Icon(Icons.leaderboard_rounded),
+            label: L10nKey.navigationStatistics.toText()),
+        NavigationRailDestination(
+            icon: const Icon(Icons.settings_outlined),
+            selectedIcon: const Icon(Icons.settings_rounded),
+            label: L10nKey.navigationSettings.toText()),
+      ];
 
   void refresh() => setState(() {});
 
@@ -188,9 +180,7 @@ class FinancrrNavigationBar extends ConsumerWidget {
     }
 
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(.1)
-      ),
+      decoration: BoxDecoration(color: Colors.white.withOpacity(.1)),
       child: Padding(
         padding: const EdgeInsets.only(bottom: 30, top: 10, left: 10, right: 10),
         child: Row(
