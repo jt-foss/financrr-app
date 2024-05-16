@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 # prepare
-set -e
 set -x  # Add this line
 WORK_DIR="$(pwd)"
 cd "$(dirname "$0")"
