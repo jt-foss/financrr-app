@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import 'app_navigation_bar.dart';
 import 'app_navigation_rail.dart';
 
 class ScaffoldNavBarShell extends StatefulHookConsumerWidget {
@@ -46,7 +47,7 @@ class ScaffoldNavBarShellState extends ConsumerState<ScaffoldNavBarShell> {
                         setState(() => _isHovered = false);
                       },
                       child: FinancrrNavigationRail(
-                          destinations: _getNavRailDestinations(),
+                          destinations: _getDestinations(),
                           extended: context.isWidescreen || _isHovered,
                           onDestinationSelected: (index) => goToBranch(index),
                           selectedIndex: widget.navigationShell.currentIndex),
@@ -83,31 +84,12 @@ class ScaffoldNavBarShellState extends ConsumerState<ScaffoldNavBarShell> {
           ? FinancrrNavigationBar(
               onDestinationSelected: (index) => goToBranch(index),
               selectedIndex: widget.navigationShell.currentIndex,
-              destinations: _getNavBarDestinations())
+              destinations: _getDestinations())
           : null,
     );
   }
 
-  List<NavigationDestination> _getNavBarDestinations() => [
-        NavigationDestination(
-            icon: const Icon(Icons.dashboard_outlined),
-            selectedIcon: const Icon(Icons.dashboard_rounded),
-            label: L10nKey.navigationDashboard.toString()),
-        NavigationDestination(
-            icon: const Icon(Icons.account_balance_wallet_outlined),
-            selectedIcon: const Icon(Icons.account_balance_wallet_rounded),
-            label: L10nKey.navigationAccounts.toString()),
-        NavigationDestination(
-            icon: const Icon(Icons.leaderboard_outlined),
-            selectedIcon: const Icon(Icons.leaderboard_rounded),
-            label: L10nKey.navigationStatistics.toString()),
-        NavigationDestination(
-            icon: const Icon(Icons.person_outline_rounded),
-            selectedIcon: const Icon(Icons.person_rounded),
-            label: L10nKey.navigationSettings.toString()),
-      ];
-
-  List<NavDestination> _getNavRailDestinations() => const [
+  List<NavDestination> _getDestinations() => const [
     NavDestination(
             iconData: Icons.dashboard_outlined,
             selectedIconData: Icons.dashboard_rounded,
@@ -141,77 +123,5 @@ class ScaffoldNavBarShellState extends ConsumerState<ScaffoldNavBarShell> {
   /// Jumps to the corresponding [StatefulShellBranch], based on the specified index.
   void goToBranch(int index) {
     widget.navigationShell.goBranch(index, initialLocation: widget.navigationShell.currentIndex == index);
-  }
-}
-
-class FinancrrNavigationBar extends ConsumerWidget {
-  final List<NavigationDestination> destinations;
-  final int selectedIndex;
-  final void Function(int) onDestinationSelected;
-
-  const FinancrrNavigationBar({
-    super.key,
-    required this.destinations,
-    required this.selectedIndex,
-    required this.onDestinationSelected,
-  });
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    var theme = ref.watch(themeProvider);
-    final ThemeData themeData = theme.getCurrent().themeData;
-
-    Widget buildNavBarItem({required NavigationDestination destination, required int index, bool isSelected = false}) {
-      final IconData iconData = (destination.icon as Icon).icon!;
-      final IconData selectedIconData = (destination.selectedIcon as Icon).icon ?? iconData;
-      return GestureDetector(
-        onTap: () => onDestinationSelected(index),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 100),
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isSelected ? null : themeData.primaryColor.withOpacity(0.1),
-                border: Border.all(
-                  color: isSelected ? themeData.primaryColor : Colors.transparent,
-                  width: 4,
-                ),
-              ),
-              child: Icon(isSelected ? selectedIconData : iconData, color: isSelected ? themeData.primaryColor : null),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 5),
-              child: Text(destination.label,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: isSelected ? themeData.primaryColor : null,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                  )),
-            )
-          ],
-        ),
-      );
-    }
-
-    return Container(
-      decoration: BoxDecoration(color: Colors.white.withOpacity(.1)),
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 30, top: 10, left: 10, right: 10),
-        child: Row(
-          children: [
-            for (NavigationDestination destination in destinations)
-              Expanded(
-                child: buildNavBarItem(
-                    destination: destination,
-                    index: destinations.indexOf(destination),
-                    isSelected: destinations.indexOf(destination) == selectedIndex),
-              )
-          ],
-        ),
-      ),
-    );
   }
 }
