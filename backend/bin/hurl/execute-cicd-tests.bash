@@ -18,10 +18,6 @@ bash bin/hurl/clean-up.bash
 
 bash bin/hurl/start-up.bash
 
-echo "Waiting for the server to start..."
-sleep 10
-wait
-
 docker compose -f compose.yml -f compose.test.yml logs rust
 
 set +e

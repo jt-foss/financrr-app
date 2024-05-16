@@ -13,5 +13,6 @@ set -e
 
 echo "Creating logs directory..."
 mkdir -p logs
+chmod +rw logs
 
 cd "${WORK_DIR}"

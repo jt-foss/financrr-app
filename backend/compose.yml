@@ -14,6 +14,11 @@ services:
       - ./logs:/home/financrr/logs
     ports:
       - "127.0.0.1:3000:8080"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://127.0.0.1:8080/api/status/health" ]
+      interval: 10s
+      timeout: 3s
+      retries: 10
     depends_on:
       db:
         condition: service_healthy

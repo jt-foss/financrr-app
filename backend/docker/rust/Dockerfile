@@ -16,6 +16,7 @@ RUN cargo build --release
 FROM alpine:3.19.1
 
 # Update package repositories
+RUN apk add --no-cache curl
 RUN apk update
 
 # Create a non-root user
