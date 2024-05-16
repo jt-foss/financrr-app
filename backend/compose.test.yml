@@ -5,6 +5,8 @@ services:
     init: true
     volumes:
       - ./tests:/tests
+    networks:
+      - test
     environment:
       HURL_admin_token: ${HURL_admin_token}
 
@@ -12,19 +14,29 @@ services:
     ports: []
     env_file:
       - .env.test
+    networks:
+      - test
 
   db:
     volumes:
       - postgres-data-test:/var/lib/postgresql/data
       - ./docker/db/postgresql.conf:/etc/postgresql.conf
+    networks:
+      - test
     ports: []
 
   cache:
     volumes:
       - dragonflydata-test:/data
+    networks:
+      - test
     ports: []
 
 
 volumes:
   postgres-data-test: ~
   dragonflydata-test: ~
+
+networks:
+  test:
+    driver: bridge
