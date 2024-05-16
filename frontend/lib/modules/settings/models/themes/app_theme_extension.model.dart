@@ -4,24 +4,25 @@ import 'package:flutter/material.dart';
 import 'app_color.model.dart';
 
 extension AppThemeExtension on AppTheme {
-  FinancrrAppThemeExtension get financrrExtension => themeData.extensions[FinancrrAppThemeExtension] as FinancrrAppThemeExtension;
+  FinancrrAppThemeExtension get financrrExtension =>
+      themeData.extensions[FinancrrAppThemeExtension] as FinancrrAppThemeExtension;
 }
 
 class FinancrrAppThemeExtension extends ThemeExtension<FinancrrAppThemeExtension> {
-  final AppColor primary;
-  final AppColor font;
-  final AppColor background;
-  final AppColor backgroundTone1;
-  final AppColor backgroundTone2;
-  final AppColor backgroundTone3;
+  final Color primary;
+  final Color font;
+  final Color background;
+  final Color backgroundTone1;
+  final Color backgroundTone2;
+  final Color backgroundTone3;
 
   const FinancrrAppThemeExtension(
       {required this.primary,
-        required this.font,
-        required this.background,
-        required this.backgroundTone1,
-        required this.backgroundTone2,
-        required this.backgroundTone3});
+      required this.font,
+      required this.background,
+      required this.backgroundTone1,
+      required this.backgroundTone2,
+      required this.backgroundTone3});
 
   static FinancrrAppThemeExtension? tryFromJson(Map<String, dynamic> json) {
     final AppColor? primary = AppColor.tryFromJson(json['primary']);
@@ -39,23 +40,26 @@ class FinancrrAppThemeExtension extends ThemeExtension<FinancrrAppThemeExtension
       return null;
     }
     return FinancrrAppThemeExtension(
-      primary: primary,
-      font: font,
-      background: background,
-      backgroundTone1: backgroundTone1,
-      backgroundTone2: backgroundTone2,
-      backgroundTone3: backgroundTone3,
+      primary: primary.toColor(json),
+      font: font.toColor(json),
+      background: background.toColor(json),
+      backgroundTone1: backgroundTone1.toColor(json),
+      backgroundTone2: backgroundTone2.toColor(json),
+      backgroundTone3: backgroundTone3.toColor(json),
     );
   }
 
+  Color get primaryContrast =>
+      WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.light ? font : background;
+
   @override
   ThemeExtension<FinancrrAppThemeExtension> copyWith({
-    AppColor? primary,
-    AppColor? font,
-    AppColor? background,
-    AppColor? backgroundTone1,
-    AppColor? backgroundTone2,
-    AppColor? backgroundTone3,
+    Color? primary,
+    Color? font,
+    Color? background,
+    Color? backgroundTone1,
+    Color? backgroundTone2,
+    Color? backgroundTone3,
   }) {
     return FinancrrAppThemeExtension(
       primary: primary ?? this.primary,
@@ -73,12 +77,12 @@ class FinancrrAppThemeExtension extends ThemeExtension<FinancrrAppThemeExtension
       return this;
     }
     return FinancrrAppThemeExtension(
-      primary: primary.lerp(other.primary, t),
-      font: font.lerp(other.font, t),
-      background: background.lerp(other.background, t),
-      backgroundTone1: backgroundTone1.lerp(other.backgroundTone1, t),
-      backgroundTone2: backgroundTone2.lerp(other.backgroundTone2, t),
-      backgroundTone3: backgroundTone3.lerp(other.backgroundTone3, t),
+      primary: Color.lerp(primary, other.primary, t)!,
+      font: Color.lerp(font, other.font, t)!,
+      background: Color.lerp(background, other.background, t)!,
+      backgroundTone1: Color.lerp(backgroundTone1, other.backgroundTone1, t)!,
+      backgroundTone2: Color.lerp(backgroundTone2, other.backgroundTone2, t)!,
+      backgroundTone3: Color.lerp(backgroundTone3, other.backgroundTone3, t)!,
     );
   }
 }

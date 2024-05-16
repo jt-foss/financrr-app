@@ -67,8 +67,8 @@ class AppTheme {
       brightness: brightness,
       fontFamily: fontFamily,
       fontFamilyFallback: fontFamilyFallback,
-      primaryColor: themeExtension.primary.toColor(json),
-      scaffoldBackgroundColor: themeExtension.background.toColor(json),
+      primaryColor: themeExtension.primary,
+      scaffoldBackgroundColor: themeExtension.background,
       textTheme: TextTheme(
         displayLarge: textTheme.displayLarge.toTextStyle(),
         displayMedium: textTheme.displayMedium.toTextStyle(),
@@ -89,5 +89,3 @@ class AppTheme {
     );
   }
 }
-
-

@@ -1,4 +1,5 @@
 import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -20,7 +21,11 @@ class NoticeCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     var theme = ref.watch(themeProvider);
 
-    return Card.outlined(
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(width: 3, color: theme.financrrExtension.backgroundTone1),
+        borderRadius: BorderRadius.circular(10),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
@@ -42,11 +47,11 @@ class NoticeCard extends ConsumerWidget {
                                 WidgetSpan(
                                     child: Padding(
                                   padding: const EdgeInsets.only(left: 5),
-                                  child: Icon(Icons.arrow_forward_rounded, size: 17, color: theme.themeData.primaryColor),
+                                  child: Icon(Icons.arrow_forward_rounded, size: 17, color: theme.financrrExtension.primary),
                                 ))
                               ],
                               style: theme.textTheme.bodyMedium
-                                  ?.copyWith(color: theme.themeData.primaryColor, fontWeight: FontWeight.w500))),
+                                  ?.copyWith(color: theme.financrrExtension.primary, fontWeight: FontWeight.w500))),
                         ),
                 ],
               ),

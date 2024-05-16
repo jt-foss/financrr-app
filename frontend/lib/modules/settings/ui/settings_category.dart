@@ -24,12 +24,11 @@ class SettingsCategory extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = ref.watch(themeProvider).getCurrent();
 
-
     buildSettingsItem(SettingsItem item) {
       return GestureDetector(
         onTap: item.onTap,
         child: Container(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(12),
           child: Row(
             children: [
               if (item.iconData != null) ...[
@@ -55,9 +54,7 @@ class SettingsCategory extends ConsumerWidget {
             ),
           Container(
             decoration: BoxDecoration(
-              border: Border.all(
-                  width: 3,
-                  color: theme.financrrExtension.backgroundTone1.toColor({})),
+              border: Border.all(width: 3, color: theme.financrrExtension.backgroundTone1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Column(

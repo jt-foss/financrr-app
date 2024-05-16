@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'app_color.model.dart';
 import 'app_text.model.dart';
 
 class AppTextTheme {
@@ -39,15 +38,15 @@ class AppTextTheme {
   });
 
   static AppTextTheme fromJson(Map<String, dynamic>? json,
-      {AppColor? defaultColor, String? defaultFontFamily, List<String>? defaultFontFamilyFallback}) {
+      {Color? defaultColor, String? defaultFontFamily, List<String>? defaultFontFamilyFallback}) {
     AppText fromJson(String key, AppText fallback) {
       if (json == null) {
         return fallback;
       }
       return AppText.tryFromJson(json[key],
-          defaultColor: defaultColor,
-          defaultFontFamily: defaultFontFamily,
-          defaultFontFamilyFallback: defaultFontFamilyFallback) ??
+              defaultColor: defaultColor,
+              defaultFontFamily: defaultFontFamily,
+              defaultFontFamilyFallback: defaultFontFamilyFallback) ??
           fallback;
     }
 

@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class ScaffoldNavBarShell extends StatefulWidget {
+class ScaffoldNavBarShell extends StatefulHookConsumerWidget {
   final StatefulNavigationShell navigationShell;
 
   const ScaffoldNavBarShell({super.key, required this.navigationShell});
@@ -14,14 +14,16 @@ class ScaffoldNavBarShell extends StatefulWidget {
   static ScaffoldNavBarShellState? maybeOf(BuildContext context) => context.findAncestorStateOfType<ScaffoldNavBarShellState>();
 
   @override
-  State<StatefulWidget> createState() => ScaffoldNavBarShellState();
+  ConsumerState<ScaffoldNavBarShell> createState() => ScaffoldNavBarShellState();
 }
 
-class ScaffoldNavBarShellState extends State<ScaffoldNavBarShell> {
+class ScaffoldNavBarShellState extends ConsumerState<ScaffoldNavBarShell> {
   bool _isHovered = false;
 
   @override
   Widget build(BuildContext context) {
+    final theme = ref.watch(themeProvider);
+
     final isMobile = context.isMobile;
     final Widget shell = kIsWeb ? SelectionArea(child: widget.navigationShell) : widget.navigationShell;
     return Scaffold(
@@ -36,6 +38,7 @@ class ScaffoldNavBarShellState extends State<ScaffoldNavBarShell> {
                       onEnter: (event) => setState(() => _isHovered = true),
                       onExit: (event) => setState(() => _isHovered = false),
                       child: NavigationRail(
+                          backgroundColor: theme.financrrExtension.background,
                           destinations: _getNavRailDestinations(),
                           extended: context.isWidescreen || _isHovered,
                           onDestinationSelected: (index) => goToBranch(index),
@@ -43,12 +46,19 @@ class ScaffoldNavBarShellState extends State<ScaffoldNavBarShell> {
                     );
                   }),
                   Expanded(
-                    child: shell,
+                    child: Container(
+                        decoration: BoxDecoration(
+                          border: Border(
+                            left: BorderSide(color: theme.financrrExtension.backgroundTone1, width: 3),
+                          ),
+                        ),
+                        child: shell),
                   )
                 ],
               ),
       ),
       appBar: AppBar(
+        backgroundColor: theme.financrrExtension.background,
         title: GestureDetector(
           onTap: () => resetLocation(index: 0),
           child: const Text('financrr'),

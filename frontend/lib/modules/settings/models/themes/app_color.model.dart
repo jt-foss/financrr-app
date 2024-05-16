@@ -1,7 +1,5 @@
 import 'dart:ui';
 
-import 'package:financrr_frontend/utils/extensions.dart';
-
 import '../../../../utils/json_utils.dart';
 
 class AppColor {
@@ -59,21 +57,6 @@ class AppColor {
       }
     }
     throw StateError('Either value or options must be set!');
-  }
-
-  AppColor lerp(covariant AppColor other, double t) {
-    return AppColor(
-        value: value == null || other.value == null
-            ? null
-            : Color.lerp(_parseColor(value!), _parseColor(other.value!), t)?.toHex(),
-        options: options == null || options?.hex == null || other.options == null || other.options?.hex == null
-            ? null
-            : AppColorOptions(
-          hex: Color.lerp(_parseColor(options!.hex!), _parseColor(other.options!.hex!), t)?.toHex(),
-          opacity: options!.opacity == null || other.options!.opacity == null
-              ? null
-              : lerpDouble(options!.opacity!, other.options!.opacity!, t),
-        ));
   }
 
   Color _parseColor(String rawHex) {

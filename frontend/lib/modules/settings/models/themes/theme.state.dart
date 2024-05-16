@@ -1,4 +1,5 @@
 import 'package:financrr_frontend/modules/settings/models/themes/app_theme.model.dart';
+import 'package:financrr_frontend/modules/settings/models/themes/app_theme_extension.model.dart';
 import 'package:financrr_frontend/modules/settings/models/themes/theme_loader.dart';
 import 'package:financrr_frontend/shared/models/store.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +23,7 @@ class ThemeState {
   ThemeData get themeData => getCurrent().themeData;
   TextTheme get textTheme => themeData.textTheme;
   ColorScheme get colorScheme => themeData.colorScheme;
+  FinancrrAppThemeExtension get financrrExtension => getCurrent().financrrExtension;
 
   AppTheme getCurrent() {
     return switch (mode) {
