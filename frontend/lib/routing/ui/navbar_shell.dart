@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
 import 'package:financrr_frontend/utils/l10n_utils.dart';
@@ -5,6 +7,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import 'app_navigation_rail.dart';
 
 class ScaffoldNavBarShell extends StatefulHookConsumerWidget {
   final StatefulNavigationShell navigationShell;
@@ -19,6 +23,7 @@ class ScaffoldNavBarShell extends StatefulHookConsumerWidget {
 
 class ScaffoldNavBarShellState extends ConsumerState<ScaffoldNavBarShell> {
   bool _isHovered = false;
+  Timer? _hoverTimer;
 
   @override
   Widget build(BuildContext context) {
@@ -35,10 +40,12 @@ class ScaffoldNavBarShellState extends ConsumerState<ScaffoldNavBarShell> {
                 children: [
                   StatefulBuilder(builder: (context, setState) {
                     return MouseRegion(
-                      onEnter: (event) => setState(() => _isHovered = true),
-                      onExit: (event) => setState(() => _isHovered = false),
-                      child: NavigationRail(
-                          backgroundColor: theme.financrrExtension.background,
+                      onEnter: (event) => _hoverTimer = Timer(const Duration(milliseconds: 1000), () => setState(() => _isHovered = true)),
+                      onExit: (event) {
+                        _hoverTimer?.cancel();
+                        setState(() => _isHovered = false);
+                      },
+                      child: FinancrrNavigationRail(
                           destinations: _getNavRailDestinations(),
                           extended: context.isWidescreen || _isHovered,
                           onDestinationSelected: (index) => goToBranch(index),
@@ -100,23 +107,23 @@ class ScaffoldNavBarShellState extends ConsumerState<ScaffoldNavBarShell> {
             label: L10nKey.navigationSettings.toString()),
       ];
 
-  List<NavigationRailDestination> _getNavRailDestinations() => [
-        NavigationRailDestination(
-            icon: const Icon(Icons.dashboard_outlined),
-            selectedIcon: const Icon(Icons.dashboard_rounded),
-            label: L10nKey.navigationDashboard.toText()),
-        NavigationRailDestination(
-            icon: const Icon(Icons.account_balance_wallet_outlined),
-            selectedIcon: const Icon(Icons.account_balance_wallet_rounded),
-            label: L10nKey.navigationAccounts.toText()),
-        NavigationRailDestination(
-            icon: const Icon(Icons.leaderboard_outlined),
-            selectedIcon: const Icon(Icons.leaderboard_rounded),
-            label: L10nKey.navigationStatistics.toText()),
-        NavigationRailDestination(
-            icon: const Icon(Icons.settings_outlined),
-            selectedIcon: const Icon(Icons.settings_rounded),
-            label: L10nKey.navigationSettings.toText()),
+  List<NavDestination> _getNavRailDestinations() => const [
+    NavDestination(
+            iconData: Icons.dashboard_outlined,
+            selectedIconData: Icons.dashboard_rounded,
+            label: L10nKey.navigationDashboard),
+    NavDestination(
+            iconData: Icons.account_balance_wallet_outlined,
+            selectedIconData: Icons.account_balance_wallet_rounded,
+            label: L10nKey.navigationAccounts),
+    NavDestination(
+            iconData: Icons.leaderboard_outlined,
+            selectedIconData: Icons.leaderboard_rounded,
+            label: L10nKey.navigationStatistics),
+    NavDestination(
+            iconData: Icons.settings_outlined,
+            selectedIconData: Icons.settings_rounded,
+            label: L10nKey.navigationSettings),
       ];
 
   void refresh() => setState(() {});

@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
-import 'package:financrr_frontend/routing/navbar_shell.dart';
+import 'package:financrr_frontend/routing/ui/navbar_shell.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
 import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';

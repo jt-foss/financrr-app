@@ -136,7 +136,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           child: SizedBox(
             width: size.width / 1.1,
             child: Scaffold(
-                body: Column(
+                body: ListView(
               children: [
                 buildDummyAccountItem(),
                 for (SettingsCategory category in _getCategories()) category,
