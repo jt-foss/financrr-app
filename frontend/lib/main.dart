@@ -29,6 +29,7 @@ void main() async {
   try {
     app = await initApp();
   } catch (e, stackTrace) {
+    _log.severe('Error during initialization: $e\n\n$stackTrace');
     app = FallbackErrorApp(error: e.toString(), stackTrace: stackTrace.toString());
   }
   runApp(app);

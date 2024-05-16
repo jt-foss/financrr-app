@@ -38,7 +38,7 @@ class _ThemeSettingsPageState extends ConsumerState<ThemeSettingsPage> {
             ref.read(themeProvider.notifier).setMode(appTheme.themeMode);
           },
           contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-          title: Text(appTheme.effectiveName),
+          title: appTheme.translationKey.toText(),
           leading: CircleAvatar(
             backgroundColor: appTheme.previewColor,
             child: Icon(

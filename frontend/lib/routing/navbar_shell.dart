@@ -1,6 +1,6 @@
 import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -18,52 +18,6 @@ class ScaffoldNavBarShell extends StatefulWidget {
 }
 
 class ScaffoldNavBarShellState extends State<ScaffoldNavBarShell> {
-  static const List<NavigationDestination> _navBarDestinations = [
-    NavigationDestination(
-      icon: Icon(Icons.dashboard_outlined),
-      selectedIcon: Icon(Icons.dashboard_rounded),
-      label: 'Dashboard',
-    ),
-    NavigationDestination(
-      icon: Icon(Icons.account_balance_wallet_outlined),
-      selectedIcon: Icon(Icons.account_balance_wallet_rounded),
-      label: 'Accounts',
-    ),
-    NavigationDestination(
-      icon: Icon(Icons.leaderboard_outlined),
-      selectedIcon: Icon(Icons.leaderboard_rounded),
-      label: 'Statistics',
-    ),
-    NavigationDestination(
-      icon: Icon(Icons.person_outline_rounded),
-      selectedIcon: Icon(Icons.person_rounded),
-      label: 'Settings',
-    ),
-  ];
-
-  static const List<NavigationRailDestination> _navRailDestinations = [
-    NavigationRailDestination(
-      icon: Icon(Icons.dashboard_outlined),
-      selectedIcon: Icon(Icons.dashboard_rounded),
-      label: Text('Dashboard'),
-    ),
-    NavigationRailDestination(
-      icon: Icon(Icons.account_balance_wallet_outlined),
-      selectedIcon: Icon(Icons.account_balance_wallet_rounded),
-      label: Text('Accounts'),
-    ),
-    NavigationRailDestination(
-      icon: Icon(Icons.leaderboard_outlined),
-      selectedIcon: Icon(Icons.leaderboard_rounded),
-      label: Text('Statistics'),
-    ),
-    NavigationRailDestination(
-      icon: Icon(Icons.settings_outlined),
-      selectedIcon: Icon(Icons.settings_rounded),
-      label: Text('Settings'),
-    ),
-  ];
-
   bool _isHovered = false;
 
   @override
@@ -82,7 +36,7 @@ class ScaffoldNavBarShellState extends State<ScaffoldNavBarShell> {
                       onEnter: (event) => setState(() => _isHovered = true),
                       onExit: (event) => setState(() => _isHovered = false),
                       child: NavigationRail(
-                          destinations: _navRailDestinations,
+                          destinations: _getNavRailDestinations(),
                           extended: context.isWidescreen || _isHovered,
                           onDestinationSelected: (index) => goToBranch(index),
                           selectedIndex: widget.navigationShell.currentIndex),
@@ -112,10 +66,58 @@ class ScaffoldNavBarShellState extends State<ScaffoldNavBarShell> {
           ? FinancrrNavigationBar(
               onDestinationSelected: (index) => goToBranch(index),
               selectedIndex: widget.navigationShell.currentIndex,
-              destinations: _navBarDestinations)
+              destinations: _getNavBarDestinations())
           : null,
     );
   }
+
+  List<NavigationDestination> _getNavBarDestinations() => [
+    NavigationDestination(
+      icon: const Icon(Icons.dashboard_outlined),
+      selectedIcon: const Icon(Icons.dashboard_rounded),
+      label: L10nKey.navigationDashboard.toString()
+    ),
+    NavigationDestination(
+      icon: const Icon(Icons.account_balance_wallet_outlined),
+      selectedIcon: const Icon(Icons.account_balance_wallet_rounded),
+      label: L10nKey.navigationAccounts.toString()
+    ),
+    NavigationDestination(
+      icon: const Icon(Icons.leaderboard_outlined),
+      selectedIcon: const Icon(Icons.leaderboard_rounded),
+      label: L10nKey.navigationStatistics.toString()
+    ),
+    NavigationDestination(
+      icon: const Icon(Icons.person_outline_rounded),
+      selectedIcon: const Icon(Icons.person_rounded),
+      label: L10nKey.navigationSettings.toString()
+    ),
+  ];
+
+  List<NavigationRailDestination> _getNavRailDestinations() => [
+    NavigationRailDestination(
+      icon: const Icon(Icons.dashboard_outlined),
+      selectedIcon: const Icon(Icons.dashboard_rounded),
+      label: L10nKey.navigationDashboard.toText()
+    ),
+    NavigationRailDestination(
+      icon: const Icon(Icons.account_balance_wallet_outlined),
+      selectedIcon: const Icon(Icons.account_balance_wallet_rounded),
+      label: L10nKey.navigationAccounts.toText()
+    ),
+    NavigationRailDestination(
+      icon: const Icon(Icons.leaderboard_outlined),
+      selectedIcon: const Icon(Icons.leaderboard_rounded),
+      label: L10nKey.navigationStatistics.toText()
+    ),
+    NavigationRailDestination(
+      icon: const Icon(Icons.settings_outlined),
+      selectedIcon: const Icon(Icons.settings_rounded),
+      label: L10nKey.navigationSettings.toText()
+    ),
+  ];
+
+  void refresh() => setState(() {});
 
   bool canPop() {
     final GoRouterState state = GoRouterState.of(context);
@@ -148,7 +150,7 @@ class FinancrrNavigationBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var theme = ref.watch(themeProvider);
-    final ThemeData themeData = theme.getActive().themeData;
+    final ThemeData themeData = theme.getCurrent().themeData;
 
     Widget buildNavBarItem({required NavigationDestination destination, required int index, bool isSelected = false}) {
       final IconData iconData = (destination.icon as Icon).icon!;

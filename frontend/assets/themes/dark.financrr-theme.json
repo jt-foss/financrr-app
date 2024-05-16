@@ -1,86 +1,94 @@
 {
-    "id": "DARK",
-    "logo_path": "assets/logo/logo_light.svg",
-    "translation_key": "theme_dark",
-    "preview_color": "0x111111",
-    "theme_mode": "dark",
-    "theme_data": {
-        "brightness": "dark",
-        "primary_color": "0x4B87FF",
-        "background_color": "0x111111",
-        "secondary_background_color": "0x1A1A1A",
-        "hint_color": "0xB4B4B4",
-        "card_color": "0x656565",
-        "app_bar_theme_data": {
-            "foreground_color": "0xFFFFFF",
-            "title_color": "0xFFFFFF",
-            "background_color": {
-                "copy_from_path": "theme_data/secondary_background_color"
-            }
-        },
-        "navigation_bar_theme_data": {
-            "indicator_color": {
-                "copy_from_path": "theme_data/primary_color",
-                "opacity": 0.4
-            },
-            "icon_color": "0x9E9E9E",
-            "background_color": {
-                "copy_from_path": "theme_data/secondary_background_color"
-            },
-            "label_color": "0xE0E0E0"
-        },
-        "navigation_rail_theme_data": {
-            "indicator_color": {
-                "copy_from_path": "theme_data/navigation_bar_theme_data/indicator_color"
-            },
-            "selected_icon_color": {
-                "copy_from_path": "theme_data/navigation_bar_theme_data/icon_color"
-            },
-            "background_color": {
-                "copy_from_path": "theme_data/secondary_background_color"
-            },
-            "selected_label_color": {
-                "copy_from_path": "theme_data/navigation_bar_theme_data/label_color"
-            },
-            "unselected_label_color": "0xEEEEEE"
-        },
-        "elevated_button_theme_data": {
-            "foreground_color": "0xFFFFFF",
-            "background_color": {
-                "copy_from_path": "theme_data/primary_color"
-            }
-        },
-        "text_button_theme_data": {
-            "foreground_color": {
-                "copy_from_path": "theme_data/primary_color"
-            }
-        },
-        "text_selection_theme_data": {
-            "selection_color": {
-                "copy_from_path": "theme_data/primary_color"
-            }
-        },
-        "switch_theme_data": {
-            "thumb_color": {
-                "copy_from_path": "theme_data/primary_color"
-            },
-            "track_color": {
-                "copy_from_path": "theme_data/primary_color",
-                "opacity": 0.5
-            }
-        },
-        "snack_bar_theme_data": {
-            "content_text_color": "0xFFFFFF",
-            "background_color": "0x656565"
-        },
-        "drawer_theme_data": {
-            "background_color": {
-                "copy_from_path": "theme_data/background_color"
-            },
-            "scrim_color": {
-                "hex": "0xFFFFFF",
-                "opacity": 0.1
-            }
-        }
+  "id": "DARK",
+  "logo_path": "assets/logo/logo_light.svg",
+  "translation_key": "theme_dark",
+  "preview_color": "0x111111",
+  "theme_mode": "dark",
+  "colors": {
+    "primary": "0x2C03E6",
+    "font": "0x000000",
+    "background": "0xFFFFFF",
+    "background_tone1": "0xF2F2F2",
+    "background_tone2": "0x9D9D9",
+    "background_tone3": "0x1C1B1F"
+  },
+  "theme_data": {
+    "brightness": "dark",
+    "primary_color": "0x4B87FF",
+    "background_color": "0x111111",
+    "secondary_background_color": "0x1A1A1A",
+    "hint_color": "0xB4B4B4",
+    "card_color": "0x656565",
+    "app_bar_theme_data": {
+      "foreground_color": "0xFFFFFF",
+      "title_color": "0xFFFFFF",
+      "background_color": {
+        "copy_from_path": "theme_data/secondary_background_color"
+      }
+    },
+    "navigation_bar_theme_data": {
+      "indicator_color": {
+        "copy_from_path": "theme_data/primary_color",
+        "opacity": 0.4
+      },
+      "icon_color": "0x9E9E9E",
+      "background_color": {
+        "copy_from_path": "theme_data/secondary_background_color"
+      },
+      "label_color": "0xE0E0E0"
+    },
+    "navigation_rail_theme_data": {
+      "indicator_color": {
+        "copy_from_path": "theme_data/navigation_bar_theme_data/indicator_color"
+      },
+      "selected_icon_color": {
+        "copy_from_path": "theme_data/navigation_bar_theme_data/icon_color"
+      },
+      "background_color": {
+        "copy_from_path": "theme_data/secondary_background_color"
+      },
+      "selected_label_color": {
+        "copy_from_path": "theme_data/navigation_bar_theme_data/label_color"
+      },
+      "unselected_label_color": "0xEEEEEE"
+    },
+    "elevated_button_theme_data": {
+      "foreground_color": "0xFFFFFF",
+      "background_color": {
+        "copy_from_path": "theme_data/primary_color"
+      }
+    },
+    "text_button_theme_data": {
+      "foreground_color": {
+        "copy_from_path": "theme_data/primary_color"
+      }
+    },
+    "text_selection_theme_data": {
+      "selection_color": {
+        "copy_from_path": "theme_data/primary_color"
+      }
+    },
+    "switch_theme_data": {
+      "thumb_color": {
+        "copy_from_path": "theme_data/primary_color"
+      },
+      "track_color": {
+        "copy_from_path": "theme_data/primary_color",
+        "opacity": 0.5
+      }
+    },
+    "snack_bar_theme_data": {
+      "content_text_color": "0xFFFFFF",
+      "background_color": "0x656565"
+    },
+    "drawer_theme_data": {
+      "background_color": {
+        "copy_from_path": "theme_data/background_color"
+      },
+      "scrim_color": {
+        "hex": "0xFFFFFF",
+        "opacity": 0.1
+      }
     }
+  }
 }

@@ -4,6 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:restrr/restrr.dart';
 
+extension HexColor on Color {
+  String toHex({bool leadingHashSign = true}) => '${leadingHashSign ? '#' : ''}'
+      '${alpha.toRadixString(16).padLeft(2, '0')}'
+      '${red.toRadixString(16).padLeft(2, '0')}'
+      '${green.toRadixString(16).padLeft(2, '0')}'
+      '${blue.toRadixString(16).padLeft(2, '0')}';
+}
+
 extension LocaleExtension on Locale {
   String getLocaleName() {
     return switch (languageCode) { 'en' => 'English', 'de' => 'Deutsch', _ => 'Unknown' };

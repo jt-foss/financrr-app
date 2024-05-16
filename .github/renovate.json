@@ -1,0 +1,18 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": [
+        "config:recommended"
+    ],
+    "rangeStrategy": "bump",
+    "ignorePaths": [
+        "frontend/android/",
+        "frontend/macos/",
+        "frontend/ios/"
+    ],
+    "prHourlyLimit": 0,
+    "updateLockFiles": true,
+    "lockFileMaintenance": { 
+        "enabled": true,
+        "schedule": ["at any time"]
+    }
+}
