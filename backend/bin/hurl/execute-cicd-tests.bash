@@ -18,6 +18,11 @@ bash bin/hurl/clean-up.bash
 
 bash bin/hurl/start-up.bash
 
+sleep 10
+wait
+
+docker compose -f compose.yml -f compose.test.yml rust
+
 set +e
 # Execute the curl command inside the hurl container and capture the response
 RESPONSE=$(docker compose -f compose.yml -f compose.test.yml run -T --entrypoint curl hurl -s -X POST 'http://rust:8080/api/v1/session' \
