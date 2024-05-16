@@ -18,6 +18,7 @@ bash bin/hurl/clean-up.bash
 
 bash bin/hurl/start-up.bash
 
+echo "Waiting for the services to start..."
 sleep 10
 wait
 

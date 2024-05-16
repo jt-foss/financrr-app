@@ -34,6 +34,9 @@ COPY --from=builder --chown=1000:1000 /usr/src/financrr/target/release/migration
 RUN chmod +x /home/financrr/financrr
 RUN chmod +x /home/financrr/migrator
 
+RUN mkdir "./logs"
+RUN chown -R financrr:financrr "./logs"
+
 # Switch to non-root user
 USER financrr
 
