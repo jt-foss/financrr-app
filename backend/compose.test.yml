@@ -10,8 +10,6 @@ services:
 
   rust:
     ports: []
-    volumes:
-      - logs:/home/financrr/logs
     env_file:
       - .env.test
 
