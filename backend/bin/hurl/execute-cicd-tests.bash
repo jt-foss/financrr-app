@@ -21,7 +21,7 @@ bash bin/hurl/start-up.bash
 sleep 10
 wait
 
-docker compose -f compose.yml -f compose.test.yml rust
+docker compose -f compose.yml -f compose.test.yml logs rust
 
 set +e
 # Execute the curl command inside the hurl container and capture the response
