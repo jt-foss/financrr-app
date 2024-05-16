@@ -22,6 +22,12 @@ echo "Waiting for the server to start..."
 sleep 10
 wait
 
+# Execute the curl command inside the hurl container and capture the response
+RESPONSE=$(docker compose -f compose.yml -f compose.test.yml run -T --entrypoint curl hurl -s -X POST 'http://rust:8080/api/v1/session' \
+    -H 'Content-Type: application/json' \
+    -d '{"username": "admin", "password": "Financrr123", "session_name": "test_session"}' -w "\n%{http_code}" 2>&1)
+echo "Curl output: $RESPONSE"
+
 # Setting admin token
 echo "Setting admin token..."
 TOKEN_OUTPUT=$(bash bin/hurl/set-admin-token.bash)
@@ -36,7 +42,7 @@ fi
 
 set +e
 echo "Running the tests..."
-docker compose -f compose.yml -f compose.test.yml -e HURL_admin_token run --rm -T hurl --test --color --glob "/tests/**/*.hurl"
+docker compose -f compose.yml -f compose.test.yml run --rm -T hurl --test --color --glob "/tests/**/*.hurl"
 TEST_EXIT_CODE=$?
 wait
 set -e
