@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/shared/ui/auth_page_template.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
+import 'package:financrr_frontend/shared/ui/custom_text_field.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
 import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/foundation.dart';
@@ -60,9 +61,14 @@ class ServerConfigPageState extends ConsumerState<ServerConfigPage> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(top: 20),
-                    child: TextFormField(
+                    child: AppTextField(
                       controller: _urlController,
-                      decoration: const InputDecoration(labelText: 'Server URL'),
+                      label: L10nKey.authConfigCheckUrl, // TODO: implement L10nKey ("Server URL")
+                      hint: L10nKey.authConfigCheckUrl, // TODO: implement L10nKey ("https://demo.financrr.app/api")
+                      status: _isValid && _apiVersion != null
+                          ? L10nKey.authConfigStatus.toString(namedArgs: {'hostStatus': 'Healthy', 'apiVersion': '$_apiVersion'})
+                          : null,
+                      prefixIcon: const Icon(Icons.link),
                       autofillHints: const [AutofillHints.username],
                       validator: (value) => InputValidators.url(value),
                       onChanged: (_) => setState(() {
@@ -71,13 +77,6 @@ class ServerConfigPageState extends ConsumerState<ServerConfigPage> {
                       }),
                     ),
                   ),
-                  if (_isValid && _apiVersion != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 5),
-                      child: L10nKey.authConfigStatus.toText(
-                          namedArgs: {'hostStatus': 'Healthy', 'apiVersion': '$_apiVersion'},
-                          style: theme.textTheme.labelMedium?.copyWith(color: theme.themeData.primaryColor)),
-                    )
                 ],
               )),
           Padding(

@@ -12,6 +12,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../shared/ui/adaptive_scaffold.dart';
 import '../../../routing/page_path.dart';
+import '../../../shared/ui/custom_text_field.dart';
 
 class LoginPage extends StatefulHookConsumerWidget {
   static const PagePathBuilder pagePath = PagePathBuilder('/login');
@@ -55,23 +56,23 @@ class LoginPageState extends ConsumerState<LoginPage> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 20),
-                      child: TextFormField(
+                      child: AppTextField(
                         controller: _usernameController,
-                        decoration: InputDecoration(labelText: L10nKey.commonUsername.toString()),
+                        label: L10nKey.commonUsername,
+                        hint: L10nKey.commonUsername, // TODO: implement L10nKey ("John Doe")
                         autofillHints: const [AutofillHints.username, AutofillHints.newUsername],
                         validator: (value) => value!.isEmpty ? L10nKey.commonUsernameRequired.toString() : null,
                       ),
                     ),
-                    TextFormField(
+                    AppTextField(
                       controller: _passwordController,
-                      decoration: InputDecoration(
-                          labelText: L10nKey.commonPassword.toString(),
-                          suffixIcon: Padding(
-                            padding: const EdgeInsets.only(right: 10),
-                            child: IconButton(
-                                icon: Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
-                                onPressed: () => setState(() => _obscureText = !_obscureText)),
-                          )),
+                      label: L10nKey.commonPassword,
+                      suffixIcon: Padding(
+                        padding: const EdgeInsets.only(right: 10),
+                        child: IconButton(
+                            icon: Icon(_obscureText ? Icons.visibility_outlined : Icons.visibility_off_outlined),
+                            onPressed: () => setState(() => _obscureText = !_obscureText)),
+                      ),
                       obscureText: _obscureText,
                       autofillHints: const [AutofillHints.password, AutofillHints.newPassword],
                       validator: (value) => value!.isEmpty ? L10nKey.commonPasswordRequired.toString() : null,

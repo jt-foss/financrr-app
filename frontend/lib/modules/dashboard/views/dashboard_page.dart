@@ -68,7 +68,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
         children: [
           Padding(
             padding: const EdgeInsets.only(bottom: 10),
-            child: Text('Quick Actions', style: theme.textTheme.titleMedium),
+            child: Text('Quick Actions', style: theme.textTheme.titleMedium), // TODO: implement L10nKey ("Quick Actions")
           ),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -104,7 +104,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Total', style: theme.textTheme.titleMedium),
+          Text('Total', style: theme.textTheme.titleMedium), // TODO: implement L10nKey ("Total")
           Text('0,00€', style: theme.textTheme.displaySmall?.copyWith(color: theme.financrrExtension.primary)),
           Container(
             width: size.width / 4,
