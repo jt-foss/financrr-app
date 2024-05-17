@@ -27,36 +27,47 @@ class FinancrrNavigationRail extends ConsumerWidget {
 
     buildDestination(NavDestination destination, int index) {
       final bool isSelected = index == selectedIndex;
-      return GestureDetector(
-        onTap: () => onDestinationSelected?.call(index),
-        child: Row(
-          mainAxisAlignment: extended ? MainAxisAlignment.start : MainAxisAlignment.center,
-          children: [
-            if (extended)
-              const SizedBox(width: 40),
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(width: 3, color: isSelected ? theme.financrrExtension.primary : Colors.transparent),
-                color: theme.financrrExtension.backgroundTone1,
+      bool isHovered = false;
+
+      return StatefulBuilder(
+        builder: (context, setState) {
+
+          return MouseRegion(
+            onHover: (_) => setState(() => isHovered = true),
+            onExit: (_) => setState(() => isHovered = false),
+            child: GestureDetector(
+              onTap: () => onDestinationSelected?.call(index),
+              child: Row(
+                mainAxisAlignment: extended ? MainAxisAlignment.start : MainAxisAlignment.center,
+                children: [
+                  if (extended)
+                    const SizedBox(width: 40),
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    padding: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(width: 3, color: isSelected ? theme.financrrExtension.primary : Colors.transparent),
+                      color: isSelected ? null : theme.financrrExtension.backgroundTone1,
+                    ),
+                    child: Icon(isSelected
+                        ? destination.selectedIconData ?? destination.iconData
+                        : destination.iconData,
+                        color: isSelected ? theme.financrrExtension.primary : theme.financrrExtension.backgroundTone3),
+                  ),
+                  if (extended) ...[
+                    const SizedBox(width: 25),
+                    destination.label.toText(
+                        softWrap: true,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                            color: isSelected ? theme.financrrExtension.primary : null,
+                            fontWeight: isSelected || isHovered ? FontWeight.w600 : FontWeight.w500))
+                  ]
+                ],
               ),
-              child: Icon(isSelected
-                  ? destination.selectedIconData ?? destination.iconData
-                  : destination.iconData,
-                  color: isSelected ? theme.financrrExtension.primary : theme.financrrExtension.backgroundTone3),
             ),
-            if (extended) ...[
-              const SizedBox(width: 25),
-              destination.label.toText(
-                  softWrap: true,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                      color: isSelected ? theme.financrrExtension.primary : null,
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500))
-            ]
-          ],
-        ),
+          );
+        },
       );
     }
 
