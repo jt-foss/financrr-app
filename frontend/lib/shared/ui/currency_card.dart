@@ -41,40 +41,42 @@ class CurrencyCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     var theme = ref.watch(themeProvider);
 
-    return Card.outlined(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        child: Row(
-          children: [
-            TextCircleAvatar(text: symbol, radius: 25),
-            const SizedBox(width: 20),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(name, style: theme.textTheme.titleSmall),
-                  if (isoCode != null) Text(isoCode!),
-                ],
-              ),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      decoration: BoxDecoration(
+        border: Border.all(color: theme.financrrExtension.backgroundTone1, width: 3),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          TextCircleAvatar(text: symbol, radius: 25),
+          const SizedBox(width: 20),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(name, style: theme.textTheme.titleSmall),
+                if (isoCode != null) Text(isoCode!),
+              ],
             ),
-            PopupMenuButton(
-              enabled: interactive && isCustom,
-              itemBuilder: (context) {
-                return [
+          ),
+          PopupMenuButton(
+            enabled: interactive && isCustom,
+            itemBuilder: (context) {
+              return [
+                PopupMenuItem(
+                  onTap: () => context.goPath(CurrencyEditPage.pagePath.build(params: {'currencyId': id.toString()})),
+                  child: L10nKey.commonEdit.toText(),
+                ),
+                if (onDelete != null)
                   PopupMenuItem(
-                    onTap: () => context.goPath(CurrencyEditPage.pagePath.build(params: {'currencyId': id.toString()})),
-                    child: L10nKey.commonEdit.toText(),
+                    onTap: onDelete,
+                    child: L10nKey.commonDelete.toText(),
                   ),
-                  if (onDelete != null)
-                    PopupMenuItem(
-                      onTap: onDelete,
-                      child: L10nKey.commonDelete.toText(),
-                    ),
-                ];
-              },
-            )
-          ],
-        ),
+              ];
+            },
+          )
+        ],
       ),
     );
   }

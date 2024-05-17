@@ -59,7 +59,7 @@ class _CurrencySettingsPageState extends ConsumerState<CurrencySettingsPage> {
                       valueListenable: _amount,
                       builder: (context, value, child) {
                         // TODO: add plurals
-                        return Text('${_amount.value} currencies').tr();
+                        return Text('${_amount.value} currencies');
                       },
                     ),
                   ],
