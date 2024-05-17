@@ -1,4 +1,5 @@
 import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
+import 'package:financrr_frontend/shared/ui/outline_card.dart';
 import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -37,12 +38,8 @@ class SessionCard extends ConsumerWidget {
     var theme = ref.watch(themeProvider);
     var l10n = ref.watch(l10nProvider);
 
-    return Container(
+    return OutlineCard(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      decoration: BoxDecoration(
-        border: Border.all(color: theme.financrrExtension.backgroundTone1, width: 3),
-        borderRadius: BorderRadius.circular(10),
-      ),
       child: Row(
         children: [
           const Icon(Icons.devices_rounded),

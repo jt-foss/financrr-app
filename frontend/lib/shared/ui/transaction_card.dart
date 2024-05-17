@@ -1,5 +1,6 @@
 import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
+import 'package:financrr_frontend/shared/ui/outline_card.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
@@ -53,39 +54,33 @@ class TransactionCard extends ConsumerWidget {
     var theme = ref.watch(themeProvider);
     var l10n = ref.watch(l10nProvider);
 
-    return GestureDetector(
+    return OutlineCard(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       onTap: !interactive
           ? null
           : () => context.goPath(TransactionPage.pagePath
-              .build(params: {'accountId': account.id.value.toString(), 'transactionId': id.toString()})),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        decoration: BoxDecoration(
-          border: Border.all(width: 3, color: theme.financrrExtension.backgroundTone1),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(name, style: theme.textTheme.titleSmall),
-            if (description != null) Text(description!, style: theme.textTheme.bodyMedium),
-            Text(TextUtils.formatIBAN(account.iban) ?? account.name),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(l10n.dateFormat.format(executedAt)),
-                Text(
-                    '${type == TransactionType.deposit ? '' : '-'}${TextUtils.formatBalanceWithCurrency(l10n, amount, account.currencyId.get()!)}',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                        color: type == TransactionType.deposit
-                            ? theme.themeData.primaryColor
-                            : theme.themeData.colorScheme.error)),
-              ],
-            ),
-          ],
-        ),
+          .build(params: {'accountId': account.id.value.toString(), 'transactionId': id.toString()})),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(name, style: theme.textTheme.titleSmall),
+          if (description != null) Text(description!, style: theme.textTheme.bodyMedium),
+          Text(TextUtils.formatIBAN(account.iban) ?? account.name),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(l10n.dateFormat.format(executedAt)),
+              Text(
+                  '${type == TransactionType.deposit ? '' : '-'}${TextUtils.formatBalanceWithCurrency(l10n, amount, account.currencyId.get()!)}',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                      color: type == TransactionType.deposit
+                          ? theme.themeData.primaryColor
+                          : theme.themeData.colorScheme.error)),
+            ],
+          ),
+        ],
       ),
     );
   }

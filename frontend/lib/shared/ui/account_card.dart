@@ -1,5 +1,6 @@
 import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
+import 'package:financrr_frontend/shared/ui/outline_card.dart';
 import 'package:financrr_frontend/shared/ui/text_circle_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -41,31 +42,25 @@ class AccountCard extends ConsumerWidget {
     var theme = ref.watch(themeProvider);
     var l10n = ref.watch(l10nProvider);
 
-    return GestureDetector(
+    return OutlineCard(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       onTap: !interactive ? null : () => context.goPath(AccountPage.pagePath.build(params: {'accountId': id.toString()})),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        decoration: BoxDecoration(
-          border: Border.all(width: 3, color: theme.financrrExtension.backgroundTone1),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Row(
-          children: [
-            TextCircleAvatar(text: name, radius: 25),
-            const SizedBox(width: 20),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(name, style: theme.textTheme.titleSmall),
-                  if (iban != null || description != null) Text(TextUtils.formatIBAN(iban) ?? description!),
-                ],
-              ),
+      child: Row(
+        children: [
+          TextCircleAvatar(text: name, radius: 25),
+          const SizedBox(width: 20),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(name, style: theme.textTheme.titleSmall),
+                if (iban != null || description != null) Text(TextUtils.formatIBAN(iban) ?? description!),
+              ],
             ),
-            Text(TextUtils.formatBalanceWithCurrency(l10n, balance, currency!),
-                style: theme.textTheme.titleSmall?.copyWith(color: theme.themeData.primaryColor))
-          ],
-        ),
+          ),
+          Text(TextUtils.formatBalanceWithCurrency(l10n, balance, currency!),
+              style: theme.textTheme.titleSmall?.copyWith(color: theme.themeData.primaryColor))
+        ],
       ),
     );
   }

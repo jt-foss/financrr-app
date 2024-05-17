@@ -1,5 +1,6 @@
 import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
+import 'package:financrr_frontend/shared/ui/outline_card.dart';
 import 'package:financrr_frontend/shared/ui/text_circle_avatar.dart';
 import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
@@ -41,12 +42,8 @@ class CurrencyCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     var theme = ref.watch(themeProvider);
 
-    return Container(
+    return OutlineCard(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      decoration: BoxDecoration(
-        border: Border.all(color: theme.financrrExtension.backgroundTone1, width: 3),
-        borderRadius: BorderRadius.circular(10),
-      ),
       child: Row(
         children: [
           TextCircleAvatar(text: symbol, radius: 25),
