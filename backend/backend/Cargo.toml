@@ -17,7 +17,7 @@ workspace = true
 
 [dependencies]
 # Actix
-actix-web = { version = "4.5.1", features = ["rustls-0_22"] }
+actix-web = { version = "4.6.0", features = ["rustls-0_22"] }
 actix-cors = "0.7.0"
 actix-limitation = "0.5.1"
 actix-web-prom = "0.8.0"
