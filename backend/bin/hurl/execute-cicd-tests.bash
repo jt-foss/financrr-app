@@ -19,9 +19,7 @@ bash bin/hurl/clean-up.bash
 bash bin/hurl/start-up.bash
 
 echo "Waiting for the services to start..."
-sleep 10
-wait
-
+bash bin/utils/container-status-waiter.bash financrr-backend-test healthy
 
 # Setting admin token
 echo "Setting admin token..."

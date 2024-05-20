@@ -1,7 +1,7 @@
-GET http://rust:8080/api/status/health
+GET {{base_url}}/api/status/health
 HTTP 200
 
-POST http://rust:8080/api/v1/session
+POST {{api_v1}}}/session
 {
   "username": "admin",
   "password": "Financrr123",

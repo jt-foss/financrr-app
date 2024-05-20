@@ -7,9 +7,12 @@ services:
       - ./tests:/tests
     environment:
       HURL_admin_token: ${HURL_admin_token}
+      HURL_base_url: http://rust:8080
+      HURL_api_v1: http://rust:8080/api/v1
 
   rust:
     ports: []
+    container_name: financrr-backend-test
     env_file:
       - .env.test
 

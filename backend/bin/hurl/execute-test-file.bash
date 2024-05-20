@@ -14,6 +14,21 @@ WORK_DIR="$(pwd)"
 cd "$(dirname "$0")"
 cd ../../
 
+# Function to clean up
+cleanup() {
+    bash bin/hurl/clean-up.bash
+}
+
+# Trap EXIT signal to ensure cleanup is always executed
+trap cleanup EXIT
+
+bash bin/hurl/clean-up.bash
+
+bash bin/hurl/start-up.bash
+
+echo "Waiting for the services to start..."
+bash bin/utils/container-status-waiter.bash financrr-backend-test healthy
+
 # Setting admin token
 echo "Setting admin token..."
 TOKEN_OUTPUT=$(bash bin/hurl/set-admin-token.bash)
