@@ -5,8 +5,8 @@ use tracing::log::LevelFilter;
 
 use crate::CONFIG;
 
-pub mod logger;
-pub mod public;
+pub(crate) mod logger;
+pub(crate) mod public;
 
 #[derive(Debug, Clone)]
 pub(crate) struct Config {

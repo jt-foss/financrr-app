@@ -10,12 +10,13 @@ RUN apk update
 WORKDIR /usr/src/financrr
 COPY . .
 
-RUN RUSTFLAGS='-C target-feature=-crt-static' cargo build --release
+RUN cargo build --release
 
 # Final stage: create a minimal runtime image
 FROM alpine:3.19.1
 
 # Update package repositories
+RUN apk add --no-cache curl
 RUN apk update
 
 # Create a non-root user
@@ -32,6 +33,9 @@ COPY --from=builder --chown=1000:1000 /usr/src/financrr/target/release/migration
 # Set permissions for the binary
 RUN chmod +x /home/financrr/financrr
 RUN chmod +x /home/financrr/migrator
+
+RUN mkdir "./logs"
+RUN chown -R financrr:financrr "./logs"
 
 # Switch to non-root user
 USER financrr

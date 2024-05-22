@@ -14,17 +14,17 @@ use crate::api::pagination::PageSizeParam;
 use crate::database::entity::{count, delete, find_all_paginated, find_one_or_error, insert, update};
 use crate::event::lifecycle::transaction::{TransactionCreation, TransactionDeletion, TransactionUpdate};
 use crate::event::GenericEvent;
+use crate::permission_impl;
 use crate::wrapper::entity::account::Account;
 use crate::wrapper::entity::budget::Budget;
 use crate::wrapper::entity::currency::Currency;
 use crate::wrapper::entity::transaction::dto::TransactionDTO;
 use crate::wrapper::entity::{TableName, WrapperEntity};
-use crate::wrapper::permission::{
-    HasPermissionByIdOrError, HasPermissionOrError, Permission, PermissionByIds, Permissions,
-};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
-pub mod dto;
+pub(crate) mod dto;
+pub(crate) mod recurring;
+pub(crate) mod template;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub(crate) struct Transaction {
@@ -43,25 +43,30 @@ pub(crate) struct Transaction {
 }
 
 impl Transaction {
-    pub(crate) async fn new(dto: TransactionDTO, user_id: i32) -> Result<Self, ApiError> {
+    pub(crate) async fn new(dto: TransactionDTO) -> Result<Self, ApiError> {
         let active_model = transaction::ActiveModel {
             id: Default::default(),
-            source: Set(dto.source_id.map(|source| source.get_id())),
-            destination: Set(dto.destination_id.map(|destination| destination.get_id())),
+            source: Set(dto.source_id.as_ref().map(|source| source.get_id())),
+            destination: Set(dto.destination_id.as_ref().map(|destination| destination.get_id())),
             amount: Set(dto.amount),
             currency: Set(dto.currency_id.get_id()),
             name: Set(dto.name),
             description: Set(dto.description),
             budget: Set(dto.budget_id.map(|budget| budget.get_id())),
-            created_at: Set(get_now()),
             executed_at: Set(dto.executed_at),
+            created_at: Set(get_now()),
         };
         let model = insert(active_model).await?;
 
         let transaction = Self::from(model);
 
         //grant permission
-        transaction.add_permission(user_id, Permissions::all()).await?;
+        if let Some(source) = dto.source_id.as_ref() {
+            Account::assign_permissions_from_account(&transaction, source.get_id()).await?;
+        }
+        if let Some(destination) = dto.destination_id.as_ref() {
+            Account::assign_permissions_from_account(&transaction, destination.get_id()).await?;
+        }
 
         // check if execute_at is in the future
         if transaction.executed_at > get_now() {
@@ -103,10 +108,6 @@ impl Transaction {
         Ok(())
     }
 
-    pub(crate) async fn find_by_id(id: i32) -> Result<Self, ApiError> {
-        Ok(Self::from(find_one_or_error(transaction::Entity::find_by_id(id), "Transaction").await?))
-    }
-
     pub(crate) async fn find_all_by_user_paginated(
         user_id: i32,
         page_size: &PageSizeParam,
@@ -123,6 +124,8 @@ impl Transaction {
     }
 }
 
+permission_impl!(Transaction);
+
 impl TableName for Transaction {
     fn table_name() -> &'static str {
         transaction::Entity.table_name()
@@ -135,17 +138,9 @@ impl WrapperEntity for Transaction {
     }
 }
 
-impl PermissionByIds for Transaction {}
-
-impl Permission for Transaction {}
-
-impl HasPermissionOrError for Transaction {}
-
-impl HasPermissionByIdOrError for Transaction {}
-
 impl Identifiable for Transaction {
-    async fn from_id(id: i32) -> Result<Self, ApiError> {
-        Self::find_by_id(id).await
+    async fn find_by_id(id: i32) -> Result<Self, ApiError> {
+        find_one_or_error(transaction::Entity::find_by_id(id), "Transaction").await.map(Self::from)
     }
 }
 

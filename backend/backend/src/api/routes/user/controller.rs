@@ -11,17 +11,17 @@ pub(crate) fn user_controller(cfg: &mut web::ServiceConfig) {
 }
 
 #[utoipa::path(get,
-responses(
-(status = 200, description = "Successfully retrieved your own User.", content_type = "application/json", body = User),
-Unauthorized,
-ResourceNotFound,
-InternalServerError,
-),
-security(
-("bearer_token" = [])
-),
-path = "/api/v1/user/@me",
-tag = "User"
+    responses(
+        (status = 200, description = "Successfully retrieved your own User.", content_type = "application/json", body = User),
+        Unauthorized,
+        ResourceNotFound,
+        InternalServerError,
+    ),
+    security(
+        ("bearer_token" = [])
+    ),
+    path = "/api/v1/user/@me",
+    tag = "User"
 )]
 #[get("/@me")]
 pub(crate) async fn me(mut user: Phantom<User>) -> Result<impl Responder, ApiError> {

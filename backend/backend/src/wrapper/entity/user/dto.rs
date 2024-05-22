@@ -16,7 +16,7 @@ pub(crate) struct UserRegistration {
     #[validate(email)]
     pub(crate) email: Option<String>,
     pub(crate) display_name: Option<String>,
-    #[validate(custom = "validate_password")]
+    #[validate(custom(function = validate_password))]
     pub(crate) password: String,
 }
 

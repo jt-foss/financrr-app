@@ -31,11 +31,12 @@ We call these custom error codes `Api Codes`.
 
 ### User-causes errors
 
-| Code | Description         |
-|------|---------------------|
-| 1100 | Resource not found  |
-| 1101 | Serialization error |
-| 1102 | Missing permissions |
+| Code | Description                 |
+|------|-----------------------------|
+| 1100 | Resource not found          |
+| 1101 | Serialization error         |
+| 1102 | Missing permissions         |
+| 1103 | Error while parsing to cron |
 
 ### Validation errors
 
@@ -45,11 +46,12 @@ We call these custom error codes `Api Codes`.
 
 ### Internal server errors
 
-| Code | Description      |
-|------|------------------|
-| 1300 | DB-Entitiy error |
-| 1301 | Database error   |
-| 1302 | Redis error      |
+| Code | Description        |
+|------|--------------------|
+| 1300 | DB-Entitiy error   |
+| 1301 | Database error     |
+| 1302 | Redis error        |
+| 1303 | Cron builder error |
 
 ### Misc errors
 

@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use actix_web::dev::Payload;
 use actix_web::web::Json;
 use actix_web::{FromRequest, HttpRequest};
@@ -8,11 +10,12 @@ use utoipa::ToSchema;
 use validator::Validate;
 
 use crate::api::error::api::ApiError;
-use crate::api::error::validation::ValidationError;
+use crate::api::routes::transaction::check_transaction_permissions;
+use crate::api::routes::transaction::validation::validate_transaction;
 use crate::wrapper::entity::account::Account;
 use crate::wrapper::entity::budget::Budget;
 use crate::wrapper::entity::currency::Currency;
-use crate::wrapper::permission::{Permission, Permissions};
+use crate::wrapper::entity::transaction::template::TransactionTemplate;
 use crate::wrapper::types::phantom::Phantom;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Validate, ToSchema)]
@@ -28,64 +31,36 @@ pub(crate) struct TransactionDTO {
     pub(crate) executed_at: OffsetDateTime,
 }
 
-impl TransactionDTO {
-    pub(crate) async fn check_account_access(&self, user_id: i32) -> Result<bool, ApiError> {
-        match (&self.source_id, &self.destination_id) {
-            (Some(source), Some(destination)) => {
-                let source_permissions = source.has_permission(user_id, Permissions::READ_WRITE).await?;
-                let destination_permissions = destination.has_permission(user_id, Permissions::READ_WRITE).await?;
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Validate, ToSchema)]
+pub(crate) struct TransactionFromTemplate {
+    pub(crate) template: Phantom<TransactionTemplate>,
+    #[serde(with = "time::serde::rfc3339")]
+    pub(crate) executed_at: OffsetDateTime,
+}
 
-                Ok(source_permissions && destination_permissions)
-            }
-            (Some(source), None) => {
-                let source_permissions = source.has_permission(user_id, Permissions::READ_WRITE).await?;
-                Ok(source_permissions)
-            }
-            (None, Some(destination)) => {
-                let destination_permissions = destination.has_permission(user_id, Permissions::READ_WRITE).await?;
-                Ok(destination_permissions)
-            }
-            (None, None) => Ok(false),
-        }
+impl TransactionDTO {
+    pub(crate) async fn from_template(
+        template: Arc<TransactionTemplate>,
+        executed_at: OffsetDateTime,
+    ) -> Result<Self, ApiError> {
+        Ok(Self {
+            source_id: template.source_id.clone(),
+            destination_id: template.destination_id.clone(),
+            amount: template.amount,
+            currency_id: template.currency_id.clone(),
+            name: template.name.clone(),
+            description: template.description.clone(),
+            budget_id: template.budget_id.clone(),
+            executed_at,
+        })
+    }
+
+    pub(crate) async fn check_permissions(&self, user_id: i32) -> Result<bool, ApiError> {
+        check_transaction_permissions(&self.budget_id, &self.source_id, &self.destination_id, user_id).await
     }
 
     async fn validate(&self) -> Result<(), ApiError> {
-        let mut error = ValidationError::new("Transaction validation error");
-        // TODO add check if budget exists
-        if self.source_id.is_none() && self.destination_id.is_none() {
-            error.add("account", "source or destination must be present");
-        }
-
-        match (&self.source_id, &self.destination_id) {
-            (Some(source), Some(destination)) => {
-                if !Account::exists(source.get_id()).await? {
-                    error.add("account", "source account does not exist");
-                }
-                if !Account::exists(destination.get_id()).await? {
-                    error.add("account", "destination account does not exist");
-                }
-                if source.get_id() == destination.get_id() {
-                    error.add("account", "source and destination must be different");
-                }
-            }
-            (Some(source), None) => {
-                if !Account::exists(source.get_id()).await? {
-                    error.add("account", "source account does not exist");
-                }
-            }
-            (None, Some(destination)) => {
-                if !Account::exists(destination.get_id()).await? {
-                    error.add("account", "destination account does not exist");
-                }
-            }
-            (None, None) => {}
-        }
-
-        if error.has_error() {
-            return Err(error.into());
-        }
-
-        Ok(())
+        validate_transaction(&self.budget_id, &self.source_id, &self.destination_id).await
     }
 }
 
@@ -99,6 +74,21 @@ impl FromRequest for TransactionDTO {
             let dto = json_fut.await?;
             let dto = dto.into_inner();
             dto.validate().await?;
+
+            Ok(dto)
+        })
+    }
+}
+
+impl FromRequest for TransactionFromTemplate {
+    type Error = ApiError;
+    type Future = LocalBoxFuture<'static, Result<Self, Self::Error>>;
+
+    fn from_request(req: &HttpRequest, payload: &mut Payload) -> Self::Future {
+        let json_fut = Json::<Self>::from_request(req, payload);
+        Box::pin(async move {
+            let dto = json_fut.await?;
+            let dto = dto.into_inner();
 
             Ok(dto)
         })

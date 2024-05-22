@@ -7,6 +7,7 @@ use sea_orm::{JoinType, QuerySelect};
 use serde::{Deserialize, Serialize};
 
 use crate::permissions;
+use crate::permissions::find_all_by_user_id;
 use crate::utility::time::get_now;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
@@ -46,6 +47,8 @@ impl Related<super::currency::Entity> for Entity {
 
 impl ActiveModelBehavior for ActiveModel {}
 
+find_all_by_user_id!(Entity);
+
 impl Entity {
     pub fn find_by_id_and_user_id(id: i32, user_id: i32) -> Select<Self> {
         Self::find()
@@ -61,16 +64,6 @@ impl Entity {
             )
             .filter(permissions::Column::UserId.eq(user_id))
             .filter(Column::Id.eq(id))
-    }
-
-    pub fn find_all_by_user_id(user_id: i32) -> Select<Self> {
-        Self::find()
-            .join_rev(
-                JoinType::InnerJoin,
-                permissions::Entity::belongs_to(Self).from(permissions::Column::EntityId).to(Column::Id).into(),
-            )
-            .filter(permissions::Column::UserId.eq(user_id))
-            .filter(permissions::Column::EntityType.eq(Self.table_name()))
     }
 }
 
