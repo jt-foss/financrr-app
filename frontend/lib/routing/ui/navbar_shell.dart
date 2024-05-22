@@ -57,7 +57,7 @@ class ScaffoldNavBarShellState extends ConsumerState<ScaffoldNavBarShell> {
                     child: Container(
                         decoration: BoxDecoration(
                           border: Border(
-                            left: BorderSide(color: theme.financrrExtension.backgroundTone1, width: 3),
+                            left: BorderSide(color: theme.financrrExtension.surfaceVariant1, width: 3),
                           ),
                         ),
                         child: shell),
@@ -66,7 +66,7 @@ class ScaffoldNavBarShellState extends ConsumerState<ScaffoldNavBarShell> {
               ),
       ),
       appBar: AppBar(
-        backgroundColor: theme.financrrExtension.background,
+        backgroundColor: theme.financrrExtension.surface,
         title: GestureDetector(
           onTap: () => resetLocation(index: 0),
           child: const Text('financrr'),

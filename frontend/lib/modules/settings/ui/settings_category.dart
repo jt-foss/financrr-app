@@ -54,7 +54,7 @@ class SettingsCategory extends ConsumerWidget {
             ),
           Container(
             decoration: BoxDecoration(
-              border: Border.all(width: 3, color: theme.financrrExtension.backgroundTone1),
+              border: Border.all(width: 3, color: theme.financrrExtension.surfaceVariant1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Column(

@@ -19,14 +19,14 @@ class FinancrrRadioButton extends ConsumerWidget {
         padding: const EdgeInsets.all(3),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: value ? theme.financrrExtension.primary : theme.financrrExtension.backgroundTone1,
+          color: value ? theme.financrrExtension.primary : theme.financrrExtension.surfaceVariant1,
           border: Border.all(
-            color: !value ? theme.financrrExtension.backgroundTone2 : theme.financrrExtension.primary,
+            color: !value ? theme.financrrExtension.surfaceVariant2 : theme.financrrExtension.primary,
             width: 3,
           ),
         ),
         duration: const Duration(milliseconds: 200),
-        child: Icon(Icons.check, color: value ? theme.financrrExtension.primaryContrast : Colors.transparent, size: 20),
+        child: Icon(Icons.check, color: value ? theme.financrrExtension.onPrimary : Colors.transparent, size: 20),
       ),
     );
   }

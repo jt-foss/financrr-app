@@ -108,7 +108,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       return Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          border: Border.all(width: 3, color: theme.financrrExtension.backgroundTone1),
+          border: Border.all(width: 3, color: theme.financrrExtension.surfaceVariant1),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Row(

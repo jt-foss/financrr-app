@@ -22,7 +22,7 @@ class NoticeCard extends ConsumerWidget {
 
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(width: 3, color: theme.financrrExtension.backgroundTone1),
+        border: Border.all(width: 3, color: theme.financrrExtension.surfaceVariant1),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Padding(

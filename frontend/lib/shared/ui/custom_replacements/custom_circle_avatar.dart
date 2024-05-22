@@ -48,8 +48,8 @@ class FinancrrCircleAvatar extends ConsumerWidget {
       height: radius * 2,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: backgroundColor ?? theme.financrrExtension.background,
-        border: Border.all(width: 3, color: borderColor ?? theme.financrrExtension.backgroundTone1),
+        color: backgroundColor ?? theme.financrrExtension.surface,
+        border: Border.all(width: 3, color: borderColor ?? theme.financrrExtension.surfaceVariant1),
       ),
       child: Center(
         child: child ?? buildText(text ?? ''),

@@ -9,70 +9,83 @@ extension AppThemeExtension on AppTheme {
 }
 
 class FinancrrAppThemeExtension extends ThemeExtension<FinancrrAppThemeExtension> {
-  final Brightness brightness;
   final Color primary;
-  final Color font;
-  final Color background;
-  final Color backgroundTone1;
-  final Color backgroundTone2;
-  final Color backgroundTone3;
+  final Color error;
+  final Color surface;
+  final Color surfaceVariant1;
+  final Color surfaceVariant2;
+  final Color surfaceVariant3;
+  final Color onPrimary;
+  final Color onError;
+  final Color onSurface;
 
   const FinancrrAppThemeExtension(
-      {
-        required this.brightness,
-        required this.primary,
-      required this.font,
-      required this.background,
-      required this.backgroundTone1,
-      required this.backgroundTone2,
-      required this.backgroundTone3});
+      {required this.primary,
+      required this.error,
+      required this.surface,
+      required this.surfaceVariant1,
+      required this.surfaceVariant2,
+      required this.surfaceVariant3,
+      required this.onPrimary,
+      required this.onError,
+      required this.onSurface});
 
-  static FinancrrAppThemeExtension? tryFromJson(Map<String, dynamic> json, Brightness brightness) {
+  static FinancrrAppThemeExtension? tryFromJson(Map<String, dynamic> json) {
     final AppColor? primary = AppColor.tryFromJson(json['primary']);
-    final AppColor? font = AppColor.tryFromJson(json['font']);
-    final AppColor? background = AppColor.tryFromJson(json['background']);
-    final AppColor? backgroundTone1 = AppColor.tryFromJson(json['background_tone1']);
-    final AppColor? backgroundTone2 = AppColor.tryFromJson(json['background_tone2']);
-    final AppColor? backgroundTone3 = AppColor.tryFromJson(json['background_tone3']);
+    final AppColor? error = AppColor.tryFromJson(json['error']);
+    final AppColor? surface = AppColor.tryFromJson(json['surface']);
+    final AppColor? surfaceVariant1 = AppColor.tryFromJson(json['surface_variant1']);
+    final AppColor? surfaceVariant2 = AppColor.tryFromJson(json['surface_variant2']);
+    final AppColor? surfaceVariant3 = AppColor.tryFromJson(json['surface_variant3']);
+    final AppColor? onPrimary = AppColor.tryFromJson(json['on_primary']);
+    final AppColor? onError = AppColor.tryFromJson(json['on_error']);
+    final AppColor? onSurface = AppColor.tryFromJson(json['on_surface']);
     if (primary == null ||
-        font == null ||
-        background == null ||
-        backgroundTone1 == null ||
-        backgroundTone2 == null ||
-        backgroundTone3 == null) {
-      return null;
+        error == null ||
+        surface == null ||
+        surfaceVariant1 == null ||
+        surfaceVariant2 == null ||
+        surfaceVariant3 == null ||
+        onPrimary == null ||
+        onError == null ||
+        onSurface == null) {
+      throw StateError('All colors must be set!');
     }
     return FinancrrAppThemeExtension(
-      brightness: brightness,
       primary: primary.toColor(json),
-      font: font.toColor(json),
-      background: background.toColor(json),
-      backgroundTone1: backgroundTone1.toColor(json),
-      backgroundTone2: backgroundTone2.toColor(json),
-      backgroundTone3: backgroundTone3.toColor(json),
+      error: error.toColor(json),
+      surface: surface.toColor(json),
+      surfaceVariant1: surfaceVariant1.toColor(json),
+      surfaceVariant2: surfaceVariant2.toColor(json),
+      surfaceVariant3: surfaceVariant3.toColor(json),
+      onPrimary: onPrimary.toColor(json),
+      onError: onError.toColor(json),
+      onSurface: onSurface.toColor(json),
     );
   }
 
-  Color get primaryContrast => brightness == Brightness.light ? background : font;
-
   @override
-  ThemeExtension<FinancrrAppThemeExtension> copyWith({
-    Brightness? brightness,
-    Color? primary,
-    Color? font,
-    Color? background,
-    Color? backgroundTone1,
-    Color? backgroundTone2,
-    Color? backgroundTone3,
-  }) {
+  ThemeExtension<FinancrrAppThemeExtension> copyWith(
+      {Color? primary,
+      Color? error,
+      Color? surface,
+      Color? surfaceVariant1,
+      Color? surfaceVariant2,
+      Color? surfaceVariant3,
+      Color? onPrimary,
+      Color? onError,
+      Color? onSurface}
+      ) {
     return FinancrrAppThemeExtension(
-      brightness: brightness ?? this.brightness,
       primary: primary ?? this.primary,
-      font: font ?? this.font,
-      background: background ?? this.background,
-      backgroundTone1: backgroundTone1 ?? this.backgroundTone1,
-      backgroundTone2: backgroundTone2 ?? this.backgroundTone2,
-      backgroundTone3: backgroundTone3 ?? this.backgroundTone3,
+      error: error ?? this.error,
+      surface: surface ?? this.surface,
+      surfaceVariant1: surfaceVariant1 ?? this.surfaceVariant1,
+      surfaceVariant2: surfaceVariant2 ?? this.surfaceVariant2,
+      surfaceVariant3: surfaceVariant3 ?? this.surfaceVariant3,
+      onPrimary: onPrimary ?? this.onPrimary,
+      onError: onError ?? this.onError,
+      onSurface: onSurface ?? this.onSurface,
     );
   }
 
@@ -82,13 +95,15 @@ class FinancrrAppThemeExtension extends ThemeExtension<FinancrrAppThemeExtension
       return this;
     }
     return FinancrrAppThemeExtension(
-      brightness: t < 0.5 ? brightness : other.brightness,
       primary: Color.lerp(primary, other.primary, t)!,
-      font: Color.lerp(font, other.font, t)!,
-      background: Color.lerp(background, other.background, t)!,
-      backgroundTone1: Color.lerp(backgroundTone1, other.backgroundTone1, t)!,
-      backgroundTone2: Color.lerp(backgroundTone2, other.backgroundTone2, t)!,
-      backgroundTone3: Color.lerp(backgroundTone3, other.backgroundTone3, t)!,
+      error: Color.lerp(error, other.error, t)!,
+      surface: Color.lerp(surface, other.surface, t)!,
+      surfaceVariant1: Color.lerp(surfaceVariant1, other.surfaceVariant1, t)!,
+      surfaceVariant2: Color.lerp(surfaceVariant2, other.surfaceVariant2, t)!,
+      surfaceVariant3: Color.lerp(surfaceVariant3, other.surfaceVariant3, t)!,
+      onPrimary: Color.lerp(onPrimary, other.onPrimary, t)!,
+      onError: Color.lerp(onError, other.onError, t)!,
+      onSurface: Color.lerp(onSurface, other.onSurface, t)!,
     );
   }
 }

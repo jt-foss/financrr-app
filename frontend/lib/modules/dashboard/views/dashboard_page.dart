@@ -83,7 +83,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                         child: Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            border: Border.all(width: 3, color: theme.financrrExtension.backgroundTone1),
+                            border: Border.all(width: 3, color: theme.financrrExtension.surfaceVariant1),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(action.iconData),
@@ -110,7 +110,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
             width: size.width / 4,
             height: 5,
             decoration: BoxDecoration(
-              color: theme.financrrExtension.backgroundTone1,
+              color: theme.financrrExtension.surfaceVariant1,
               borderRadius: BorderRadius.circular(10),
             ),
           )

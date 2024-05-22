@@ -7,10 +7,13 @@
   "brightness": "dark",
   "colors": {
     "primary": "0x4D94FF",
-    "font": "0xFFFFFF",
-    "background": "0x000000",
-    "background_tone1": "0x333333",
-    "background_tone2": "0x4E4E4E",
-    "background_tone3": "0x7F7F7F"
+    "error": "0xFF0000",
+    "surface": "0x000000",
+    "surface_variant1": "0x333333",
+    "surface_variant2": "0x4E4E4E",
+    "surface_variant3": "0x7F7F7F",
+    "on_primary": "0xFFFFFF",
+    "on_error": "0xFFFFFF",
+    "on_surface": "0xFFFFFF"
   }
 }

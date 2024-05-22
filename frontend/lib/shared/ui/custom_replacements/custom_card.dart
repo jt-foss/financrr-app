@@ -37,8 +37,8 @@ class _OutlineCardState extends ConsumerState<FinancrrCard> {
           duration: const Duration(milliseconds: 200),
           padding: widget.padding,
           decoration: BoxDecoration(
-            color: _hovered ? theme.financrrExtension.backgroundTone1.withOpacity(.5) : null,
-            border: Border.all(color: widget.borderColor ?? theme.financrrExtension.backgroundTone1, width: 3),
+            color: _hovered ? theme.financrrExtension.surfaceVariant1.withOpacity(.5) : null,
+            border: Border.all(color: widget.borderColor ?? theme.financrrExtension.surfaceVariant1, width: 3),
             borderRadius: BorderRadius.circular(10),
           ),
           child: widget.child,

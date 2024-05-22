@@ -33,12 +33,12 @@ class FinancrrNavigationBar extends ConsumerWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(width: 3, color: isSelected ? theme.financrrExtension.primary : Colors.transparent),
-                color: isSelected ? null : theme.financrrExtension.backgroundTone1,
+                color: isSelected ? null : theme.financrrExtension.surfaceVariant1,
               ),
               child: Icon(isSelected
                   ? destination.selectedIconData ?? destination.iconData
                   : destination.iconData,
-                  color: isSelected ? theme.financrrExtension.primary : theme.financrrExtension.backgroundTone3),
+                  color: isSelected ? theme.financrrExtension.primary : theme.financrrExtension.surfaceVariant3),
             ),
             Padding(
               padding: const EdgeInsets.only(top: 5),

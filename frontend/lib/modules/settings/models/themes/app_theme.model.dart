@@ -55,12 +55,12 @@ class AppTheme {
 
   static ThemeData _buildThemeDataFromJson(Map<String, dynamic> json) {
     final Brightness? brightness = JsonUtils.tryEnum(json['brightness'], Brightness.values);
-    final FinancrrAppThemeExtension? themeExtension = FinancrrAppThemeExtension.tryFromJson(json['colors'], brightness!);
+    final FinancrrAppThemeExtension? themeExtension = FinancrrAppThemeExtension.tryFromJson(json['colors']);
     if (themeExtension == null) {
       throw StateError('Theme extension must be set!');
     }
     final AppTextTheme textTheme = AppTextTheme.fromJson(json['text_theme'],
-        defaultColor: themeExtension.font, defaultFontFamily: fontFamily, defaultFontFamilyFallback: fontFamilyFallback);
+        defaultColor: themeExtension.onSurface, defaultFontFamily: fontFamily, defaultFontFamilyFallback: fontFamilyFallback);
     return ThemeData(
       extensions: [themeExtension],
       useMaterial3: true,
@@ -68,9 +68,25 @@ class AppTheme {
       fontFamily: fontFamily,
       fontFamilyFallback: fontFamilyFallback,
       primaryColor: themeExtension.primary,
-      scaffoldBackgroundColor: themeExtension.background,
-      appBarTheme: AppBarTheme(foregroundColor: themeExtension.font),
-      iconTheme: IconThemeData(color: themeExtension.backgroundTone3),
+      scaffoldBackgroundColor: themeExtension.surface,
+      appBarTheme: AppBarTheme(foregroundColor: themeExtension.onSurface),
+      iconTheme: IconThemeData(color: themeExtension.surfaceVariant3),
+      colorScheme: ColorScheme(
+        primary: themeExtension.primary,
+        secondary: themeExtension.primary,
+        surface: themeExtension.surface,
+        error: themeExtension.error,
+        onPrimary: themeExtension.onPrimary,
+        onSecondary: themeExtension.onPrimary,
+        onSurface: themeExtension.onSurface,
+        onError: themeExtension.onError,
+        brightness: brightness!,
+      ),
+      textSelectionTheme: TextSelectionThemeData(
+        cursorColor: themeExtension.primary,
+        selectionColor: themeExtension.primary.withOpacity(0.5),
+        selectionHandleColor: themeExtension.primary,
+      ),
       textTheme: TextTheme(
         displayLarge: textTheme.displayLarge.toTextStyle(),
         displayMedium: textTheme.displayMedium.toTextStyle(),

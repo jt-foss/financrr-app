@@ -48,14 +48,14 @@ class _AppTextFieldState extends ConsumerState<FinancrrTextField> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        widget.label.toText(style: labelStyle?.copyWith(color: _error != null ? theme.financrrExtension.primary : null)),
+        widget.label.toText(style: labelStyle),
         const SizedBox(height: 5),
         AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(horizontal: 10),
           decoration: BoxDecoration(
             border: Border.all(
-                color: _error != null ? theme.financrrExtension.primary : theme.financrrExtension.backgroundTone1, width: 3),
+                color: _error != null ? theme.financrrExtension.error : theme.financrrExtension.surfaceVariant1, width: 3),
             borderRadius: BorderRadius.circular(10),
           ),
           child: TextFormField(
@@ -73,7 +73,7 @@ class _AppTextFieldState extends ConsumerState<FinancrrTextField> {
                 suffixIcon: widget.suffixIcon,
                 hintText: widget.hint?.toString(),
                 hintStyle: theme.textTheme.bodyMedium
-                    ?.copyWith(fontWeight: FontWeight.w500, color: theme.financrrExtension.backgroundTone2),
+                    ?.copyWith(fontWeight: FontWeight.w500, color: theme.financrrExtension.surfaceVariant2),
                 errorStyle: const TextStyle(height: 0),
                 border: InputBorder.none),
             obscureText: widget.obscureText,
@@ -83,7 +83,7 @@ class _AppTextFieldState extends ConsumerState<FinancrrTextField> {
         ),
         if (_error != null) ...[
           const SizedBox(height: 5),
-          Text(_error!, style: labelStyle?.copyWith(color: theme.financrrExtension.primary))
+          Text(_error!, style: labelStyle?.copyWith(color: theme.financrrExtension.error))
         ],
         if (widget.status != null && _error == null) ...[
           const SizedBox(height: 5),
