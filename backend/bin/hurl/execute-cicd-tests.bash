@@ -35,7 +35,7 @@ fi
 
 set +e
 echo "Running the tests..."
-docker compose -f compose.yml -f compose.test.yml run --rm -T hurl --test --color --glob "/tests/**/*.hurl" --parallel
+docker compose -f compose.yml -f compose.test.yml run --rm -T hurl --test --color --glob "/tests/**/*.hurl" --continue-on-error
 TEST_EXIT_CODE=$?
 wait
 set -e

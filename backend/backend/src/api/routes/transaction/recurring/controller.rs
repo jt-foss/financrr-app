@@ -94,7 +94,7 @@ pub(crate) async fn create_recurring_transaction(
 
     let transaction = RecurringTransaction::new(recurring_transaction_dto).await?;
 
-    Ok(HttpResponse::Ok().json(transaction))
+    Ok(HttpResponse::Created().json(transaction))
 }
 
 #[utoipa::path(delete,

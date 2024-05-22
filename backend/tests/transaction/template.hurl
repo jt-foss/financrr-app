@@ -70,7 +70,74 @@ HTTP 201
 [Captures]
 deposit_transaction_id: jsonpath "$['id']"
 
-# Delete the deposit transaction
-DELETE {{api_v1}}/transaction/{{deposit_transaction_id}}
+# Assert that test account 1 has now 11000
+GET {{api_v1}}/account/{{test_acc1_id}}
+Authorization: Bearer {{admin_token}}
+[Options]
+delay: 100
+HTTP 200
+[Asserts]
+jsonpath "$['balance']" == 11000
+
+# Update the template
+PATCH {{api_v1}}/transaction/template/{{template_id}}
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+{
+  "source_id": {{test_acc1_id}},
+  "destination_id": {{test_acc2_id}},
+  "amount": 2000,
+  "currency_id": 2,
+  "name": "20€ Deposit",
+  "description": "A longer description bla bla",
+  "budget_id": null
+}
+HTTP 200
+
+# Assert that updating the template did not affect the transaction
+GET {{api_v1}}/account/{{test_acc1_id}}
+Authorization: Bearer {{admin_token}}
+[Options]
+delay: 100
+HTTP 200
+[Asserts]
+jsonpath "$['balance']" == 11000
+
+# Assert that the template was updated
+GET {{api_v1}}/transaction/template/{{template_id}}
+Authorization: Bearer {{admin_token}}
+HTTP 200
+[Asserts]
+jsonpath "$['id']" == {{template_id}}
+jsonpath "$['source_id']" == {{test_acc1_id}}
+jsonpath "$['destination_id']" == {{test_acc2_id}}
+jsonpath "$['amount']" == 2000
+jsonpath "$['currency_id']" == 2
+jsonpath "$['name']" == "20€ Deposit"
+jsonpath "$['description']" == "A longer description bla bla"
+jsonpath "$['budget_id']" == null
+
+# Delete the template
+DELETE {{api_v1}}/transaction/template/{{template_id}}
+Authorization: Bearer {{admin_token}}
+HTTP 204
+
+# Assert that the transaction is still there
+GET {{api_v1}}/transaction/{{deposit_transaction_id}}
+Authorization: Bearer {{admin_token}}
+HTTP 200
+
+# Assert that the template is gone
+GET {{api_v1}}/transaction/template/{{template_id}}
+Authorization: Bearer {{admin_token}}
+HTTP 404
+
+# Delete the first account
+DELETE {{api_v1}}/account/{{test_acc1_id}}
+Authorization: Bearer {{admin_token}}
+HTTP 204
+
+# Delete the second account
+DELETE {{api_v1}}/account/{{test_acc2_id}}
 Authorization: Bearer {{admin_token}}
 HTTP 204

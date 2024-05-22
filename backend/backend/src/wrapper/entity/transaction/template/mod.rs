@@ -9,7 +9,7 @@ use entity::utility::time::get_now;
 
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
-use crate::database::entity::{count, delete, find_all_paginated, find_one_or_error, insert};
+use crate::database::entity::{count, delete, find_all_paginated, find_one_or_error, insert, update};
 use crate::permission_impl;
 use crate::wrapper::entity::account::Account;
 use crate::wrapper::entity::budget::Budget;
@@ -83,7 +83,7 @@ impl TransactionTemplate {
             budget: Set(updated_dto.budget_id.map(|budget| budget.get_id())),
             created_at: Set(get_now()),
         };
-        let model = insert(active_model).await?;
+        let model = update(active_model).await?;
         let template = Self::from(model);
 
         Ok(template)

@@ -103,6 +103,9 @@ Content-Type: application/json
   "budget_id": null,
   "executed_at": "2024-05-19T15:39:03.013Z"
 }
+HTTP 201
+[Captures]
+transfer_transaction_id: jsonpath "$['id']"
 
 # Assert that test1 account balance is now 9000
 GET {{api_v1}}/account/{{test_acc1_id}}
@@ -121,6 +124,46 @@ delay: 100
 HTTP 200
 [Asserts]
 jsonpath "$['balance']" == 11000
+
+# Assert that there are 3 transactions
+GET {{api_v1}}/transaction
+Authorization: Bearer {{admin_token}}
+HTTP 200
+[Asserts]
+jsonpath "$['_metadata']['total']" == 3
+
+# Update transfer transaction
+PATCH {{api_v1}}/transaction/{{transfer_transaction_id}}
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+{
+  "source_id": {{test_acc1_id}},
+  "destination_id": {{test_acc2_id}},
+  "amount": 1500,
+  "currency_id": 2,
+  "name": "10€ Transfer",
+  "description": null,
+  "budget_id": null,
+  "executed_at": "2024-05-19T15:39:03.013Z"
+}
+
+# Assert that test1 account balance is now 7500
+GET {{api_v1}}/account/{{test_acc1_id}}
+Authorization: Bearer {{admin_token}}
+[Options]
+delay: 200
+HTTP 200
+[Asserts]
+jsonpath "$['balance']" == 8500
+
+# Assert that test2 account balance is now 12500
+GET {{api_v1}}/account/{{test_acc2_id}}
+Authorization: Bearer {{admin_token}}
+[Options]
+delay: 100
+HTTP 200
+[Asserts]
+jsonpath "$['balance']" == 11500
 
 # Assert that there are 3 transactions
 GET {{api_v1}}/transaction
