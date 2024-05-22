@@ -89,7 +89,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><li class="part-title">Reference</li><li class="chapter-item expanded "><a href="goals/index.html"><strong aria-hidden="true">1.</strong> Goals</a></li><li class="chapter-item expanded "><a href="features/index.html"><strong aria-hidden="true">2.</strong> Features</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="features/frontend.html"><strong aria-hidden="true">2.1.</strong> Frontend</a></li><li class="chapter-item expanded "><a href="features/backend.html"><strong aria-hidden="true">2.2.</strong> Backend</a></li></ol></li><li class="chapter-item expanded "><a href="api/index.html"><strong aria-hidden="true">3.</strong> API</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="api/Error.html"><strong aria-hidden="true">3.1.</strong> Api Error</a></li></ol></li><li class="chapter-item expanded "><a href="db/index.html"><strong aria-hidden="true">4.</strong> Database</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><li class="part-title">Reference</li><li class="chapter-item expanded "><a href="goals/index.html"><strong aria-hidden="true">1.</strong> Goals</a></li><li class="chapter-item expanded "><a href="features/index.html"><strong aria-hidden="true">2.</strong> Features</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="features/frontend.html"><strong aria-hidden="true">2.1.</strong> Frontend</a></li><li class="chapter-item expanded "><a href="features/backend.html"><strong aria-hidden="true">2.2.</strong> Backend</a></li></ol></li><li class="chapter-item expanded "><a href="api/index.html"><strong aria-hidden="true">3.</strong> API</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="api/Error.html"><strong aria-hidden="true">3.1.</strong> Api Error</a></li><li class="chapter-item expanded "><a href="api/RecurringRule.html"><strong aria-hidden="true">3.2.</strong> Recurring Rule</a></li></ol></li><li class="chapter-item expanded "><a href="db/index.html"><strong aria-hidden="true">4.</strong> Database</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle">
                 <div class="sidebar-resize-indicator"></div>
@@ -247,8 +247,6 @@ integrated rate limiter -&gt; no need for an external one</li>
 <br>
 <strong>For development use only!!!</strong></p>
 <p>Url: <code>https://api-stage.financrr.app/swagger-ui/</code></p>
-<h2 id="production"><a class="header" href="#production">Production</a></h2>
-<p>Url: <code>https://api.financrr.app/swagger-ui/</code></p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="api-error"><a class="header" href="#api-error">API Error</a></h1>
 <p>We provide a custom error object that is utilized throughout the library.</p>
 <h2 id="error-and-http-codes"><a class="header" href="#error-and-http-codes">Error and HTTP Codes</a></h2>
@@ -277,6 +275,7 @@ We call these custom error codes <code>Api Codes</code>.</p>
 <tr><td>1100</td><td>Resource not found</td></tr>
 <tr><td>1101</td><td>Serialization error</td></tr>
 <tr><td>1102</td><td>Missing permissions</td></tr>
+<tr><td>1103</td><td>Error while parsing to cron</td></tr>
 </tbody></table>
 </div>
 <h3 id="validation-errors"><a class="header" href="#validation-errors">Validation errors</a></h3>
@@ -289,6 +288,7 @@ We call these custom error codes <code>Api Codes</code>.</p>
 <tr><td>1300</td><td>DB-Entitiy error</td></tr>
 <tr><td>1301</td><td>Database error</td></tr>
 <tr><td>1302</td><td>Redis error</td></tr>
+<tr><td>1303</td><td>Cron builder error</td></tr>
 </tbody></table>
 </div>
 <h3 id="misc-errors"><a class="header" href="#misc-errors">Misc errors</a></h3>
@@ -296,7 +296,105 @@ We call these custom error codes <code>Api Codes</code>.</p>
 <tr><td>9000</td><td>Actix error</td></tr>
 <tr><td>9999</td><td>Unknown error</td></tr>
 </tbody></table>
-</div><div style="break-before: page; page-break-before: always;"></div><h1 id="database"><a class="header" href="#database">Database</a></h1>
+</div><div style="break-before: page; page-break-before: always;"></div><h1 id="recurring-rule"><a class="header" href="#recurring-rule">Recurring rule</a></h1>
+<p>A recurring rule is a rule that defines when and how often a recurring transaction should be executed.<br />
+Structure of a recurring rule:</p>
+<pre><code class="language-json">{
+    &quot;cronPattern&quot;: {
+        &quot;day_of_month&quot;: &quot;*&quot;,
+        &quot;month&quot;: &quot;*&quot;,
+        &quot;day_of_week&quot;: &quot;*&quot;
+    }
+}
+</code></pre>
+<p>This rule will execute the transaction every day.</p>
+<ul>
+<li><code>day_of_month</code>: The day of the month when the transaction should be executed.
+<ul>
+<li><code>*</code>: Every day of the month.</li>
+<li><code>1-31</code>: The day of the month.</li>
+</ul>
+</li>
+<li><code>month</code>: The month when the transaction should be executed.
+<ul>
+<li><code>*</code>: Every month.</li>
+<li><code>1-12</code>: The month.</li>
+</ul>
+</li>
+<li><code>day_of_week</code>: The day of the week when the transaction should be executed.
+<ul>
+<li><code>*</code>: Every day of the week.</li>
+<li><code>1-7</code>: The day of the week. (1 is Monday, ..., 6 is Saturday, 7 is Sunday)</li>
+</ul>
+</li>
+</ul>
+<p>We use <a href="https://github.com/hexagon/croner-rust">croner-rust</a> to parse the recurring rule.<br />
+Check out their <a href="https://github.com/hexagon/croner-rust">repository</a> to see what is supported.</p>
+<h3 id="special-rules"><a class="header" href="#special-rules">Special rules</a></h3>
+<p>There are some special rules that can be used instead of the cron pattern.<br />
+The special rules are:</p>
+<ul>
+<li><code>@yearly</code>: Execute the transaction every year.</li>
+<li><code>@annually</code>: Execute the transaction every year.</li>
+<li><code>@monthly</code>: Execute the transaction every month.</li>
+<li><code>@weekly</code>: Execute the transaction every week.</li>
+<li><code>@daily</code>: Execute the transaction every day.</li>
+</ul>
+<h3 id="how-to-use-it-easily"><a class="header" href="#how-to-use-it-easily">How to use it easily</a></h3>
+<p>You should be able to use a cron builder to create the recurring rule.<br />
+Simply build the cron and extract the <code>day_of_month</code>, <code>month</code>, and <code>day_of_week</code> from the cron string.</p>
+<h2 id="examples"><a class="header" href="#examples">Examples</a></h2>
+<h3 id="repeat-every-day"><a class="header" href="#repeat-every-day">repeat every day</a></h3>
+<pre><code class="language-json">{
+    &quot;cronPattern&quot;: {
+        &quot;day_of_month&quot;: &quot;*&quot;,
+        &quot;month&quot;: &quot;*&quot;,
+        &quot;day_of_week&quot;: &quot;*&quot;
+    }
+}
+</code></pre>
+<h3 id="repeat-every-4th-day"><a class="header" href="#repeat-every-4th-day">repeat every 4th day</a></h3>
+<pre><code class="language-json">{
+    &quot;cronPattern&quot;: {
+        &quot;day_of_month&quot;: &quot;*&quot;,
+        &quot;month&quot;: &quot;*&quot;,
+        &quot;day_of_week&quot;: &quot;*/4&quot;
+    }
+}
+</code></pre>
+<h3 id="repeat-every-2nd-week-on-monday-and-friday"><a class="header" href="#repeat-every-2nd-week-on-monday-and-friday">repeat every 2nd week on monday and friday</a></h3>
+<pre><code class="language-json">{
+    &quot;cronPattern&quot;: {
+        &quot;day_of_month&quot;: &quot;*&quot;,
+        &quot;month&quot;: &quot;*&quot;,
+        &quot;day_of_week&quot;: &quot;1,5&quot;
+    }
+}
+</code></pre>
+<h3 id="repeat-every-month"><a class="header" href="#repeat-every-month">repeat every month</a></h3>
+<pre><code class="language-json">{
+    &quot;special&quot;: &quot;@monthly&quot;
+}
+</code></pre>
+<h3 id="repeat-every-3rd-month-on-the-2nd-monday"><a class="header" href="#repeat-every-3rd-month-on-the-2nd-monday">repeat every 3rd month on the 2nd monday</a></h3>
+<pre><code class="language-json">{
+    &quot;cronPattern&quot;: {
+        &quot;day_of_month&quot;: &quot;*&quot;,
+        &quot;month&quot;: &quot;*/3&quot;,
+        &quot;day_of_week&quot;: &quot;1#2&quot;
+    }
+}
+</code></pre>
+<h3 id="repeat-every-year-on-january-and-august"><a class="header" href="#repeat-every-year-on-january-and-august">repeat every year on january and august</a></h3>
+<pre><code class="language-json">{
+    &quot;cronPattern&quot;: {
+        &quot;day_of_month&quot;: &quot;*&quot;,
+        &quot;month&quot;: &quot;1,8&quot;,
+        &quot;day_of_week&quot;: &quot;*&quot;
+    }
+}
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="database"><a class="header" href="#database">Database</a></h1>
 <h2 id="model"><a class="header" href="#model">Model</a></h2>
 <pre class="mermaid">
 erDiagram
