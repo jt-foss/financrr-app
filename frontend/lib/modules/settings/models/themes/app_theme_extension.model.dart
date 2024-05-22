@@ -9,6 +9,7 @@ extension AppThemeExtension on AppTheme {
 }
 
 class FinancrrAppThemeExtension extends ThemeExtension<FinancrrAppThemeExtension> {
+  final Brightness brightness;
   final Color primary;
   final Color font;
   final Color background;
@@ -17,14 +18,16 @@ class FinancrrAppThemeExtension extends ThemeExtension<FinancrrAppThemeExtension
   final Color backgroundTone3;
 
   const FinancrrAppThemeExtension(
-      {required this.primary,
+      {
+        required this.brightness,
+        required this.primary,
       required this.font,
       required this.background,
       required this.backgroundTone1,
       required this.backgroundTone2,
       required this.backgroundTone3});
 
-  static FinancrrAppThemeExtension? tryFromJson(Map<String, dynamic> json) {
+  static FinancrrAppThemeExtension? tryFromJson(Map<String, dynamic> json, Brightness brightness) {
     final AppColor? primary = AppColor.tryFromJson(json['primary']);
     final AppColor? font = AppColor.tryFromJson(json['font']);
     final AppColor? background = AppColor.tryFromJson(json['background']);
@@ -40,6 +43,7 @@ class FinancrrAppThemeExtension extends ThemeExtension<FinancrrAppThemeExtension
       return null;
     }
     return FinancrrAppThemeExtension(
+      brightness: brightness,
       primary: primary.toColor(json),
       font: font.toColor(json),
       background: background.toColor(json),
@@ -49,11 +53,11 @@ class FinancrrAppThemeExtension extends ThemeExtension<FinancrrAppThemeExtension
     );
   }
 
-  Color get primaryContrast =>
-      WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.light ? font : background;
+  Color get primaryContrast => brightness == Brightness.light ? background : font;
 
   @override
   ThemeExtension<FinancrrAppThemeExtension> copyWith({
+    Brightness? brightness,
     Color? primary,
     Color? font,
     Color? background,
@@ -62,6 +66,7 @@ class FinancrrAppThemeExtension extends ThemeExtension<FinancrrAppThemeExtension
     Color? backgroundTone3,
   }) {
     return FinancrrAppThemeExtension(
+      brightness: brightness ?? this.brightness,
       primary: primary ?? this.primary,
       font: font ?? this.font,
       background: background ?? this.background,
@@ -77,6 +82,7 @@ class FinancrrAppThemeExtension extends ThemeExtension<FinancrrAppThemeExtension
       return this;
     }
     return FinancrrAppThemeExtension(
+      brightness: t < 0.5 ? brightness : other.brightness,
       primary: Color.lerp(primary, other.primary, t)!,
       font: Color.lerp(font, other.font, t)!,
       background: Color.lerp(background, other.background, t)!,

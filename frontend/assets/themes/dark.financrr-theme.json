@@ -4,7 +4,7 @@
   "translation_key": "theme_dark",
   "preview_color": "0x111111",
   "theme_mode": "dark",
-  "brightness": "light",
+  "brightness": "dark",
   "colors": {
     "primary": "0x4D94FF",
     "font": "0xFFFFFF",

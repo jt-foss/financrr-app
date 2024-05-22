@@ -1,13 +1,13 @@
 import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/shared/ui/custom_replacements/custom_card.dart';
-import 'package:financrr_frontend/shared/ui/text_circle_avatar.dart';
 import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
 import '../../modules/settings/views/currency_edit_page.dart';
+import 'custom_replacements/custom_circle_avatar.dart';
 
 class CurrencyCard extends ConsumerWidget {
   final Id id;
@@ -46,7 +46,7 @@ class CurrencyCard extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Row(
         children: [
-          TextCircleAvatar(text: symbol, radius: 25),
+          FinancrrCircleAvatar.text(text: symbol, radius: 25),
           const SizedBox(width: 20),
           Expanded(
             child: Column(

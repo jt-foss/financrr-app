@@ -55,7 +55,7 @@ class AppTheme {
 
   static ThemeData _buildThemeDataFromJson(Map<String, dynamic> json) {
     final Brightness? brightness = JsonUtils.tryEnum(json['brightness'], Brightness.values);
-    final FinancrrAppThemeExtension? themeExtension = FinancrrAppThemeExtension.tryFromJson(json['colors']);
+    final FinancrrAppThemeExtension? themeExtension = FinancrrAppThemeExtension.tryFromJson(json['colors'], brightness!);
     if (themeExtension == null) {
       throw StateError('Theme extension must be set!');
     }

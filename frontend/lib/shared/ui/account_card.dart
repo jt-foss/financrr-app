@@ -1,7 +1,7 @@
 import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/shared/ui/custom_replacements/custom_card.dart';
-import 'package:financrr_frontend/shared/ui/text_circle_avatar.dart';
+import 'package:financrr_frontend/shared/ui/custom_replacements/custom_circle_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
@@ -47,7 +47,7 @@ class AccountCard extends ConsumerWidget {
       onTap: !interactive ? null : () => context.goPath(AccountPage.pagePath.build(params: {'accountId': id.toString()})),
       child: Row(
         children: [
-          TextCircleAvatar(text: name, radius: 25),
+          FinancrrCircleAvatar.text(text: name, radius: 25),
           const SizedBox(width: 20),
           Expanded(
             child: Column(

@@ -6,10 +6,11 @@ import '../../../modules/settings/providers/theme.provider.dart';
 class FinancrrCard extends StatefulHookConsumerWidget {
   final Widget child;
   final EdgeInsetsGeometry? padding;
+  final Color? borderColor;
   final bool hoverable;
   final Function()? onTap;
 
-  const FinancrrCard({super.key, required this.child, this.padding, this.hoverable = true, this.onTap});
+  const FinancrrCard({super.key, required this.child, this.padding, this.borderColor, this.hoverable = true, this.onTap});
 
   @override
   ConsumerState<FinancrrCard> createState() => _OutlineCardState();
@@ -37,7 +38,7 @@ class _OutlineCardState extends ConsumerState<FinancrrCard> {
           padding: widget.padding,
           decoration: BoxDecoration(
             color: _hovered ? theme.financrrExtension.backgroundTone1.withOpacity(.5) : null,
-            border: Border.all(color: theme.financrrExtension.backgroundTone1, width: 3),
+            border: Border.all(color: widget.borderColor ?? theme.financrrExtension.backgroundTone1, width: 3),
             borderRadius: BorderRadius.circular(10),
           ),
           child: widget.child,

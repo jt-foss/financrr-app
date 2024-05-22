@@ -16,7 +16,7 @@ import 'package:restrr/restrr.dart';
 
 import '../../../shared/ui/adaptive_scaffold.dart';
 import '../../../routing/page_path.dart';
-import '../../../shared/ui/text_circle_avatar.dart';
+import '../../../shared/ui/custom_replacements/custom_circle_avatar.dart';
 import '../../../utils/common_actions.dart';
 import 'currency_settings_page.dart';
 import 'log_settings_page.dart';
@@ -113,7 +113,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         ),
         child: Row(
           children: [
-            TextCircleAvatar(text: _api.selfUser.effectiveDisplayName, radius: 25),
+            FinancrrCircleAvatar.text(text: _api.selfUser.effectiveDisplayName, radius: 25),
             const SizedBox(width: 10),
             Expanded(
               child: Column(

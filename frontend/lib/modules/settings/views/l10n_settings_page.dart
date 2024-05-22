@@ -59,9 +59,16 @@ class _L10nSettingsPageState extends ConsumerState<L10nSettingsPage> {
           context.setLocale(locale);
           ScaffoldNavBarShell.maybeOf(context)?.refresh();
         },
-        child: ListTile(
-          title: Text(locale.getLocaleName()),
-          trailing: selected ? Icon(Icons.check, color: theme.financrrExtension.primary) : null,
+        padding: const EdgeInsets.all(10),
+        borderColor: selected ? theme.financrrExtension.primary : null,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(locale.getLocaleName(),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                    color: selected ? theme.financrrExtension.primary : null, fontWeight: selected ? FontWeight.bold : null)),
+            if (selected) Icon(Icons.check, color: theme.financrrExtension.primary),
+          ],
         ),
       );
     }

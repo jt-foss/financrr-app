@@ -7,6 +7,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../shared/ui/adaptive_scaffold.dart';
 import '../../../routing/page_path.dart';
+import '../../../shared/ui/custom_replacements/custom_circle_avatar.dart';
 import '../models/themes/app_theme.model.dart';
 import '../models/themes/theme_loader.dart';
 import 'settings_page.dart';
@@ -30,7 +31,6 @@ class _ThemeSettingsPageState extends ConsumerState<ThemeSettingsPage> {
       final bool activeLight = theme.lightTheme.id == appTheme.id;
       final bool activeDark = theme.darkTheme.id == appTheme.id;
       return FinancrrCard(
-          padding: const EdgeInsets.all(10),
           onTap: () {
             if (appTheme.themeMode == ThemeMode.light) {
               ref.read(themeProvider.notifier).setLightTheme(appTheme);
@@ -39,27 +39,36 @@ class _ThemeSettingsPageState extends ConsumerState<ThemeSettingsPage> {
             }
             ref.read(themeProvider.notifier).setMode(appTheme.themeMode);
           },
+          borderColor: currentTheme ? theme.financrrExtension.primary : null,
+          padding: const EdgeInsets.all(10),
           child: Row(
             children: [
-              CircleAvatar(
+              FinancrrCircleAvatar(
                 backgroundColor: appTheme.previewColor,
-                child: Icon(
-                    activeLight
-                        ? Icons.wb_sunny
-                        : activeDark
-                            ? Icons.nightlight_round
-                            : null,
-                    size: 17,
-                    color: appTheme.themeMode == ThemeMode.light ? Colors.black : Colors.white),
+                borderColor: currentTheme ? theme.financrrExtension.primary : null,
+                child: theme.mode == ThemeMode.system
+                    ? Icon(
+                        activeLight
+                            ? Icons.wb_sunny
+                            : activeDark
+                                ? Icons.nightlight_round
+                                : null,
+                        size: 17,
+                        color: appTheme.themeMode == ThemeMode.light ? Colors.black : Colors.white)
+                    : null,
               ),
               const SizedBox(width: 10),
               Expanded(
                   child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  appTheme.translationKey.toText(),
-                  if (activeLight || activeDark)
-                    (activeLight ? L10nKey.appearanceCurrentLightTheme : L10nKey.appearanceCurrentDarkTheme).toText()
+                  appTheme.translationKey.toText(
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                          color: currentTheme ? theme.financrrExtension.primary : null,
+                          fontWeight: currentTheme ? FontWeight.bold : null)),
+                  if (theme.mode == ThemeMode.system && (activeLight || activeDark))
+                    (activeLight ? L10nKey.appearanceCurrentLightTheme : L10nKey.appearanceCurrentDarkTheme)
+                        .toText(style: theme.textTheme.labelSmall)
                 ],
               )),
               if (currentTheme) Icon(Icons.check, color: theme.financrrExtension.primary)
@@ -81,7 +90,7 @@ class _ThemeSettingsPageState extends ConsumerState<ThemeSettingsPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          L10nKey.appearanceUseDeviceTheme.toText(),
+                          L10nKey.appearanceUseDeviceTheme.toText(style: theme.textTheme.titleSmall),
                           L10nKey.appearanceCurrentDeviceTheme.toText(
                               namedArgs: {'deviceTheme': WidgetsBinding.instance.platformDispatcher.platformBrightness.name})
                         ],
@@ -94,7 +103,7 @@ class _ThemeSettingsPageState extends ConsumerState<ThemeSettingsPage> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 20),
                 for (AppTheme theme in AppThemeLoader.themes)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 10),

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -17,23 +16,17 @@ class FinancrrRadioButton extends ConsumerWidget {
     return GestureDetector(
       onTap: () => onChanged?.call(!value),
       child: AnimatedContainer(
-        width: 40,
-        height: 40,
+        padding: const EdgeInsets.all(3),
         decoration: BoxDecoration(
-
-          // TODO: add primary contrast color
-          // TODO: fix radio button radius
-          // TODO: fix text size
-
           shape: BoxShape.circle,
           color: value ? theme.financrrExtension.primary : theme.financrrExtension.backgroundTone1,
           border: Border.all(
-            color: theme.financrrExtension.backgroundTone2,
+            color: !value ? theme.financrrExtension.backgroundTone2 : theme.financrrExtension.primary,
             width: 3,
           ),
         ),
         duration: const Duration(milliseconds: 200),
-        child: value ? Icon(Icons.check, color: theme.financrrExtension.font) : null,
+        child: Icon(Icons.check, color: value ? theme.financrrExtension.primaryContrast : Colors.transparent, size: 20),
       ),
     );
   }
