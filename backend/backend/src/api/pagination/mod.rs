@@ -5,6 +5,7 @@ use actix_web::web::Query;
 use actix_web::{FromRequest, HttpRequest};
 use futures_util::future::LocalBoxFuture;
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use utoipa::openapi::path::{Parameter, ParameterBuilder, ParameterIn};
 use utoipa::openapi::{KnownFormat, ObjectBuilder, Required, SchemaFormat, SchemaType};
 use utoipa::{IntoParams, ToSchema};
@@ -15,6 +16,8 @@ use crate::wrapper::entity::account::Account;
 use crate::wrapper::entity::budget::Budget;
 use crate::wrapper::entity::currency::Currency;
 use crate::wrapper::entity::session::Session;
+use crate::wrapper::entity::transaction::recurring::RecurringTransaction;
+use crate::wrapper::entity::transaction::template::TransactionTemplate;
 use crate::wrapper::entity::transaction::Transaction;
 
 pub(crate) const DEFAULT_PAGE: u64 = 1;
@@ -23,11 +26,13 @@ pub(crate) const MAX_LIMIT: u64 = 500;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, ToSchema)]
 #[aliases(
-PaginatedAccount = Pagination < Account >,
-PaginatedBudget = Pagination < Budget >,
-PaginatedCurrency = Pagination < Currency >,
-PaginatedTransaction = Pagination < Transaction >,
-PaginatedSession = Pagination < Session >
+    PaginatedAccount = Pagination < Account >,
+    PaginatedBudget = Pagination < Budget >,
+    PaginatedCurrency = Pagination < Currency >,
+    PaginatedTransaction = Pagination < Transaction >,
+    PaginatedTransactionTemplate = Pagination < TransactionTemplate >,
+    PaginatedRecurringTransaction = Pagination < RecurringTransaction >,
+    PaginatedSession = Pagination < Session >,
 )]
 pub(crate) struct Pagination<T: Serialize + ToSchema<'static>> {
     #[serde(rename = "_metadata")]
@@ -136,28 +141,32 @@ impl FromRequest for PageSizeParam {
 }
 
 impl IntoParams for PageSizeParam {
-    fn into_params(parameter_in_provider: impl Fn() -> Option<ParameterIn>) -> Vec<Parameter> {
+    fn into_params(_parameter_in_provider: impl Fn() -> Option<ParameterIn>) -> Vec<Parameter> {
         vec![
             ParameterBuilder::new()
                 .name("page")
+                .parameter_in(ParameterIn::Query)
                 .required(Required::False)
-                .parameter_in(parameter_in_provider().unwrap_or_default())
-                .description(Some(format!("The page number. Default: {}", DEFAULT_PAGE)))
+                .description(Some("The page number."))
                 .schema(Some(
                     ObjectBuilder::new()
+                        .default(Some(Value::from(DEFAULT_PAGE)))
                         .schema_type(SchemaType::Integer)
-                        .format(Some(SchemaFormat::KnownFormat(KnownFormat::Int64))),
+                        .format(Some(SchemaFormat::KnownFormat(KnownFormat::Int64)))
+                        .build(),
                 ))
                 .build(),
             ParameterBuilder::new()
                 .name("limit")
+                .parameter_in(ParameterIn::Query)
                 .required(Required::False)
-                .parameter_in(parameter_in_provider().unwrap_or_default())
-                .description(Some(format!("The number of items per page. Default: {}", DEFAULT_LIMIT)))
+                .description(Some("The number of items per page"))
                 .schema(Some(
                     ObjectBuilder::new()
+                        .default(Some(Value::from(DEFAULT_LIMIT)))
                         .schema_type(SchemaType::Integer)
-                        .format(Some(SchemaFormat::KnownFormat(KnownFormat::Int64))),
+                        .format(Some(SchemaFormat::KnownFormat(KnownFormat::Int64)))
+                        .build(),
                 ))
                 .build(),
         ]

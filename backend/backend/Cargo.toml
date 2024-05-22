@@ -17,7 +17,7 @@ workspace = true
 
 [dependencies]
 # Actix
-actix-web = { version = "4.5.1", features = ["rustls-0_22"] }
+actix-web = { version = "4.6.0", features = ["rustls-0_23"] }
 actix-cors = "0.7.0"
 actix-limitation = "0.5.1"
 actix-web-prom = "0.8.0"
@@ -25,9 +25,13 @@ actix-web-prom = "0.8.0"
 # Async runtime/Event handeling
 tokio.workspace = true
 
+# Scheduling
+deschuler = "0.4.0"
+croner = "2.0.4"
+
 # Validation
-validator = { version = "0.16.1", features = ["derive"] }
-actix-web-validator = "5.0.1"
+validator = { version = "0.18.1", features = ["derive"] }
+actix-web-validator5 = "1.0.0"
 iban = "0.1.7"
 
 # Database / ORM
@@ -43,7 +47,7 @@ serde_json = "1.0.117"
 
 # Generating openapi spec
 utoipa = { version = "4.2.3", features = ["actix_extras", "openapi_extensions", "time", "preserve_order", "preserve_path_order", "non_strict_integers"] }
-utoipa-swagger-ui = { version = "7.0.1", features = ["actix-web", "debug-embed"] }
+utoipa-swagger-ui = { version = "7.1.0", features = ["actix-web", "debug-embed", "reqwest"] }
 utoipauto = { version = "0.1.10", features = ["generic_full_path"] }
 
 # Logging
@@ -54,6 +58,7 @@ tracing-appender = "0.2.3"
 
 # Date/Time
 time.workspace = true
+chrono = { version = "0.4.38", features = ["clock"]}
 
 # Utils
 dotenvy = "0.15.7"

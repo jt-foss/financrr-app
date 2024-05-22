@@ -21,15 +21,15 @@ use crate::api::pagination::PageSizeParam;
 use crate::config::Config;
 use crate::database::entity::{count, delete, find_all_paginated, find_one_or_error, insert, update};
 use crate::database::redis::{del, get, set_ex, zadd};
+use crate::permission_impl;
 use crate::util::auth::extract_bearer_token;
 use crate::wrapper::entity::user::User;
 use crate::wrapper::entity::{TableName, WrapperEntity};
-use crate::wrapper::permission::{
-    HasPermissionByIdOrError, HasPermissionOrError, Permission, PermissionByIds, Permissions,
-};
+use crate::wrapper::permission::{Permission, Permissions};
+use crate::wrapper::types::phantom::Identifiable;
 use crate::wrapper::util::handle_async_result_vec;
 
-pub mod dto;
+pub(crate) mod dto;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub(crate) struct Session {
@@ -95,8 +95,8 @@ impl Session {
         Self::from_model(model).await
     }
 
-    pub(crate) async fn get_user_id(token: String) -> Result<i32, ApiError> {
-        let user_id = Self::get_user_id_from_redis(token.to_owned()).await?;
+    pub(crate) async fn find_user_id(token: String) -> Result<i32, ApiError> {
+        let user_id = Self::find_user_id_from_redis(token.to_owned()).await?;
 
         match user_id {
             Some(id) => Ok(id),
@@ -104,7 +104,7 @@ impl Session {
         }
     }
 
-    async fn get_user_id_from_redis(token: String) -> Result<Option<i32>, ApiError> {
+    async fn find_user_id_from_redis(token: String) -> Result<Option<i32>, ApiError> {
         let user_id = get::<Option<i32>>(token.to_owned()).await?;
 
         match user_id {
@@ -269,6 +269,8 @@ impl Session {
     }
 }
 
+permission_impl!(Session);
+
 impl TableName for Session {
     fn table_name() -> &'static str {
         session::Entity.table_name()
@@ -280,14 +282,6 @@ impl WrapperEntity for Session {
         self.id
     }
 }
-
-impl PermissionByIds for Session {}
-
-impl Permission for Session {}
-
-impl HasPermissionOrError for Session {}
-
-impl HasPermissionByIdOrError for Session {}
 
 impl FromRequest for Session {
     type Error = ApiError;

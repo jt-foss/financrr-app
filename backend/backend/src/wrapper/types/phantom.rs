@@ -6,7 +6,7 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use crate::api::error::api::ApiError;
 
 pub(crate) trait Identifiable {
-    fn from_id(id: i32) -> impl Future<Output = Result<Self, ApiError>> + Send
+    fn find_by_id(id: i32) -> impl Future<Output = Result<Self, ApiError>> + Send
     where
         Self: Sized;
 }
@@ -33,7 +33,7 @@ impl<T: Identifiable + Send + 'static> Phantom<T> {
         match self.inner {
             Some(ref inner) => Ok(inner.clone()),
             None => {
-                let inner = T::from_id(self.id).await?;
+                let inner = T::find_by_id(self.id).await?;
                 let inner = Arc::new(inner);
                 self.set_inner(inner.clone());
 
@@ -43,7 +43,7 @@ impl<T: Identifiable + Send + 'static> Phantom<T> {
     }
 
     pub(crate) async fn fetch_inner(&self) -> Result<T, ApiError> {
-        T::from_id(self.id).await
+        T::find_by_id(self.id).await
     }
 
     pub(crate) fn set_inner(&mut self, inner: Arc<T>) {

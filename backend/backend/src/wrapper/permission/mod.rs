@@ -1,9 +1,9 @@
 use std::future::Future;
 
-use actix_web::http::Uri;
 use bitflags::bitflags;
 use sea_orm::{EntityTrait, Set};
 use serde::Serialize;
+use utoipa::openapi::{KnownFormat, ObjectBuilder, RefOr, Schema, SchemaFormat, SchemaType};
 use utoipa::ToSchema;
 
 use entity::permissions;
@@ -11,15 +11,15 @@ use entity::permissions::Model;
 use entity::utility::table::{does_entity_exist, does_table_exists};
 
 use crate::api::error::api::ApiError;
-use crate::api::pagination::{PageSizeParam, Pagination};
+use crate::api::pagination::PageSizeParam;
 use crate::database::connection::get_database_connection;
-use crate::database::entity::{count, delete, find_all_paginated, find_one, insert, update};
+use crate::database::entity::{count, delete, find_all, find_all_paginated, find_one, insert, update};
 use crate::wrapper::entity::{TableName, WrapperEntity};
 
 pub(crate) mod cleanup;
 
 bitflags! {
-    #[derive(Debug, Clone, PartialEq, Eq, Serialize, ToSchema)]
+    #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
     pub(crate) struct Permissions: u32 {
         const READ = 0b001;
         const WRITE = 0b010;
@@ -27,6 +27,19 @@ bitflags! {
 
         const READ_WRITE = Self::READ.bits() | Self::WRITE.bits();
         const READ_DELETE = Self::READ.bits() | Self::DELETE.bits();
+    }
+}
+
+impl ToSchema<'static> for Permissions {
+    fn schema() -> (&'static str, RefOr<Schema>) {
+        (
+            "Permissions",
+            ObjectBuilder::new()
+                .schema_type(SchemaType::Integer)
+                .format(Some(SchemaFormat::KnownFormat(KnownFormat::UInt32)))
+                .build()
+                .into(),
+        )
     }
 }
 
@@ -39,15 +52,8 @@ pub(crate) struct PermissionsEntity {
 }
 
 impl PermissionsEntity {
-    pub(crate) async fn get_all_paginated(page_size: PageSizeParam) -> Result<Pagination<Self>, ApiError> {
-        let count = Self::count_all().await?;
-        let permissions = find_all_paginated(permissions::Entity::find_all(), &page_size)
-            .await?
-            .into_iter()
-            .map(Self::from)
-            .collect();
-
-        Ok(Pagination::new(permissions, &page_size, count, Uri::default()))
+    pub(crate) async fn find_all_paginated(page_size: PageSizeParam) -> Result<Vec<Self>, ApiError> {
+        Ok(find_all_paginated(permissions::Entity::find_all(), &page_size).await?.into_iter().map(Self::from).collect())
     }
 
     pub(crate) async fn count_all() -> Result<u64, ApiError> {
@@ -71,6 +77,14 @@ impl PermissionsEntity {
         }
 
         Ok(false)
+    }
+
+    pub(crate) async fn find_all_by_type_and_id(entity_type: &str, entity_id: i32) -> Result<Vec<Self>, ApiError> {
+        Ok(find_all(permissions::Entity::find_all_by_type_and_id(entity_type, entity_id))
+            .await?
+            .into_iter()
+            .map(Self::from)
+            .collect())
     }
 }
 
@@ -97,7 +111,20 @@ impl From<Option<permissions::Model>> for Permissions {
     }
 }
 
-#[allow(unused)]
+#[macro_export]
+macro_rules! permission_impl {
+    ($type:ty) => {
+        impl $crate::wrapper::permission::PermissionByIds for $type {}
+
+        impl $crate::wrapper::permission::Permission for $type {}
+
+        impl $crate::wrapper::permission::HasPermissionOrError for $type {}
+
+        impl $crate::wrapper::permission::HasPermissionByIdOrError for $type {}
+    };
+}
+
+#[allow(unused)] //TODO remove once multiple users per account has been implemented
 pub(crate) trait Permission: PermissionByIds + WrapperEntity {
     fn get_permissions(&self, user_id: i32) -> impl Future<Output = Result<Permissions, ApiError>> {
         async move { Self::get_permissions_by_id(self.get_id(), user_id).await }

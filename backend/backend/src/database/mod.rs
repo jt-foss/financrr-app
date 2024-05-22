@@ -1,3 +1,3 @@
-pub mod connection;
-pub mod entity;
-pub mod redis;
+pub(crate) mod connection;
+pub(crate) mod entity;
+pub(crate) mod redis;

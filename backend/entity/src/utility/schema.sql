@@ -1,3 +1,21 @@
+-- =============================================
+-- =               DOMAINS                     =
+-- =============================================
+
+DO
+$$
+    BEGIN
+        CREATE DOMAIN uint32 AS bigint
+            CHECK (VALUE >= 0 AND VALUE < 4294967296);
+    EXCEPTION
+        WHEN duplicate_object THEN null;
+    END
+$$;
+
+-- =============================================
+-- =               TABLES                      =
+-- =============================================
+
 CREATE TABLE IF NOT EXISTS "user"
 (
     id           SERIAL PRIMARY KEY,
@@ -59,6 +77,30 @@ CREATE TABLE IF NOT EXISTS budget
     created_at  timestamp with time zone                                           NOT NULL DEFAULT current_timestamp
 );
 
+CREATE TABLE IF NOT EXISTS transaction_template
+(
+    id          SERIAL PRIMARY KEY,
+    source      INTEGER REFERENCES account (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    destination INTEGER REFERENCES account (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    amount      BIGINT                                                               NOT NULL,
+    currency    INTEGER REFERENCES currency (id) ON UPDATE CASCADE ON DELETE CASCADE NOT NULL,
+    name        TEXT                                                                 NOT NULL,
+    description TEXT,
+    budget      INTEGER REFERENCES budget (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    created_at  timestamp with time zone                                             NOT NULL DEFAULT current_timestamp,
+
+    CHECK (source IS NOT NULL OR destination IS NOT NULL)
+);
+
+CREATE TABLE IF NOT EXISTS recurring_transaction
+(
+    id                      SERIAL PRIMARY KEY,
+    template                INTEGER REFERENCES transaction_template (id) ON UPDATE CASCADE ON DELETE CASCADE NOT NULL,
+    recurring_rule   json NOT NULL,
+    last_executed_at timestamp with time zone,
+    created_at              timestamp with time zone                                                         NOT NULL DEFAULT current_timestamp
+);
+
 CREATE TABLE IF NOT EXISTS transaction
 (
     id          SERIAL PRIMARY KEY,
@@ -69,7 +111,7 @@ CREATE TABLE IF NOT EXISTS transaction
     name        TEXT                     NOT NULL,
     description TEXT,
     budget      INTEGER REFERENCES budget (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    created_at  timestamp with time zone NOT NULL DEFAULT current_timestamp,
     executed_at timestamp with time zone NOT NULL DEFAULT current_timestamp,
+    created_at  timestamp with time zone NOT NULL DEFAULT current_timestamp,
     CHECK (source IS NOT NULL OR destination IS NOT NULL)
 );
