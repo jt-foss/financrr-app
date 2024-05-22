@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/shared/ui/auth_page_template.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
-import 'package:financrr_frontend/shared/ui/custom_text_field.dart';
+import 'package:financrr_frontend/shared/ui/custom_replacements/custom_text_field.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
 import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/foundation.dart';
@@ -61,7 +61,7 @@ class ServerConfigPageState extends ConsumerState<ServerConfigPage> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(top: 20),
-                    child: AppTextField(
+                    child: FinancrrTextField(
                       controller: _urlController,
                       label: L10nKey.authConfigCheckUrl, // TODO: implement L10nKey ("Server URL")
                       hint: L10nKey.authConfigCheckUrl, // TODO: implement L10nKey ("https://demo.financrr.app/api")

@@ -1,6 +1,6 @@
 import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
-import 'package:financrr_frontend/shared/ui/outline_card.dart';
+import 'package:financrr_frontend/shared/ui/custom_replacements/custom_card.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
@@ -54,7 +54,7 @@ class TransactionCard extends ConsumerWidget {
     var theme = ref.watch(themeProvider);
     var l10n = ref.watch(l10nProvider);
 
-    return OutlineCard(
+    return FinancrrCard(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       onTap: !interactive
           ? null

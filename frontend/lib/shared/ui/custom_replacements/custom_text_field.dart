@@ -1,10 +1,11 @@
 import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../modules/settings/providers/theme.provider.dart';
+import '../../../modules/settings/providers/theme.provider.dart';
 
-class AppTextField extends StatefulHookConsumerWidget {
+class FinancrrTextField extends StatefulHookConsumerWidget {
   final TextEditingController controller;
   final L10nKey label;
   final L10nKey? hint;
@@ -15,8 +16,9 @@ class AppTextField extends StatefulHookConsumerWidget {
   final Iterable<String>? autofillHints;
   final String? Function(String?)? validator;
   final void Function(String)? onChanged;
+  final List<TextInputFormatter>? inputFormatters;
 
-  const AppTextField(
+  const FinancrrTextField(
       {super.key,
       required this.controller,
       required this.label,
@@ -27,14 +29,15 @@ class AppTextField extends StatefulHookConsumerWidget {
       this.obscureText = false,
       this.autofillHints,
       this.validator,
-      this.onChanged
+      this.onChanged,
+      this.inputFormatters
       });
 
   @override
-  ConsumerState<AppTextField> createState() => _AppTextFieldState();
+  ConsumerState<FinancrrTextField> createState() => _AppTextFieldState();
 }
 
-class _AppTextFieldState extends ConsumerState<AppTextField> {
+class _AppTextFieldState extends ConsumerState<FinancrrTextField> {
   String? _error;
 
   @override
@@ -75,6 +78,7 @@ class _AppTextFieldState extends ConsumerState<AppTextField> {
                 border: InputBorder.none),
             obscureText: widget.obscureText,
             onChanged: widget.onChanged,
+            inputFormatters: widget.inputFormatters,
           ),
         ),
         if (_error != null) ...[

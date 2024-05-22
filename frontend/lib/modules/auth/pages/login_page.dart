@@ -12,7 +12,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../shared/ui/adaptive_scaffold.dart';
 import '../../../routing/page_path.dart';
-import '../../../shared/ui/custom_text_field.dart';
+import '../../../shared/ui/custom_replacements/custom_text_field.dart';
 
 class LoginPage extends StatefulHookConsumerWidget {
   static const PagePathBuilder pagePath = PagePathBuilder('/login');
@@ -56,7 +56,7 @@ class LoginPageState extends ConsumerState<LoginPage> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 20),
-                      child: AppTextField(
+                      child: FinancrrTextField(
                         controller: _usernameController,
                         label: L10nKey.commonUsername,
                         hint: L10nKey.commonUsername, // TODO: implement L10nKey ("John Doe")
@@ -64,7 +64,7 @@ class LoginPageState extends ConsumerState<LoginPage> {
                         validator: (value) => value!.isEmpty ? L10nKey.commonUsernameRequired.toString() : null,
                       ),
                     ),
-                    AppTextField(
+                    FinancrrTextField(
                       controller: _passwordController,
                       label: L10nKey.commonPassword,
                       suffixIcon: Padding(

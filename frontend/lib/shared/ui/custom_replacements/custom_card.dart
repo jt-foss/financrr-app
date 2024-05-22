@@ -1,21 +1,21 @@
 import 'package:flutter/cupertino.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../modules/settings/providers/theme.provider.dart';
+import '../../../modules/settings/providers/theme.provider.dart';
 
-class OutlineCard extends StatefulHookConsumerWidget {
+class FinancrrCard extends StatefulHookConsumerWidget {
   final Widget child;
   final EdgeInsetsGeometry? padding;
   final bool hoverable;
   final Function()? onTap;
 
-  const OutlineCard({super.key, required this.child, this.padding, this.hoverable = true, this.onTap});
+  const FinancrrCard({super.key, required this.child, this.padding, this.hoverable = true, this.onTap});
 
   @override
-  ConsumerState<OutlineCard> createState() => _OutlineCardState();
+  ConsumerState<FinancrrCard> createState() => _OutlineCardState();
 }
 
-class _OutlineCardState extends ConsumerState<OutlineCard> {
+class _OutlineCardState extends ConsumerState<FinancrrCard> {
   bool _hovered = false;
 
   @override

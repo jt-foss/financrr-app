@@ -1,6 +1,6 @@
 import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
-import 'package:financrr_frontend/shared/ui/outline_card.dart';
+import 'package:financrr_frontend/shared/ui/custom_replacements/custom_card.dart';
 import 'package:financrr_frontend/shared/ui/text_circle_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -42,7 +42,7 @@ class AccountCard extends ConsumerWidget {
     var theme = ref.watch(themeProvider);
     var l10n = ref.watch(l10nProvider);
 
-    return OutlineCard(
+    return FinancrrCard(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       onTap: !interactive ? null : () => context.goPath(AccountPage.pagePath.build(params: {'accountId': id.toString()})),
       child: Row(

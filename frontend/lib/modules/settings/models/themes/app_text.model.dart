@@ -25,6 +25,22 @@ class AppText {
     );
   }
 
+  AppText copyWith({
+    String? fontFamily,
+    List<String>? fontFamilyFallback,
+    double? fontSize,
+    FontWeight? fontWeight,
+    Color? color,
+  }) {
+    return AppText(
+      fontFamily: fontFamily ?? this.fontFamily,
+      fontFamilyFallback: fontFamilyFallback ?? this.fontFamilyFallback,
+      fontSize: fontSize ?? this.fontSize,
+      fontWeight: fontWeight ?? this.fontWeight,
+      color: color ?? this.color,
+    );
+  }
+
   TextStyle toTextStyle() {
     return TextStyle(
       fontFamily: fontFamily,

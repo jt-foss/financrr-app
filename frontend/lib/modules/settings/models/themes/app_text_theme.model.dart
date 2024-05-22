@@ -41,7 +41,11 @@ class AppTextTheme {
       {Color? defaultColor, String? defaultFontFamily, List<String>? defaultFontFamilyFallback}) {
     AppText fromJson(String key, AppText fallback) {
       if (json == null) {
-        return fallback;
+        return fallback.copyWith(
+          color: defaultColor,
+          fontFamily: defaultFontFamily,
+          fontFamilyFallback: defaultFontFamilyFallback,
+        );
       }
       return AppText.tryFromJson(json[key],
               defaultColor: defaultColor,

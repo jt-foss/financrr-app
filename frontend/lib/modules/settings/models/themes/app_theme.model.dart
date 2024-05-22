@@ -69,6 +69,8 @@ class AppTheme {
       fontFamilyFallback: fontFamilyFallback,
       primaryColor: themeExtension.primary,
       scaffoldBackgroundColor: themeExtension.background,
+      appBarTheme: AppBarTheme(foregroundColor: themeExtension.font),
+      iconTheme: IconThemeData(color: themeExtension.backgroundTone3),
       textTheme: TextTheme(
         displayLarge: textTheme.displayLarge.toTextStyle(),
         displayMedium: textTheme.displayMedium.toTextStyle(),
