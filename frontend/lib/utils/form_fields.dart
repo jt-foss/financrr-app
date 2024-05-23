@@ -1,3 +1,4 @@
+import 'package:financrr_frontend/shared/ui/custom_replacements/custom_dropdown_field.dart';
 import 'package:financrr_frontend/shared/ui/custom_replacements/custom_text_field.dart';
 import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
@@ -44,18 +45,15 @@ class FormFields {
       if (selectedType == TransactionType.transfer)
         Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: DropdownButtonFormField(
-              decoration: InputDecoration(labelText: L10nKey.transactionCreateTransferTo.toString()),
-              validator: (value) =>
-                  InputValidators.nonNull(L10nKey.transactionCreateTransferTo.toString(), value?.id.value.toString()),
+            child: FinancrrDropdownField(
+              label: L10nKey.transactionCreateTransferTo,
+              validator: (value) => InputValidators.nonNull(L10nKey.transactionCreateTransferTo.toString(), value),
+              required: true,
               items: currentAccount.api
                   .getAccounts()
                   .where((account) => account.id.value != currentAccount.id.value)
                   .map((account) {
-                return DropdownMenuItem(
-                  value: account,
-                  child: Text(account.name, style: theme.textTheme.bodyMedium),
-                );
+                return FinancrrDropdownItem(value: account, label: account.name);
               }).toList(),
               onChanged: onSecondaryChanged,
             )),
@@ -174,15 +172,15 @@ class FormFields {
       ),
       Padding(
         padding: const EdgeInsets.only(bottom: 10),
-        child: DropdownButtonFormField(
-            decoration: InputDecoration(labelText: L10nKey.accountPropertiesCurrency.toString()),
-            validator: (value) =>
-                InputValidators.nonNull(L10nKey.accountPropertiesCurrency.toString(), value?.id.value.toString()),
+        child: FinancrrDropdownField(
+            label: L10nKey.accountPropertiesCurrency,
+            validator: (value) => InputValidators.nonNull(L10nKey.accountPropertiesCurrency.toString(), value),
+            required: true,
             value: initialCurrency,
             items: api.getCurrencies().map((currency) {
-              return DropdownMenuItem(
+              return FinancrrDropdownItem(
                 value: currency,
-                child: Text('${currency.name} (${currency.symbol})', style: theme.textTheme.bodyMedium),
+                label: '${currency.name} (${currency.symbol})',
               );
             }).toList(),
             onChanged: onCurrencyChanged),

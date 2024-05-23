@@ -83,9 +83,12 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                   ));
                 }
                 return Column(
-                  children: transactions.map((t) {
-                    return TransactionCard(transaction: t);
-                  }).toList(),
+                  children: [
+                    for (var transaction in transactions) Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: TransactionCard(transaction: transaction),
+                    )
+                  ],
                 );
               },
             ),
