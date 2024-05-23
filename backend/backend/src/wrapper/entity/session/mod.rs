@@ -36,8 +36,9 @@ pub(crate) mod dto;
 pub(crate) struct Session {
     pub(crate) id: i32,
     pub(crate) token: String,
-    pub(crate) name: Option<String>,
-    pub(crate) platform_details: Option<String>,
+    pub(crate) name: String,
+    pub(crate) description: Option<String>,
+    pub(crate) platform: Option<String>,
     #[serde(with = "time::serde::rfc3339")]
     pub(crate) expires_at: OffsetDateTime,
     #[serde(with = "time::serde::rfc3339")]
@@ -57,8 +58,9 @@ impl Session {
         let session = session::ActiveModel {
             id: Default::default(),
             token: Set(session_token.clone()),
-            name: Set(credentials.session_name),
-            platform_details: Set(credentials.platform_details),
+            name: Set(credentials.name),
+            description: Set(credentials.description),
+            platform: Set(credentials.platform),
             user: Set(user.id),
             created_at: Set(get_now()),
         };
@@ -90,7 +92,8 @@ impl Session {
             id: Set(self.id),
             token: Set(self.token.to_owned()),
             name: Set(self.name.clone()),
-            platform_details: Set(self.platform_details.clone()),
+            description: Set(self.description.clone()),
+            platform: Set(self.platform.clone()),
             user: Set(self.user.id),
             created_at: Set(get_now()),
         };
@@ -261,7 +264,8 @@ impl Session {
         Ok(Self {
             id: model.id,
             name: model.name,
-            platform_details: model.platform_details,
+            description: model.description,
+            platform: model.platform,
             token: model.token,
             user,
             expires_at: model.created_at.add(TimeDuration::hours(Config::get_config().session.lifetime_hours as i64)),

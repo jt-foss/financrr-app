@@ -11,10 +11,12 @@ pub struct Model {
     pub id: i32,
     #[sea_orm(column_type = "Text", unique)]
     pub token: String,
+    #[sea_orm(column_type = "Text")]
+    pub name: String,
     #[sea_orm(column_type = "Text", nullable)]
-    pub name: Option<String>,
+    pub description: Option<String>,
     #[sea_orm(column_type = "Text", nullable)]
-    pub platform_details: Option<String>,
+    pub platform: Option<String>,
     pub user: i32,
     pub created_at: TimeDateTimeWithTimeZone,
 }
