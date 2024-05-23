@@ -176,7 +176,7 @@ class FormFields {
             label: L10nKey.accountPropertiesCurrency,
             validator: (value) => InputValidators.nonNull(L10nKey.accountPropertiesCurrency.toString(), value),
             required: true,
-            value: initialCurrency,
+            value: initialCurrency?.name,
             items: api.getCurrencies().map((currency) {
               return FinancrrDropdownItem(
                 value: currency,

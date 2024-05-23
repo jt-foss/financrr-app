@@ -19,7 +19,7 @@ class FinancrrDropdownField<T> extends StatefulHookConsumerWidget {
   final L10nKey label;
   final L10nKey? hint;
   final String? Function(String?)? validator;
-  final T? value;
+  final String? value;
   final List<FinancrrDropdownItem<T>>? items;
   final Widget? prefixIcon;
   final void Function(T?)? onChanged;
