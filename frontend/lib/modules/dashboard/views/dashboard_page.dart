@@ -123,7 +123,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.only(top: 20, bottom: 10),
+            padding: const EdgeInsets.symmetric(vertical: 10),
             child: L10nKey.dashboardTransactions.toText(style: theme.textTheme.titleMedium),
           ),
           StreamWrapper(
@@ -191,7 +191,10 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                           })
                     ],
                   ),
-                  for (Account a in _api.getAccounts()) AccountCard(account: a),
+                  for (Account a in _api.getAccounts()) Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: AccountCard(account: a),
+                  ),
                   if (_api.getAccounts().isEmpty)
                     Center(
                         child: NoticeCard(

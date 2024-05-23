@@ -42,6 +42,7 @@ class _TransactionCreatePageState extends ConsumerState<TransactionCreatePage> {
   bool _isValid = false;
   TransactionType _type = TransactionType.deposit;
   DateTime _executedAt = DateTime.now();
+  Account? _secondary;
 
   Future<Account?> _fetchAccount({bool forceRetrieve = false}) async {
     return _accountStreamController.fetchData(
@@ -106,11 +107,12 @@ class _TransactionCreatePageState extends ConsumerState<TransactionCreatePage> {
                     onSelectionChanged: (types) {
                       setState(() => _type = types.first);
                     },
+                    onSecondaryChanged: (account) => setState(() => _secondary = account),
                     onExecutedAtChanged: (date) => setState(() => _executedAt = date),
                   ),
                   const SizedBox(height: 20),
                   FinancrrButton(
-                    onPressed: _isValid ? () => _createTransaction(account, _type) : null,
+                    onPressed: _isValid ? () => _createTransaction(account, _type, secondary: _secondary) : null,
                     text: L10nKey.transactionCreate.toString(),
                   ),
                 ],
