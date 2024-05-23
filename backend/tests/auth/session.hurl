@@ -41,7 +41,7 @@ HTTP 201
 [Captures]
 new_admin_token: jsonpath "$['token']"
 new_session_id: jsonpath "$['id']"
-expires_at: jsonpath "$['expires_at']" toDate "%+" format "%S" toInt
+expires_at: jsonpath "$['expires_at']" toDate "%+" format "%s" toInt
 
 # Refresh session
 PATCH {{api_v1}}/session/refresh
@@ -50,7 +50,7 @@ Authorization: Bearer {{new_admin_token}}
 delay: 1000
 HTTP 200
 [Asserts]
-jsonpath "$['expires_at']" toDate "%+" format "%S" toInt > {{expires_at}}
+jsonpath "$['expires_at']" toDate "%+" format "%s" toInt > {{expires_at}}
 
 # Delete session by id
 DELETE {{api_v1}}/session/{{new_session_id}}
