@@ -52,7 +52,7 @@ class FinancrrNavigationBar extends ConsumerWidget {
     }
 
     return Container(
-      decoration: BoxDecoration(color: Colors.white.withOpacity(.1)),
+      decoration: BoxDecoration(color: theme.financrrExtension.surface),
       child: Padding(
         padding: const EdgeInsets.only(bottom: 40, top: 10, left: 10, right: 10),
         child: Row(
