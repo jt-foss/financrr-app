@@ -15,7 +15,6 @@
   "appearance_current_device_theme": "Current device theme: {deviceTheme}",
   "appearance_current_light_theme": "selected light theme",
   "appearance_use_device_theme": "Use device theme",
-  "auth_register_existing_account": "Already have an account?",
   "auth_register_failed": "Registration failed. Please try again later",
   "auth_register_message_1": "Let's get you going!",
   "auth_register_message_2": "Another one bites the dust",
