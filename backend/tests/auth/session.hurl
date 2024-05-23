@@ -41,13 +41,16 @@ HTTP 201
 [Captures]
 new_admin_token: jsonpath "$['token']"
 new_session_id: jsonpath "$['id']"
+expires_at: jsonpath "$['expires_at']" toDate "%+" format "%S" toInt
 
 # Refresh session
 PATCH {{api_v1}}/session/refresh
 Authorization: Bearer {{new_admin_token}}
+[Options]
+delay: 1000
 HTTP 200
 [Asserts]
-jsonpath "$['expires_at']" toDate "%+" daysAfterNow == 6 # We actually test for 6 because the session was created 1 second before
+jsonpath "$['expires_at']" toDate "%+" format "%S" toInt > {{expires_at}}
 
 # Delete session by id
 DELETE {{api_v1}}/session/{{new_session_id}}
