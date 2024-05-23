@@ -72,7 +72,9 @@ class TransactionPageState extends ConsumerState<TransactionPage> {
       return TableRow(children: [
         Padding(
           padding: const EdgeInsets.all(10),
-          child: label.toText(),
+          child: label.toText(
+            style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+          ),
         ),
         Padding(
           padding: const EdgeInsets.all(10),
@@ -107,7 +109,7 @@ class TransactionPageState extends ConsumerState<TransactionPage> {
                         Text(transaction.description ?? StoreKey.dateTimeFormat.readSync()!.format(transaction.executedAt)),
                       ],
                     ),
-                    const Divider(),
+                    const SizedBox(height: 20),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -127,7 +129,9 @@ class TransactionPageState extends ConsumerState<TransactionPage> {
                     Padding(
                       padding: const EdgeInsets.only(top: 10),
                       child: Table(
-                        border: TableBorder.all(color: theme.themeData.dividerColor),
+                        border: TableBorder.all(
+                            borderRadius: BorderRadius.circular(10),
+                            color: theme.financrrExtension.surfaceVariant1, width: 3),
                         children: [
                           buildTableRow(L10nKey.transactionPropertiesType, transaction.type.name),
                           buildTableRow(L10nKey.transactionPropertiesAmount, amountStr),
