@@ -1,6 +1,8 @@
+import 'package:financrr_frontend/modules/settings/models/l10n.state.dart';
 import 'package:financrr_frontend/shared/ui/custom_replacements/custom_dropdown_field.dart';
 import 'package:financrr_frontend/shared/ui/custom_replacements/custom_text_field.dart';
 import 'package:financrr_frontend/utils/l10n_utils.dart';
+import 'package:financrr_frontend/utils/text_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -15,7 +17,7 @@ import 'input_utils.dart';
 class FormFields {
   const FormFields._();
 
-  static List<Widget> transaction(ConsumerState state, ThemeState theme,
+  static List<Widget> transaction(ConsumerState state, L10nState l10n, ThemeState theme,
       {required Account currentAccount,
       required TextEditingController nameController,
       required TextEditingController amountController,
@@ -63,11 +65,15 @@ class FormFields {
           controller: amountController,
           label: L10nKey.transactionPropertiesAmount,
           validator: (value) => InputValidators.nonNull(L10nKey.transactionPropertiesAmount.toString(), value),
+          onChanged: (value) {
+            if (value.isNotEmpty) {
+              amountController.text =
+                  TextUtils.formatBalanceWithCurrency(l10n, int.tryParse(value) ?? 0, currentAccount.currencyId.get()!);
+            }
+          },
           required: true,
           keyboardType: TextInputType.number,
-          inputFormatters: [
-            FilteringTextInputFormatter.digitsOnly
-          ],
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
         ),
       ),
       Padding(
@@ -115,14 +121,15 @@ class FormFields {
     ];
   }
 
-  static List<Widget> account(WidgetRef ref, ThemeState theme,
+  static List<Widget> account(WidgetRef ref, L10nState l10n, ThemeState theme,
       {required Restrr api,
       required TextEditingController nameController,
       required TextEditingController descriptionController,
       required TextEditingController ibanController,
       required TextEditingController originalBalanceController,
+      required Currency selectedCurrency,
       void Function(Currency?)? onCurrencyChanged,
-      Currency? initialCurrency}) {
+      }) {
     return [
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
@@ -164,11 +171,14 @@ class FormFields {
           controller: originalBalanceController,
           label: L10nKey.accountPropertiesOriginalBalance,
           validator: (value) => InputValidators.nonNull(L10nKey.accountPropertiesOriginalBalance.toString(), value),
+          onChanged: (value) {
+            if (value.isNotEmpty) {
+              originalBalanceController.text = TextUtils.formatBalanceWithCurrency(l10n, int.tryParse(value) ?? 0, selectedCurrency);
+            }
+          },
           required: true,
           keyboardType: TextInputType.number,
-          inputFormatters: [
-            FilteringTextInputFormatter.digitsOnly
-          ],
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
         ),
       ),
       Padding(
@@ -177,7 +187,7 @@ class FormFields {
             label: L10nKey.accountPropertiesCurrency,
             validator: (value) => InputValidators.nonNull(L10nKey.accountPropertiesCurrency.toString(), value),
             required: true,
-            value: initialCurrency?.name,
+            value: selectedCurrency.name,
             items: api.getCurrencies().map((currency) {
               return FinancrrDropdownItem(
                 value: currency,

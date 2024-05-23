@@ -14,6 +14,7 @@ import '../../../shared/ui/async_wrapper.dart';
 import '../../../shared/ui/cards/account_card.dart';
 import '../../../shared/ui/custom_replacements/custom_button.dart';
 import '../../../utils/form_fields.dart';
+import '../../settings/providers/l10n.provider.dart';
 import '../../settings/providers/theme.provider.dart';
 import 'account_page.dart';
 
@@ -76,6 +77,7 @@ class AccountEditPageState extends ConsumerState<AccountEditPage> {
   @override
   Widget build(BuildContext context) {
     var theme = ref.watch(themeProvider);
+    var l10n = ref.watch(l10nProvider);
 
     buildVerticalLayout(Account account, Size size) {
       return Padding(
@@ -99,14 +101,14 @@ class AccountEditPageState extends ConsumerState<AccountEditPage> {
                     currency: _currency ?? _api.getCurrencies().first,
                   ),
                   const SizedBox(height: 20),
-                  ...FormFields.account(ref, theme,
+                  ...FormFields.account(ref, l10n, theme,
                       api: _api,
                       nameController: _nameController,
                       descriptionController: _descriptionController,
                       ibanController: _ibanController,
                       originalBalanceController: _originalBalanceController,
-                      onCurrencyChanged: (currency) => _currency = currency!,
-                      initialCurrency: _currency),
+                      selectedCurrency: _currency ?? _api.getCurrencies().first,
+                      onCurrencyChanged: (currency) => _currency = currency!),
                   const SizedBox(height: 20),
                   FinancrrButton(
                     onPressed: _isValid ? () => _editAccount(account) : null,
