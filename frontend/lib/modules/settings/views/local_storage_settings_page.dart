@@ -41,8 +41,7 @@ class _LocalStorageSettingsPageState extends ConsumerState<LocalStorageSettingsP
               children: [
                 Table(
                   border: TableBorder.all(
-                      borderRadius: BorderRadius.circular(10),
-                      color: theme.financrrExtension.surfaceVariant1, width: 3),
+                      borderRadius: BorderRadius.circular(10), color: theme.financrrExtension.surfaceVariant1, width: 3),
                   children: [
                     for (StoreKey key in StoreKey.values)
                       TableRow(

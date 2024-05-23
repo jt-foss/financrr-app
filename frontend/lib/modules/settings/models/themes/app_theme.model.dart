@@ -72,8 +72,7 @@ class AppTheme {
       appBarTheme: AppBarTheme(
           backgroundColor: themeExtension.surface,
           foregroundColor: themeExtension.onSurface,
-          surfaceTintColor: Colors.transparent
-      ),
+          surfaceTintColor: Colors.transparent),
       iconTheme: IconThemeData(color: themeExtension.surfaceVariant3),
       colorScheme: ColorScheme(
         primary: themeExtension.primary,

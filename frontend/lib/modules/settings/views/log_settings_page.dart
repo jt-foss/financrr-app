@@ -54,19 +54,20 @@ class _LogSettingsPageState extends ConsumerState<LogSettingsPage> {
     }
 
     buildLogEntryTile(LogEntry entry, int index, {bool expanded = false}) {
+      Color? color = getColorTint(entry.level);
       return FinancrrCard(
         padding: const EdgeInsets.all(10),
-        borderColor: getColorTint(entry.level),
+        borderColor: color,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(entry.loggerName, style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold)),
+            Text(entry.loggerName, style: theme.textTheme.bodyMedium?.copyWith(color: color, fontWeight: FontWeight.bold)),
             Text(entry.message, maxLines: expanded ? null : 1),
             Row(
               children: [
                 Padding(
                   padding: const EdgeInsets.only(right: 5),
-                  child: Icon(_getIcon(entry.level), color: getColorTint(entry.level), size: 17),
+                  child: Icon(_getIcon(entry.level), color: color, size: 17),
                 ),
                 Expanded(child: Text('${entry.level.name}, ${StoreKey.dateTimeFormat.readSync()!.format(entry.timestamp)}')),
               ],
