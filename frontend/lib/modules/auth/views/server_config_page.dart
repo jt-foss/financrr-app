@@ -61,10 +61,10 @@ class ServerConfigPageState extends ConsumerState<ServerConfigPage> {
                     padding: const EdgeInsets.only(top: 20),
                     child: FinancrrTextField(
                       controller: _urlController,
-                      label: L10nKey.authConfigCheckUrl, // TODO: implement L10nKey ("Server URL")
-                      hint: L10nKey.authConfigCheckUrl, // TODO: implement L10nKey ("https://demo.financrr.app/api")
+                      label: L10nKey.serverConfigUrl,
+                      hint: L10nKey.brandDemoUrl,
                       status: _isValid && _apiVersion != null
-                          ? L10nKey.authConfigStatus
+                          ? L10nKey.serverConfigStatus
                               .toString(namedArgs: {'hostStatus': 'Healthy', 'apiVersion': '$_apiVersion'})
                           : null,
                       prefixIcon: const Icon(Icons.link),
@@ -91,7 +91,7 @@ class ServerConfigPageState extends ConsumerState<ServerConfigPage> {
                         }
                       },
                       label: const Icon(Icons.arrow_forward, size: 18),
-                      icon: (_isValid ? L10nKey.commonNext : L10nKey.authConfigCheckUrl).toText(),
+                      icon: (_isValid ? L10nKey.commonNext : L10nKey.serverConfigCheckUrl).toText(),
                     )),
         ],
       ));

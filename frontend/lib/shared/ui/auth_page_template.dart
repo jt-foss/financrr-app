@@ -80,6 +80,6 @@ class AuthPageTemplateState extends ConsumerState<AuthPageTemplate> {
     if (key != null) {
       return key;
     }
-    return widget.registerWelcomeMessages ? L10nKey.authRegisterMessage1 : L10nKey.authLoginMessage1;
+    return widget.registerWelcomeMessages ? L10nKey.registerMessage1 : L10nKey.loginMessage1;
   }
 }
