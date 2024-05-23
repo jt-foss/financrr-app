@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
-import '../../modules/settings/providers/l10n.provider.dart';
-import '../../modules/transactions/views/transaction_page.dart';
-import '../../utils/text_utils.dart';
+import '../../../modules/settings/providers/l10n.provider.dart';
+import '../../../modules/transactions/views/transaction_page.dart';
+import '../../../utils/text_utils.dart';
 
 class TransactionCard extends ConsumerWidget {
   final Id id;
@@ -19,11 +19,11 @@ class TransactionCard extends ConsumerWidget {
   final DateTime executedAt;
   final DateTime createdAt;
   final Account account;
-  final TransactionType type;
+  final TransactionType? type;
 
   final bool interactive;
 
-  TransactionCard({super.key, required Transaction transaction, this.interactive = true})
+  TransactionCard({super.key, required Account? account, required Transaction transaction, this.interactive = true})
       : id = transaction.id.value,
         source = transaction.sourceId?.value,
         destination = transaction.destinationId?.value,
@@ -32,8 +32,8 @@ class TransactionCard extends ConsumerWidget {
         description = transaction.description,
         executedAt = transaction.executedAt,
         createdAt = transaction.createdAt,
-        account = (transaction.sourceId ?? transaction.destinationId)!.get()!,
-        type = transaction.type;
+        account = account ?? (transaction.sourceId ?? transaction.destinationId)!.get()!,
+        type = account == null ? null : transaction.getType(account);
 
   const TransactionCard.fromData(
       {super.key,
@@ -53,6 +53,7 @@ class TransactionCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     var theme = ref.watch(themeProvider);
     var l10n = ref.watch(l10nProvider);
+    bool isMoneyIn = type == TransactionType.deposit || type == TransactionType.transferIn;
 
     return FinancrrCard(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -72,11 +73,9 @@ class TransactionCard extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(l10n.dateFormat.format(executedAt)),
-              Text(
-                  '${type == TransactionType.deposit ? '' : '-'}${TextUtils.formatBalanceWithCurrency(l10n, amount, account.currencyId.get()!)}',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                      color:
-                          type == TransactionType.deposit ? theme.themeData.primaryColor : theme.themeData.colorScheme.error)),
+              Text('${isMoneyIn ? '+' : '-'}${TextUtils.formatBalanceWithCurrency(l10n, amount, account.currencyId.get()!)}',
+                  style: theme.textTheme.titleMedium
+                      ?.copyWith(color: isMoneyIn ? theme.themeData.primaryColor : theme.themeData.colorScheme.error)),
             ],
           ),
         ],

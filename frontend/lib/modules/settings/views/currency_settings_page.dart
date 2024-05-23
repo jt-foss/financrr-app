@@ -11,7 +11,7 @@ import '../../../shared/ui/adaptive_scaffold.dart';
 import '../../../../routing/page_path.dart';
 import '../../../../modules/settings/views/settings_page.dart';
 import '../../../../modules/settings/views/currency_create_page.dart';
-import '../../../shared/ui/currency_card.dart';
+import '../../../shared/ui/cards/currency_card.dart';
 import '../../../shared/ui/paginated_wrapper.dart';
 
 class CurrencySettingsPage extends StatefulHookConsumerWidget {

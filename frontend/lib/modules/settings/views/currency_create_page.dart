@@ -12,7 +12,7 @@ import 'package:restrr/restrr.dart';
 
 import '../../../shared/ui/adaptive_scaffold.dart';
 import '../../../routing/page_path.dart';
-import '../../../shared/ui/currency_card.dart';
+import '../../../shared/ui/cards/currency_card.dart';
 import '../../../utils/form_fields.dart';
 import 'currency_settings_page.dart';
 

@@ -4,7 +4,7 @@ import 'package:financrr_frontend/modules/auth/providers/authentication.provider
 import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/shared/ui/async_wrapper.dart';
-import 'package:financrr_frontend/shared/ui/account_card.dart';
+import 'package:financrr_frontend/shared/ui/cards/account_card.dart';
 import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -12,8 +12,8 @@ import 'package:restrr/restrr.dart';
 
 import '../../../shared/ui/adaptive_scaffold.dart';
 import '../../../routing/page_path.dart';
+import '../../../shared/ui/cards/transaction_card.dart';
 import '../../../shared/ui/notice_card.dart';
-import '../../../shared/ui/transaction_card.dart';
 import '../../accounts/views/account_create_page.dart';
 import '../../accounts/views/accounts_overview_page.dart';
 
@@ -145,7 +145,8 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                           width: double.infinity,
                           child: Padding(
                             padding: const EdgeInsets.only(bottom: 10),
-                            child: TransactionCard(transaction: t),
+                            // we can't determine an account here, so we pass null
+                            child: TransactionCard(account: null, transaction: t),
                           ))
                   ],
                 );
@@ -191,10 +192,11 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                           })
                     ],
                   ),
-                  for (Account a in _api.getAccounts()) Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: AccountCard(account: a),
-                  ),
+                  for (Account a in _api.getAccounts())
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: AccountCard(account: a),
+                    ),
                   if (_api.getAccounts().isEmpty)
                     Center(
                         child: NoticeCard(

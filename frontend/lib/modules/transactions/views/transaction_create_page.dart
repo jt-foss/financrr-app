@@ -13,7 +13,7 @@ import '../../../shared/models/store.dart';
 import '../../../shared/ui/adaptive_scaffold.dart';
 import '../../../../../routing/page_path.dart';
 import '../../../shared/ui/async_wrapper.dart';
-import '../../../shared/ui/transaction_card.dart';
+import '../../../shared/ui/cards/transaction_card.dart';
 import '../../../utils/form_fields.dart';
 import '../../accounts/views/account_page.dart';
 import '../../settings/providers/theme.provider.dart';
@@ -138,9 +138,11 @@ class _TransactionCreatePageState extends ConsumerState<TransactionCreatePage> {
   Future<void> _createTransaction(Account account, TransactionType type, {Account? secondary}) async {
     if (!_isValid) return;
     final (Id?, Id?) sourceAndDest = switch (_type) {
+      //                                  from                  to
       TransactionType.deposit => (null, account.id.value),
       TransactionType.withdrawal => (account.id.value, null),
-      TransactionType.transfer => (account.id.value, secondary!.id.value),
+      TransactionType.transferIn => (secondary!.id.value, account.id.value),
+      TransactionType.transferOut => (account.id.value, secondary!.id.value),
     };
     try {
       Transaction transaction = await _api.createTransaction(

@@ -9,7 +9,7 @@ import 'package:restrr/restrr.dart';
 import '../../../shared/ui/adaptive_scaffold.dart';
 import '../../../routing/page_path.dart';
 import '../../../shared/ui/paginated_wrapper.dart';
-import '../../../shared/ui/session_card.dart';
+import '../../../shared/ui/cards/session_card.dart';
 import '../../../utils/common_actions.dart';
 import 'settings_page.dart';
 

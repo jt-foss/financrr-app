@@ -8,7 +8,7 @@ import 'package:restrr/restrr.dart';
 
 import '../../../shared/ui/adaptive_scaffold.dart';
 import '../../../routing/page_path.dart';
-import '../../../shared/ui/account_card.dart';
+import '../../../shared/ui/cards/account_card.dart';
 import '../../../shared/ui/custom_replacements/custom_button.dart';
 import '../../../utils/form_fields.dart';
 import '../../../utils/text_utils.dart';

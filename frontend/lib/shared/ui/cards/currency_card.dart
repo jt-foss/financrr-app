@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
-import '../../modules/settings/views/currency_edit_page.dart';
-import 'custom_replacements/custom_circle_avatar.dart';
+import '../../../modules/settings/views/currency_edit_page.dart';
+import '../custom_replacements/custom_circle_avatar.dart';
 
 class CurrencyCard extends ConsumerWidget {
   final Id id;

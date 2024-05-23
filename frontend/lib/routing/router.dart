@@ -65,28 +65,28 @@ class AppRouter {
             StatefulShellBranch(routes: [
               GoRoute(
                   path: AccountsOverviewPage.pagePath.path,
-                  pageBuilder: _defaultBranchPageBuilder(const AccountsOverviewPage()),
+                  pageBuilder: _defaultBranchPageBuilder(AccountsOverviewPage(key: UniqueKey())),
                   redirect: guards([_coreAuthGuard]),
                   routes: [
                     GoRoute(
                         path: AccountCreatePage.pagePath.path,
-                        pageBuilder: _defaultPageBuilder(const AccountCreatePage()),
+                        pageBuilder: _defaultPageBuilder(AccountCreatePage(key: UniqueKey())),
                         redirect: guards([_coreAuthGuard])),
                     GoRoute(
                         path: AccountPage.pagePath.path,
                         pageBuilder: (context, state) => _buildDefaultPageTransition(
-                            context, state, AccountPage(accountId: state.pathParameters['accountId'])),
+                            context, state, AccountPage(key: UniqueKey(), accountId: state.pathParameters['accountId'])),
                         redirect: guards([_coreAuthGuard]),
                         routes: [
                           GoRoute(
                               path: AccountEditPage.pagePath.path,
-                              pageBuilder: (context, state) => _buildDefaultPageTransition(
-                                  context, state, AccountEditPage(accountId: state.pathParameters['accountId'])),
+                              pageBuilder: (context, state) => _buildDefaultPageTransition(context, state,
+                                  AccountEditPage(key: UniqueKey(), accountId: state.pathParameters['accountId'])),
                               redirect: guards([_coreAuthGuard])),
                           GoRoute(
                               path: TransactionCreatePage.pagePath.path,
-                              pageBuilder: (context, state) => _buildDefaultPageTransition(
-                                  context, state, TransactionCreatePage(accountId: state.pathParameters['accountId'])),
+                              pageBuilder: (context, state) => _buildDefaultPageTransition(context, state,
+                                  TransactionCreatePage(key: UniqueKey(), accountId: state.pathParameters['accountId'])),
                               redirect: guards([_coreAuthGuard])),
                           GoRoute(
                               path: TransactionPage.pagePath.path,
@@ -94,6 +94,7 @@ class AppRouter {
                                   context,
                                   state,
                                   TransactionPage(
+                                      key: UniqueKey(),
                                       accountId: state.pathParameters['accountId'],
                                       transactionId: state.pathParameters['transactionId'])),
                               redirect: guards([_coreAuthGuard]),
@@ -104,6 +105,7 @@ class AppRouter {
                                         context,
                                         state,
                                         TransactionEditPage(
+                                            key: UniqueKey(),
                                             accountId: state.pathParameters['accountId'],
                                             transactionId: state.pathParameters['transactionId'])),
                                     redirect: guards([_coreAuthGuard]))

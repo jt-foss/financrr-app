@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
-import '../../modules/settings/providers/l10n.provider.dart';
+import '../../../modules/settings/providers/l10n.provider.dart';
 
 class SessionCard extends ConsumerWidget {
   final Id id;

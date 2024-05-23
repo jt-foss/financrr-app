@@ -36,13 +36,13 @@ class FormFields {
             segments: [
               ButtonSegment(label: L10nKey.transactionCreateDeposit.toText(), value: TransactionType.deposit),
               ButtonSegment(label: L10nKey.transactionCreateWithdrawal.toText(), value: TransactionType.withdrawal),
-              ButtonSegment(label: L10nKey.transactionCreateTransfer.toText(), value: TransactionType.transfer),
+              ButtonSegment(label: L10nKey.transactionCreateTransfer.toText(), value: TransactionType.transferOut),
             ],
             selected: {selectedType},
           ),
         ),
       ),
-      if (selectedType == TransactionType.transfer)
+      if (selectedType == TransactionType.transferOut)
         Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: FinancrrDropdownField(

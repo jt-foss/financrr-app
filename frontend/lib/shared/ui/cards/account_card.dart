@@ -6,9 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
-import '../../modules/accounts/views/account_page.dart';
-import '../../modules/settings/providers/l10n.provider.dart';
-import '../../utils/text_utils.dart';
+import '../../../modules/accounts/views/account_page.dart';
+import '../../../modules/settings/providers/l10n.provider.dart';
+import '../../../utils/text_utils.dart';
 
 class AccountCard extends ConsumerWidget {
   final Id id;

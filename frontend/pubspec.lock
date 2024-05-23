@@ -754,11 +754,11 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: development
-      resolved-ref: ffc8b4e7b53a903ea3cfebda140901116fb3665c
+      ref: "feature/transfer-types"
+      resolved-ref: "3dd724aa333dd9074ba67adec644ed382c1d3674"
       url: "https://github.com/financrr/restrr.git"
     source: git
-    version: "0.10.0"
+    version: "0.11.0"
   riverpod:
     dependency: "direct main"
     description:
