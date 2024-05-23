@@ -15,7 +15,6 @@
   "appearance_current_device_theme": "Aktuelles Geräte-Thema: {deviceTheme}",
   "appearance_current_light_theme": "ausgewähltes helles Thema",
   "appearance_use_device_theme": "Nutze Geräte-Thema",
-  "auth_register_existing_account": "Du hast bereits ein Konto?",
   "auth_register_failed": "Registrierung fehlgeschlagen. Bitte versuche es später erneut",
   "auth_register_message_1": "Lass uns loslegen!",
   "auth_register_message_2": "Noch einer beißt ins Gras",
