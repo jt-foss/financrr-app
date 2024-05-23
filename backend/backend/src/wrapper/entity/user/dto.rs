@@ -28,6 +28,8 @@ pub(crate) struct Credentials {
     pub(crate) password: String,
     #[validate(length(min = 1))]
     pub(crate) session_name: Option<String>,
+    #[validate(length(min = 1))]
+    pub(crate) platform_details: Option<String>,
 }
 
 impl FromRequest for UserRegistration {
