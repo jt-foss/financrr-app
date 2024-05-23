@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/shared/ui/auth_page_template.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
+import 'package:financrr_frontend/shared/ui/custom_replacements/custom_text_button.dart';
 import 'package:financrr_frontend/shared/ui/custom_replacements/custom_text_field.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
 import 'package:financrr_frontend/utils/l10n_utils.dart';
@@ -83,7 +84,7 @@ class ServerConfigPageState extends ConsumerState<ServerConfigPage> {
               padding: const EdgeInsets.only(top: 20, bottom: 20),
               child: _isLoading
                   ? const CircularProgressIndicator()
-                  : TextButton.icon(
+                  : FinancrrTextButton(
                       onPressed: () {
                         if (_isValid) {
                           context.goPath(LoginPage.pagePath.build(), extra: _hostUri);
@@ -100,7 +101,7 @@ class ServerConfigPageState extends ConsumerState<ServerConfigPage> {
 
     return AdaptiveScaffold(
       resizeToAvoidBottomInset: false,
-      verticalBuilder: (_, __, size) => buildVerticalLayout(size),
+      verticalBuilder: (_, __, size) => SafeArea(child: buildVerticalLayout(size)),
     );
   }
 

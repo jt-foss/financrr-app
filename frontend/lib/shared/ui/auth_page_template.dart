@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../modules/auth/pages/server_config_page.dart';
+import '../../modules/auth/views/server_config_page.dart';
 import 'adaptive_scaffold.dart';
 
 class AuthPageTemplate extends StatefulHookConsumerWidget {

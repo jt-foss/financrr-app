@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:financrr_frontend/modules/auth/pages/register_page.dart';
 import 'package:financrr_frontend/modules/settings/views/local_storage_settings_page.dart';
 import 'package:financrr_frontend/modules/settings/views/l10n_settings_page.dart';
 import 'package:financrr_frontend/shared/views/splash_page.dart';
@@ -20,8 +19,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../modules/accounts/views/account_edit_page.dart';
 import '../modules/accounts/views/account_page.dart';
 import '../modules/accounts/views/accounts_overview_page.dart';
-import '../modules/auth/pages/login_page.dart';
-import '../modules/auth/pages/server_config_page.dart';
+import '../modules/auth/views/login_page.dart';
+import '../modules/auth/views/register_page.dart';
+import '../modules/auth/views/server_config_page.dart';
 import '../modules/settings/views/currency_edit_page.dart';
 import '../modules/settings/views/currency_settings_page.dart';
 import '../modules/settings/views/log_settings_page.dart';
