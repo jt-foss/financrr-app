@@ -21,6 +21,7 @@ class FinancrrTextField extends StatefulHookConsumerWidget {
   final String? Function(String?)? validator;
   final void Function(String)? onChanged;
   final List<TextInputFormatter>? inputFormatters;
+  final TextInputType? keyboardType;
 
   const FinancrrTextField(
       {super.key,
@@ -38,7 +39,8 @@ class FinancrrTextField extends StatefulHookConsumerWidget {
       this.autofillHints,
       this.validator,
       this.onChanged,
-      this.inputFormatters});
+      this.inputFormatters,
+      this.keyboardType});
 
   @override
   ConsumerState<FinancrrTextField> createState() => _AppTextFieldState();
@@ -95,6 +97,7 @@ class _AppTextFieldState extends ConsumerState<FinancrrTextField> {
             onTap: widget.onTap,
             onChanged: widget.onChanged,
             inputFormatters: widget.inputFormatters,
+            keyboardType: widget.keyboardType,
           ),
         ),
         if (_error != null) ...[

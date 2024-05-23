@@ -64,9 +64,9 @@ class FormFields {
           label: L10nKey.transactionPropertiesAmount,
           validator: (value) => InputValidators.nonNull(L10nKey.transactionPropertiesAmount.toString(), value),
           required: true,
+          keyboardType: TextInputType.number,
           inputFormatters: [
-            FilteringTextInputFormatter.digitsOnly,
-            LengthLimitingTextInputFormatter(6),
+            FilteringTextInputFormatter.digitsOnly
           ],
         ),
       ),
@@ -165,8 +165,9 @@ class FormFields {
           label: L10nKey.accountPropertiesOriginalBalance,
           validator: (value) => InputValidators.nonNull(L10nKey.accountPropertiesOriginalBalance.toString(), value),
           required: true,
+          keyboardType: TextInputType.number,
           inputFormatters: [
-            FilteringTextInputFormatter.digitsOnly,
+            FilteringTextInputFormatter.digitsOnly
           ],
         ),
       ),
@@ -240,6 +241,7 @@ class FormFields {
           label: L10nKey.currencyPropertiesDecimalPlaces,
           validator: (value) => InputValidators.nonNull(L10nKey.currencyPropertiesDecimalPlaces.toString(), value),
           required: true,
+          keyboardType: TextInputType.number,
           inputFormatters: [
             FilteringTextInputFormatter.digitsOnly,
             LengthLimitingTextInputFormatter(1),
