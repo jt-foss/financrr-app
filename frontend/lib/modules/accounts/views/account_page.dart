@@ -12,9 +12,10 @@ import 'package:restrr/restrr.dart';
 
 import '../../../shared/ui/adaptive_scaffold.dart';
 import '../../../routing/page_path.dart';
+import '../../../shared/ui/custom_replacements/custom_text_button.dart';
 import '../../../shared/ui/notice_card.dart';
 import '../../../shared/ui/paginated_wrapper.dart';
-import '../../../shared/ui/transaction_card.dart';
+import '../../../shared/ui/cards/transaction_card.dart';
 import '../../../utils/text_utils.dart';
 import '../../settings/providers/l10n.provider.dart';
 import '../../transactions/views/transaction_create_page.dart';
@@ -82,9 +83,13 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                   ));
                 }
                 return Column(
-                  children: transactions.map((t) {
-                    return TransactionCard(transaction: t);
-                  }).toList(),
+                  children: [
+                    for (var transaction in transactions)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: TransactionCard(account: account, transaction: transaction),
+                      )
+                  ],
                 );
               },
             ),
@@ -114,11 +119,11 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                       Text(account.name),
                     ],
                   ),
-                  const Divider(),
+                  const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      TextButton.icon(
+                      FinancrrTextButton(
                           onPressed: () => context
                               .goPath(TransactionCreatePage.pagePath.build(params: {'accountId': account.id.value.toString()})),
                           icon: const Icon(Icons.add, size: 17),

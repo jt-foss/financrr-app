@@ -141,11 +141,12 @@ enum L10nKey {
   final bool hasParams;
   const L10nKey(this.key, {this.hasParams = false});
 
-  Text toText({Map<String, String>? namedArgs, TextStyle? style, TextAlign? textAlign}) {
+  Text toText({Map<String, String>? namedArgs, TextStyle? style, TextAlign? textAlign, bool? softWrap}) {
     return Text(
       key,
       style: style,
       textAlign: textAlign,
+      softWrap: softWrap,
     ).tr(namedArgs: namedArgs);
   }
 

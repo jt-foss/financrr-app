@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:financrr_frontend/modules/auth/providers/authentication.provider.dart';
+import 'package:financrr_frontend/shared/ui/custom_replacements/custom_button.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
 import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +13,7 @@ import '../../../shared/models/store.dart';
 import '../../../shared/ui/adaptive_scaffold.dart';
 import '../../../../../routing/page_path.dart';
 import '../../../shared/ui/async_wrapper.dart';
-import '../../../shared/ui/transaction_card.dart';
+import '../../../shared/ui/cards/transaction_card.dart';
 import '../../../utils/form_fields.dart';
 import '../../accounts/views/account_page.dart';
 import '../../settings/providers/theme.provider.dart';
@@ -41,6 +42,7 @@ class _TransactionCreatePageState extends ConsumerState<TransactionCreatePage> {
   bool _isValid = false;
   TransactionType _type = TransactionType.deposit;
   DateTime _executedAt = DateTime.now();
+  Account? _secondary;
 
   Future<Account?> _fetchAccount({bool forceRetrieve = false}) async {
     return _accountStreamController.fetchData(
@@ -92,7 +94,7 @@ class _TransactionCreatePageState extends ConsumerState<TransactionCreatePage> {
                     executedAt: _executedAt,
                     interactive: false,
                   ),
-                  const Divider(),
+                  const SizedBox(height: 20),
                   ...FormFields.transaction(
                     this,
                     theme,
@@ -105,15 +107,13 @@ class _TransactionCreatePageState extends ConsumerState<TransactionCreatePage> {
                     onSelectionChanged: (types) {
                       setState(() => _type = types.first);
                     },
+                    onSecondaryChanged: (account) => setState(() => _secondary = account),
                     onExecutedAtChanged: (date) => setState(() => _executedAt = date),
                   ),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: _isValid ? () => _createTransaction(account, _type) : null,
-                      child: L10nKey.transactionCreate.toText(),
-                    ),
+                  const SizedBox(height: 20),
+                  FinancrrButton(
+                    onPressed: _isValid ? () => _createTransaction(account, _type, secondary: _secondary) : null,
+                    text: L10nKey.transactionCreate.toString(),
                   ),
                 ],
               ),
@@ -138,9 +138,11 @@ class _TransactionCreatePageState extends ConsumerState<TransactionCreatePage> {
   Future<void> _createTransaction(Account account, TransactionType type, {Account? secondary}) async {
     if (!_isValid) return;
     final (Id?, Id?) sourceAndDest = switch (_type) {
+      //                                  from                  to
       TransactionType.deposit => (null, account.id.value),
       TransactionType.withdrawal => (account.id.value, null),
-      TransactionType.transfer => (account.id.value, secondary!.id.value),
+      TransactionType.transferIn => (secondary!.id.value, account.id.value),
+      TransactionType.transferOut => (account.id.value, secondary!.id.value),
     };
     try {
       Transaction transaction = await _api.createTransaction(

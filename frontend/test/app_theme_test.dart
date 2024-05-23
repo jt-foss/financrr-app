@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:financrr_frontend/modules/settings/models/theme.model.dart';
+import 'package:financrr_frontend/modules/settings/models/themes/app_theme.model.dart';
 import 'package:test/expect.dart';
 import 'package:test/scaffolding.dart';
 

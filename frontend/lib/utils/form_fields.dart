@@ -1,10 +1,12 @@
+import 'package:financrr_frontend/shared/ui/custom_replacements/custom_dropdown_field.dart';
+import 'package:financrr_frontend/shared/ui/custom_replacements/custom_text_field.dart';
 import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
-import '../modules/settings/models/theme.state.dart';
+import '../modules/settings/models/themes/theme.state.dart';
 import '../shared/models/store.dart';
 import 'input_utils.dart';
 
@@ -34,36 +36,34 @@ class FormFields {
             segments: [
               ButtonSegment(label: L10nKey.transactionCreateDeposit.toText(), value: TransactionType.deposit),
               ButtonSegment(label: L10nKey.transactionCreateWithdrawal.toText(), value: TransactionType.withdrawal),
-              ButtonSegment(label: L10nKey.transactionCreateTransfer.toText(), value: TransactionType.transfer),
+              ButtonSegment(label: L10nKey.transactionCreateTransfer.toText(), value: TransactionType.transferOut),
             ],
             selected: {selectedType},
           ),
         ),
       ),
-      if (selectedType == TransactionType.transfer)
+      if (selectedType == TransactionType.transferOut)
         Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: DropdownButtonFormField(
-              decoration: InputDecoration(labelText: L10nKey.transactionCreateTransferTo.toString()),
-              validator: (value) =>
-                  InputValidators.nonNull(L10nKey.transactionCreateTransferTo.toString(), value?.id.value.toString()),
+            child: FinancrrDropdownField(
+              label: L10nKey.transactionCreateTransferTo,
+              validator: (value) => InputValidators.nonNull(L10nKey.transactionCreateTransferTo.toString(), value),
+              required: true,
               items: currentAccount.api
                   .getAccounts()
                   .where((account) => account.id.value != currentAccount.id.value)
                   .map((account) {
-                return DropdownMenuItem(
-                  value: account,
-                  child: Text(account.name, style: theme.textTheme.bodyMedium),
-                );
+                return FinancrrDropdownItem(value: account, label: account.name);
               }).toList(),
               onChanged: onSecondaryChanged,
             )),
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
-        child: TextFormField(
+        child: FinancrrTextField(
           controller: amountController,
-          decoration: InputDecoration(labelText: L10nKey.transactionPropertiesAmount.toString()),
+          label: L10nKey.transactionPropertiesAmount,
           validator: (value) => InputValidators.nonNull(L10nKey.transactionPropertiesAmount.toString(), value),
+          required: true,
           inputFormatters: [
             FilteringTextInputFormatter.digitsOnly,
             LengthLimitingTextInputFormatter(6),
@@ -72,10 +72,11 @@ class FormFields {
       ),
       Padding(
         padding: const EdgeInsets.only(bottom: 10),
-        child: TextFormField(
+        child: FinancrrTextField(
           controller: nameController,
-          decoration: InputDecoration(labelText: L10nKey.transactionPropertiesName.toString()),
+          label: L10nKey.transactionPropertiesName,
           validator: (value) => InputValidators.nonNull(L10nKey.transactionPropertiesName.toString(), value),
+          required: true,
           inputFormatters: [
             LengthLimitingTextInputFormatter(32),
           ],
@@ -83,9 +84,9 @@ class FormFields {
       ),
       Padding(
         padding: const EdgeInsets.only(bottom: 10),
-        child: TextFormField(
+        child: FinancrrTextField(
           controller: descriptionController,
-          decoration: InputDecoration(labelText: L10nKey.transactionPropertiesDescription.toString()),
+          label: L10nKey.transactionPropertiesDescription,
           inputFormatters: [
             LengthLimitingTextInputFormatter(32),
           ],
@@ -93,7 +94,7 @@ class FormFields {
       ),
       Padding(
         padding: const EdgeInsets.only(bottom: 10),
-        child: TextFormField(
+        child: FinancrrTextField(
           onTap: () async {
             final DateTime? date = await showDatePicker(
               context: state.context,
@@ -108,7 +109,7 @@ class FormFields {
           },
           initialValue: StoreKey.dateTimeFormat.readSync()!.format(executedAt ?? DateTime.now()),
           readOnly: true,
-          decoration: InputDecoration(labelText: L10nKey.transactionPropertiesExecutedAt.toString()),
+          label: L10nKey.transactionPropertiesExecutedAt,
         ),
       )
     ];
@@ -125,10 +126,11 @@ class FormFields {
     return [
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
-        child: TextFormField(
+        child: FinancrrTextField(
           controller: nameController,
-          decoration: InputDecoration(labelText: L10nKey.accountPropertiesName.toString()),
+          label: L10nKey.accountPropertiesName,
           validator: (value) => InputValidators.nonNull(L10nKey.accountPropertiesName.toString(), value),
+          required: true,
           inputFormatters: [
             LengthLimitingTextInputFormatter(32),
           ],
@@ -136,9 +138,9 @@ class FormFields {
       ),
       Padding(
         padding: const EdgeInsets.only(bottom: 10),
-        child: TextFormField(
+        child: FinancrrTextField(
           controller: descriptionController,
-          decoration: InputDecoration(labelText: L10nKey.accountPropertiesDescription.toString()),
+          label: L10nKey.accountPropertiesDescription,
           inputFormatters: [
             LengthLimitingTextInputFormatter(64),
           ],
@@ -146,9 +148,9 @@ class FormFields {
       ),
       Padding(
         padding: const EdgeInsets.only(bottom: 10),
-        child: TextFormField(
+        child: FinancrrTextField(
           controller: ibanController,
-          decoration: InputDecoration(labelText: L10nKey.accountPropertiesIban.toString()),
+          label: L10nKey.accountPropertiesIban,
           validator: (value) => InputValidators.iban(value),
           inputFormatters: [
             FilteringTextInputFormatter.deny(RegExp(r'\s')),
@@ -158,10 +160,11 @@ class FormFields {
       ),
       Padding(
         padding: const EdgeInsets.only(bottom: 10),
-        child: TextFormField(
+        child: FinancrrTextField(
           controller: originalBalanceController,
-          decoration: InputDecoration(labelText: L10nKey.accountPropertiesOriginalBalance.toString()),
+          label: L10nKey.accountPropertiesOriginalBalance,
           validator: (value) => InputValidators.nonNull(L10nKey.accountPropertiesOriginalBalance.toString(), value),
+          required: true,
           inputFormatters: [
             FilteringTextInputFormatter.digitsOnly,
           ],
@@ -169,15 +172,15 @@ class FormFields {
       ),
       Padding(
         padding: const EdgeInsets.only(bottom: 10),
-        child: DropdownButtonFormField(
-            decoration: InputDecoration(labelText: L10nKey.accountPropertiesCurrency.toString()),
-            validator: (value) =>
-                InputValidators.nonNull(L10nKey.accountPropertiesCurrency.toString(), value?.id.value.toString()),
-            value: initialCurrency,
+        child: FinancrrDropdownField(
+            label: L10nKey.accountPropertiesCurrency,
+            validator: (value) => InputValidators.nonNull(L10nKey.accountPropertiesCurrency.toString(), value),
+            required: true,
+            value: initialCurrency?.name,
             items: api.getCurrencies().map((currency) {
-              return DropdownMenuItem(
+              return FinancrrDropdownItem(
                 value: currency,
-                child: Text('${currency.name} (${currency.symbol})', style: theme.textTheme.bodyMedium),
+                label: '${currency.name} (${currency.symbol})',
               );
             }).toList(),
             onChanged: onCurrencyChanged),
@@ -194,11 +197,12 @@ class FormFields {
     return [
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
-        child: TextFormField(
+        child: FinancrrTextField(
           controller: nameController,
           readOnly: readOnly,
-          decoration: InputDecoration(labelText: L10nKey.currencyPropertiesName.toString()),
+          label: L10nKey.currencyPropertiesName,
           validator: (value) => InputValidators.nonNull(L10nKey.currencyPropertiesName.toString(), value),
+          required: true,
           inputFormatters: [
             LengthLimitingTextInputFormatter(32),
           ],
@@ -206,11 +210,12 @@ class FormFields {
       ),
       Padding(
         padding: const EdgeInsets.only(bottom: 10),
-        child: TextFormField(
+        child: FinancrrTextField(
           controller: symbolController,
           readOnly: readOnly,
-          decoration: InputDecoration(labelText: L10nKey.currencyPropertiesSymbol.toString()),
+          label: L10nKey.currencyPropertiesSymbol,
           validator: (value) => InputValidators.nonNull(L10nKey.currencyPropertiesSymbol.toString(), value),
+          required: true,
           inputFormatters: [
             LengthLimitingTextInputFormatter(6),
           ],
@@ -218,10 +223,10 @@ class FormFields {
       ),
       Padding(
         padding: const EdgeInsets.only(bottom: 10),
-        child: TextFormField(
+        child: FinancrrTextField(
           controller: isoCodeController,
           readOnly: readOnly,
-          decoration: InputDecoration(labelText: L10nKey.currencyPropertiesIsoCode.toString()),
+          label: L10nKey.currencyPropertiesIsoCode,
           inputFormatters: [
             LengthLimitingTextInputFormatter(3),
           ],
@@ -229,11 +234,12 @@ class FormFields {
       ),
       Padding(
         padding: const EdgeInsets.only(bottom: 10),
-        child: TextFormField(
+        child: FinancrrTextField(
           controller: decimalPlacesController,
           readOnly: readOnly,
-          decoration: InputDecoration(labelText: L10nKey.currencyPropertiesDecimalPlaces.toString()),
+          label: L10nKey.currencyPropertiesDecimalPlaces,
           validator: (value) => InputValidators.nonNull(L10nKey.currencyPropertiesDecimalPlaces.toString(), value),
+          required: true,
           inputFormatters: [
             FilteringTextInputFormatter.digitsOnly,
             LengthLimitingTextInputFormatter(1),

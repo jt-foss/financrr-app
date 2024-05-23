@@ -4,6 +4,7 @@ import 'package:financrr_frontend/modules/auth/providers/authentication.provider
 import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/modules/transactions/views/transaction_edit_page.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
+import 'package:financrr_frontend/shared/ui/links/account_link.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
 import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
@@ -68,22 +69,32 @@ class TransactionPageState extends ConsumerState<TransactionPage> {
     var theme = ref.watch(themeProvider);
     var l10n = ref.watch(l10nProvider);
 
-    buildTableRow(L10nKey label, String value) {
+    buildTableRow(L10nKey label, dynamic value) {
       return TableRow(children: [
         Padding(
           padding: const EdgeInsets.all(10),
-          child: label.toText(),
+          child: label.toText(
+            style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+          ),
         ),
-        Padding(
-          padding: const EdgeInsets.all(10),
-          child: Text(value),
-        ),
+        if (value is Account) ...[
+          Padding(
+            padding: const EdgeInsets.all(10),
+            child: AccountLink(account: value),
+          ),
+        ] else
+          Padding(
+            padding: const EdgeInsets.all(10),
+            child: Text(value),
+          ),
       ]);
     }
 
     buildVerticalLayout(Account account, Transaction transaction, Size size) {
-      final String amountStr = (transaction.type == TransactionType.deposit ? '' : '-') +
-          TextUtils.formatBalanceWithCurrency(l10n, transaction.amount, account.currencyId.get()!);
+      final bool isMoneyIn =
+          transaction.getType(account) == TransactionType.deposit || transaction.getType(account) == TransactionType.transferIn;
+      final String amountStr =
+          (isMoneyIn ? '+' : '-') + TextUtils.formatBalanceWithCurrency(l10n, transaction.amount, account.currencyId.get()!);
       return Padding(
         padding: const EdgeInsets.only(top: 10, bottom: 20),
         child: Align(
@@ -101,13 +112,11 @@ class TransactionPageState extends ConsumerState<TransactionPage> {
                       children: [
                         Text(amountStr,
                             style: theme.textTheme.titleLarge?.copyWith(
-                                color: transaction.type == TransactionType.deposit
-                                    ? theme.themeData.primaryColor
-                                    : theme.themeData.colorScheme.error)),
+                                color: isMoneyIn ? theme.themeData.primaryColor : theme.themeData.colorScheme.error)),
                         Text(transaction.description ?? StoreKey.dateTimeFormat.readSync()!.format(transaction.executedAt)),
                       ],
                     ),
-                    const Divider(),
+                    const SizedBox(height: 20),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -127,14 +136,15 @@ class TransactionPageState extends ConsumerState<TransactionPage> {
                     Padding(
                       padding: const EdgeInsets.only(top: 10),
                       child: Table(
-                        border: TableBorder.all(color: theme.themeData.dividerColor),
+                        border: TableBorder.all(
+                            borderRadius: BorderRadius.circular(10), color: theme.financrrExtension.surfaceVariant1, width: 3),
                         children: [
-                          buildTableRow(L10nKey.transactionPropertiesType, transaction.type.name),
+                          buildTableRow(L10nKey.transactionPropertiesType, transaction.getType(account).name),
                           buildTableRow(L10nKey.transactionPropertiesAmount, amountStr),
                           buildTableRow(L10nKey.transactionPropertiesName, transaction.name),
                           buildTableRow(L10nKey.transactionPropertiesDescription, transaction.description ?? 'N/A'),
-                          buildTableRow(L10nKey.transactionPropertiesFrom, transaction.sourceId?.get()?.name ?? 'N/A'),
-                          buildTableRow(L10nKey.transactionPropertiesTo, transaction.destinationId?.get()?.name ?? 'N/A'),
+                          buildTableRow(L10nKey.transactionPropertiesFrom, transaction.sourceId?.get() ?? 'N/A'),
+                          buildTableRow(L10nKey.transactionPropertiesTo, transaction.destinationId?.get() ?? 'N/A'),
                           buildTableRow(L10nKey.transactionPropertiesExecutedAt,
                               StoreKey.dateTimeFormat.readSync()!.format(transaction.executedAt)),
                           buildTableRow(L10nKey.transactionPropertiesCreatedAt,

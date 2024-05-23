@@ -1,9 +1,9 @@
-import 'package:financrr_frontend/modules/settings/models/theme.model.dart';
+import 'package:financrr_frontend/modules/settings/models/themes/app_theme.model.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../shared/models/store.dart';
-import '../models/theme.state.dart';
+import '../models/themes/theme.state.dart';
 
 final StateNotifierProvider<ThemeNotifier, ThemeState> themeProvider = StateNotifierProvider((_) => ThemeNotifier());
 

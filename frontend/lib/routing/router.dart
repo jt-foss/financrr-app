@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:financrr_frontend/modules/auth/pages/register_page.dart';
 import 'package:financrr_frontend/modules/settings/views/local_storage_settings_page.dart';
 import 'package:financrr_frontend/modules/settings/views/l10n_settings_page.dart';
 import 'package:financrr_frontend/shared/views/splash_page.dart';
@@ -20,8 +19,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../modules/accounts/views/account_edit_page.dart';
 import '../modules/accounts/views/account_page.dart';
 import '../modules/accounts/views/accounts_overview_page.dart';
-import '../modules/auth/pages/login_page.dart';
-import '../modules/auth/pages/server_config_page.dart';
+import '../modules/auth/views/login_page.dart';
+import '../modules/auth/views/register_page.dart';
+import '../modules/auth/views/server_config_page.dart';
 import '../modules/settings/views/currency_edit_page.dart';
 import '../modules/settings/views/currency_settings_page.dart';
 import '../modules/settings/views/log_settings_page.dart';
@@ -31,7 +31,7 @@ import '../modules/transactions/views/transaction_page.dart';
 import '../utils/constants.dart';
 import 'guards/core_auth_guard.dart';
 import 'guards/extra_guard.dart';
-import 'navbar_shell.dart';
+import 'ui/navbar_shell.dart';
 
 final Provider<AppRouter> appRouterProvider = Provider((ref) => AppRouter(ref));
 
@@ -65,28 +65,28 @@ class AppRouter {
             StatefulShellBranch(routes: [
               GoRoute(
                   path: AccountsOverviewPage.pagePath.path,
-                  pageBuilder: _defaultBranchPageBuilder(const AccountsOverviewPage()),
+                  pageBuilder: _defaultBranchPageBuilder(AccountsOverviewPage(key: UniqueKey())),
                   redirect: guards([_coreAuthGuard]),
                   routes: [
                     GoRoute(
                         path: AccountCreatePage.pagePath.path,
-                        pageBuilder: _defaultPageBuilder(const AccountCreatePage()),
+                        pageBuilder: _defaultPageBuilder(AccountCreatePage(key: UniqueKey())),
                         redirect: guards([_coreAuthGuard])),
                     GoRoute(
                         path: AccountPage.pagePath.path,
                         pageBuilder: (context, state) => _buildDefaultPageTransition(
-                            context, state, AccountPage(accountId: state.pathParameters['accountId'])),
+                            context, state, AccountPage(key: UniqueKey(), accountId: state.pathParameters['accountId'])),
                         redirect: guards([_coreAuthGuard]),
                         routes: [
                           GoRoute(
                               path: AccountEditPage.pagePath.path,
-                              pageBuilder: (context, state) => _buildDefaultPageTransition(
-                                  context, state, AccountEditPage(accountId: state.pathParameters['accountId'])),
+                              pageBuilder: (context, state) => _buildDefaultPageTransition(context, state,
+                                  AccountEditPage(key: UniqueKey(), accountId: state.pathParameters['accountId'])),
                               redirect: guards([_coreAuthGuard])),
                           GoRoute(
                               path: TransactionCreatePage.pagePath.path,
-                              pageBuilder: (context, state) => _buildDefaultPageTransition(
-                                  context, state, TransactionCreatePage(accountId: state.pathParameters['accountId'])),
+                              pageBuilder: (context, state) => _buildDefaultPageTransition(context, state,
+                                  TransactionCreatePage(key: UniqueKey(), accountId: state.pathParameters['accountId'])),
                               redirect: guards([_coreAuthGuard])),
                           GoRoute(
                               path: TransactionPage.pagePath.path,
@@ -94,6 +94,7 @@ class AppRouter {
                                   context,
                                   state,
                                   TransactionPage(
+                                      key: UniqueKey(),
                                       accountId: state.pathParameters['accountId'],
                                       transactionId: state.pathParameters['transactionId'])),
                               redirect: guards([_coreAuthGuard]),
@@ -104,6 +105,7 @@ class AppRouter {
                                         context,
                                         state,
                                         TransactionEditPage(
+                                            key: UniqueKey(),
                                             accountId: state.pathParameters['accountId'],
                                             transactionId: state.pathParameters['transactionId'])),
                                     redirect: guards([_coreAuthGuard]))

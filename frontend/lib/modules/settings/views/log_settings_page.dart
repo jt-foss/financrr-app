@@ -1,4 +1,6 @@
 import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
+import 'package:financrr_frontend/shared/ui/custom_replacements/custom_card.dart';
+import 'package:financrr_frontend/shared/ui/custom_replacements/custom_text_button.dart';
 import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -41,31 +43,36 @@ class _LogSettingsPageState extends ConsumerState<LogSettingsPage> {
   Widget build(BuildContext context) {
     var theme = ref.watch(themeProvider);
 
+    getColorTint(LogLevel level) {
+      return switch (level) {
+        LogLevel.config => theme.financrrExtension.primary,
+        LogLevel.warning => Colors.orange,
+        LogLevel.severe => theme.financrrExtension.error,
+        LogLevel.shout => theme.financrrExtension.error,
+        _ => null,
+      };
+    }
+
     buildLogEntryTile(LogEntry entry, int index, {bool expanded = false}) {
-      final Color? tint = _getColorTint(entry.level);
-      return Container(
-        decoration: BoxDecoration(
-          color: tint?.withOpacity(0.1),
-          borderRadius: tint != null ? BorderRadius.circular(10) : null,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(entry.loggerName, style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold)),
-              Text(entry.message, maxLines: expanded ? null : 1),
-              Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 5),
-                    child: Icon(_getIcon(entry.level), color: _getColorTint(entry.level), size: 17),
-                  ),
-                  Expanded(child: Text('${entry.level.name}, ${StoreKey.dateTimeFormat.readSync()!.format(entry.timestamp)}')),
-                ],
-              ),
-            ],
-          ),
+      Color? color = getColorTint(entry.level);
+      return FinancrrCard(
+        padding: const EdgeInsets.all(10),
+        borderColor: color,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(entry.loggerName, style: theme.textTheme.bodyMedium?.copyWith(color: color, fontWeight: FontWeight.bold)),
+            Text(entry.message, maxLines: expanded ? null : 1),
+            Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 5),
+                  child: Icon(_getIcon(entry.level), color: color, size: 17),
+                ),
+                Expanded(child: Text('${entry.level.name}, ${StoreKey.dateTimeFormat.readSync()!.format(entry.timestamp)}')),
+              ],
+            ),
+          ],
         ),
       );
     }
@@ -75,7 +82,7 @@ class _LogSettingsPageState extends ConsumerState<LogSettingsPage> {
         children: [
           Row(
             children: [
-              TextButton.icon(
+              FinancrrTextButton(
                 onPressed: () => setState(() {
                   _sortTimeAscending = !_sortTimeAscending;
                   sortEntries();
@@ -94,7 +101,7 @@ class _LogSettingsPageState extends ConsumerState<LogSettingsPage> {
                   icon: const Icon(Icons.delete_sweep_outlined))
             ],
           ),
-          const Divider()
+          const SizedBox(height: 20),
         ],
       );
     }
@@ -109,7 +116,7 @@ class _LogSettingsPageState extends ConsumerState<LogSettingsPage> {
                 // +1 for the divider
                 // +1 for the notice card if there are no logs
                 itemCount: _entries.length + 1,
-                separatorBuilder: (_, index) => index == 0 ? const SizedBox() : const Divider(),
+                separatorBuilder: (_, index) => index == 0 ? const SizedBox() : const SizedBox(height: 10),
                 itemBuilder: (context, index) {
                   if (index == 0) {
                     return buildDivider();
@@ -143,16 +150,6 @@ class _LogSettingsPageState extends ConsumerState<LogSettingsPage> {
       LogLevel.warning => Icons.warning_amber_outlined,
       LogLevel.severe => Icons.error_outline,
       LogLevel.shout => Icons.error_outline,
-    };
-  }
-
-  Color? _getColorTint(LogLevel level) {
-    return switch (level) {
-      LogLevel.config => Colors.blue,
-      LogLevel.warning => Colors.orange,
-      LogLevel.severe => Colors.red,
-      LogLevel.shout => Colors.red,
-      _ => null,
     };
   }
 }

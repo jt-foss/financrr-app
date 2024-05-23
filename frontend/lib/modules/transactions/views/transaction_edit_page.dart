@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:financrr_frontend/modules/auth/providers/authentication.provider.dart';
 import 'package:financrr_frontend/modules/transactions/views/transaction_page.dart';
+import 'package:financrr_frontend/shared/ui/custom_replacements/custom_button.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
 import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +14,7 @@ import '../../../shared/models/store.dart';
 import '../../../shared/ui/adaptive_scaffold.dart';
 import '../../../../../routing/page_path.dart';
 import '../../../shared/ui/async_wrapper.dart';
-import '../../../shared/ui/transaction_card.dart';
+import '../../../shared/ui/cards/transaction_card.dart';
 import '../../../utils/form_fields.dart';
 import '../../settings/providers/theme.provider.dart';
 
@@ -58,7 +59,7 @@ class TransactionEditPageState extends ConsumerState<TransactionEditPage> {
   @override
   void initState() {
     super.initState();
-    _fetchAccount().then((_) {
+    _fetchAccount().then((account) {
       Future.delayed(
           const Duration(milliseconds: 100),
           () => _fetchTransaction().then((transaction) {
@@ -69,7 +70,7 @@ class TransactionEditPageState extends ConsumerState<TransactionEditPage> {
                   _executedAtController =
                       TextEditingController(text: StoreKey.dateTimeFormat.readSync()!.format(transaction.executedAt));
                   _isValid = _formKey.currentState?.validate() ?? false;
-                  _type = transaction.type;
+                  _type = transaction.getType(account!);
                   _executedAt = transaction.executedAt;
                 }
               }));
@@ -116,7 +117,7 @@ class TransactionEditPageState extends ConsumerState<TransactionEditPage> {
                     executedAt: _executedAt,
                     interactive: false,
                   ),
-                  const Divider(),
+                  const SizedBox(height: 20),
                   ...FormFields.transaction(
                     this,
                     theme,
@@ -134,13 +135,10 @@ class TransactionEditPageState extends ConsumerState<TransactionEditPage> {
                       setState(() => _executedAt = date);
                     },
                   ),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: _isValid ? () => _editTransaction(account, transaction, _type) : null,
-                      child: L10nKey.transactionEdit.toText(),
-                    ),
+                  const SizedBox(height: 20),
+                  FinancrrButton(
+                    onPressed: _isValid ? () => _editTransaction(account, transaction, _type) : null,
+                    text: L10nKey.transactionEdit.toString(),
                   ),
                 ],
               ),
@@ -174,7 +172,8 @@ class TransactionEditPageState extends ConsumerState<TransactionEditPage> {
     final (Id?, Id?) sourceAndDest = switch (_type) {
       TransactionType.deposit => (null, account.id.value),
       TransactionType.withdrawal => (account.id.value, null),
-      TransactionType.transfer => (account.id.value, secondary!.id.value),
+      TransactionType.transferOut => (account.id.value, secondary!.id.value),
+      TransactionType.transferIn => (secondary!.id.value, account.id.value),
     };
     try {
       await transaction.update(

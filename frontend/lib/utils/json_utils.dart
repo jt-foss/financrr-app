@@ -10,7 +10,7 @@ class JsonUtils {
       return null;
     }
     try {
-      return values.firstWhere((e) => e.toString().split('.').last == value);
+      return values.firstWhere((e) => e.name == value);
     } catch (e) {
       return null;
     }

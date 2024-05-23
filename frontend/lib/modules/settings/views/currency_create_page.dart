@@ -1,6 +1,8 @@
 import 'dart:math';
 
 import 'package:financrr_frontend/modules/auth/providers/authentication.provider.dart';
+import 'package:financrr_frontend/shared/ui/custom_replacements/custom_button.dart';
+import 'package:financrr_frontend/shared/ui/custom_replacements/custom_card.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
 import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +12,7 @@ import 'package:restrr/restrr.dart';
 
 import '../../../shared/ui/adaptive_scaffold.dart';
 import '../../../routing/page_path.dart';
-import '../../../shared/ui/currency_card.dart';
+import '../../../shared/ui/cards/currency_card.dart';
 import '../../../utils/form_fields.dart';
 import 'currency_settings_page.dart';
 
@@ -30,12 +32,13 @@ class CurrencyCreatePage extends StatefulHookConsumerWidget {
       required String decimalPlaces,
       required double previewAmount}) {
     return [
-      Card.outlined(
+      FinancrrCard(
         child: ListTile(
           leading: L10nKey.commonPreview.toText(),
           title: Text('${previewAmount.toStringAsFixed(int.tryParse(decimalPlaces) ?? 0)} $symbol'),
         ),
       ),
+      const SizedBox(height: 10),
       CurrencyCard.fromData(
         id: -1,
         name: name,
@@ -86,53 +89,50 @@ class _CurrencyCreatePageState extends ConsumerState<CurrencyCreatePage> {
 
   @override
   Widget build(BuildContext context) {
+    buildVerticalLayout(Size size) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 10, bottom: 20),
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: SizedBox(
+            width: size.width / 1.1,
+            child: SingleChildScrollView(
+                child: Form(
+              key: _formKey,
+              onChanged: () => setState(() => _isValid = _formKey.currentState?.validate() ?? false),
+              child: Column(
+                children: [
+                  ...CurrencyCreatePage.buildCurrencyPreview(
+                      size: size,
+                      symbol: _symbolController.text,
+                      name: _nameController.text,
+                      isoCode: _isoCodeController.text,
+                      decimalPlaces: _decimalPlacesController.text,
+                      previewAmount: _randomNumber),
+                  const SizedBox(height: 20),
+                  ...FormFields.currency(
+                      nameController: _nameController,
+                      symbolController: _symbolController,
+                      isoCodeController: _isoCodeController,
+                      decimalPlacesController: _decimalPlacesController),
+                  const SizedBox(height: 20),
+                  FinancrrButton(
+                    onPressed: _isValid ? () => _createCurrency() : null,
+                    text: _nameController.text.isEmpty
+                        ? L10nKey.currencyCreate.toString()
+                        : L10nKey.commonCreateObject.toString(namedArgs: {'object': _nameController.text}),
+                  ),
+                ],
+              ),
+            )),
+          ),
+        ),
+      );
+    }
+
     return AdaptiveScaffold(
       resizeToAvoidBottomInset: false,
-      verticalBuilder: (_, __, size) => _buildVerticalLayout(size),
-    );
-  }
-
-  Widget _buildVerticalLayout(Size size) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10, bottom: 20),
-      child: Align(
-        alignment: Alignment.topCenter,
-        child: SizedBox(
-          width: size.width / 1.1,
-          child: SingleChildScrollView(
-              child: Form(
-            key: _formKey,
-            onChanged: () => setState(() => _isValid = _formKey.currentState?.validate() ?? false),
-            child: Column(
-              children: [
-                ...CurrencyCreatePage.buildCurrencyPreview(
-                    size: size,
-                    symbol: _symbolController.text,
-                    name: _nameController.text,
-                    isoCode: _isoCodeController.text,
-                    decimalPlaces: _decimalPlacesController.text,
-                    previewAmount: _randomNumber),
-                const Divider(),
-                ...FormFields.currency(
-                    nameController: _nameController,
-                    symbolController: _symbolController,
-                    isoCodeController: _isoCodeController,
-                    decimalPlacesController: _decimalPlacesController),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _isValid ? () => _createCurrency() : null,
-                    child: _nameController.text.isEmpty
-                        ? L10nKey.currencyCreate.toText()
-                        : L10nKey.commonCreateObject.toText(namedArgs: {'object': _nameController.text}),
-                  ),
-                ),
-              ],
-            ),
-          )),
-        ),
-      ),
+      verticalBuilder: (_, __, size) => buildVerticalLayout(size),
     );
   }
 
