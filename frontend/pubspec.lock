@@ -754,8 +754,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "feature/transfer-types"
-      resolved-ref: "3dd724aa333dd9074ba67adec644ed382c1d3674"
+      ref: development
+      resolved-ref: aa8861c4b36808272685b4816f0fe077d28f15c3
       url: "https://github.com/financrr/restrr.git"
     source: git
     version: "0.11.0"

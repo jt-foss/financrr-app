@@ -55,7 +55,7 @@ class LoginPageState extends ConsumerState<LoginPage> {
                         child: FinancrrTextField(
                           controller: _usernameController,
                           label: L10nKey.commonUsername,
-                          hint: L10nKey.commonUsername, // TODO: implement L10nKey ("John Doe")
+                          hint: L10nKey.commonSampleName,
                           prefixIcon: const Icon(Icons.person_outline),
                           autofillHints: const [AutofillHints.username, AutofillHints.newUsername],
                           validator: (value) => value!.isEmpty ? L10nKey.commonUsernameRequired.toString() : null,
@@ -64,7 +64,7 @@ class LoginPageState extends ConsumerState<LoginPage> {
                       FinancrrTextField(
                         controller: _passwordController,
                         label: L10nKey.commonPassword,
-                        hint: L10nKey.commonPassword, // TODO: implement L10nKey ("Password")
+                        hint: L10nKey.commonPassword,
                         prefixIcon: const Icon(Icons.lock_outline),
                         suffixIcon: Padding(
                           padding: const EdgeInsets.only(right: 10),
@@ -94,7 +94,7 @@ class LoginPageState extends ConsumerState<LoginPage> {
                       }
                       context.goPath(RegisterPage.pagePath.build(), extra: widget.hostUri);
                     },
-                    label: L10nKey.authLoginNoAccount.toText(),
+                    label: L10nKey.loginNoAccount.toText(),
                   )),
             ],
           ));
@@ -129,7 +129,7 @@ class LoginPageState extends ConsumerState<LoginPage> {
     if (state.status == AuthenticationStatus.authenticated) {
       context.goPath(DashboardPage.pagePath.build());
     } else {
-      L10nKey.authLoginFailed.showSnack(context);
+      L10nKey.loginFailed.showSnack(context);
     }
   }
 }
