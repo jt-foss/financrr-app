@@ -15,7 +15,6 @@
   "appearance_current_device_theme": "Aktuelles Geräte-Thema: {deviceTheme}",
   "appearance_current_light_theme": "ausgewähltes helles Thema",
   "appearance_use_device_theme": "Nutze Geräte-Thema",
-  "auth_config_status": "Status: {hostStatus}, v{apiVersion}",
   "auth_login_failed": "Anmeldung fehlgeschlagen. Bitte versuche es später erneut",
   "auth_login_message_1": "Schön dich zu sehen!",
   "auth_login_message_2": "Willkommen zurück!",
