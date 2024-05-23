@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:financrr_frontend/modules/auth/providers/authentication.provider.dart';
 import 'package:financrr_frontend/modules/transactions/views/transaction_page.dart';
+import 'package:financrr_frontend/shared/ui/custom_replacements/custom_button.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
 import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
@@ -116,7 +117,7 @@ class TransactionEditPageState extends ConsumerState<TransactionEditPage> {
                     executedAt: _executedAt,
                     interactive: false,
                   ),
-                  const Divider(),
+                  const SizedBox(height: 20),
                   ...FormFields.transaction(
                     this,
                     theme,
@@ -134,13 +135,10 @@ class TransactionEditPageState extends ConsumerState<TransactionEditPage> {
                       setState(() => _executedAt = date);
                     },
                   ),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: _isValid ? () => _editTransaction(account, transaction, _type) : null,
-                      child: L10nKey.transactionEdit.toText(),
-                    ),
+                  const SizedBox(height: 20),
+                  FinancrrButton(
+                    onPressed: _isValid ? () => _editTransaction(account, transaction, _type) : null,
+                    text: L10nKey.transactionEdit.toString(),
                   ),
                 ],
               ),

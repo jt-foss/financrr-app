@@ -41,7 +41,8 @@ class ScaffoldNavBarShellState extends ConsumerState<ScaffoldNavBarShell> {
                 children: [
                   StatefulBuilder(builder: (context, setState) {
                     return MouseRegion(
-                      onEnter: (event) => _hoverTimer = Timer(const Duration(milliseconds: 1000), () => setState(() => _isHovered = true)),
+                      onEnter: (event) =>
+                          _hoverTimer = Timer(const Duration(milliseconds: 1000), () => setState(() => _isHovered = true)),
                       onExit: (event) {
                         _hoverTimer?.cancel();
                         setState(() => _isHovered = false);
@@ -90,22 +91,18 @@ class ScaffoldNavBarShellState extends ConsumerState<ScaffoldNavBarShell> {
   }
 
   List<NavDestination> _getDestinations() => const [
-    NavDestination(
-            iconData: Icons.dashboard_outlined,
-            selectedIconData: Icons.dashboard_rounded,
-            label: L10nKey.navigationDashboard),
-    NavDestination(
+        NavDestination(
+            iconData: Icons.dashboard_outlined, selectedIconData: Icons.dashboard_rounded, label: L10nKey.navigationDashboard),
+        NavDestination(
             iconData: Icons.account_balance_wallet_outlined,
             selectedIconData: Icons.account_balance_wallet_rounded,
             label: L10nKey.navigationAccounts),
-    NavDestination(
+        NavDestination(
             iconData: Icons.leaderboard_outlined,
             selectedIconData: Icons.leaderboard_rounded,
             label: L10nKey.navigationStatistics),
-    NavDestination(
-            iconData: Icons.settings_outlined,
-            selectedIconData: Icons.settings_rounded,
-            label: L10nKey.navigationSettings),
+        NavDestination(
+            iconData: Icons.settings_outlined, selectedIconData: Icons.settings_rounded, label: L10nKey.navigationSettings),
       ];
 
   void refresh() => setState(() {});

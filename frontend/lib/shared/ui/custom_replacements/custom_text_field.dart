@@ -6,13 +6,17 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../modules/settings/providers/theme.provider.dart';
 
 class FinancrrTextField extends StatefulHookConsumerWidget {
-  final TextEditingController controller;
   final L10nKey label;
+  final TextEditingController? controller;
   final L10nKey? hint;
   final String? status;
   final Widget? prefixIcon;
   final Widget? suffixIcon;
   final bool obscureText;
+  final bool readOnly;
+  final bool required;
+  final String? initialValue;
+  final VoidCallback? onTap;
   final Iterable<String>? autofillHints;
   final String? Function(String?)? validator;
   final void Function(String)? onChanged;
@@ -20,18 +24,21 @@ class FinancrrTextField extends StatefulHookConsumerWidget {
 
   const FinancrrTextField(
       {super.key,
-      required this.controller,
       required this.label,
+      this.controller,
       this.hint,
       this.status,
       this.prefixIcon,
       this.suffixIcon,
       this.obscureText = false,
+      this.readOnly = false,
+      this.required = false,
+      this.initialValue,
+      this.onTap,
       this.autofillHints,
       this.validator,
       this.onChanged,
-      this.inputFormatters
-      });
+      this.inputFormatters});
 
   @override
   ConsumerState<FinancrrTextField> createState() => _AppTextFieldState();
@@ -48,7 +55,13 @@ class _AppTextFieldState extends ConsumerState<FinancrrTextField> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        widget.label.toText(style: labelStyle),
+        Row(
+          children: [
+            Flexible(child: widget.label.toText(style: labelStyle)),
+            if (widget.required)
+              Text(' *', style: labelStyle?.copyWith(fontWeight: FontWeight.w600, color: theme.financrrExtension.error)),
+          ],
+        ),
         const SizedBox(height: 5),
         AnimatedContainer(
           duration: const Duration(milliseconds: 200),
@@ -77,6 +90,9 @@ class _AppTextFieldState extends ConsumerState<FinancrrTextField> {
                 errorStyle: const TextStyle(height: 0),
                 border: InputBorder.none),
             obscureText: widget.obscureText,
+            readOnly: widget.readOnly,
+            initialValue: widget.initialValue,
+            onTap: widget.onTap,
             onChanged: widget.onChanged,
             inputFormatters: widget.inputFormatters,
           ),

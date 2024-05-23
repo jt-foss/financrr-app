@@ -12,6 +12,7 @@ import '../../../shared/ui/adaptive_scaffold.dart';
 import '../../../routing/page_path.dart';
 import '../../../shared/ui/async_wrapper.dart';
 import '../../../shared/ui/account_card.dart';
+import '../../../shared/ui/custom_replacements/custom_button.dart';
 import '../../../utils/form_fields.dart';
 import '../../settings/providers/theme.provider.dart';
 import 'account_page.dart';
@@ -97,7 +98,7 @@ class AccountEditPageState extends ConsumerState<AccountEditPage> {
                     balance: int.tryParse(_originalBalanceController.text) ?? 0,
                     currency: _currency ?? _api.getCurrencies().first,
                   ),
-                  const Divider(),
+                  const SizedBox(height: 20),
                   ...FormFields.account(ref, theme,
                       api: _api,
                       nameController: _nameController,
@@ -106,15 +107,12 @@ class AccountEditPageState extends ConsumerState<AccountEditPage> {
                       originalBalanceController: _originalBalanceController,
                       onCurrencyChanged: (currency) => _currency = currency!,
                       initialCurrency: _currency),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: _isValid ? () => _editAccount(account) : null,
-                      child: _nameController.text.isEmpty
-                          ? L10nKey.accountEdit.toText()
-                          : L10nKey.commonEditObject.toText(namedArgs: {'object': _nameController.text}),
-                    ),
+                  const SizedBox(height: 20),
+                  FinancrrButton(
+                    onPressed: _isValid ? () => _editAccount(account) : null,
+                    text: _nameController.text.isEmpty
+                        ? L10nKey.accountEdit.toString()
+                        : L10nKey.commonEditObject.toString(namedArgs: {'object': _nameController.text}),
                   ),
                 ],
               ),

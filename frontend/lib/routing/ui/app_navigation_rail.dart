@@ -19,7 +19,13 @@ class FinancrrNavigationRail extends ConsumerWidget {
   final Function(int)? onDestinationSelected;
   final List<Widget> Function(bool)? trailingBuilder;
 
-  const FinancrrNavigationRail({super.key, required this.destinations, required this.selectedIndex, this.extended = true, this.onDestinationSelected, this.trailingBuilder});
+  const FinancrrNavigationRail(
+      {super.key,
+      required this.destinations,
+      required this.selectedIndex,
+      this.extended = true,
+      this.onDestinationSelected,
+      this.trailingBuilder});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -31,7 +37,6 @@ class FinancrrNavigationRail extends ConsumerWidget {
 
       return StatefulBuilder(
         builder: (context, setState) {
-
           return MouseRegion(
             onHover: (_) => setState(() => isHovered = true),
             onExit: (_) => setState(() => isHovered = false),
@@ -40,8 +45,7 @@ class FinancrrNavigationRail extends ConsumerWidget {
               child: Row(
                 mainAxisAlignment: extended ? MainAxisAlignment.start : MainAxisAlignment.center,
                 children: [
-                  if (extended)
-                    const SizedBox(width: 40),
+                  if (extended) const SizedBox(width: 40),
                   AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     padding: const EdgeInsets.all(5),
@@ -50,9 +54,7 @@ class FinancrrNavigationRail extends ConsumerWidget {
                       border: Border.all(width: 3, color: isSelected ? theme.financrrExtension.primary : Colors.transparent),
                       color: isSelected ? null : theme.financrrExtension.surfaceVariant1,
                     ),
-                    child: Icon(isSelected
-                        ? destination.selectedIconData ?? destination.iconData
-                        : destination.iconData,
+                    child: Icon(isSelected ? destination.selectedIconData ?? destination.iconData : destination.iconData,
                         color: isSelected ? theme.financrrExtension.primary : theme.financrrExtension.surfaceVariant3),
                   ),
                   if (extended) ...[
@@ -81,8 +83,8 @@ class FinancrrNavigationRail extends ConsumerWidget {
             const SizedBox(height: 10),
             for (NavDestination destination in destinations)
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 5),
-                child: buildDestination(destination, destinations.indexOf(destination))),
+                  padding: const EdgeInsets.symmetric(vertical: 5),
+                  child: buildDestination(destination, destinations.indexOf(destination))),
             if (trailingBuilder != null) ...trailingBuilder!(extended),
           ],
         ),

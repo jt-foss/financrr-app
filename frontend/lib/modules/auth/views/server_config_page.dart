@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/shared/ui/auth_page_template.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/shared/ui/custom_replacements/custom_text_button.dart';
@@ -49,8 +48,6 @@ class ServerConfigPageState extends ConsumerState<ServerConfigPage> {
 
   @override
   Widget build(BuildContext context) {
-    var theme = ref.watch(themeProvider);
-
     buildVerticalLayout(Size size) {
       return AuthPageTemplate(
           child: Column(
@@ -67,7 +64,8 @@ class ServerConfigPageState extends ConsumerState<ServerConfigPage> {
                       label: L10nKey.authConfigCheckUrl, // TODO: implement L10nKey ("Server URL")
                       hint: L10nKey.authConfigCheckUrl, // TODO: implement L10nKey ("https://demo.financrr.app/api")
                       status: _isValid && _apiVersion != null
-                          ? L10nKey.authConfigStatus.toString(namedArgs: {'hostStatus': 'Healthy', 'apiVersion': '$_apiVersion'})
+                          ? L10nKey.authConfigStatus
+                              .toString(namedArgs: {'hostStatus': 'Healthy', 'apiVersion': '$_apiVersion'})
                           : null,
                       prefixIcon: const Icon(Icons.link),
                       autofillHints: const [AutofillHints.username],

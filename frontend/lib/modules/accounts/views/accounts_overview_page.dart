@@ -10,6 +10,7 @@ import 'package:restrr/restrr.dart';
 import '../../../shared/ui/adaptive_scaffold.dart';
 import '../../../routing/page_path.dart';
 import '../../../shared/ui/account_card.dart';
+import '../../../shared/ui/custom_replacements/custom_text_button.dart';
 import '../../../shared/ui/notice_card.dart';
 import '../../../utils/text_utils.dart';
 import '../../settings/providers/l10n.provider.dart';
@@ -74,7 +75,7 @@ class _AccountsOverviewPageState extends ConsumerState<AccountsOverviewPage> {
                               style: theme.textTheme.titleSmall?.copyWith(color: theme.themeData.primaryColor));
                         }).toList(),
                       ),
-                      TextButton.icon(
+                      FinancrrTextButton(
                         label: L10nKey.accountCreate.toText(),
                         icon: const Icon(Icons.add, size: 17),
                         onPressed: () => context.goPath(AccountCreatePage.pagePath.build()),
@@ -123,7 +124,7 @@ class _AccountsOverviewPageState extends ConsumerState<AccountsOverviewPage> {
                                 })
                           ],
                         ),
-                        const Divider(),
+                        const SizedBox(height: 5),
                         AccountCard(account: account),
                       ],
                     ),

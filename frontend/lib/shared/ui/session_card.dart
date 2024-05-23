@@ -56,7 +56,7 @@ class SessionCard extends ConsumerWidget {
           ),
           IconButton(
             onPressed: onDelete,
-            icon: Icon(isCurrent ? Icons.logout_rounded : Icons.delete_rounded),
+            icon: Icon(isCurrent ? Icons.logout_rounded : Icons.delete_outline_rounded),
           )
         ],
       ),

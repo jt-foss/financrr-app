@@ -1,4 +1,5 @@
 import 'package:financrr_frontend/modules/auth/providers/authentication.provider.dart';
+import 'package:financrr_frontend/shared/ui/custom_replacements/custom_text_button.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
 import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
@@ -29,76 +30,78 @@ class _SessionSettingsPageState extends ConsumerState<SessionSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return AdaptiveScaffold(
-      resizeToAvoidBottomInset: false,
-      verticalBuilder: (_, __, size) => _buildVerticalLayout(size),
-    );
-  }
-
-  Widget _buildVerticalLayout(Size size) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10, bottom: 20),
-      child: Center(
-        child: SizedBox(
-          width: size.width / 1.1,
-          child: RefreshIndicator(
-            onRefresh: () async => _paginatedSessionKey.currentState?.reset(),
-            child: ListView(
-              children: [
-                SessionCard(session: _api.session, onDelete: () => CommonActions.logOut(this, ref)),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    TextButton.icon(
-                      onPressed: () => _deleteAllSessions(),
-                      label: L10nKey.commonDeleteAll.toText(),
-                      icon: const Icon(Icons.delete_sweep_rounded),
-                    ),
-                    ValueListenableBuilder(
-                        valueListenable: _amount,
-                        builder: (context, value, child) {
-                          // TODO: add plurals
-                          return Text('${_amount.value} session(s)');
-                        })
-                  ],
-                ),
-                const Divider(),
-                PaginatedWrapper(
-                  key: _paginatedSessionKey,
-                  initialPageFunction: (forceRetrieve) => _api.retrieveAllSessions(limit: 10, forceRetrieve: forceRetrieve),
-                  onError: (context, snap) {
-                    if (snap.error is ServerException) {
-                      CommonActions.logOut(this, ref);
-                    }
-                    return Text(snap.error.toString());
-                  },
-                  onSuccess: (context, snap) {
-                    final PaginatedDataResult<PartialSession> sessions = snap.data!;
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      _amount.value = sessions.total;
-                    });
-                    sessions.items.removeWhere((s) => s.id.value == _api.session.id.value);
-                    return Column(
-                      children: [
-                        for (PartialSession s in sessions.items)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: SessionCard(session: s, onDelete: () => _deleteSession(s)),
-                          ),
-                        if (sessions.nextPage != null)
-                          TextButton(
-                            onPressed: () => sessions.nextPage!(_api),
-                            child: L10nKey.commonLoadMore.toText(),
-                          ),
-                      ],
-                    );
-                  },
-                )
-              ],
+    buildVerticalLayout(Size size) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 10, bottom: 20),
+        child: Center(
+          child: SizedBox(
+            width: size.width / 1.1,
+            child: RefreshIndicator(
+              onRefresh: () async => _paginatedSessionKey.currentState?.reset(),
+              child: ListView(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      FinancrrTextButton(
+                        onPressed: () => _deleteAllSessions(),
+                        label: L10nKey.commonDeleteAll.toText(),
+                        icon: const Icon(Icons.delete_sweep_rounded),
+                      ),
+                      ValueListenableBuilder(
+                          valueListenable: _amount,
+                          builder: (context, value, child) {
+                            // TODO: add plurals
+                            return Text('${_amount.value} session(s)');
+                          })
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  PaginatedWrapper(
+                    key: _paginatedSessionKey,
+                    initialPageFunction: (forceRetrieve) => _api.retrieveAllSessions(limit: 10, forceRetrieve: forceRetrieve),
+                    onError: (context, snap) {
+                      if (snap.error is ServerException) {
+                        CommonActions.logOut(this, ref);
+                      }
+                      return Text(snap.error.toString());
+                    },
+                    onSuccess: (context, snap) {
+                      final PaginatedDataResult<PartialSession> sessions = snap.data!;
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        _amount.value = sessions.total;
+                      });
+                      return Column(
+                        children: [
+                          for (PartialSession s in sessions.items)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 10),
+                              child: SessionCard(
+                                  session: s,
+                                  onDelete: s.id.value == _api.session.id.value
+                                      ? () => CommonActions.logOut(this, ref)
+                                      : () => _deleteSession(s)),
+                            ),
+                          if (sessions.nextPage != null)
+                            FinancrrTextButton(
+                              onPressed: () => sessions.nextPage!(_api),
+                              label: L10nKey.commonLoadMore.toText(),
+                            ),
+                        ],
+                      );
+                    },
+                  )
+                ],
+              ),
             ),
           ),
         ),
-      ),
+      );
+    }
+
+    return AdaptiveScaffold(
+      resizeToAvoidBottomInset: false,
+      verticalBuilder: (_, __, size) => buildVerticalLayout(size),
     );
   }
 

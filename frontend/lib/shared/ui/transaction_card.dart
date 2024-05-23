@@ -59,7 +59,7 @@ class TransactionCard extends ConsumerWidget {
       onTap: !interactive
           ? null
           : () => context.goPath(TransactionPage.pagePath
-          .build(params: {'accountId': account.id.value.toString(), 'transactionId': id.toString()})),
+              .build(params: {'accountId': account.id.value.toString(), 'transactionId': id.toString()})),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -75,9 +75,8 @@ class TransactionCard extends ConsumerWidget {
               Text(
                   '${type == TransactionType.deposit ? '' : '-'}${TextUtils.formatBalanceWithCurrency(l10n, amount, account.currencyId.get()!)}',
                   style: theme.textTheme.titleMedium?.copyWith(
-                      color: type == TransactionType.deposit
-                          ? theme.themeData.primaryColor
-                          : theme.themeData.colorScheme.error)),
+                      color:
+                          type == TransactionType.deposit ? theme.themeData.primaryColor : theme.themeData.colorScheme.error)),
             ],
           ),
         ],

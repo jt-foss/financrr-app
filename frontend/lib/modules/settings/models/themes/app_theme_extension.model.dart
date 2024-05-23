@@ -74,8 +74,7 @@ class FinancrrAppThemeExtension extends ThemeExtension<FinancrrAppThemeExtension
       Color? surfaceVariant3,
       Color? onPrimary,
       Color? onError,
-      Color? onSurface}
-      ) {
+      Color? onSurface}) {
     return FinancrrAppThemeExtension(
       primary: primary ?? this.primary,
       error: error ?? this.error,

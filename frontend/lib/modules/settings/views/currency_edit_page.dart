@@ -14,6 +14,7 @@ import 'package:restrr/restrr.dart';
 import '../../../shared/ui/adaptive_scaffold.dart';
 import '../../../../routing/page_path.dart';
 import '../../../shared/ui/async_wrapper.dart';
+import '../../../shared/ui/custom_replacements/custom_button.dart';
 import '../../../utils/form_fields.dart';
 import 'currency_settings_page.dart';
 
@@ -101,22 +102,19 @@ class _CurrencyEditPageState extends ConsumerState<CurrencyEditPage> {
                       isoCode: _isoCodeController.text,
                       decimalPlaces: _decimalPlacesController.text,
                       previewAmount: _randomNumber),
-                  const Divider(),
+                  const SizedBox(height: 20),
                   ...FormFields.currency(
                       nameController: _nameController,
                       symbolController: _symbolController,
                       isoCodeController: _isoCodeController,
                       decimalPlacesController: _decimalPlacesController,
                       readOnly: !_isCustom),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: _isValid && _isCustom ? () => _editCurrency(currency as CustomCurrency) : null,
-                      child: _nameController.text.isEmpty
-                          ? L10nKey.currencyEdit.toText()
-                          : L10nKey.commonEditObject.toText(namedArgs: {'object': _nameController.text}),
-                    ),
+                  const SizedBox(height: 20),
+                  FinancrrButton(
+                    onPressed: _isValid && _isCustom ? () => _editCurrency(currency as CustomCurrency) : null,
+                    text: _nameController.text.isEmpty
+                        ? L10nKey.currencyEdit.toString()
+                        : L10nKey.commonEditObject.toString(namedArgs: {'object': _nameController.text}),
                   ),
                   if (!_isCustom)
                     Padding(

@@ -23,9 +23,8 @@ class _FinancrrTextButtonState extends ConsumerState<FinancrrTextButton> {
 
     style(Widget child) {
       if (child is Text) {
-        return Text(child.data ?? '', style: theme.textTheme.bodyMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: theme.financrrExtension.primary));
+        return Text(child.data ?? '',
+            style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold, color: theme.financrrExtension.primary));
       }
       if (child is Icon) {
         return Icon(child.icon, color: theme.financrrExtension.primary, size: child.size);

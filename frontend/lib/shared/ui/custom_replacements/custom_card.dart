@@ -12,7 +12,15 @@ class FinancrrCard extends StatefulHookConsumerWidget {
   final bool filled;
   final Function()? onTap;
 
-  const FinancrrCard({super.key, required this.child, this.padding, this.borderColor, this.borderRadius, this.hoverable = true, this.filled = false, this.onTap});
+  const FinancrrCard(
+      {super.key,
+      required this.child,
+      this.padding,
+      this.borderColor,
+      this.borderRadius,
+      this.hoverable = true,
+      this.filled = false,
+      this.onTap});
 
   @override
   ConsumerState<FinancrrCard> createState() => _OutlineCardState();

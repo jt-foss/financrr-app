@@ -38,7 +38,6 @@ class RegisterPageState extends ConsumerState<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
-
     buildVerticalLayout(Size size) {
       return AuthPageTemplate(
           showBackButton: true,

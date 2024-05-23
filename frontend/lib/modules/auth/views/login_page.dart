@@ -15,7 +15,6 @@ import '../../../routing/page_path.dart';
 import '../../../shared/ui/custom_replacements/custom_button.dart';
 import '../../../shared/ui/custom_replacements/custom_text_button.dart';
 import '../../../shared/ui/custom_replacements/custom_text_field.dart';
-import '../../settings/providers/theme.provider.dart';
 
 class LoginPage extends StatefulHookConsumerWidget {
   static const PagePathBuilder pagePath = PagePathBuilder('/login');
@@ -37,8 +36,6 @@ class LoginPageState extends ConsumerState<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    var theme = ref.watch(themeProvider);
-
     buildVerticalLayout(Size size) {
       return AuthPageTemplate(
           showBackButton: true,
