@@ -55,11 +55,11 @@ class AccountCard extends ConsumerWidget {
               children: [
                 Text(name, style: theme.textTheme.titleSmall),
                 if (iban != null || description != null) Text(TextUtils.formatIBAN(iban) ?? description!),
+                Text(TextUtils.formatBalanceWithCurrency(l10n, balance, currency!),
+                    style: theme.textTheme.titleSmall?.copyWith(color: theme.themeData.primaryColor))
               ],
             ),
           ),
-          Text(TextUtils.formatBalanceWithCurrency(l10n, balance, currency!),
-              style: theme.textTheme.titleSmall?.copyWith(color: theme.themeData.primaryColor))
         ],
       ),
     );

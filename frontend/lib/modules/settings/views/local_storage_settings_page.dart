@@ -21,7 +21,7 @@ class _LocalStorageSettingsPageState extends ConsumerState<LocalStorageSettingsP
   Widget build(BuildContext context) {
     var theme = ref.watch(themeProvider);
 
-    buildTableCell(String text) {
+    buildTableCell(String text, {bool isKey = false}) {
       return GestureDetector(
         onTap: () => CommonActions.copyToClipboard(this, text),
         child: Padding(
@@ -40,7 +40,9 @@ class _LocalStorageSettingsPageState extends ConsumerState<LocalStorageSettingsP
             child: ListView(
               children: [
                 Table(
-                  border: TableBorder.all(color: theme.themeData.dividerColor),
+                  border: TableBorder.all(
+                      borderRadius: BorderRadius.circular(10),
+                      color: theme.financrrExtension.surfaceVariant1, width: 3),
                   children: [
                     for (StoreKey key in StoreKey.values)
                       TableRow(
