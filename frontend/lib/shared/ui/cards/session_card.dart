@@ -62,7 +62,6 @@ class _SessionCardState extends ConsumerState<SessionCard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // TODO: remove sessionCurrent & sessionUnnamed
                 Text('${widget.name} (${_getPlatformApp(widget.platform)})', style: theme.textTheme.titleSmall),
                 if (widget.description != null && _expanded)
                   Padding(
