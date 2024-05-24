@@ -9,7 +9,9 @@ use crate::wrapper::entity::user::User;
 pub(crate) struct PublicSession {
     pub(crate) id: i32,
     pub(crate) user_id: i32,
-    pub(crate) name: Option<String>,
+    pub(crate) name: String,
+    pub(crate) description: Option<String>,
+    pub(crate) platform: Option<String>,
     #[serde(with = "time::serde::rfc3339")]
     pub(crate) expires_at: OffsetDateTime,
     #[serde(with = "time::serde::rfc3339")]
@@ -23,6 +25,8 @@ impl From<Session> for PublicSession {
             id: value.id,
             user_id: value.user.id,
             name: value.name,
+            description: value.description,
+            platform: value.platform,
             expires_at: value.expires_at,
             created_at: value.created_at,
             user: value.user,

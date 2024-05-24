@@ -188,9 +188,8 @@ pub(crate) async fn delete_all_sessions(user: Phantom<User>) -> Result<impl Resp
 #[post("")]
 pub(crate) async fn create_session(credentials: Json<Credentials>) -> Result<impl Responder, ApiError> {
     let credentials = credentials.into_inner();
-    let session_name = credentials.session_name.clone();
-    let user = User::authenticate(credentials).await?;
-    let session = Session::new(user, session_name).await?;
+    let user = User::authenticate(&credentials).await?;
+    let session = Session::new(user, credentials).await?;
 
     Ok(HttpResponse::Created().json(session))
 }

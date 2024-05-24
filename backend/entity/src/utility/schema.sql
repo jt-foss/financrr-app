@@ -31,7 +31,9 @@ CREATE TABLE IF NOT EXISTS session
 (
     id         SERIAL PRIMARY KEY,
     token      TEXT UNIQUE                                                        NOT NULL,
-    name       TEXT,
+    name        TEXT NOT NULL,
+    description TEXT,
+    platform    TEXT,
     "user"     INTEGER REFERENCES "user" (id) ON UPDATE CASCADE ON DELETE CASCADE NOT NULL,
     created_at timestamp with time zone                                           NOT NULL DEFAULT current_timestamp
 );

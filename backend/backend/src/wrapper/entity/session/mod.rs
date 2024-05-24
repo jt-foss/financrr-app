@@ -23,6 +23,7 @@ use crate::database::entity::{count, delete, find_all_paginated, find_one_or_err
 use crate::database::redis::{del, get, set_ex, zadd};
 use crate::permission_impl;
 use crate::util::auth::extract_bearer_token;
+use crate::wrapper::entity::user::dto::Credentials;
 use crate::wrapper::entity::user::User;
 use crate::wrapper::entity::{TableName, WrapperEntity};
 use crate::wrapper::permission::{Permission, Permissions};
@@ -35,7 +36,9 @@ pub(crate) mod dto;
 pub(crate) struct Session {
     pub(crate) id: i32,
     pub(crate) token: String,
-    pub(crate) name: Option<String>,
+    pub(crate) name: String,
+    pub(crate) description: Option<String>,
+    pub(crate) platform: Option<String>,
     #[serde(with = "time::serde::rfc3339")]
     pub(crate) expires_at: OffsetDateTime,
     #[serde(with = "time::serde::rfc3339")]
@@ -44,7 +47,7 @@ pub(crate) struct Session {
 }
 
 impl Session {
-    pub(crate) async fn new(user: User, session_name: Option<String>) -> Result<Self, ApiError> {
+    pub(crate) async fn new(user: User, credentials: Credentials) -> Result<Self, ApiError> {
         let session_token = Self::generate_session_key();
 
         if Self::reached_session_limit(user.id).await? {
@@ -55,7 +58,9 @@ impl Session {
         let session = session::ActiveModel {
             id: Default::default(),
             token: Set(session_token.clone()),
-            name: Set(session_name),
+            name: Set(credentials.name),
+            description: Set(credentials.description),
+            platform: Set(credentials.platform),
             user: Set(user.id),
             created_at: Set(get_now()),
         };
@@ -87,6 +92,8 @@ impl Session {
             id: Set(self.id),
             token: Set(self.token.to_owned()),
             name: Set(self.name.clone()),
+            description: Set(self.description.clone()),
+            platform: Set(self.platform.clone()),
             user: Set(self.user.id),
             created_at: Set(get_now()),
         };
@@ -257,6 +264,8 @@ impl Session {
         Ok(Self {
             id: model.id,
             name: model.name,
+            description: model.description,
+            platform: model.platform,
             token: model.token,
             user,
             expires_at: model.created_at.add(TimeDuration::hours(Config::get_config().session.lifetime_hours as i64)),
