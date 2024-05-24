@@ -65,9 +65,7 @@ class FormFields {
           validator: (value) => InputValidators.nonNull(L10nKey.transactionPropertiesAmount.toString(), value),
           required: true,
           keyboardType: TextInputType.number,
-          inputFormatters: [
-            FilteringTextInputFormatter.digitsOnly
-          ],
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
         ),
       ),
       Padding(
@@ -166,9 +164,7 @@ class FormFields {
           validator: (value) => InputValidators.nonNull(L10nKey.accountPropertiesOriginalBalance.toString(), value),
           required: true,
           keyboardType: TextInputType.number,
-          inputFormatters: [
-            FilteringTextInputFormatter.digitsOnly
-          ],
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
         ),
       ),
       Padding(
