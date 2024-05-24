@@ -39,7 +39,7 @@ impl User {
         Ok(count(user::Entity::find_by_id(id)).await? > 0)
     }
 
-    pub(crate) async fn authenticate(credentials: Credentials) -> Result<Self, ApiError> {
+    pub(crate) async fn authenticate(credentials: &Credentials) -> Result<Self, ApiError> {
         let user = find_one(DbUser::find_by_username(credentials.username.as_str())).await;
         match user {
             Ok(Some(user)) => {

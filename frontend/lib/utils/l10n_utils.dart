@@ -103,9 +103,7 @@ enum L10nKey {
   serverConfigStatus('server_config_status', hasParams: true),
   serverConfigUrl('server_config_url'),
   // session
-  sessionCurrent('session_current'),
   sessionDeleteAllSuccess('session_delete_all_success'),
-  sessionUnnamed('session_unnamed'),
   // settings
   settingsCategoryAccount('settings_category_account'),
   settingsCategoryApp('settings_category_app'),

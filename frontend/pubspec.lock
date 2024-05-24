@@ -754,11 +754,11 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: development
-      resolved-ref: aa8861c4b36808272685b4816f0fe077d28f15c3
+      ref: "feature/session-enhancements"
+      resolved-ref: fde5d3ce2454f7e34aca3e1c91ce18a234c1e155
       url: "https://github.com/financrr/restrr.git"
     source: git
-    version: "0.11.0"
+    version: "0.12.0"
   riverpod:
     dependency: "direct main"
     description:
