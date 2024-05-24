@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use crate::permissions::find_all_by_user_id;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
-#[sea_orm(schema_name = "public", table_name = "transaction_template")]
+#[sea_orm(table_name = "transaction_template")]
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,

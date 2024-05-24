@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use crate::account;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
-#[sea_orm(schema_name = "public", table_name = "permissions")]
+#[sea_orm(table_name = "permissions")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub user_id: i32,

@@ -11,7 +11,7 @@ use crate::permissions::find_all_by_user_id;
 use crate::utility::time::get_now;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
-#[sea_orm(schema_name = "public", table_name = "account")]
+#[sea_orm(table_name = "account")]
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,

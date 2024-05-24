@@ -5,7 +5,7 @@ use sea_orm::{DeleteMany, QueryOrder, QuerySelect};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
-#[sea_orm(schema_name = "public", table_name = "session")]
+#[sea_orm(table_name = "session")]
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
