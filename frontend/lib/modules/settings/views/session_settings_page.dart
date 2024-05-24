@@ -109,8 +109,7 @@ class _SessionSettingsPageState extends ConsumerState<SessionSettingsPage> {
     try {
       await session.delete();
       if (!mounted) return;
-      L10nKey.commonDeleteObjectSuccess
-          .showSnack(context, namedArgs: {'object': session.name ?? 'Session ${session.id.value}'});
+      L10nKey.commonDeleteObjectSuccess.showSnack(context, namedArgs: {'object': session.name});
       if (session.id.value == _api.session.id.value) {
         CommonActions.logOut(this, ref);
       }
