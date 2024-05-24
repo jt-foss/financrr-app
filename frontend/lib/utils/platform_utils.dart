@@ -6,19 +6,30 @@ import 'package:flutter/foundation.dart';
 class PlatformUtils {
   const PlatformUtils._();
 
-  static Future<String?> getPlatformDescription() async {
+  static Future<String> getPlatformName() async {
     DeviceInfoPlugin plugin = DeviceInfoPlugin();
     if (kIsWeb) {
-      Map<String, dynamic> webBrowserInfo = (await plugin.deviceInfo).data;
-      BrowserName browserName = webBrowserInfo['browserName'] ?? BrowserName.unknown;
+      BrowserName browserName = (await plugin.deviceInfo).data['browserName'] ?? BrowserName.unknown;
       return browserName.name;
     } else {
       if (Platform.isAndroid) {
-        AndroidDeviceInfo androidInfo = await plugin.androidInfo;
-        return androidInfo.model;
+        return (await plugin.androidInfo).model;
       } else if (Platform.isIOS) {
-        IosDeviceInfo iosInfo = await plugin.iosInfo;
-        return iosInfo.utsname.machine;
+        return (await plugin.iosInfo).utsname.machine;
+      }
+    }
+    return 'Unknown';
+  }
+
+  static Future<String?> getPlatformDescription() async {
+    DeviceInfoPlugin plugin = DeviceInfoPlugin();
+    if (kIsWeb) {
+      return (await plugin.deviceInfo).data['userAgent'];
+    } else {
+      if (Platform.isAndroid) {
+        return (await plugin.androidInfo).model;
+      } else if (Platform.isIOS) {
+        return (await plugin.iosInfo).utsname.machine;
       }
     }
     return null;

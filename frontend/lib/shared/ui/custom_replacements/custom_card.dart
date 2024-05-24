@@ -11,6 +11,7 @@ class FinancrrCard extends StatefulHookConsumerWidget {
   final bool hoverable;
   final bool filled;
   final Function()? onTap;
+  final Function()? onLongPress;
 
   const FinancrrCard(
       {super.key,
@@ -20,7 +21,8 @@ class FinancrrCard extends StatefulHookConsumerWidget {
       this.borderRadius,
       this.hoverable = true,
       this.filled = false,
-      this.onTap});
+      this.onTap,
+      this.onLongPress});
 
   @override
   ConsumerState<FinancrrCard> createState() => _OutlineCardState();
@@ -54,10 +56,15 @@ class _OutlineCardState extends ConsumerState<FinancrrCard> {
       },
       child: GestureDetector(
         onTap: widget.onTap,
-        onLongPress: () => setState(() => _hovered = true),
+        onLongPress: () {
+          widget.onLongPress?.call();
+          setState(() => _hovered = true);
+        },
         onLongPressEnd: (_) {
           setState(() => _hovered = false);
-          widget.onTap?.call();
+          if (widget.onLongPress != null) {
+            widget.onTap?.call();
+          }
         },
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
