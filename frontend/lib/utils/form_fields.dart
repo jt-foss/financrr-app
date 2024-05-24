@@ -3,11 +3,9 @@ import 'package:financrr_frontend/shared/ui/custom_replacements/custom_dropdown_
 import 'package:financrr_frontend/shared/ui/custom_replacements/custom_text_field.dart';
 import 'package:financrr_frontend/utils/formatter/currency_input_formatter.dart';
 import 'package:financrr_frontend/utils/l10n_utils.dart';
-import 'package:financrr_frontend/utils/text_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:restrr/restrr.dart';
 
 import '../modules/settings/models/themes/theme.state.dart';
@@ -120,15 +118,18 @@ class FormFields {
     ];
   }
 
-  static List<Widget> account(WidgetRef ref, L10nState l10n, ThemeState theme,
-      {required Restrr api,
-      required TextEditingController nameController,
-      required TextEditingController descriptionController,
-      required TextEditingController ibanController,
-      required TextEditingController originalBalanceController,
-      required Currency selectedCurrency,
-      void Function(Currency?)? onCurrencyChanged,
-      }) {
+  static List<Widget> account(
+    WidgetRef ref,
+    L10nState l10n,
+    ThemeState theme, {
+    required Restrr api,
+    required TextEditingController nameController,
+    required TextEditingController descriptionController,
+    required TextEditingController ibanController,
+    required TextEditingController originalBalanceController,
+    required Currency selectedCurrency,
+    void Function(Currency?)? onCurrencyChanged,
+  }) {
     return [
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
