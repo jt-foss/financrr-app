@@ -1,7 +1,7 @@
 import 'package:financrr_frontend/modules/settings/models/l10n.state.dart';
 import 'package:financrr_frontend/shared/ui/custom_replacements/custom_dropdown_field.dart';
 import 'package:financrr_frontend/shared/ui/custom_replacements/custom_text_field.dart';
-import 'package:financrr_frontend/utils/formatter/currency_input_formatter.dart';
+import 'package:financrr_frontend/utils/formatter/money_input_formatter.dart';
 import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -69,7 +69,11 @@ class FormFields {
           keyboardType: TextInputType.number,
           inputFormatters: [
             FilteringTextInputFormatter.digitsOnly,
-            CurrencyInputFormatter(l10n: l10n, currency: currentAccount.currencyId.get()!)
+            MoneyInputFormatter.fromCurrency(
+                currency: currentAccount.currencyId.get()!,
+                decimalSeparator: l10n.decimalSeparator,
+                thousandSeparator: l10n.thousandSeparator
+            )
           ],
         ),
       ),
@@ -173,7 +177,14 @@ class FormFields {
           validator: (value) => InputValidators.nonNull(L10nKey.accountPropertiesOriginalBalance.toString(), value),
           required: true,
           keyboardType: TextInputType.number,
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          inputFormatters: [
+            FilteringTextInputFormatter.digitsOnly,
+            MoneyInputFormatter.fromCurrency(
+                currency: selectedCurrency,
+                decimalSeparator: l10n.decimalSeparator,
+                thousandSeparator: l10n.thousandSeparator
+            )
+          ],
         ),
       ),
       Padding(

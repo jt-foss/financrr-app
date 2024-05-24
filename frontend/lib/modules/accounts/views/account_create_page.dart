@@ -35,7 +35,7 @@ class _AccountCreatePageState extends ConsumerState<AccountCreatePage> {
   late final TextEditingController _ibanController = TextEditingController();
   late final TextEditingController _originalBalanceController = TextEditingController();
 
-  Currency? _currency;
+  Currency? _selectedCurrency;
 
   bool _isValid = false;
 
@@ -78,7 +78,7 @@ class _AccountCreatePageState extends ConsumerState<AccountCreatePage> {
                     iban: _ibanController.text,
                     description: _descriptionController.text,
                     balance: int.tryParse(_originalBalanceController.text) ?? 0,
-                    currency: _currency ?? _api.getCurrencies().first,
+                    currency: _selectedCurrency ?? _api.getCurrencies().first,
                   ),
                   const SizedBox(height: 20),
                   ...FormFields.account(ref, l10n, theme,
@@ -87,8 +87,8 @@ class _AccountCreatePageState extends ConsumerState<AccountCreatePage> {
                       descriptionController: _descriptionController,
                       ibanController: _ibanController,
                       originalBalanceController: _originalBalanceController,
-                      selectedCurrency: _currency ?? _api.getCurrencies().first,
-                      onCurrencyChanged: (currency) => _currency = currency!),
+                      selectedCurrency: _selectedCurrency ?? _api.getCurrencies().first,
+                      onCurrencyChanged: (currency) => setState(() => _selectedCurrency = currency!)),
                   const SizedBox(height: 20),
                   FinancrrButton(
                     onPressed: _isValid ? () => _createAccount() : null,
@@ -111,14 +111,14 @@ class _AccountCreatePageState extends ConsumerState<AccountCreatePage> {
   }
 
   Future<void> _createAccount() async {
-    if (!_isValid || _currency == null) return;
+    if (!_isValid || _selectedCurrency == null) return;
     try {
       await _api.createAccount(
         name: _nameController.text,
         description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
         iban: _ibanController.text.isEmpty ? null : TextUtils.formatIBAN(_ibanController.text),
         originalBalance: int.tryParse(_originalBalanceController.text) ?? 0,
-        currencyId: _currency!.id.value,
+        currencyId: _selectedCurrency!.id.value,
       );
       if (!mounted) return;
       L10nKey.commonCreateObjectSuccess.showSnack(context, namedArgs: {'object': _nameController.text});
