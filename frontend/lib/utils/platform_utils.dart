@@ -15,7 +15,7 @@ class PlatformUtils {
       if (Platform.isAndroid) {
         return (await plugin.androidInfo).model;
       } else if (Platform.isIOS) {
-        return (await plugin.iosInfo).utsname.machine;
+        return (await plugin.iosInfo).name;
       }
     }
     return 'Unknown';
@@ -29,7 +29,8 @@ class PlatformUtils {
       if (Platform.isAndroid) {
         return (await plugin.androidInfo).model;
       } else if (Platform.isIOS) {
-        return (await plugin.iosInfo).utsname.machine;
+        IosDeviceInfo iosInfo = await plugin.iosInfo;
+        return '${iosInfo.utsname.machine}, iOS ${iosInfo.systemVersion}';
       }
     }
     return null;
