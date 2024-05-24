@@ -1,11 +1,13 @@
 import 'package:financrr_frontend/modules/settings/models/l10n.state.dart';
 import 'package:financrr_frontend/shared/ui/custom_replacements/custom_dropdown_field.dart';
 import 'package:financrr_frontend/shared/ui/custom_replacements/custom_text_field.dart';
+import 'package:financrr_frontend/utils/formatter/currency_input_formatter.dart';
 import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:financrr_frontend/utils/text_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:restrr/restrr.dart';
 
 import '../modules/settings/models/themes/theme.state.dart';
@@ -65,15 +67,12 @@ class FormFields {
           controller: amountController,
           label: L10nKey.transactionPropertiesAmount,
           validator: (value) => InputValidators.nonNull(L10nKey.transactionPropertiesAmount.toString(), value),
-          onChanged: (value) {
-            if (value.isNotEmpty) {
-              amountController.text =
-                  TextUtils.formatBalanceWithCurrency(l10n, int.tryParse(value) ?? 0, currentAccount.currencyId.get()!);
-            }
-          },
           required: true,
           keyboardType: TextInputType.number,
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          inputFormatters: [
+            FilteringTextInputFormatter.digitsOnly,
+            CurrencyInputFormatter(l10n: l10n, currency: currentAccount.currencyId.get()!)
+          ],
         ),
       ),
       Padding(
@@ -171,11 +170,6 @@ class FormFields {
           controller: originalBalanceController,
           label: L10nKey.accountPropertiesOriginalBalance,
           validator: (value) => InputValidators.nonNull(L10nKey.accountPropertiesOriginalBalance.toString(), value),
-          onChanged: (value) {
-            if (value.isNotEmpty) {
-              originalBalanceController.text = TextUtils.formatBalanceWithCurrency(l10n, int.tryParse(value) ?? 0, selectedCurrency);
-            }
-          },
           required: true,
           keyboardType: TextInputType.number,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
