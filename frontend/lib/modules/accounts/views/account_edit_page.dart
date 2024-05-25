@@ -16,7 +16,6 @@ import '../../../shared/ui/cards/account_card.dart';
 import '../../../shared/ui/custom_replacements/custom_button.dart';
 import '../../../utils/form_fields.dart';
 import '../../settings/providers/l10n.provider.dart';
-import '../../settings/providers/theme.provider.dart';
 import 'account_page.dart';
 
 class AccountEditPage extends StatefulHookConsumerWidget {
@@ -78,7 +77,6 @@ class AccountEditPageState extends ConsumerState<AccountEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    var theme = ref.watch(themeProvider);
     var l10n = ref.watch(l10nProvider);
 
     buildVerticalLayout(Account account, Size size) {
@@ -115,7 +113,7 @@ class AccountEditPageState extends ConsumerState<AccountEditPage> {
                     interactive: false,
                   ),
                   const SizedBox(height: 20),
-                  ...FormFields.account(ref, l10n, theme,
+                  ...FormFields.account(ref,
                       api: _api,
                       nameController: _nameController,
                       descriptionController: _descriptionController,

@@ -14,7 +14,6 @@ import '../../../shared/ui/custom_replacements/custom_button.dart';
 import '../../../utils/form_fields.dart';
 import '../../../utils/text_utils.dart';
 import '../../settings/providers/l10n.provider.dart';
-import '../../settings/providers/theme.provider.dart';
 import 'accounts_overview_page.dart';
 
 class AccountCreatePage extends StatefulHookConsumerWidget {
@@ -58,7 +57,6 @@ class _AccountCreatePageState extends ConsumerState<AccountCreatePage> {
 
   @override
   Widget build(BuildContext context) {
-    var theme = ref.watch(themeProvider);
     var l10n = ref.watch(l10nProvider);
 
     final MoneyInputFormatter moneyFormatter = MoneyInputFormatter.fromCurrency(
@@ -94,7 +92,7 @@ class _AccountCreatePageState extends ConsumerState<AccountCreatePage> {
                     interactive: false,
                   ),
                   const SizedBox(height: 20),
-                  ...FormFields.account(ref, l10n, theme,
+                  ...FormFields.account(ref,
                       api: _api,
                       nameController: _nameController,
                       descriptionController: _descriptionController,

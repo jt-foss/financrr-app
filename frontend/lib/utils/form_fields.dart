@@ -1,4 +1,3 @@
-import 'package:financrr_frontend/modules/settings/models/l10n.state.dart';
 import 'package:financrr_frontend/shared/ui/custom_replacements/custom_dropdown_field.dart';
 import 'package:financrr_frontend/shared/ui/custom_replacements/custom_text_field.dart';
 import 'package:financrr_frontend/utils/formatter/money_input_formatter.dart';
@@ -8,7 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
-import '../modules/settings/models/themes/theme.state.dart';
 import '../shared/models/store.dart';
 import 'input_utils.dart';
 
@@ -18,9 +16,7 @@ class FormFields {
   const FormFields._();
 
   static List<Widget> transaction(
-    ConsumerState state,
-    L10nState l10n,
-    ThemeState theme, {
+    ConsumerState state, {
     required Account currentAccount,
     required TextEditingController nameController,
     required TextEditingController amountController,
@@ -126,9 +122,7 @@ class FormFields {
   }
 
   static List<Widget> account(
-    WidgetRef ref,
-    L10nState l10n,
-    ThemeState theme, {
+    WidgetRef ref, {
     required Restrr api,
     required TextEditingController nameController,
     required TextEditingController descriptionController,

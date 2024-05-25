@@ -18,7 +18,6 @@ import '../../../shared/ui/cards/transaction_card.dart';
 import '../../../utils/form_fields.dart';
 import '../../accounts/views/account_page.dart';
 import '../../settings/providers/l10n.provider.dart';
-import '../../settings/providers/theme.provider.dart';
 
 class TransactionCreatePage extends StatefulHookConsumerWidget {
   static const PagePathBuilder pagePath = PagePathBuilder.child(parent: AccountPage.pagePath, path: 'transactions/create');
@@ -71,7 +70,6 @@ class _TransactionCreatePageState extends ConsumerState<TransactionCreatePage> {
 
   @override
   Widget build(BuildContext context) {
-    var theme = ref.watch(themeProvider);
     var l10n = ref.watch(l10nProvider);
 
     buildVerticalLayout(Account account, Size size) {
@@ -111,8 +109,6 @@ class _TransactionCreatePageState extends ConsumerState<TransactionCreatePage> {
                   const SizedBox(height: 20),
                   ...FormFields.transaction(
                     this,
-                    l10n,
-                    theme,
                     currentAccount: account,
                     nameController: _nameController,
                     amountController: _amountController,

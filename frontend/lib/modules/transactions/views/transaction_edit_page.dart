@@ -18,7 +18,6 @@ import '../../../shared/ui/cards/transaction_card.dart';
 import '../../../utils/form_fields.dart';
 import '../../../utils/formatter/money_input_formatter.dart';
 import '../../settings/providers/l10n.provider.dart';
-import '../../settings/providers/theme.provider.dart';
 
 class TransactionEditPage extends StatefulHookConsumerWidget {
   static const PagePathBuilder pagePath = PagePathBuilder.child(parent: TransactionPage.pagePath, path: 'edit');
@@ -94,7 +93,6 @@ class TransactionEditPageState extends ConsumerState<TransactionEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    var theme = ref.watch(themeProvider);
     var l10n = ref.watch(l10nProvider);
 
     buildVerticalLayout(Account account, Transaction transaction, Size size) {
@@ -135,8 +133,6 @@ class TransactionEditPageState extends ConsumerState<TransactionEditPage> {
                   const SizedBox(height: 20),
                   ...FormFields.transaction(
                     this,
-                    l10n,
-                    theme,
                     currentAccount: account,
                     nameController: _nameController,
                     amountController: _amountController,
