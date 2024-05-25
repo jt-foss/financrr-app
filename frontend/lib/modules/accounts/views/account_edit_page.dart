@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:financrr_frontend/modules/auth/providers/authentication.provider.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
+import 'package:financrr_frontend/utils/formatter/money_input_formatter.dart';
 import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -14,7 +15,7 @@ import '../../../shared/ui/async_wrapper.dart';
 import '../../../shared/ui/cards/account_card.dart';
 import '../../../shared/ui/custom_replacements/custom_button.dart';
 import '../../../utils/form_fields.dart';
-import '../../settings/providers/theme.provider.dart';
+import '../../settings/providers/l10n.provider.dart';
 import 'account_page.dart';
 
 class AccountEditPage extends StatefulHookConsumerWidget {
@@ -39,6 +40,7 @@ class AccountEditPageState extends ConsumerState<AccountEditPage> {
   late final TextEditingController _ibanController;
   late final TextEditingController _originalBalanceController;
 
+  int _originalBalance = 0;
   Currency? _currency;
 
   bool _isValid = false;
@@ -56,7 +58,7 @@ class AccountEditPageState extends ConsumerState<AccountEditPage> {
         _nameController = TextEditingController(text: account.name);
         _descriptionController = TextEditingController(text: account.description);
         _ibanController = TextEditingController(text: account.iban);
-        _originalBalanceController = TextEditingController(text: account.originalBalance.toString());
+        _originalBalanceController = TextEditingController();
         _currency = account.currencyId.get()!;
       }
     });
@@ -75,9 +77,20 @@ class AccountEditPageState extends ConsumerState<AccountEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    var theme = ref.watch(themeProvider);
+    var l10n = ref.watch(l10nProvider);
 
     buildVerticalLayout(Account account, Size size) {
+      final MoneyInputFormatter moneyFormatter = MoneyInputFormatter.fromCurrency(
+        currency: account.currencyId.get() ?? _api.getCurrencies().first,
+        decimalSeparator: l10n.decimalSeparator,
+        thousandSeparator: l10n.thousandSeparator,
+      );
+      if (_originalBalanceController.text.isEmpty) {
+        _originalBalanceController.text = moneyFormatter
+            .formatEditUpdate(const TextEditingValue(text: ''), TextEditingValue(text: account.originalBalance.toString()))
+            .text;
+      }
+
       return Padding(
         padding: const EdgeInsets.only(top: 10, bottom: 20),
         child: Align(
@@ -95,18 +108,21 @@ class AccountEditPageState extends ConsumerState<AccountEditPage> {
                     name: _nameController.text,
                     iban: _ibanController.text,
                     description: _descriptionController.text,
-                    balance: int.tryParse(_originalBalanceController.text) ?? 0,
+                    balance: _originalBalance,
                     currency: _currency ?? _api.getCurrencies().first,
+                    interactive: false,
                   ),
                   const SizedBox(height: 20),
-                  ...FormFields.account(ref, theme,
+                  ...FormFields.account(ref,
                       api: _api,
                       nameController: _nameController,
                       descriptionController: _descriptionController,
                       ibanController: _ibanController,
                       originalBalanceController: _originalBalanceController,
-                      onCurrencyChanged: (currency) => _currency = currency!,
-                      initialCurrency: _currency),
+                      selectedCurrency: _currency ?? _api.getCurrencies().first,
+                      moneyInputFormatter: moneyFormatter,
+                      onOriginalBalanceChanged: (balance) => setState(() => _originalBalance = balance),
+                      onCurrencyChanged: (currency) => setState(() => _currency = currency!)),
                   const SizedBox(height: 20),
                   FinancrrButton(
                     onPressed: _isValid ? () => _editAccount(account) : null,
@@ -143,7 +159,7 @@ class AccountEditPageState extends ConsumerState<AccountEditPage> {
         name: _nameController.text,
         description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
         iban: _ibanController.text.isEmpty ? null : _ibanController.text,
-        originalBalance: int.tryParse(_originalBalanceController.text) ?? 0,
+        originalBalance: _originalBalance,
         currencyId: _currency!.id.value,
       );
       if (!mounted) return;

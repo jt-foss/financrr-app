@@ -1,12 +1,12 @@
 import 'package:financrr_frontend/shared/ui/custom_replacements/custom_dropdown_field.dart';
 import 'package:financrr_frontend/shared/ui/custom_replacements/custom_text_field.dart';
+import 'package:financrr_frontend/utils/formatter/money_input_formatter.dart';
 import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:restrr/restrr.dart';
 
-import '../modules/settings/models/themes/theme.state.dart';
 import '../shared/models/store.dart';
 import 'input_utils.dart';
 
@@ -15,17 +15,21 @@ import 'input_utils.dart';
 class FormFields {
   const FormFields._();
 
-  static List<Widget> transaction(ConsumerState state, ThemeState theme,
-      {required Account currentAccount,
-      required TextEditingController nameController,
-      required TextEditingController amountController,
-      required TextEditingController descriptionController,
-      required TextEditingController executedAtController,
-      required TransactionType selectedType,
-      DateTime? executedAt,
-      Function(Set<TransactionType>)? onSelectionChanged,
-      Function(Account?)? onSecondaryChanged,
-      Function(DateTime)? onExecutedAtChanged}) {
+  static List<Widget> transaction(
+    ConsumerState state, {
+    required Account currentAccount,
+    required TextEditingController nameController,
+    required TextEditingController amountController,
+    required TextEditingController descriptionController,
+    required TextEditingController executedAtController,
+    required TransactionType selectedType,
+    required MoneyInputFormatter moneyInputFormatter,
+    DateTime? executedAt,
+    void Function(int)? onAmountChanged,
+    void Function(Set<TransactionType>)? onSelectionChanged,
+    void Function(Account?)? onSecondaryChanged,
+    void Function(DateTime)? onExecutedAtChanged,
+  }) {
     return [
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
@@ -64,8 +68,12 @@ class FormFields {
           label: L10nKey.transactionPropertiesAmount,
           validator: (value) => InputValidators.nonNull(L10nKey.transactionPropertiesAmount.toString(), value),
           required: true,
+          onChanged: (_) => onAmountChanged?.call(moneyInputFormatter.intValue),
           keyboardType: TextInputType.number,
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          inputFormatters: [
+            FilteringTextInputFormatter.digitsOnly,
+            moneyInputFormatter,
+          ],
         ),
       ),
       Padding(
@@ -113,14 +121,18 @@ class FormFields {
     ];
   }
 
-  static List<Widget> account(WidgetRef ref, ThemeState theme,
-      {required Restrr api,
-      required TextEditingController nameController,
-      required TextEditingController descriptionController,
-      required TextEditingController ibanController,
-      required TextEditingController originalBalanceController,
-      void Function(Currency?)? onCurrencyChanged,
-      Currency? initialCurrency}) {
+  static List<Widget> account(
+    WidgetRef ref, {
+    required Restrr api,
+    required TextEditingController nameController,
+    required TextEditingController descriptionController,
+    required TextEditingController ibanController,
+    required TextEditingController originalBalanceController,
+    required Currency selectedCurrency,
+    required MoneyInputFormatter moneyInputFormatter,
+    void Function(int)? onOriginalBalanceChanged,
+    void Function(Currency?)? onCurrencyChanged,
+  }) {
     return [
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
@@ -163,8 +175,9 @@ class FormFields {
           label: L10nKey.accountPropertiesOriginalBalance,
           validator: (value) => InputValidators.nonNull(L10nKey.accountPropertiesOriginalBalance.toString(), value),
           required: true,
+          onChanged: (_) => onOriginalBalanceChanged?.call(moneyInputFormatter.intValue),
           keyboardType: TextInputType.number,
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly, moneyInputFormatter],
         ),
       ),
       Padding(
@@ -173,7 +186,7 @@ class FormFields {
             label: L10nKey.accountPropertiesCurrency,
             validator: (value) => InputValidators.nonNull(L10nKey.accountPropertiesCurrency.toString(), value),
             required: true,
-            value: initialCurrency?.name,
+            value: selectedCurrency.name,
             items: api.getCurrencies().map((currency) {
               return FinancrrDropdownItem(
                 value: currency,

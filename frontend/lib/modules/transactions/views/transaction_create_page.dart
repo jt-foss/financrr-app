@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:financrr_frontend/modules/auth/providers/authentication.provider.dart';
 import 'package:financrr_frontend/shared/ui/custom_replacements/custom_button.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
+import 'package:financrr_frontend/utils/formatter/money_input_formatter.dart';
 import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -16,7 +17,7 @@ import '../../../shared/ui/async_wrapper.dart';
 import '../../../shared/ui/cards/transaction_card.dart';
 import '../../../utils/form_fields.dart';
 import '../../accounts/views/account_page.dart';
-import '../../settings/providers/theme.provider.dart';
+import '../../settings/providers/l10n.provider.dart';
 
 class TransactionCreatePage extends StatefulHookConsumerWidget {
   static const PagePathBuilder pagePath = PagePathBuilder.child(parent: AccountPage.pagePath, path: 'transactions/create');
@@ -40,6 +41,7 @@ class _TransactionCreatePageState extends ConsumerState<TransactionCreatePage> {
   late final TextEditingController _executedAtController;
 
   bool _isValid = false;
+  int _amount = 0;
   TransactionType _type = TransactionType.deposit;
   DateTime _executedAt = DateTime.now();
   Account? _secondary;
@@ -68,9 +70,19 @@ class _TransactionCreatePageState extends ConsumerState<TransactionCreatePage> {
 
   @override
   Widget build(BuildContext context) {
-    var theme = ref.watch(themeProvider);
+    var l10n = ref.watch(l10nProvider);
 
     buildVerticalLayout(Account account, Size size) {
+      final MoneyInputFormatter moneyFormatter = MoneyInputFormatter.fromCurrency(
+        currency: account.currencyId.get()!,
+        decimalSeparator: l10n.decimalSeparator,
+        thousandSeparator: l10n.thousandSeparator,
+      );
+      if (_amountController.text.isEmpty) {
+        _amountController.text =
+            moneyFormatter.formatEditUpdate(const TextEditingValue(text: ''), const TextEditingValue(text: '0')).text;
+      }
+
       return Padding(
         padding: const EdgeInsets.only(top: 10, bottom: 20),
         child: Align(
@@ -85,7 +97,7 @@ class _TransactionCreatePageState extends ConsumerState<TransactionCreatePage> {
                 children: [
                   TransactionCard.fromData(
                     id: 0,
-                    amount: int.tryParse(_amountController.text) ?? 0,
+                    amount: _amount,
                     account: account,
                     name: _nameController.text,
                     description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
@@ -97,16 +109,15 @@ class _TransactionCreatePageState extends ConsumerState<TransactionCreatePage> {
                   const SizedBox(height: 20),
                   ...FormFields.transaction(
                     this,
-                    theme,
                     currentAccount: account,
                     nameController: _nameController,
                     amountController: _amountController,
                     descriptionController: _descriptionController,
                     executedAtController: _executedAtController,
                     selectedType: _type,
-                    onSelectionChanged: (types) {
-                      setState(() => _type = types.first);
-                    },
+                    moneyInputFormatter: moneyFormatter,
+                    onAmountChanged: (amount) => setState(() => _amount = amount),
+                    onSelectionChanged: (types) => setState(() => _type = types.first),
                     onSecondaryChanged: (account) => setState(() => _secondary = account),
                     onExecutedAtChanged: (date) => setState(() => _executedAt = date),
                   ),
@@ -148,7 +159,7 @@ class _TransactionCreatePageState extends ConsumerState<TransactionCreatePage> {
       Transaction transaction = await _api.createTransaction(
           sourceId: sourceAndDest.$1,
           destinationId: sourceAndDest.$2,
-          amount: int.parse(_amountController.text),
+          amount: _amount,
           name: _nameController.text,
           description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
           executedAt: _executedAt,
