@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:financrr_frontend/modules/auth/providers/authentication.provider.dart';
 import 'package:financrr_frontend/shared/ui/custom_replacements/custom_button.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
+import 'package:financrr_frontend/utils/formatter/money_input_formatter.dart';
 import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -74,6 +75,16 @@ class _TransactionCreatePageState extends ConsumerState<TransactionCreatePage> {
     var l10n = ref.watch(l10nProvider);
 
     buildVerticalLayout(Account account, Size size) {
+      final MoneyInputFormatter moneyFormatter = MoneyInputFormatter.fromCurrency(
+        currency: account.currencyId.get()!,
+        decimalSeparator: l10n.decimalSeparator,
+        thousandSeparator: l10n.thousandSeparator,
+      );
+      if (_amountController.text.isEmpty) {
+        _amountController.text =
+            moneyFormatter.formatEditUpdate(const TextEditingValue(text: ''), const TextEditingValue(text: '0')).text;
+      }
+
       return Padding(
         padding: const EdgeInsets.only(top: 10, bottom: 20),
         child: Align(
@@ -108,6 +119,7 @@ class _TransactionCreatePageState extends ConsumerState<TransactionCreatePage> {
                     descriptionController: _descriptionController,
                     executedAtController: _executedAtController,
                     selectedType: _type,
+                    moneyInputFormatter: moneyFormatter,
                     onAmountChanged: (amount) => setState(() => _amount = amount),
                     onSelectionChanged: (types) => setState(() => _type = types.first),
                     onSecondaryChanged: (account) => setState(() => _secondary = account),

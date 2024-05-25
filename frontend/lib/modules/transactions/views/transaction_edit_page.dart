@@ -16,6 +16,7 @@ import '../../../../../routing/page_path.dart';
 import '../../../shared/ui/async_wrapper.dart';
 import '../../../shared/ui/cards/transaction_card.dart';
 import '../../../utils/form_fields.dart';
+import '../../../utils/formatter/money_input_formatter.dart';
 import '../../settings/providers/l10n.provider.dart';
 import '../../settings/providers/theme.provider.dart';
 
@@ -67,7 +68,7 @@ class TransactionEditPageState extends ConsumerState<TransactionEditPage> {
           () => _fetchTransaction().then((transaction) {
                 if (transaction != null) {
                   _nameController = TextEditingController(text: transaction.name);
-                  _amountController = TextEditingController(text: transaction.amount.toString());
+                  _amountController = TextEditingController();
                   _descriptionController = TextEditingController(text: transaction.description);
                   _executedAtController =
                       TextEditingController(text: StoreKey.dateTimeFormat.readSync()!.format(transaction.executedAt));
@@ -97,6 +98,17 @@ class TransactionEditPageState extends ConsumerState<TransactionEditPage> {
     var l10n = ref.watch(l10nProvider);
 
     buildVerticalLayout(Account account, Transaction transaction, Size size) {
+      final MoneyInputFormatter moneyFormatter = MoneyInputFormatter.fromCurrency(
+        currency: account.currencyId.get() ?? _api.getCurrencies().first,
+        decimalSeparator: l10n.decimalSeparator,
+        thousandSeparator: l10n.thousandSeparator,
+      );
+      if (_amountController.text.isEmpty) {
+        _amountController.text = moneyFormatter
+            .formatEditUpdate(const TextEditingValue(text: ''), TextEditingValue(text: transaction.amount.toString()))
+            .text;
+      }
+
       return Padding(
         padding: const EdgeInsets.only(top: 10, bottom: 20),
         child: Align(
@@ -132,6 +144,7 @@ class TransactionEditPageState extends ConsumerState<TransactionEditPage> {
                     executedAtController: _executedAtController,
                     selectedType: _type,
                     executedAt: _executedAt,
+                    moneyInputFormatter: moneyFormatter,
                     onAmountChanged: (amount) => setState(() => _amount = amount),
                     onSelectionChanged: (types) => setState(() => _type = types.first),
                     onExecutedAtChanged: (date) => setState(() => _executedAt = date),

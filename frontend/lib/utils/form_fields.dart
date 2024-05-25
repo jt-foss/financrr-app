@@ -27,16 +27,13 @@ class FormFields {
     required TextEditingController descriptionController,
     required TextEditingController executedAtController,
     required TransactionType selectedType,
+    required MoneyInputFormatter moneyInputFormatter,
     DateTime? executedAt,
     void Function(int)? onAmountChanged,
     void Function(Set<TransactionType>)? onSelectionChanged,
     void Function(Account?)? onSecondaryChanged,
     void Function(DateTime)? onExecutedAtChanged,
   }) {
-    MoneyInputFormatter moneyInputFormatter = MoneyInputFormatter.fromCurrency(
-        currency: currentAccount.currencyId.get()!,
-        decimalSeparator: l10n.decimalSeparator,
-        thousandSeparator: l10n.thousandSeparator);
     return [
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
@@ -138,11 +135,10 @@ class FormFields {
     required TextEditingController ibanController,
     required TextEditingController originalBalanceController,
     required Currency selectedCurrency,
+    required MoneyInputFormatter moneyInputFormatter,
     void Function(int)? onOriginalBalanceChanged,
     void Function(Currency?)? onCurrencyChanged,
   }) {
-    MoneyInputFormatter moneyInputFormatter = MoneyInputFormatter.fromCurrency(
-        currency: selectedCurrency, decimalSeparator: l10n.decimalSeparator, thousandSeparator: l10n.thousandSeparator);
     return [
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),

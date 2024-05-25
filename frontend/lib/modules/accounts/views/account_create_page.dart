@@ -1,5 +1,6 @@
 import 'package:financrr_frontend/modules/auth/providers/authentication.provider.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
+import 'package:financrr_frontend/utils/formatter/money_input_formatter.dart';
 import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -60,6 +61,16 @@ class _AccountCreatePageState extends ConsumerState<AccountCreatePage> {
     var theme = ref.watch(themeProvider);
     var l10n = ref.watch(l10nProvider);
 
+    final MoneyInputFormatter moneyFormatter = MoneyInputFormatter.fromCurrency(
+      currency: _selectedCurrency ?? _api.getCurrencies().first,
+      decimalSeparator: l10n.decimalSeparator,
+      thousandSeparator: l10n.thousandSeparator,
+    );
+    if (_originalBalanceController.text.isEmpty) {
+      _originalBalanceController.text =
+          moneyFormatter.formatEditUpdate(const TextEditingValue(text: ''), const TextEditingValue(text: '0')).text;
+    }
+
     buildVerticalLayout(Size size) {
       return Padding(
         padding: const EdgeInsets.only(top: 10, bottom: 20),
@@ -80,6 +91,7 @@ class _AccountCreatePageState extends ConsumerState<AccountCreatePage> {
                     description: _descriptionController.text,
                     balance: _originalBalance,
                     currency: _selectedCurrency ?? _api.getCurrencies().first,
+                    interactive: false,
                   ),
                   const SizedBox(height: 20),
                   ...FormFields.account(ref, l10n, theme,
@@ -89,6 +101,7 @@ class _AccountCreatePageState extends ConsumerState<AccountCreatePage> {
                       ibanController: _ibanController,
                       originalBalanceController: _originalBalanceController,
                       selectedCurrency: _selectedCurrency ?? _api.getCurrencies().first,
+                      moneyInputFormatter: moneyFormatter,
                       onOriginalBalanceChanged: (balance) => setState(() => _originalBalance = balance),
                       onCurrencyChanged: (currency) => setState(() => _selectedCurrency = currency!)),
                   const SizedBox(height: 20),
