@@ -1,0 +1,33 @@
+services:
+  hurl:
+    build:
+      dockerfile: docker/hurl/Dockerfile
+    init: true
+    volumes:
+      - ./tests:/tests
+    environment:
+      HURL_admin_token: ${HURL_admin_token}
+      HURL_base_url: http://rust:8080
+      HURL_api_v1: http://rust:8080/api/v1
+
+  rust:
+    ports: []
+    container_name: financrr-backend-test
+    env_file:
+      - .env.test
+
+  db:
+    volumes:
+      - postgres-data-test:/var/lib/postgresql/data
+      - ./docker/db/postgresql.conf:/etc/postgresql.conf
+    ports: []
+
+  cache:
+    volumes:
+      - dragonflydata-test:/data
+    ports: []
+
+
+volumes:
+  postgres-data-test: ~
+  dragonflydata-test: ~

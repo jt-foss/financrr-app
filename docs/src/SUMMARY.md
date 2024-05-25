@@ -10,4 +10,5 @@ Everything here is still work in progress and subject to change!
     - [Backend](features/backend.md)
 - [API](api/README.md)
   - [Api Error](api/Error.md)
+  - [Recurring Rule](api/RecurringRule.md)
 - [Database](db/README.md) 

@@ -1,5 +1,7 @@
-import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
-import 'package:financrr_frontend/utils/text_utils.dart';
+import 'package:financrr_frontend/shared/ui/custom_replacements/custom_dropdown_field.dart';
+import 'package:financrr_frontend/shared/ui/custom_replacements/custom_text_field.dart';
+import 'package:financrr_frontend/utils/formatter/money_input_formatter.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -13,17 +15,21 @@ import 'input_utils.dart';
 class FormFields {
   const FormFields._();
 
-  static List<Widget> transaction(ConsumerState state,
-      {required Account currentAccount,
-      required TextEditingController nameController,
-      required TextEditingController amountController,
-      required TextEditingController descriptionController,
-      required TextEditingController executedAtController,
-      required TransactionType selectedType,
-      DateTime? executedAt,
-      Function(Set<TransactionType>)? onSelectionChanged,
-      Function(Account?)? onSecondaryChanged,
-      Function(DateTime)? onExecutedAtChanged}) {
+  static List<Widget> transaction(
+    ConsumerState state, {
+    required Account currentAccount,
+    required TextEditingController nameController,
+    required TextEditingController amountController,
+    required TextEditingController descriptionController,
+    required TextEditingController executedAtController,
+    required TransactionType selectedType,
+    required MoneyInputFormatter moneyInputFormatter,
+    DateTime? executedAt,
+    void Function(int)? onAmountChanged,
+    void Function(Set<TransactionType>)? onSelectionChanged,
+    void Function(Account?)? onSecondaryChanged,
+    void Function(DateTime)? onExecutedAtChanged,
+  }) {
     return [
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
@@ -31,50 +37,52 @@ class FormFields {
           width: double.infinity,
           child: SegmentedButton(
             onSelectionChanged: onSelectionChanged,
-            segments: const [
-              ButtonSegment(label: Text('Deposit'), value: TransactionType.deposit),
-              ButtonSegment(label: Text('Withdrawal'), value: TransactionType.withdrawal),
-              ButtonSegment(label: Text('Transfer'), value: TransactionType.transfer),
+            segments: [
+              ButtonSegment(label: L10nKey.transactionCreateDeposit.toText(), value: TransactionType.deposit),
+              ButtonSegment(label: L10nKey.transactionCreateWithdrawal.toText(), value: TransactionType.withdrawal),
+              ButtonSegment(label: L10nKey.transactionCreateTransfer.toText(), value: TransactionType.transferOut),
             ],
             selected: {selectedType},
           ),
         ),
       ),
-      if (selectedType == TransactionType.transfer)
+      if (selectedType == TransactionType.transferOut)
         Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: DropdownButtonFormField(
-              decoration: const InputDecoration(labelText: 'Transfer To'),
-              validator: (value) => InputValidators.nonNull('Transfer To', value?.id.value.toString()),
+            child: FinancrrDropdownField(
+              label: L10nKey.transactionCreateTransferTo,
+              validator: (value) => InputValidators.nonNull(L10nKey.transactionCreateTransferTo.toString(), value),
+              required: true,
               items: currentAccount.api
                   .getAccounts()
                   .where((account) => account.id.value != currentAccount.id.value)
                   .map((account) {
-                return DropdownMenuItem(
-                  value: account,
-                  child: Text(account.name, style: state.ref.textTheme.bodyMedium),
-                );
+                return FinancrrDropdownItem(value: account, label: account.name);
               }).toList(),
               onChanged: onSecondaryChanged,
             )),
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
-        child: TextFormField(
+        child: FinancrrTextField(
           controller: amountController,
-          decoration: const InputDecoration(labelText: 'Amount'),
-          validator: (value) => InputValidators.nonNull('Amount', value),
+          label: L10nKey.transactionPropertiesAmount,
+          validator: (value) => InputValidators.nonNull(L10nKey.transactionPropertiesAmount.toString(), value),
+          required: true,
+          onChanged: (_) => onAmountChanged?.call(moneyInputFormatter.intValue),
+          keyboardType: TextInputType.number,
           inputFormatters: [
             FilteringTextInputFormatter.digitsOnly,
-            LengthLimitingTextInputFormatter(6),
+            moneyInputFormatter,
           ],
         ),
       ),
       Padding(
         padding: const EdgeInsets.only(bottom: 10),
-        child: TextFormField(
+        child: FinancrrTextField(
           controller: nameController,
-          decoration: const InputDecoration(labelText: 'Name'),
-          validator: (value) => InputValidators.nonNull('Name', value),
+          label: L10nKey.transactionPropertiesName,
+          validator: (value) => InputValidators.nonNull(L10nKey.transactionPropertiesName.toString(), value),
+          required: true,
           inputFormatters: [
             LengthLimitingTextInputFormatter(32),
           ],
@@ -82,9 +90,9 @@ class FormFields {
       ),
       Padding(
         padding: const EdgeInsets.only(bottom: 10),
-        child: TextFormField(
+        child: FinancrrTextField(
           controller: descriptionController,
-          decoration: const InputDecoration(labelText: 'Description'),
+          label: L10nKey.transactionPropertiesDescription,
           inputFormatters: [
             LengthLimitingTextInputFormatter(32),
           ],
@@ -92,7 +100,7 @@ class FormFields {
       ),
       Padding(
         padding: const EdgeInsets.only(bottom: 10),
-        child: TextFormField(
+        child: FinancrrTextField(
           onTap: () async {
             final DateTime? date = await showDatePicker(
               context: state.context,
@@ -101,34 +109,38 @@ class FormFields {
             );
             if (date == null || !state.mounted) return;
             final TimeOfDay? time = await showTimePicker(
-                context: state.context,
-                initialTime: executedAt != null ? TimeOfDay.fromDateTime(executedAt) : TimeOfDay.now());
+                context: state.context, initialTime: executedAt != null ? TimeOfDay.fromDateTime(executedAt) : TimeOfDay.now());
             if (time == null) return;
             onExecutedAtChanged?.call(date.copyWith(hour: time.hour, minute: time.minute));
           },
           initialValue: StoreKey.dateTimeFormat.readSync()!.format(executedAt ?? DateTime.now()),
           readOnly: true,
-          decoration: const InputDecoration(labelText: 'Executed At'),
+          label: L10nKey.transactionPropertiesExecutedAt,
         ),
       )
     ];
   }
 
-  static List<Widget> account(WidgetRef ref,
-      {required Restrr api,
-      required TextEditingController nameController,
-      required TextEditingController descriptionController,
-      required TextEditingController ibanController,
-      required TextEditingController originalBalanceController,
-      void Function(Currency?)? onCurrencyChanged,
-      Currency? initialCurrency}) {
+  static List<Widget> account(
+    WidgetRef ref, {
+    required Restrr api,
+    required TextEditingController nameController,
+    required TextEditingController descriptionController,
+    required TextEditingController ibanController,
+    required TextEditingController originalBalanceController,
+    required Currency selectedCurrency,
+    required MoneyInputFormatter moneyInputFormatter,
+    void Function(int)? onOriginalBalanceChanged,
+    void Function(Currency?)? onCurrencyChanged,
+  }) {
     return [
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
-        child: TextFormField(
+        child: FinancrrTextField(
           controller: nameController,
-          decoration: const InputDecoration(labelText: 'Name'),
-          validator: (value) => InputValidators.nonNull('Name', value),
+          label: L10nKey.accountPropertiesName,
+          validator: (value) => InputValidators.nonNull(L10nKey.accountPropertiesName.toString(), value),
+          required: true,
           inputFormatters: [
             LengthLimitingTextInputFormatter(32),
           ],
@@ -136,9 +148,9 @@ class FormFields {
       ),
       Padding(
         padding: const EdgeInsets.only(bottom: 10),
-        child: TextFormField(
+        child: FinancrrTextField(
           controller: descriptionController,
-          decoration: const InputDecoration(labelText: 'Description'),
+          label: L10nKey.accountPropertiesDescription,
           inputFormatters: [
             LengthLimitingTextInputFormatter(64),
           ],
@@ -146,11 +158,10 @@ class FormFields {
       ),
       Padding(
         padding: const EdgeInsets.only(bottom: 10),
-        child: TextFormField(
+        child: FinancrrTextField(
           controller: ibanController,
-          decoration: const InputDecoration(labelText: 'IBAN'),
-          validator: (value) =>
-              value == null || value.trim().isEmpty || TextUtils.formatIBAN(value) != null ? null : 'Invalid IBAN',
+          label: L10nKey.accountPropertiesIban,
+          validator: (value) => InputValidators.iban(value),
           inputFormatters: [
             FilteringTextInputFormatter.deny(RegExp(r'\s')),
             LengthLimitingTextInputFormatter(22),
@@ -159,25 +170,27 @@ class FormFields {
       ),
       Padding(
         padding: const EdgeInsets.only(bottom: 10),
-        child: TextFormField(
+        child: FinancrrTextField(
           controller: originalBalanceController,
-          decoration: const InputDecoration(labelText: 'Original Balance'),
-          validator: (value) => InputValidators.nonNull('Original Balance', value),
-          inputFormatters: [
-            FilteringTextInputFormatter.digitsOnly,
-          ],
+          label: L10nKey.accountPropertiesOriginalBalance,
+          validator: (value) => InputValidators.nonNull(L10nKey.accountPropertiesOriginalBalance.toString(), value),
+          required: true,
+          onChanged: (_) => onOriginalBalanceChanged?.call(moneyInputFormatter.intValue),
+          keyboardType: TextInputType.number,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly, moneyInputFormatter],
         ),
       ),
       Padding(
         padding: const EdgeInsets.only(bottom: 10),
-        child: DropdownButtonFormField(
-            decoration: const InputDecoration(labelText: 'Currency'),
-            validator: (value) => InputValidators.nonNull('Currency', value?.id.value.toString()),
-            value: initialCurrency,
+        child: FinancrrDropdownField(
+            label: L10nKey.accountPropertiesCurrency,
+            validator: (value) => InputValidators.nonNull(L10nKey.accountPropertiesCurrency.toString(), value),
+            required: true,
+            value: selectedCurrency.name,
             items: api.getCurrencies().map((currency) {
-              return DropdownMenuItem(
+              return FinancrrDropdownItem(
                 value: currency,
-                child: Text('${currency.name} (${currency.symbol})', style: ref.textTheme.bodyMedium),
+                label: '${currency.name} (${currency.symbol})',
               );
             }).toList(),
             onChanged: onCurrencyChanged),
@@ -194,11 +207,12 @@ class FormFields {
     return [
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
-        child: TextFormField(
+        child: FinancrrTextField(
           controller: nameController,
           readOnly: readOnly,
-          decoration: const InputDecoration(labelText: 'Name'),
-          validator: (value) => InputValidators.nonNull('Name', value),
+          label: L10nKey.currencyPropertiesName,
+          validator: (value) => InputValidators.nonNull(L10nKey.currencyPropertiesName.toString(), value),
+          required: true,
           inputFormatters: [
             LengthLimitingTextInputFormatter(32),
           ],
@@ -206,11 +220,12 @@ class FormFields {
       ),
       Padding(
         padding: const EdgeInsets.only(bottom: 10),
-        child: TextFormField(
+        child: FinancrrTextField(
           controller: symbolController,
           readOnly: readOnly,
-          decoration: const InputDecoration(labelText: 'Symbol'),
-          validator: (value) => InputValidators.nonNull('Symbol', value),
+          label: L10nKey.currencyPropertiesSymbol,
+          validator: (value) => InputValidators.nonNull(L10nKey.currencyPropertiesSymbol.toString(), value),
+          required: true,
           inputFormatters: [
             LengthLimitingTextInputFormatter(6),
           ],
@@ -218,10 +233,10 @@ class FormFields {
       ),
       Padding(
         padding: const EdgeInsets.only(bottom: 10),
-        child: TextFormField(
+        child: FinancrrTextField(
           controller: isoCodeController,
           readOnly: readOnly,
-          decoration: const InputDecoration(labelText: 'ISO Code'),
+          label: L10nKey.currencyPropertiesIsoCode,
           inputFormatters: [
             LengthLimitingTextInputFormatter(3),
           ],
@@ -229,11 +244,13 @@ class FormFields {
       ),
       Padding(
         padding: const EdgeInsets.only(bottom: 10),
-        child: TextFormField(
+        child: FinancrrTextField(
           controller: decimalPlacesController,
           readOnly: readOnly,
-          decoration: const InputDecoration(labelText: 'Decimal Places'),
-          validator: (value) => InputValidators.nonNull('Decimal Places', value),
+          label: L10nKey.currencyPropertiesDecimalPlaces,
+          validator: (value) => InputValidators.nonNull(L10nKey.currencyPropertiesDecimalPlaces.toString(), value),
+          required: true,
+          keyboardType: TextInputType.number,
           inputFormatters: [
             FilteringTextInputFormatter.digitsOnly,
             LengthLimitingTextInputFormatter(1),

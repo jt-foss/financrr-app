@@ -16,7 +16,7 @@ pub(crate) struct AccountDTO {
     pub(crate) name: String,
     #[validate(length(max = 25000))]
     pub(crate) description: Option<String>,
-    #[validate(custom = "validate_iban")]
+    #[validate(custom(function = validate_iban))]
     pub(crate) iban: Option<String>,
     pub(crate) original_balance: i64,
     pub(crate) currency_id: i32,

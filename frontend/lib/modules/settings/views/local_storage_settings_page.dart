@@ -19,46 +19,49 @@ class LocalStorageSettingsPage extends StatefulHookConsumerWidget {
 class _LocalStorageSettingsPageState extends ConsumerState<LocalStorageSettingsPage> {
   @override
   Widget build(BuildContext context) {
-    return AdaptiveScaffold(
-      resizeToAvoidBottomInset: false,
-      verticalBuilder: (_, __, size) => SafeArea(child: _buildVerticalLayout(size)),
-    );
-  }
+    var theme = ref.watch(themeProvider);
 
-  Widget _buildVerticalLayout(Size size) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10, bottom: 20),
-      child: Center(
-        child: SizedBox(
-          width: size.width / 1.1,
-          child: ListView(
-            children: [
-              Table(
-                border: TableBorder.all(color: ref.themeData.dividerColor),
-                children: [
-                  for (StoreKey key in StoreKey.values)
-                    TableRow(
-                      children: [
-                        _buildTableCell(key.key),
-                        _buildTableCell(_readKey(key)),
-                      ],
-                    ),
-                ],
-              )
-            ],
+    buildTableCell(String text, {bool isKey = false}) {
+      return GestureDetector(
+        onTap: () => CommonActions.copyToClipboard(this, text),
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Text(text),
+        ),
+      );
+    }
+
+    buildVerticalLayout(Size size) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 10, bottom: 20),
+        child: Center(
+          child: SizedBox(
+            width: size.width / 1.1,
+            child: ListView(
+              children: [
+                Table(
+                  border: TableBorder.all(
+                      borderRadius: BorderRadius.circular(10), color: theme.financrrExtension.surfaceVariant1, width: 3),
+                  children: [
+                    for (StoreKey key in StoreKey.values)
+                      TableRow(
+                        children: [
+                          buildTableCell(key.key),
+                          buildTableCell(_readKey(key)),
+                        ],
+                      ),
+                  ],
+                )
+              ],
+            ),
           ),
         ),
-      ),
-    );
-  }
+      );
+    }
 
-  Widget _buildTableCell(String text) {
-    return GestureDetector(
-      onTap: () => CommonActions.copyToClipboard(this, text),
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Text(text),
-      ),
+    return AdaptiveScaffold(
+      resizeToAvoidBottomInset: false,
+      verticalBuilder: (_, __, size) => buildVerticalLayout(size),
     );
   }
 

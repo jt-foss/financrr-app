@@ -5,6 +5,7 @@ import 'package:financrr_frontend/modules/auth/providers/authentication.provider
 import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/modules/settings/views/currency_create_page.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -13,6 +14,7 @@ import 'package:restrr/restrr.dart';
 import '../../../shared/ui/adaptive_scaffold.dart';
 import '../../../../routing/page_path.dart';
 import '../../../shared/ui/async_wrapper.dart';
+import '../../../shared/ui/custom_replacements/custom_button.dart';
 import '../../../utils/form_fields.dart';
 import 'currency_settings_page.dart';
 
@@ -78,86 +80,81 @@ class _CurrencyEditPageState extends ConsumerState<CurrencyEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    return AdaptiveScaffold(verticalBuilder: (_, __, size) => SafeArea(child: _handleCurrencyStream(size)));
-  }
+    var theme = ref.watch(themeProvider);
 
-  Widget _handleCurrencyStream(Size size) {
-    return StreamWrapper(
-      stream: _currencyStreamController.stream,
-      onSuccess: (ctx, snap) {
-        return _buildVerticalLayout(snap.data!, size);
-      },
-      onLoading: (ctx, snap) {
-        return const Center(child: CircularProgressIndicator());
-      },
-      onError: (ctx, snap) {
-        return const Text('Could not find currency');
-      },
-    );
-  }
-
-  Widget _buildVerticalLayout(Currency currency, Size size) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10, bottom: 20),
-      child: Align(
-        alignment: Alignment.topCenter,
-        child: SizedBox(
-          width: size.width / 1.1,
-          child: SingleChildScrollView(
-              child: Form(
-            key: _formKey,
-            onChanged: () => setState(() => _isValid = _formKey.currentState?.validate() ?? false),
-            child: Column(
-              children: [
-                ...CurrencyCreatePage.buildCurrencyPreview(
-                    size: size,
-                    symbol: _symbolController.text,
-                    name: _nameController.text,
-                    isoCode: _isoCodeController.text,
-                    decimalPlaces: _decimalPlacesController.text,
-                    previewAmount: _randomNumber),
-                const Divider(),
-                ...FormFields.currency(
-                    nameController: _nameController,
-                    symbolController: _symbolController,
-                    isoCodeController: _isoCodeController,
-                    decimalPlacesController: _decimalPlacesController,
-                    readOnly: !_isCustom),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
+    buildVerticalLayout(Currency currency, Size size) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 10, bottom: 20),
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: SizedBox(
+            width: size.width / 1.1,
+            child: SingleChildScrollView(
+                child: Form(
+              key: _formKey,
+              onChanged: () => setState(() => _isValid = _formKey.currentState?.validate() ?? false),
+              child: Column(
+                children: [
+                  ...CurrencyCreatePage.buildCurrencyPreview(
+                      size: size,
+                      symbol: _symbolController.text,
+                      name: _nameController.text,
+                      isoCode: _isoCodeController.text,
+                      decimalPlaces: _decimalPlacesController.text,
+                      previewAmount: _randomNumber),
+                  const SizedBox(height: 20),
+                  ...FormFields.currency(
+                      nameController: _nameController,
+                      symbolController: _symbolController,
+                      isoCodeController: _isoCodeController,
+                      decimalPlacesController: _decimalPlacesController,
+                      readOnly: !_isCustom),
+                  const SizedBox(height: 20),
+                  FinancrrButton(
                     onPressed: _isValid && _isCustom ? () => _editCurrency(currency as CustomCurrency) : null,
-                    child: Text(_nameController.text.isEmpty ? 'Edit Currency' : 'Edit "${_nameController.text}"'),
+                    text: _nameController.text.isEmpty
+                        ? L10nKey.currencyEdit.toString()
+                        : L10nKey.commonEditObject.toString(namedArgs: {'object': _nameController.text}),
                   ),
-                ),
-                if (!_isCustom)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10),
-                    child: SizedBox(
-                      width: size.width,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.warning_amber_rounded),
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.only(left: 10),
-                              child: Text('This currency is not custom and can therefore not be edited!',
-                                  style: ref.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700)),
+                  if (!_isCustom)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: SizedBox(
+                        width: size.width,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.warning_amber_rounded),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 10),
+                                child: L10nKey.currencyNotEditable
+                                    .toText(style: theme.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700)),
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  )
-              ],
-            ),
-          )),
+                    )
+                ],
+              ),
+            )),
+          ),
         ),
-      ),
-    );
+      );
+    }
+
+    handleCurrencyStream(Size size) {
+      return StreamWrapper(
+        stream: _currencyStreamController.stream,
+        onSuccess: (ctx, snap) => buildVerticalLayout(snap.data!, size),
+        onLoading: (ctx, snap) => const Center(child: CircularProgressIndicator()),
+        onError: (ctx, snap) => L10nKey.currencyNotFound.toText(),
+      );
+    }
+
+    return AdaptiveScaffold(verticalBuilder: (_, __, size) => handleCurrencyStream(size));
   }
 
   Future<void> _editCurrency(CustomCurrency currency) async {
@@ -170,7 +167,7 @@ class _CurrencyEditPageState extends ConsumerState<CurrencyEditPage> {
         isoCode: _isoCodeController.text.isEmpty ? null : _isoCodeController.text,
       );
       if (!mounted) return;
-      context.showSnackBar('Successfully edited "${_nameController.text}"');
+      L10nKey.commonEditObjectSuccess.showSnack(context, namedArgs: {'object': _nameController.text});
       context.pop();
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);

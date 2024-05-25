@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:financrr_frontend/modules/auth/providers/authentication.provider.dart';
 import 'package:financrr_frontend/modules/transactions/views/transaction_page.dart';
+import 'package:financrr_frontend/shared/ui/custom_replacements/custom_button.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -12,8 +14,10 @@ import '../../../shared/models/store.dart';
 import '../../../shared/ui/adaptive_scaffold.dart';
 import '../../../../../routing/page_path.dart';
 import '../../../shared/ui/async_wrapper.dart';
-import '../../../shared/ui/transaction_card.dart';
+import '../../../shared/ui/cards/transaction_card.dart';
 import '../../../utils/form_fields.dart';
+import '../../../utils/formatter/money_input_formatter.dart';
+import '../../settings/providers/l10n.provider.dart';
 
 class TransactionEditPage extends StatefulHookConsumerWidget {
   static const PagePathBuilder pagePath = PagePathBuilder.child(parent: TransactionPage.pagePath, path: 'edit');
@@ -40,6 +44,7 @@ class TransactionEditPageState extends ConsumerState<TransactionEditPage> {
   late final TextEditingController _executedAtController;
 
   bool _isValid = false;
+  int _amount = 0;
   TransactionType _type = TransactionType.deposit;
   DateTime _executedAt = DateTime.now();
 
@@ -56,18 +61,18 @@ class TransactionEditPageState extends ConsumerState<TransactionEditPage> {
   @override
   void initState() {
     super.initState();
-    _fetchAccount().then((_) {
+    _fetchAccount().then((account) {
       Future.delayed(
           const Duration(milliseconds: 100),
           () => _fetchTransaction().then((transaction) {
                 if (transaction != null) {
                   _nameController = TextEditingController(text: transaction.name);
-                  _amountController = TextEditingController(text: transaction.amount.toString());
+                  _amountController = TextEditingController();
                   _descriptionController = TextEditingController(text: transaction.description);
                   _executedAtController =
                       TextEditingController(text: StoreKey.dateTimeFormat.readSync()!.format(transaction.executedAt));
                   _isValid = _formKey.currentState?.validate() ?? false;
-                  _type = transaction.type;
+                  _type = transaction.getType(account!);
                   _executedAt = transaction.executedAt;
                 }
               }));
@@ -88,103 +93,109 @@ class TransactionEditPageState extends ConsumerState<TransactionEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    return AdaptiveScaffold(verticalBuilder: (_, __, size) => SafeArea(child: _handleAccountStream(size)));
-  }
+    var l10n = ref.watch(l10nProvider);
 
-  Widget _handleAccountStream(Size size) {
-    return StreamWrapper(
-      stream: _accountStreamController.stream,
-      onSuccess: (ctx, snap) => _handleTransactionStream(snap.data!, size),
-      onLoading: (_, __) => const Center(child: CircularProgressIndicator()),
-      onError: (_, __) => const Text('Could not find account'),
-    );
-  }
+    buildVerticalLayout(Account account, Transaction transaction, Size size) {
+      final MoneyInputFormatter moneyFormatter = MoneyInputFormatter.fromCurrency(
+        currency: account.currencyId.get() ?? _api.getCurrencies().first,
+        decimalSeparator: l10n.decimalSeparator,
+        thousandSeparator: l10n.thousandSeparator,
+      );
+      if (_amountController.text.isEmpty) {
+        _amountController.text = moneyFormatter
+            .formatEditUpdate(const TextEditingValue(text: ''), TextEditingValue(text: transaction.amount.toString()))
+            .text;
+      }
 
-  Widget _handleTransactionStream(Account account, Size size) {
-    return StreamWrapper(
-      stream: _transactionStreamController.stream,
-      onSuccess: (ctx, snap) => _buildVerticalLayout(account, snap.data!, size),
-      onLoading: (_, __) => const Center(child: CircularProgressIndicator()),
-      onError: (_, __) => const Text('Could not find transaction'),
-    );
-  }
-
-  Widget _buildVerticalLayout(Account account, Transaction transaction, Size size) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10, bottom: 20),
-      child: Align(
-        alignment: Alignment.topCenter,
-        child: SizedBox(
-          width: size.width / 1.1,
-          child: SingleChildScrollView(
-              child: Form(
-            key: _formKey,
-            onChanged: () => setState(() => _isValid = _formKey.currentState?.validate() ?? false),
-            child: Column(
-              children: [
-                TransactionCard.fromData(
-                  id: 0,
-                  amount: int.tryParse(_amountController.text) ?? 0,
-                  account: account,
-                  name: _nameController.text,
-                  description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
-                  type: _type,
-                  createdAt: DateTime.now(),
-                  executedAt: _executedAt,
-                  interactive: false,
-                ),
-                const Divider(),
-                ...FormFields.transaction(
-                  this,
-                  currentAccount: account,
-                  nameController: _nameController,
-                  amountController: _amountController,
-                  descriptionController: _descriptionController,
-                  executedAtController: _executedAtController,
-                  selectedType: _type,
-                  executedAt: _executedAt,
-                  onSelectionChanged: (types) {
-                    setState(() => _type = types.first);
-                  },
-                  onExecutedAtChanged: (date) {
-                    setState(() => _executedAt = date);
-                  },
-                ),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _isValid ? () => _editTransaction(account, transaction, _type) : null,
-                    child: const Text('Edit Transaction'),
+      return Padding(
+        padding: const EdgeInsets.only(top: 10, bottom: 20),
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: SizedBox(
+            width: size.width / 1.1,
+            child: SingleChildScrollView(
+                child: Form(
+              key: _formKey,
+              onChanged: () => setState(() => _isValid = _formKey.currentState?.validate() ?? false),
+              child: Column(
+                children: [
+                  TransactionCard.fromData(
+                    id: 0,
+                    amount: _amount,
+                    account: account,
+                    name: _nameController.text,
+                    description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
+                    type: _type,
+                    createdAt: DateTime.now(),
+                    executedAt: _executedAt,
+                    interactive: false,
                   ),
-                ),
-              ],
-            ),
-          )),
+                  const SizedBox(height: 20),
+                  ...FormFields.transaction(
+                    this,
+                    currentAccount: account,
+                    nameController: _nameController,
+                    amountController: _amountController,
+                    descriptionController: _descriptionController,
+                    executedAtController: _executedAtController,
+                    selectedType: _type,
+                    executedAt: _executedAt,
+                    moneyInputFormatter: moneyFormatter,
+                    onAmountChanged: (amount) => setState(() => _amount = amount),
+                    onSelectionChanged: (types) => setState(() => _type = types.first),
+                    onExecutedAtChanged: (date) => setState(() => _executedAt = date),
+                  ),
+                  const SizedBox(height: 20),
+                  FinancrrButton(
+                    onPressed: _isValid ? () => _editTransaction(account, transaction, _type) : null,
+                    text: L10nKey.transactionEdit.toString(),
+                  ),
+                ],
+              ),
+            )),
+          ),
         ),
-      ),
-    );
+      );
+    }
+
+    handleTransactionStream(Account account, Size size) {
+      return StreamWrapper(
+          stream: _transactionStreamController.stream,
+          onSuccess: (_, snap) => buildVerticalLayout(account, snap.data!, size),
+          onLoading: (_, __) => const Center(child: CircularProgressIndicator()),
+          onError: (_, __) => L10nKey.transactionNotFound.toText());
+    }
+
+    handleAccountStream(Size size) {
+      return StreamWrapper(
+          stream: _accountStreamController.stream,
+          onSuccess: (_, snap) => handleTransactionStream(snap.data!, size),
+          onLoading: (_, __) => const Center(child: CircularProgressIndicator()),
+          onError: (_, __) => L10nKey.accountNotFound.toText());
+    }
+
+    return AdaptiveScaffold(verticalBuilder: (_, __, size) => handleAccountStream(size));
   }
 
-  Future<void> _editTransaction(Account account, Transaction transaction, TransactionType type,
-      {Account? secondary}) async {
+  Future<void> _editTransaction(Account account, Transaction transaction, TransactionType type, {Account? secondary}) async {
     if (!_isValid) return;
     final (Id?, Id?) sourceAndDest = switch (_type) {
       TransactionType.deposit => (null, account.id.value),
       TransactionType.withdrawal => (account.id.value, null),
-      TransactionType.transfer => (account.id.value, secondary!.id.value),
+      TransactionType.transferOut => (account.id.value, secondary!.id.value),
+      TransactionType.transferIn => (secondary!.id.value, account.id.value),
     };
     try {
       await transaction.update(
           sourceId: sourceAndDest.$1,
           destinationId: sourceAndDest.$2,
-          amount: int.parse(_amountController.text),
+          amount: _amount,
           name: _nameController.text,
           description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
           executedAt: _executedAt,
           currencyId: account.currencyId.value);
       if (!mounted) return;
-      context.showSnackBar('Successfully edited transaction');
+      L10nKey.commonEditObjectSuccess.showSnack(context, namedArgs: {'object': transaction.name});
       context.pop();
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);

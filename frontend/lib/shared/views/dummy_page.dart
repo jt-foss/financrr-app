@@ -15,7 +15,7 @@ class DummyPage extends StatefulWidget {
 class _DummyPageState extends State<DummyPage> {
   @override
   Widget build(BuildContext context) {
-    return AdaptiveScaffold(verticalBuilder: (_, __, size) => SafeArea(child: _buildVerticalLayout(size)));
+    return AdaptiveScaffold(verticalBuilder: (_, __, size) => _buildVerticalLayout(size));
   }
 
   Widget _buildVerticalLayout(Size size) {
@@ -27,9 +27,7 @@ class _DummyPageState extends State<DummyPage> {
           child: ListView(
             children: const [
               NoticeCard(
-                  iconData: Icons.bar_chart_rounded,
-                  title: 'Statistics',
-                  description: 'There will be content here soon!'),
+                  iconData: Icons.leaderboard_outlined, title: 'Statistics', description: 'There will be content here soon!'),
             ],
           ),
         ),

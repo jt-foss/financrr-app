@@ -32,12 +32,16 @@ async fn transaction_created(event: TransactionCreation) -> Result<(), ApiError>
 async fn transaction_updated(event: TransactionUpdate) -> Result<(), ApiError> {
     let old_transaction = event.old_transaction;
     let new_transaction = event.new_transaction;
+
+    // Reverse the effect of the old transaction
     if let Some(source) = old_transaction.source_id {
         update_account_balance(source.fetch_inner().await?, old_transaction.amount).await?;
     }
     if let Some(destination) = old_transaction.destination_id {
         update_account_balance(destination.fetch_inner().await?, -old_transaction.amount).await?;
     }
+
+    // Apply the new transaction
     if let Some(source) = new_transaction.source_id {
         update_account_balance(source.fetch_inner().await?, -new_transaction.amount).await?;
     }

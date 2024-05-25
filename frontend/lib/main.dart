@@ -7,6 +7,7 @@ import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart
 import 'package:financrr_frontend/routing/router.dart';
 import 'package:financrr_frontend/shared/models/store.dart';
 import 'package:financrr_frontend/shared/ui/fallback_error_app.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,8 +18,8 @@ import 'package:logging/logging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'modules/settings/models/log_entry.model.dart';
-import 'modules/settings/models/theme.model.dart';
-import 'modules/settings/models/theme_loader.dart';
+import 'modules/settings/models/themes/app_theme.model.dart';
+import 'modules/settings/models/themes/theme_loader.dart';
 
 Logger _log = Logger('GenericLogger');
 
@@ -28,6 +29,7 @@ void main() async {
   try {
     app = await initApp();
   } catch (e, stackTrace) {
+    _log.severe('Error during initialization: $e\n\n$stackTrace');
     app = FallbackErrorApp(error: e.toString(), stackTrace: stackTrace.toString());
   }
   runApp(app);
@@ -83,8 +85,7 @@ class FinancrrApp extends StatefulHookConsumerWidget {
   final AppTheme currentLightTheme;
   final AppTheme currentDarkTheme;
 
-  const FinancrrApp(
-      {super.key, required this.themeMode, required this.currentLightTheme, required this.currentDarkTheme});
+  const FinancrrApp({super.key, required this.themeMode, required this.currentLightTheme, required this.currentDarkTheme});
 
   @override
   ConsumerState<FinancrrApp> createState() => FinancrrAppState();
@@ -106,7 +107,7 @@ class FinancrrAppState extends ConsumerState<FinancrrApp> {
     var theme = ref.watch(themeProvider);
 
     return MaterialApp.router(
-        onGenerateTitle: (ctx) => 'brand_name'.tr(),
+        onGenerateTitle: (ctx) => L10nKey.brandName.toString(),
         routerConfig: router.goRouter,
         debugShowCheckedModeBanner: false,
         scrollBehavior: CustomScrollBehavior(),
@@ -123,8 +124,7 @@ class FinancrrAppState extends ConsumerState<FinancrrApp> {
 class CustomHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
-    return super.createHttpClient(context)
-      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+    return super.createHttpClient(context)..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
   }
 }
 

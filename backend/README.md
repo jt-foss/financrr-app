@@ -89,3 +89,23 @@ To run it:
 
 1. execute `bash bin/build.bash`
 2. execute `docker compose up -d` (or `docker compose up -d db cache` for development)
+
+## Execute E2E Tests
+
+We are using [hurl](https://hurl.dev/) for our E2E tests.  
+**Remember to rebuild our docker container if you made changes to the source code!**
+```bash
+bash bin/hurl/builder.bash
+```
+
+### Execute all tests
+ 
+```bash
+bash bin/hurl/execute-cicd-tests.bash
+```
+
+### Execute single test
+
+```bash
+bash bin/hurl/execute-test.bash <path to file relative to Tests directory>
+```

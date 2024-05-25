@@ -12,15 +12,14 @@ use entity::currency;
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
 use crate::database::entity::{count, delete, find_all_paginated, find_one_or_error, insert, update};
+use crate::permission_impl;
 use crate::wrapper::entity::currency::dto::CurrencyDTO;
 use crate::wrapper::entity::user::User;
 use crate::wrapper::entity::{TableName, WrapperEntity};
-use crate::wrapper::permission::{
-    HasPermissionByIdOrError, HasPermissionOrError, Permission, PermissionByIds, Permissions,
-};
+use crate::wrapper::permission::{Permission, Permissions};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
 
-pub mod dto;
+pub(crate) mod dto;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub(crate) struct Currency {
@@ -57,10 +56,6 @@ impl Currency {
         delete(currency::Entity::delete_by_id(self.id)).await?;
 
         Ok(())
-    }
-
-    pub(crate) async fn find_by_id(id: i32) -> Result<Self, ApiError> {
-        Ok(Self::from(find_one_or_error(currency::Entity::find_by_id(id), "Currency").await?))
     }
 
     pub(crate) async fn find_by_id_include_user(id: i32, user_id: i32) -> Result<Self, ApiError> {
@@ -110,6 +105,8 @@ impl Currency {
     }
 }
 
+permission_impl!(Currency);
+
 impl TableName for Currency {
     fn table_name() -> &'static str {
         currency::Entity.table_name()
@@ -122,20 +119,12 @@ impl WrapperEntity for Currency {
     }
 }
 
-impl PermissionByIds for Currency {}
-
-impl Permission for Currency {}
-
-impl HasPermissionOrError for Currency {}
-
-impl HasPermissionByIdOrError for Currency {}
-
 impl Identifiable for Currency {
-    async fn from_id(id: i32) -> Result<Self, ApiError>
+    async fn find_by_id(id: i32) -> Result<Self, ApiError>
     where
         Self: Sized,
     {
-        Self::find_by_id(id).await
+        find_one_or_error(currency::Entity::find_by_id(id), "Currency").await.map(Self::from)
     }
 }
 

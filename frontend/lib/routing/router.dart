@@ -19,8 +19,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../modules/accounts/views/account_edit_page.dart';
 import '../modules/accounts/views/account_page.dart';
 import '../modules/accounts/views/accounts_overview_page.dart';
-import '../modules/auth/pages/login_page.dart';
-import '../modules/auth/pages/server_config_page.dart';
+import '../modules/auth/views/login_page.dart';
+import '../modules/auth/views/register_page.dart';
+import '../modules/auth/views/server_config_page.dart';
 import '../modules/settings/views/currency_edit_page.dart';
 import '../modules/settings/views/currency_settings_page.dart';
 import '../modules/settings/views/log_settings_page.dart';
@@ -30,7 +31,7 @@ import '../modules/transactions/views/transaction_page.dart';
 import '../utils/constants.dart';
 import 'guards/core_auth_guard.dart';
 import 'guards/extra_guard.dart';
-import 'navbar_shell.dart';
+import 'ui/navbar_shell.dart';
 
 final Provider<AppRouter> appRouterProvider = Provider((ref) => AppRouter(ref));
 
@@ -73,38 +74,60 @@ class AppRouter {
                         redirect: guards([_coreAuthGuard])),
                     GoRoute(
                         path: AccountPage.pagePath.path,
-                        pageBuilder: (context, state) => _buildDefaultPageTransition(
-                            context, state, AccountPage(accountId: state.pathParameters['accountId'])),
+                        pageBuilder: (context, state) {
+                          final String accountId = state.pathParameters['accountId']!;
+                          return _buildDefaultPageTransition(
+                              context, state, AccountPage(key: ValueKey('account-$accountId'), accountId: accountId));
+                        },
                         redirect: guards([_coreAuthGuard]),
                         routes: [
                           GoRoute(
                               path: AccountEditPage.pagePath.path,
-                              pageBuilder: (context, state) => _buildDefaultPageTransition(
-                                  context, state, AccountEditPage(accountId: state.pathParameters['accountId'])),
+                              pageBuilder: (context, state) {
+                                final String accountId = state.pathParameters['accountId']!;
+                                return _buildDefaultPageTransition(context, state,
+                                    AccountEditPage(key: ValueKey('account-$accountId-edit'), accountId: accountId));
+                              },
                               redirect: guards([_coreAuthGuard])),
                           GoRoute(
                               path: TransactionCreatePage.pagePath.path,
-                              pageBuilder: (context, state) => _buildDefaultPageTransition(
-                                  context, state, TransactionCreatePage(accountId: state.pathParameters['accountId'])),
+                              pageBuilder: (context, state) {
+                                final String accountId = state.pathParameters['accountId']!;
+                                return _buildDefaultPageTransition(
+                                    context,
+                                    state,
+                                    TransactionCreatePage(
+                                        key: ValueKey('account-$accountId-create-transaction'), accountId: accountId));
+                              },
                               redirect: guards([_coreAuthGuard])),
                           GoRoute(
                               path: TransactionPage.pagePath.path,
-                              pageBuilder: (context, state) => _buildDefaultPageTransition(
-                                  context,
-                                  state,
-                                  TransactionPage(
-                                      accountId: state.pathParameters['accountId'],
-                                      transactionId: state.pathParameters['transactionId'])),
+                              pageBuilder: (context, state) {
+                                final String accountId = state.pathParameters['accountId']!;
+                                final String transactionId = state.pathParameters['transactionId']!;
+                                return _buildDefaultPageTransition(
+                                    context,
+                                    state,
+                                    TransactionPage(
+                                        key: ValueKey('account-$accountId-transaction-$transactionId'),
+                                        accountId: accountId,
+                                        transactionId: transactionId));
+                              },
                               redirect: guards([_coreAuthGuard]),
                               routes: [
                                 GoRoute(
                                     path: TransactionEditPage.pagePath.path,
-                                    pageBuilder: (context, state) => _buildDefaultPageTransition(
-                                        context,
-                                        state,
-                                        TransactionEditPage(
-                                            accountId: state.pathParameters['accountId'],
-                                            transactionId: state.pathParameters['transactionId'])),
+                                    pageBuilder: (context, state) {
+                                      final String accountId = state.pathParameters['accountId']!;
+                                      final String transactionId = state.pathParameters['transactionId']!;
+                                      return _buildDefaultPageTransition(
+                                          context,
+                                          state,
+                                          TransactionEditPage(
+                                              key: ValueKey('account-$accountId-transaction-$transactionId-edit'),
+                                              accountId: accountId,
+                                              transactionId: transactionId));
+                                    },
                                     redirect: guards([_coreAuthGuard]))
                               ]),
                         ])
@@ -139,8 +162,11 @@ class AppRouter {
                               redirect: guards([_coreAuthGuard])),
                           GoRoute(
                               path: CurrencyEditPage.pagePath.path,
-                              pageBuilder: (context, state) => _buildDefaultPageTransition(
-                                  context, state, CurrencyEditPage(currencyId: state.pathParameters['currencyId'])),
+                              pageBuilder: (context, state) {
+                                final String currencyId = state.pathParameters['currencyId']!;
+                                return _buildDefaultPageTransition(context, state,
+                                    CurrencyEditPage(key: ValueKey('currency-$currencyId-edit'), currencyId: currencyId));
+                              },
                               redirect: guards([_coreAuthGuard]))
                         ]),
                     GoRoute(
@@ -181,9 +207,13 @@ class AppRouter {
           redirect: guards([_loginAuthGuard])),
       GoRoute(
           path: LoginPage.pagePath.path,
-          pageBuilder: (context, state) =>
-              _buildDefaultPageTransition(context, state, LoginPage(hostUri: state.extra as Uri)),
-          redirect: guards([ExtraGuard(ServerConfigPage.pagePath)]))
+          pageBuilder: (context, state) => _buildDefaultPageTransition(context, state, LoginPage(hostUri: state.extra as Uri)),
+          redirect: guards([ExtraGuard(ServerConfigPage.pagePath)])),
+      GoRoute(
+        path: RegisterPage.pagePath.path,
+        pageBuilder: (context, state) => _buildDefaultPageTransition(context, state, RegisterPage(hostUri: state.extra as Uri)),
+        redirect: guards([ExtraGuard(ServerConfigPage.pagePath)]),
+      )
     ];
   }
 

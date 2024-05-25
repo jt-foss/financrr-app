@@ -1,7 +1,10 @@
 import 'dart:async';
 
 import 'package:financrr_frontend/modules/auth/providers/authentication.provider.dart';
+import 'package:financrr_frontend/shared/ui/custom_replacements/custom_button.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
+import 'package:financrr_frontend/utils/formatter/money_input_formatter.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -11,13 +14,13 @@ import '../../../shared/models/store.dart';
 import '../../../shared/ui/adaptive_scaffold.dart';
 import '../../../../../routing/page_path.dart';
 import '../../../shared/ui/async_wrapper.dart';
-import '../../../shared/ui/transaction_card.dart';
+import '../../../shared/ui/cards/transaction_card.dart';
 import '../../../utils/form_fields.dart';
 import '../../accounts/views/account_page.dart';
+import '../../settings/providers/l10n.provider.dart';
 
 class TransactionCreatePage extends StatefulHookConsumerWidget {
-  static const PagePathBuilder pagePath =
-      PagePathBuilder.child(parent: AccountPage.pagePath, path: 'transactions/create');
+  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: AccountPage.pagePath, path: 'transactions/create');
 
   final String? accountId;
 
@@ -38,8 +41,10 @@ class _TransactionCreatePageState extends ConsumerState<TransactionCreatePage> {
   late final TextEditingController _executedAtController;
 
   bool _isValid = false;
+  int _amount = 0;
   TransactionType _type = TransactionType.deposit;
   DateTime _executedAt = DateTime.now();
+  Account? _secondary;
 
   Future<Account?> _fetchAccount({bool forceRetrieve = false}) async {
     return _accountStreamController.fetchData(
@@ -65,96 +70,102 @@ class _TransactionCreatePageState extends ConsumerState<TransactionCreatePage> {
 
   @override
   Widget build(BuildContext context) {
-    return AdaptiveScaffold(verticalBuilder: (_, __, size) => SafeArea(child: _handleAccountStream(size)));
-  }
+    var l10n = ref.watch(l10nProvider);
 
-  Widget _handleAccountStream(Size size) {
-    return StreamWrapper(
-      stream: _accountStreamController.stream,
-      onSuccess: (ctx, snap) {
-        return _buildVerticalLayout(snap.data!, size);
-      },
-      onLoading: (ctx, snap) {
-        return const Center(child: CircularProgressIndicator());
-      },
-      onError: (ctx, snap) {
-        return const Text('Could not find account');
-      },
-    );
-  }
+    buildVerticalLayout(Account account, Size size) {
+      final MoneyInputFormatter moneyFormatter = MoneyInputFormatter.fromCurrency(
+        currency: account.currencyId.get()!,
+        decimalSeparator: l10n.decimalSeparator,
+        thousandSeparator: l10n.thousandSeparator,
+      );
+      if (_amountController.text.isEmpty) {
+        _amountController.text =
+            moneyFormatter.formatEditUpdate(const TextEditingValue(text: ''), const TextEditingValue(text: '0')).text;
+      }
 
-  Widget _buildVerticalLayout(Account account, Size size) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10, bottom: 20),
-      child: Align(
-        alignment: Alignment.topCenter,
-        child: SizedBox(
-          width: size.width / 1.1,
-          child: SingleChildScrollView(
-              child: Form(
-            key: _formKey,
-            onChanged: () => setState(() => _isValid = _formKey.currentState?.validate() ?? false),
-            child: Column(
-              children: [
-                TransactionCard.fromData(
-                  id: 0,
-                  amount: int.tryParse(_amountController.text) ?? 0,
-                  account: account,
-                  name: _nameController.text,
-                  description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
-                  type: _type,
-                  createdAt: DateTime.now(),
-                  executedAt: _executedAt,
-                  interactive: false,
-                ),
-                const Divider(),
-                ...FormFields.transaction(
-                  this,
-                  currentAccount: account,
-                  nameController: _nameController,
-                  amountController: _amountController,
-                  descriptionController: _descriptionController,
-                  executedAtController: _executedAtController,
-                  selectedType: _type,
-                  onSelectionChanged: (types) {
-                    setState(() => _type = types.first);
-                  },
-                  onExecutedAtChanged: (date) => setState(() => _executedAt = date),
-                ),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _isValid ? () => _createTransaction(account, _type) : null,
-                    child: const Text('Create Transaction'),
+      return Padding(
+        padding: const EdgeInsets.only(top: 10, bottom: 20),
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: SizedBox(
+            width: size.width / 1.1,
+            child: SingleChildScrollView(
+                child: Form(
+              key: _formKey,
+              onChanged: () => setState(() => _isValid = _formKey.currentState?.validate() ?? false),
+              child: Column(
+                children: [
+                  TransactionCard.fromData(
+                    id: 0,
+                    amount: _amount,
+                    account: account,
+                    name: _nameController.text,
+                    description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
+                    type: _type,
+                    createdAt: DateTime.now(),
+                    executedAt: _executedAt,
+                    interactive: false,
                   ),
-                ),
-              ],
-            ),
-          )),
+                  const SizedBox(height: 20),
+                  ...FormFields.transaction(
+                    this,
+                    currentAccount: account,
+                    nameController: _nameController,
+                    amountController: _amountController,
+                    descriptionController: _descriptionController,
+                    executedAtController: _executedAtController,
+                    selectedType: _type,
+                    moneyInputFormatter: moneyFormatter,
+                    onAmountChanged: (amount) => setState(() => _amount = amount),
+                    onSelectionChanged: (types) => setState(() => _type = types.first),
+                    onSecondaryChanged: (account) => setState(() => _secondary = account),
+                    onExecutedAtChanged: (date) => setState(() => _executedAt = date),
+                  ),
+                  const SizedBox(height: 20),
+                  FinancrrButton(
+                    onPressed: _isValid ? () => _createTransaction(account, _type, secondary: _secondary) : null,
+                    text: L10nKey.transactionCreate.toString(),
+                  ),
+                ],
+              ),
+            )),
+          ),
         ),
-      ),
-    );
+      );
+    }
+
+    handleAccountStream(Size size) {
+      return StreamWrapper(
+        stream: _accountStreamController.stream,
+        onSuccess: (_, snap) => buildVerticalLayout(snap.data!, size),
+        onLoading: (_, __) => const Center(child: CircularProgressIndicator()),
+        onError: (ctx, snap) => L10nKey.accountNotFound.toText(),
+      );
+    }
+
+    return AdaptiveScaffold(verticalBuilder: (_, __, size) => handleAccountStream(size));
   }
 
   Future<void> _createTransaction(Account account, TransactionType type, {Account? secondary}) async {
     if (!_isValid) return;
     final (Id?, Id?) sourceAndDest = switch (_type) {
+      //                                  from                  to
       TransactionType.deposit => (null, account.id.value),
       TransactionType.withdrawal => (account.id.value, null),
-      TransactionType.transfer => (account.id.value, secondary!.id.value),
+      TransactionType.transferIn => (secondary!.id.value, account.id.value),
+      TransactionType.transferOut => (account.id.value, secondary!.id.value),
     };
     try {
-      await _api.createTransaction(
+      Transaction transaction = await _api.createTransaction(
           sourceId: sourceAndDest.$1,
           destinationId: sourceAndDest.$2,
-          amount: int.parse(_amountController.text),
+          amount: _amount,
           name: _nameController.text,
           description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
           executedAt: _executedAt,
           currencyId: account.currencyId.value);
       if (!mounted) return;
-      context.showSnackBar('Successfully created transaction');
+      L10nKey.commonCreateObjectSuccess.showSnack(context, namedArgs: {'object': transaction.name});
       context.pop();
     } on RestrrException catch (e) {
       context.showSnackBar(e.message!);

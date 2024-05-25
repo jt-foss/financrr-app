@@ -16,7 +16,7 @@ pub(crate) struct UserRegistration {
     #[validate(email)]
     pub(crate) email: Option<String>,
     pub(crate) display_name: Option<String>,
-    #[validate(custom = "validate_password")]
+    #[validate(custom(function = validate_password))]
     pub(crate) password: String,
 }
 
@@ -27,7 +27,11 @@ pub(crate) struct Credentials {
     #[validate(length(min = 1))]
     pub(crate) password: String,
     #[validate(length(min = 1))]
-    pub(crate) session_name: Option<String>,
+    pub(crate) name: String,
+    #[validate(length(min = 1))]
+    pub(crate) description: Option<String>,
+    #[validate(length(min = 1))]
+    pub(crate) platform: Option<String>,
 }
 
 impl FromRequest for UserRegistration {

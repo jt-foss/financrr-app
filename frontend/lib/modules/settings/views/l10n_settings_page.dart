@@ -1,143 +1,166 @@
+import 'dart:async';
+
+import 'package:easy_localization/easy_localization.dart';
+import 'package:financrr_frontend/routing/ui/navbar_shell.dart';
+import 'package:financrr_frontend/shared/ui/custom_replacements/custom_text_field.dart';
+import 'package:financrr_frontend/shared/ui/custom_replacements/custom_card.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
+import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../shared/models/store.dart';
 import '../../../shared/ui/adaptive_scaffold.dart';
 import '../../../routing/page_path.dart';
-import '../../../utils/text_utils.dart';
+import '../providers/l10n.provider.dart';
+import '../providers/theme.provider.dart';
 import 'settings_page.dart';
 
-class L10nSettingsPage extends StatefulWidget {
-  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'languages');
+class L10nSettingsPage extends StatefulHookConsumerWidget {
+  static const PagePathBuilder pagePath = PagePathBuilder.child(parent: SettingsPage.pagePath, path: 'language');
 
   const L10nSettingsPage({super.key});
 
   @override
-  State<StatefulWidget> createState() => _L10nSettingsPageState();
+  ConsumerState<L10nSettingsPage> createState() => _L10nSettingsPageState();
 }
 
-class _L10nSettingsPageState extends State<L10nSettingsPage> {
+class _L10nSettingsPageState extends ConsumerState<L10nSettingsPage> {
   late final TextEditingController _decimalSeparatorController;
   late final TextEditingController _thousandSeparatorController;
   late final TextEditingController _dateTimeFormatController;
 
-  late String _decimalSeparator;
-  late String _thousandSeparator;
-  late String _dateTimeFormat;
-
   @override
   void initState() {
     super.initState();
-    _decimalSeparator = StoreKey.decimalSeparator.readSync()!;
-    _thousandSeparator = StoreKey.thousandSeparator.readSync()!;
-    _dateTimeFormat = StoreKey.dateTimeFormat.readSync()!.pattern!;
+    var l10n = ref.read(l10nProvider);
+    _decimalSeparatorController = TextEditingController(text: l10n.decimalSeparator);
+    _thousandSeparatorController = TextEditingController(text: l10n.thousandSeparator);
+    _dateTimeFormatController = TextEditingController(text: l10n.dateFormat.pattern);
+  }
 
-    _decimalSeparatorController = TextEditingController(text: _decimalSeparator);
-    _thousandSeparatorController = TextEditingController(text: _thousandSeparator);
-    _dateTimeFormatController = TextEditingController(text: _dateTimeFormat);
+  @override
+  void dispose() {
+    _decimalSeparatorController.dispose();
+    _thousandSeparatorController.dispose();
+    _dateTimeFormatController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return AdaptiveScaffold(
-      resizeToAvoidBottomInset: false,
-      verticalBuilder: (_, __, size) => SafeArea(child: _buildVerticalLayout(size)),
-    );
-  }
+    var theme = ref.watch(themeProvider);
+    var l10n = ref.watch(l10nProvider);
 
-  Widget _buildVerticalLayout(Size size) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10),
-      child: Center(
-        child: SizedBox(
-          width: size.width / 1.1,
-          child: ListView(
-            children: [
-              Card.outlined(
-                child: ListTile(
-                  leading: const Text('Preview'),
-                  title: Text(TextUtils.formatBalance(
-                      123456789, 2, _decimalSeparatorController.text, _thousandSeparatorController.text)),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 20),
-                child: TextFormField(
-                  controller: _decimalSeparatorController,
-                  onChanged: (_) => setState(() {}),
-                  decoration: const InputDecoration(
-                    labelText: 'Decimal Separator',
+    buildLocaleCard(Locale locale) {
+      final bool selected = context.locale == locale;
+      return FinancrrCard(
+        onTap: () {
+          context.setLocale(locale);
+          ScaffoldNavBarShell.maybeOf(context)?.refresh();
+        },
+        padding: const EdgeInsets.all(10),
+        borderColor: selected ? theme.financrrExtension.primary : null,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(locale.getLocaleName(),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                    color: selected ? theme.financrrExtension.primary : null, fontWeight: selected ? FontWeight.bold : null)),
+            if (selected) Icon(Icons.check, color: theme.financrrExtension.primary),
+          ],
+        ),
+      );
+    }
+
+    buildVerticalLayout(Size size) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 10),
+        child: Center(
+          child: SizedBox(
+            width: size.width / 1.1,
+            child: Theme(
+              data: theme.themeData.copyWith(dividerColor: Colors.transparent),
+              child: ListView(
+                children: [
+                  for (Locale locale in context.supportedLocales)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: buildLocaleCard(locale),
+                    ),
+                  ExpansionTile(
+                    title: L10nKey.l10nDecimalSeparator.toText(),
+                    subtitle: Text('1${l10n.decimalSeparator}234'),
+                    expandedCrossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: FinancrrTextField(
+                          controller: _decimalSeparatorController,
+                          onChanged: (value) {
+                            if (value.trim().isEmpty || value.length > 1) return;
+                            ref.read(l10nProvider.notifier).setDecimalSeparator(value);
+                          },
+                          label: L10nKey.l10nDecimalSeparator,
+                          inputFormatters: [LengthLimitingTextInputFormatter(1)],
+                        ),
+                      ),
+                    ],
                   ),
-                  inputFormatters: [LengthLimitingTextInputFormatter(1)],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                child: TextFormField(
-                  controller: _thousandSeparatorController,
-                  onChanged: (_) => setState(() {}),
-                  decoration: const InputDecoration(
-                    labelText: 'Thousand Separator',
+                  ExpansionTile(
+                    title: L10nKey.l10nThousandsSeparator.toText(),
+                    subtitle: Text('1${l10n.thousandSeparator}234${l10n.thousandSeparator}567'),
+                    expandedCrossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: FinancrrTextField(
+                          controller: _thousandSeparatorController,
+                          onChanged: (value) {
+                            if (value.trim().isEmpty || value.length > 1) return;
+                            ref.read(l10nProvider.notifier).setThousandSeparator(value);
+                          },
+                          label: L10nKey.l10nThousandsSeparator,
+                          inputFormatters: [LengthLimitingTextInputFormatter(1)],
+                        ),
+                      ),
+                    ],
                   ),
-                  inputFormatters: [LengthLimitingTextInputFormatter(1)],
-                ),
+                  ExpansionTile(
+                    title: L10nKey.l10nDateFormat.toText(),
+                    subtitle: StatefulBuilder(builder: (context, setState) {
+                      Timer(const Duration(seconds: 1), () {
+                        if (context.mounted) {
+                          setState(() {});
+                        }
+                      });
+                      return Text(l10n.dateFormat.format(DateTime.now()));
+                    }),
+                    expandedCrossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: FinancrrTextField(
+                          controller: _dateTimeFormatController,
+                          onChanged: (value) {
+                            ref.read(l10nProvider.notifier).setDateFormat(DateFormat(value));
+                          },
+                          label: L10nKey.l10nDateFormat,
+                        ),
+                      ),
+                    ],
+                  )
+                ],
               ),
-              const Divider(),
-              Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: Card.outlined(
-                  child: ListTile(
-                    leading: const Text('Preview'),
-                    title: Text(DateFormat(_dateTimeFormatController.text).format(DateTime.now())),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 20),
-                child: TextFormField(
-                    controller: _dateTimeFormatController,
-                    onChanged: (_) => setState(() {}),
-                    decoration: const InputDecoration(
-                      labelText: 'Date Format',
-                    )),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 20),
-                child: TextButton(
-                  onPressed: _isDifferent() ? () => _save() : null,
-                  child: const Text('Save'),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
-      ),
+      );
+    }
+
+    return AdaptiveScaffold(
+      resizeToAvoidBottomInset: false,
+      verticalBuilder: (_, __, size) => buildVerticalLayout(size),
     );
-  }
-
-  bool _isDifferent() {
-    return _decimalSeparatorController.text != _decimalSeparator ||
-        _thousandSeparatorController.text != _thousandSeparator ||
-        _dateTimeFormatController.text != _dateTimeFormat;
-  }
-
-  void _save() {
-    if (_decimalSeparatorController.text != _decimalSeparator) {
-      StoreKey.decimalSeparator.write(_decimalSeparatorController.text);
-    }
-    if (_thousandSeparatorController.text != _thousandSeparator) {
-      StoreKey.thousandSeparator.write(_thousandSeparatorController.text);
-    }
-    if (_dateTimeFormatController.text != _dateTimeFormat) {
-      StoreKey.dateTimeFormat.write(DateFormat(_dateTimeFormatController.text));
-    }
-    setState(() {
-      _decimalSeparator = _decimalSeparatorController.text;
-      _thousandSeparator = _thousandSeparatorController.text;
-      _dateTimeFormat = _dateTimeFormatController.text;
-    });
-    context.showSnackBar('Successfully saved changes!');
   }
 }

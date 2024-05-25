@@ -4,8 +4,8 @@ import 'package:financrr_frontend/modules/dashboard/views/dashboard_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../modules/auth/pages/server_config_page.dart';
 import '../../modules/auth/providers/authentication.provider.dart';
+import '../../modules/auth/views/server_config_page.dart';
 import '../page_path.dart';
 import 'guard.dart';
 

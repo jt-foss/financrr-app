@@ -44,12 +44,14 @@ class _SplashPageState extends ConsumerState<SplashPage> with SingleTickerProvid
 
   @override
   Widget build(BuildContext context) {
+    var theme = ref.watch(themeProvider);
+
     return Scaffold(
       body: Center(
         child: FadeTransition(
           opacity: _fadeTransition,
-          child: SvgPicture.asset(ref.currentTheme.logoPath,
-              width: 100, height: 100, colorFilter: ColorFilter.mode(ref.themeData.primaryColor, BlendMode.srcIn)),
+          child: SvgPicture.asset(theme.getCurrent().logoPath,
+              width: 100, height: 100, colorFilter: ColorFilter.mode(theme.themeData.primaryColor, BlendMode.srcIn)),
         ),
       ),
     );

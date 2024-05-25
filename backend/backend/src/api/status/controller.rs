@@ -10,16 +10,16 @@ pub(crate) fn status_controller(cfg: &mut web::ServiceConfig) {
 }
 
 #[utoipa::path(get,
-responses(
-(status = 200, description = "healthy", content_type = "application/json", body = HealthResponse),
-(status = 503, description = "Service is unhealthy", content_type = "application/json", body = HealthResponse, example = json ! (
-{
-"healthy": false,
-"details": "PostgreSQL connection failed"
-}
-))),
-path = "/api/status/health",
-tag = "Status")]
+    responses(
+        (status = 200, description = "healthy", content_type = "application/json", body = HealthResponse),
+        (status = 503, description = "Service is unhealthy", content_type = "application/json", body = HealthResponse, example = json ! (
+        {
+        "healthy": false,
+        "details": "PostgreSQL connection failed"
+        }
+        ))),
+    path = "/api/status/health",
+    tag = "Status")]
 #[get("/health")]
 async fn health() -> impl Responder {
     if !is_psql_reachable().await {
@@ -35,11 +35,11 @@ async fn health() -> impl Responder {
 }
 
 #[utoipa::path(get,
-responses(
-(status = 418, description = "I'm a teapot"),
-),
-path = "/api/status/coffee",
-tag = "Status")]
+    responses(
+        (status = 418, description = "I'm a teapot"),
+    ),
+    path = "/api/status/coffee",
+    tag = "Status")]
 #[get("/coffee")]
 pub(crate) async fn coffee() -> impl Responder {
     HttpResponse::ImATeapot()
@@ -59,11 +59,11 @@ async fn is_redis_reachable() -> bool {
 }
 
 #[utoipa::path(get,
-responses(
-(status = 200, description = "Config", content_type = "application/json", body = PublicConfig),
-),
-path = "/api/status/config",
-tag = "Status")]
+    responses(
+        (status = 200, description = "Config", content_type = "application/json", body = PublicConfig),
+    ),
+    path = "/api/status/config",
+    tag = "Status")]
 #[get("/config")]
 pub(crate) async fn config() -> impl Responder {
     HttpResponse::Ok().json(PublicConfig::get())
