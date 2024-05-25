@@ -40,6 +40,7 @@ class AccountEditPageState extends ConsumerState<AccountEditPage> {
   late final TextEditingController _ibanController;
   late final TextEditingController _originalBalanceController;
 
+  int _originalBalance = 0;
   Currency? _currency;
 
   bool _isValid = false;
@@ -97,7 +98,7 @@ class AccountEditPageState extends ConsumerState<AccountEditPage> {
                     name: _nameController.text,
                     iban: _ibanController.text,
                     description: _descriptionController.text,
-                    balance: int.tryParse(_originalBalanceController.text) ?? 0,
+                    balance: _originalBalance,
                     currency: _currency ?? _api.getCurrencies().first,
                   ),
                   const SizedBox(height: 20),
@@ -108,7 +109,8 @@ class AccountEditPageState extends ConsumerState<AccountEditPage> {
                       ibanController: _ibanController,
                       originalBalanceController: _originalBalanceController,
                       selectedCurrency: _currency ?? _api.getCurrencies().first,
-                      onCurrencyChanged: (currency) => _currency = currency!),
+                      onOriginalBalanceChanged: (balance) => setState(() => _originalBalance = balance),
+                      onCurrencyChanged: (currency) => setState(() => _currency = currency!)),
                   const SizedBox(height: 20),
                   FinancrrButton(
                     onPressed: _isValid ? () => _editAccount(account) : null,
@@ -145,7 +147,7 @@ class AccountEditPageState extends ConsumerState<AccountEditPage> {
         name: _nameController.text,
         description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
         iban: _ibanController.text.isEmpty ? null : _ibanController.text,
-        originalBalance: int.tryParse(_originalBalanceController.text) ?? 0,
+        originalBalance: _originalBalance,
         currencyId: _currency!.id.value,
       );
       if (!mounted) return;

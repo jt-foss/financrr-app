@@ -17,17 +17,26 @@ import 'input_utils.dart';
 class FormFields {
   const FormFields._();
 
-  static List<Widget> transaction(ConsumerState state, L10nState l10n, ThemeState theme,
-      {required Account currentAccount,
-      required TextEditingController nameController,
-      required TextEditingController amountController,
-      required TextEditingController descriptionController,
-      required TextEditingController executedAtController,
-      required TransactionType selectedType,
-      DateTime? executedAt,
-      Function(Set<TransactionType>)? onSelectionChanged,
-      Function(Account?)? onSecondaryChanged,
-      Function(DateTime)? onExecutedAtChanged}) {
+  static List<Widget> transaction(
+    ConsumerState state,
+    L10nState l10n,
+    ThemeState theme, {
+    required Account currentAccount,
+    required TextEditingController nameController,
+    required TextEditingController amountController,
+    required TextEditingController descriptionController,
+    required TextEditingController executedAtController,
+    required TransactionType selectedType,
+    DateTime? executedAt,
+    void Function(int)? onAmountChanged,
+    void Function(Set<TransactionType>)? onSelectionChanged,
+    void Function(Account?)? onSecondaryChanged,
+    void Function(DateTime)? onExecutedAtChanged,
+  }) {
+    MoneyInputFormatter moneyInputFormatter = MoneyInputFormatter.fromCurrency(
+        currency: currentAccount.currencyId.get()!,
+        decimalSeparator: l10n.decimalSeparator,
+        thousandSeparator: l10n.thousandSeparator);
     return [
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
@@ -66,14 +75,11 @@ class FormFields {
           label: L10nKey.transactionPropertiesAmount,
           validator: (value) => InputValidators.nonNull(L10nKey.transactionPropertiesAmount.toString(), value),
           required: true,
+          onChanged: (_) => onAmountChanged?.call(moneyInputFormatter.intValue),
           keyboardType: TextInputType.number,
           inputFormatters: [
             FilteringTextInputFormatter.digitsOnly,
-            MoneyInputFormatter.fromCurrency(
-                currency: currentAccount.currencyId.get()!,
-                decimalSeparator: l10n.decimalSeparator,
-                thousandSeparator: l10n.thousandSeparator
-            )
+            moneyInputFormatter,
           ],
         ),
       ),
@@ -132,8 +138,11 @@ class FormFields {
     required TextEditingController ibanController,
     required TextEditingController originalBalanceController,
     required Currency selectedCurrency,
+    void Function(int)? onOriginalBalanceChanged,
     void Function(Currency?)? onCurrencyChanged,
   }) {
+    MoneyInputFormatter moneyInputFormatter = MoneyInputFormatter.fromCurrency(
+        currency: selectedCurrency, decimalSeparator: l10n.decimalSeparator, thousandSeparator: l10n.thousandSeparator);
     return [
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
@@ -176,15 +185,9 @@ class FormFields {
           label: L10nKey.accountPropertiesOriginalBalance,
           validator: (value) => InputValidators.nonNull(L10nKey.accountPropertiesOriginalBalance.toString(), value),
           required: true,
+          onChanged: (_) => onOriginalBalanceChanged?.call(moneyInputFormatter.intValue),
           keyboardType: TextInputType.number,
-          inputFormatters: [
-            FilteringTextInputFormatter.digitsOnly,
-            MoneyInputFormatter.fromCurrency(
-                currency: selectedCurrency,
-                decimalSeparator: l10n.decimalSeparator,
-                thousandSeparator: l10n.thousandSeparator
-            )
-          ],
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly, moneyInputFormatter],
         ),
       ),
       Padding(

@@ -41,6 +41,7 @@ class _TransactionCreatePageState extends ConsumerState<TransactionCreatePage> {
   late final TextEditingController _executedAtController;
 
   bool _isValid = false;
+  int _amount = 0;
   TransactionType _type = TransactionType.deposit;
   DateTime _executedAt = DateTime.now();
   Account? _secondary;
@@ -87,7 +88,7 @@ class _TransactionCreatePageState extends ConsumerState<TransactionCreatePage> {
                 children: [
                   TransactionCard.fromData(
                     id: 0,
-                    amount: int.tryParse(_amountController.text) ?? 0,
+                    amount: _amount,
                     account: account,
                     name: _nameController.text,
                     description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
@@ -107,9 +108,8 @@ class _TransactionCreatePageState extends ConsumerState<TransactionCreatePage> {
                     descriptionController: _descriptionController,
                     executedAtController: _executedAtController,
                     selectedType: _type,
-                    onSelectionChanged: (types) {
-                      setState(() => _type = types.first);
-                    },
+                    onAmountChanged: (amount) => setState(() => _amount = amount),
+                    onSelectionChanged: (types) => setState(() => _type = types.first),
                     onSecondaryChanged: (account) => setState(() => _secondary = account),
                     onExecutedAtChanged: (date) => setState(() => _executedAt = date),
                   ),
@@ -151,7 +151,7 @@ class _TransactionCreatePageState extends ConsumerState<TransactionCreatePage> {
       Transaction transaction = await _api.createTransaction(
           sourceId: sourceAndDest.$1,
           destinationId: sourceAndDest.$2,
-          amount: int.parse(_amountController.text),
+          amount: _amount,
           name: _nameController.text,
           description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
           executedAt: _executedAt,

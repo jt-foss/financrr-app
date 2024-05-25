@@ -35,6 +35,7 @@ class _AccountCreatePageState extends ConsumerState<AccountCreatePage> {
   late final TextEditingController _ibanController = TextEditingController();
   late final TextEditingController _originalBalanceController = TextEditingController();
 
+  int _originalBalance = 0;
   Currency? _selectedCurrency;
 
   bool _isValid = false;
@@ -77,7 +78,7 @@ class _AccountCreatePageState extends ConsumerState<AccountCreatePage> {
                     name: _nameController.text,
                     iban: _ibanController.text,
                     description: _descriptionController.text,
-                    balance: int.tryParse(_originalBalanceController.text) ?? 0,
+                    balance: _originalBalance,
                     currency: _selectedCurrency ?? _api.getCurrencies().first,
                   ),
                   const SizedBox(height: 20),
@@ -88,6 +89,7 @@ class _AccountCreatePageState extends ConsumerState<AccountCreatePage> {
                       ibanController: _ibanController,
                       originalBalanceController: _originalBalanceController,
                       selectedCurrency: _selectedCurrency ?? _api.getCurrencies().first,
+                      onOriginalBalanceChanged: (balance) => setState(() => _originalBalance = balance),
                       onCurrencyChanged: (currency) => setState(() => _selectedCurrency = currency!)),
                   const SizedBox(height: 20),
                   FinancrrButton(
@@ -117,7 +119,7 @@ class _AccountCreatePageState extends ConsumerState<AccountCreatePage> {
         name: _nameController.text,
         description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
         iban: _ibanController.text.isEmpty ? null : TextUtils.formatIBAN(_ibanController.text),
-        originalBalance: int.tryParse(_originalBalanceController.text) ?? 0,
+        originalBalance: _originalBalance,
         currencyId: _selectedCurrency!.id.value,
       );
       if (!mounted) return;

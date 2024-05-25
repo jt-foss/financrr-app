@@ -44,6 +44,7 @@ class TransactionEditPageState extends ConsumerState<TransactionEditPage> {
   late final TextEditingController _executedAtController;
 
   bool _isValid = false;
+  int _amount = 0;
   TransactionType _type = TransactionType.deposit;
   DateTime _executedAt = DateTime.now();
 
@@ -110,7 +111,7 @@ class TransactionEditPageState extends ConsumerState<TransactionEditPage> {
                 children: [
                   TransactionCard.fromData(
                     id: 0,
-                    amount: int.tryParse(_amountController.text) ?? 0,
+                    amount: _amount,
                     account: account,
                     name: _nameController.text,
                     description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
@@ -131,12 +132,9 @@ class TransactionEditPageState extends ConsumerState<TransactionEditPage> {
                     executedAtController: _executedAtController,
                     selectedType: _type,
                     executedAt: _executedAt,
-                    onSelectionChanged: (types) {
-                      setState(() => _type = types.first);
-                    },
-                    onExecutedAtChanged: (date) {
-                      setState(() => _executedAt = date);
-                    },
+                    onAmountChanged: (amount) => setState(() => _amount = amount),
+                    onSelectionChanged: (types) => setState(() => _type = types.first),
+                    onExecutedAtChanged: (date) => setState(() => _executedAt = date),
                   ),
                   const SizedBox(height: 20),
                   FinancrrButton(
@@ -182,7 +180,7 @@ class TransactionEditPageState extends ConsumerState<TransactionEditPage> {
       await transaction.update(
           sourceId: sourceAndDest.$1,
           destinationId: sourceAndDest.$2,
-          amount: int.parse(_amountController.text),
+          amount: _amount,
           name: _nameController.text,
           description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
           executedAt: _executedAt,
