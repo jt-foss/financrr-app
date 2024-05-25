@@ -50,7 +50,7 @@ Content-Type: application/json
 {
   "template_id": {{template_id}},
   "recurring_rule": {
-    "cronPattern": {
+    "cron_pattern": {
       "day_of_month": "*",
       "month": "*",
       "day_of_week": "1"
@@ -75,7 +75,7 @@ Content-Type: application/json
 {
     "template_id": {{template_id}},
     "recurring_rule": {
-        "cronPattern": {
+        "cron_pattern": {
         "day_of_month": "*",
         "month": "*",
         "day_of_week": "1,2"
@@ -127,7 +127,7 @@ Content-Type: application/json
 {
   "template_id": {{template_id}},
   "recurring_rule": {
-    "cronPattern": {
+    "cron_pattern": {
       "day_of_month": "*",
       "month": "*",
       "day_of_week": "1"
