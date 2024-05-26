@@ -13,7 +13,7 @@ use validator::ValidationError;
 
 use entity::currency;
 use entity::prelude::User;
-use entity::utility::time::get_now;
+use utility::datetime::get_now;
 
 use crate::database::connection::get_database_connection;
 

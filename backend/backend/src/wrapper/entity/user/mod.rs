@@ -10,6 +10,7 @@ use dto::Credentials;
 use entity::prelude::User as DbUser;
 use entity::user;
 use entity::user::Model;
+use utility::datetime::get_now;
 
 use crate::api::error::api::ApiError;
 use crate::database::entity::{count, find_one, find_one_or_error, insert};
@@ -59,6 +60,7 @@ impl User {
             registration.email,
             registration.display_name,
             registration.password,
+            get_now(),
         ) {
             Ok(user) => {
                 let model = insert(user).await?;

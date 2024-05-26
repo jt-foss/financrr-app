@@ -4,8 +4,8 @@ use time::OffsetDateTime;
 use tracing::error;
 use utoipa::ToSchema;
 
-use entity::utility::time::get_now;
 use entity::{account, transaction};
+use utility::datetime::get_now;
 
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;

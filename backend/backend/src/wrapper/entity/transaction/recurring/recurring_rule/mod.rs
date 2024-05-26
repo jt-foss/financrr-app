@@ -5,7 +5,7 @@ use serde_json::Value;
 use time::OffsetDateTime;
 use utoipa::ToSchema;
 
-use entity::utility::time::get_now;
+use utility::datetime::get_now;
 
 use crate::api::error::api::ApiError;
 use crate::util::cron::get_cron_builder_default;

@@ -2,7 +2,8 @@
 members = [
     "entity",
     "migration",
-    "backend"
+    "backend",
+    "utility",
 ]
 resolver = "2"
 
@@ -45,6 +46,7 @@ sea-orm = { version = "1.0.0-rc.4", features = ["sqlx-postgres", "runtime-tokio-
 
 # Date/Time
 time = { version = "0.3.36", features = ["serde-human-readable", "local-offset"] }
+chrono = { version = "0.4.38", features = ["clock"] }
 
 # Logging
 tracing = "0.1.40"

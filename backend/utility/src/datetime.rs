@@ -1,7 +1,16 @@
-use chrono::{DateTime, FixedOffset, Offset, TimeZone};
+use chrono::{DateTime, FixedOffset, Local, Offset, TimeZone};
 use time::{OffsetDateTime, UtcOffset};
 
-pub(crate) fn convert_chrono_to_time(chrono: &DateTime<FixedOffset>) -> OffsetDateTime {
+pub fn get_now() -> OffsetDateTime {
+    OffsetDateTime::now_local().unwrap_or(get_now_from_chrono())
+}
+
+fn get_now_from_chrono() -> OffsetDateTime {
+    let local = Local::now();
+    convert_chrono_to_time(&local.with_timezone(local.offset()))
+}
+
+pub fn convert_chrono_to_time(chrono: &DateTime<FixedOffset>) -> OffsetDateTime {
     let timestamp = chrono.timestamp();
     let offset_seconds = chrono.offset().fix().local_minus_utc();
 
@@ -13,7 +22,7 @@ pub(crate) fn convert_chrono_to_time(chrono: &DateTime<FixedOffset>) -> OffsetDa
         .to_offset(utc_offset)
 }
 
-pub(crate) fn convert_time_to_chrono(time: &OffsetDateTime) -> DateTime<FixedOffset> {
+pub fn convert_time_to_chrono(time: &OffsetDateTime) -> DateTime<FixedOffset> {
     let timestamp = time.unix_timestamp();
     let offset_seconds = time.offset().whole_seconds();
     let offset = FixedOffset::east_opt(offset_seconds).expect("Failed to convert time offset to FixedOffset");
@@ -21,7 +30,7 @@ pub(crate) fn convert_time_to_chrono(time: &OffsetDateTime) -> DateTime<FixedOff
     offset.timestamp_opt(timestamp, 0).unwrap()
 }
 
-pub(crate) fn extract_tz(datetime: &OffsetDateTime) -> (FixedOffset, bool) {
+pub fn extract_to_chrono_tz(datetime: &OffsetDateTime) -> (FixedOffset, bool) {
     let offset_seconds = datetime.offset().whole_seconds();
     let offset = FixedOffset::east_opt(offset_seconds).expect("Failed to extract timezone from datetime");
     let fixed_offset = TimeZone::from_offset(&offset);

@@ -2,7 +2,7 @@ use serde::Serialize;
 use time::OffsetDateTime;
 use utoipa::ToSchema;
 
-use entity::utility::time::get_now;
+use utility::datetime::get_now;
 
 #[derive(Serialize, ToSchema)]
 pub(crate) struct HealthResponse {

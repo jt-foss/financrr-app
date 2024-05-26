@@ -3,10 +3,10 @@
 use sea_orm::entity::prelude::*;
 use sea_orm::ActiveValue::Set;
 use serde::{Deserialize, Serialize};
+use time::OffsetDateTime;
 
 use crate::error::EntityError;
 use crate::utility::hashing::hash_string;
-use crate::utility::time::get_now;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
 #[sea_orm(table_name = "user")]
@@ -75,6 +75,7 @@ impl ActiveModel {
         email: Option<String>,
         display_name: Option<String>,
         password: String,
+        now: OffsetDateTime,
     ) -> Result<Self, EntityError> {
         let hashed_password = hash_string(&password)?;
 
@@ -84,7 +85,7 @@ impl ActiveModel {
             email: Set(email),
             display_name: Set(display_name),
             password: Set(hashed_password),
-            created_at: Set(get_now()),
+            created_at: Set(now),
             is_admin: Set(false),
         })
     }

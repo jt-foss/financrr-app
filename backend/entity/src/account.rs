@@ -5,10 +5,10 @@ use sea_orm::sea_query::IntoCondition;
 use sea_orm::ActiveValue::Set;
 use sea_orm::{JoinType, QuerySelect};
 use serde::{Deserialize, Serialize};
+use time::OffsetDateTime;
 
 use crate::permissions;
 use crate::permissions::find_all_by_user_id;
-use crate::utility::time::get_now;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
 #[sea_orm(table_name = "account")]
@@ -74,6 +74,7 @@ impl ActiveModel {
         iban: &Option<String>,
         balance: &i64,
         currency_id: &i32,
+        now: OffsetDateTime,
     ) -> Self {
         Self {
             id: Default::default(),
@@ -83,7 +84,7 @@ impl ActiveModel {
             balance: Set(balance.to_owned()),
             original_balance: Set(balance.to_owned()),
             currency: Set(currency_id.to_owned()),
-            created_at: Set(get_now()),
+            created_at: Set(now),
         }
     }
 }

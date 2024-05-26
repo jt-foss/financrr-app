@@ -5,7 +5,7 @@ use utoipa::ToSchema;
 
 use dto::TransactionTemplateDTO;
 use entity::transaction_template;
-use entity::utility::time::get_now;
+use utility::datetime::get_now;
 
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
