@@ -39,3 +39,42 @@ pub fn extract_to_chrono_tz(datetime: &OffsetDateTime) -> (FixedOffset, bool) {
 
     (fixed_offset, is_utc)
 }
+
+#[cfg(test)]
+mod tests {
+    use chrono::prelude::*;
+
+    use super::*;
+
+    #[test]
+    fn test_get_now() {
+        let now = get_now();
+        // Check that the returned OffsetDateTime is not more than a few seconds away from the current time
+        assert!((OffsetDateTime::now_utc() - now).whole_seconds().abs() < 5);
+    }
+
+    #[test]
+    fn test_convert_chrono_to_time() {
+        let chrono_now = Utc::now();
+        let time_now = convert_chrono_to_time(&chrono_now.fixed_offset());
+        // Check that the converted OffsetDateTime is not more than a few seconds away from the original DateTime
+        assert!((chrono_now.timestamp() - time_now.unix_timestamp()).abs() < 5);
+    }
+
+    #[test]
+    fn test_convert_time_to_chrono() {
+        let time_now = OffsetDateTime::now_utc();
+        let chrono_now = convert_time_to_chrono(&time_now);
+        // Check that the converted DateTime is not more than a few seconds away from the original OffsetDateTime
+        assert!((time_now.unix_timestamp() - chrono_now.timestamp()).abs() < 5);
+    }
+
+    #[test]
+    fn test_extract_to_chrono_tz() {
+        let time_now = OffsetDateTime::now_utc();
+        let (fixed_offset, is_utc) = extract_to_chrono_tz(&time_now);
+        // Check that the extracted timezone is UTC
+        assert_eq!(fixed_offset, FixedOffset::east_opt(0).expect("Failed to create FixedOffset from 0 seconds"));
+        assert!(is_utc);
+    }
+}
