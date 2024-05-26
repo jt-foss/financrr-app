@@ -40,7 +40,7 @@ class AccountEditPageState extends ConsumerState<AccountEditPage> {
   late final TextEditingController _ibanController;
   late final TextEditingController _originalBalanceController;
 
-  int _originalBalance = 0;
+  UnformattedAmount _originalBalance = const UnformattedAmount(0);
   Currency? _currency;
 
   bool _isValid = false;

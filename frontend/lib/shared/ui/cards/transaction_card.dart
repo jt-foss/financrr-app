@@ -13,7 +13,7 @@ class TransactionCard extends ConsumerWidget {
   final Id id;
   final Id? source;
   final Id? destination;
-  final int amount;
+  final UnformattedAmount amount;
   final String name;
   final String? description;
   final DateTime executedAt;
@@ -73,7 +73,9 @@ class TransactionCard extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(l10n.dateFormat.format(executedAt)),
-              Text('${isMoneyIn ? '+' : '-'}${TextUtils.formatBalanceWithCurrency(l10n, amount, account.currencyId.get()!)}',
+              Text(
+                  amount.formatWithCurrency(account.currencyId.get()!, l10n.decimalSeparator,
+                      thousandsSeparator: l10n.thousandSeparator, isNegative: !isMoneyIn),
                   style: theme.textTheme.titleMedium
                       ?.copyWith(color: isMoneyIn ? theme.themeData.primaryColor : theme.themeData.colorScheme.error)),
             ],

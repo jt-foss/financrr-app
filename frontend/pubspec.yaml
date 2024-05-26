@@ -36,7 +36,7 @@ dependencies:
   restrr:
     git:
       url: https://github.com/financrr/restrr.git
-      ref: feature/session-enhancements
+      ref: feature/templates-and-recurring-transactions
   # L10n
   intl: ^0.19.0
   easy_localization: ^3.0.7

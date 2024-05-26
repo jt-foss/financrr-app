@@ -16,7 +16,6 @@ import '../../../shared/models/store.dart';
 import '../../../shared/ui/adaptive_scaffold.dart';
 import '../../../../../routing/page_path.dart';
 import '../../../shared/ui/async_wrapper.dart';
-import '../../../utils/text_utils.dart';
 import '../../accounts/views/account_page.dart';
 import '../../settings/providers/l10n.provider.dart';
 
@@ -93,8 +92,7 @@ class TransactionPageState extends ConsumerState<TransactionPage> {
     buildVerticalLayout(Account account, Transaction transaction, Size size) {
       final bool isMoneyIn =
           transaction.getType(account) == TransactionType.deposit || transaction.getType(account) == TransactionType.transferIn;
-      final String amountStr =
-          (isMoneyIn ? '+' : '-') + TextUtils.formatBalanceWithCurrency(l10n, transaction.amount, account.currencyId.get()!);
+      final String amountStr = transaction.amount.formatWithCurrency(account.currencyId.get()!, l10n.decimalSeparator, thousandsSeparator: l10n.thousandSeparator, isNegative: !isMoneyIn);
       return Padding(
         padding: const EdgeInsets.only(top: 10, bottom: 20),
         child: Align(
