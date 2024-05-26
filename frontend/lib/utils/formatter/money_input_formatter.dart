@@ -15,7 +15,7 @@ class MoneyInputFormatter extends TextInputFormatter {
       : symbol = currency.symbol,
         decimalPlaces = currency.decimalPlaces;
 
-  UnformattedAmount amount = const UnformattedAmount(0);
+  UnformattedAmount amount = UnformattedAmount.zero;
 
   @override
   TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {

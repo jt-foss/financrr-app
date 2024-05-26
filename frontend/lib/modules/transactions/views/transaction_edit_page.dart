@@ -44,7 +44,7 @@ class TransactionEditPageState extends ConsumerState<TransactionEditPage> {
   late final TextEditingController _executedAtController;
 
   bool _isValid = false;
-  UnformattedAmount _amount = const UnformattedAmount(0);
+  UnformattedAmount _amount = UnformattedAmount.zero;
   TransactionType _type = TransactionType.deposit;
   DateTime _executedAt = DateTime.now();
 
