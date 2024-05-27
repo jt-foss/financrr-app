@@ -87,7 +87,6 @@
   "server_config_check_url": "Check URL",
   "server_config_status": "Status: {hostStatus}, v{apiVersion}",
   "server_config_url": "Server URL",
-  "session_current": "Current Session",
   "session_delete_all_success": "Successfully deleted all sessions!",
   "settings_category_account": "Account",
   "settings_category_app": "App",
