@@ -56,7 +56,8 @@ class AccountCard extends ConsumerWidget {
                 Text(name, style: theme.textTheme.titleSmall),
                 if (iban != null || description != null) Text(TextUtils.formatIBAN(iban) ?? description!),
                 Text(balance.formatWithCurrency(currency!, l10n.decimalSeparator, thousandsSeparator: l10n.thousandSeparator),
-                    style: theme.textTheme.titleSmall?.copyWith(color: theme.themeData.primaryColor))
+                    style: theme.textTheme.titleSmall?.copyWith(
+                        color: balance.rawAmount < 0 ? theme.financrrExtension.error : theme.financrrExtension.primary))
               ],
             ),
           ),

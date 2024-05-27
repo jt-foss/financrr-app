@@ -90,9 +90,8 @@ class TransactionPageState extends ConsumerState<TransactionPage> {
     }
 
     buildVerticalLayout(Account account, Transaction transaction, Size size) {
-      final bool isMoneyIn =
-          transaction.getType(account) == TransactionType.deposit || transaction.getType(account) == TransactionType.transferIn;
-      final String amountStr = transaction.amount.formatWithCurrency(account.currencyId.get()!, l10n.decimalSeparator, thousandsSeparator: l10n.thousandSeparator, isNegative: !isMoneyIn);
+      final UnformattedAmount displayAmount = transaction.getDisplayAmount(account);
+      final String amountStr = displayAmount.formatWithCurrency(account.currencyId.get()!, l10n.decimalSeparator, thousandsSeparator: l10n.thousandSeparator);
       return Padding(
         padding: const EdgeInsets.only(top: 10, bottom: 20),
         child: Align(
@@ -110,7 +109,7 @@ class TransactionPageState extends ConsumerState<TransactionPage> {
                       children: [
                         Text(amountStr,
                             style: theme.textTheme.titleLarge?.copyWith(
-                                color: isMoneyIn ? theme.themeData.primaryColor : theme.themeData.colorScheme.error)),
+                                color: displayAmount.rawAmount > 0 ? theme.themeData.primaryColor : theme.themeData.colorScheme.error)),
                         Text(transaction.description ?? StoreKey.dateTimeFormat.readSync()!.format(transaction.executedAt)),
                       ],
                     ),

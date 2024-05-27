@@ -755,7 +755,7 @@ packages:
     description:
       path: "."
       ref: "feature/templates-and-recurring-transactions"
-      resolved-ref: d6e0e74127592a7a12383b862d2421bbc3dc117e
+      resolved-ref: "5d6465be221b05fd9c78a638be829aaf85e7440b"
       url: "https://github.com/financrr/restrr.git"
     source: git
     version: "0.13.0"

@@ -20,7 +20,7 @@ class MoneyInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
     amount = UnformattedAmount.fromString(newValue.text);
-    final String formatted = amount.format(decimalPlaces, decimalSeparator, currencySymbol: symbol, thousandsSeparator: thousandSeparator);
+    final String formatted = amount.format(decimalPlaces, decimalSeparator, thousandsSeparator: thousandSeparator);
     return newValue.copyWith(
       text: '$formatted$symbol',
       selection: TextSelection.collapsed(offset: formatted.length),

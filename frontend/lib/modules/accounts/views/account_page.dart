@@ -113,8 +113,13 @@ class _AccountPageState extends ConsumerState<AccountPage> {
                 children: [
                   Column(
                     children: [
-                      Text(account.balance.formatWithCurrency(account.currencyId.get()!, l10n.decimalSeparator, thousandsSeparator: l10n.thousandSeparator),
-                          style: theme.textTheme.titleLarge?.copyWith(color: theme.themeData.primaryColor)),
+                      Text(
+                          account.balance.formatWithCurrency(account.currencyId.get()!, l10n.decimalSeparator,
+                              thousandsSeparator: l10n.thousandSeparator),
+                          style: theme.textTheme.titleLarge?.copyWith(
+                              color: account.balance.rawAmount < 0
+                                  ? theme.financrrExtension.error
+                                  : theme.financrrExtension.primary)),
                       Text(account.name),
                     ],
                   ),
