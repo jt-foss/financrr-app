@@ -98,6 +98,7 @@
   "settings_item_local_storage": "Local Storage",
   "settings_item_logs": "Logs",
   "settings_item_sessions": "Sessions",
+  "settings_item_transaction_templates": "Transaction Templates",
   "startup_error_subtitle": "If this error persists, please create an issue on our GitHub repository or contact us via support@financrr.app",
   "startup_error_title": "An error occurred while initializing the app",
   "theme_dark": "Dark",
