@@ -2975,9 +2975,9 @@ dependencies = [
 
 [[package]]
 name = "sea-orm-cli"
-version = "1.0.0-rc.4"
+version = "1.0.0-rc.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e4d9173b3768a8cd39e4c6ddb50f3d0bca7907aad0f7c9c8b9db4dad70740535"
+checksum = "7e1d7c669920a0734f9a269bd210f2e2ac9aca603a531854bc81f03100e92d3a"
 dependencies = [
  "chrono",
  "clap",
@@ -3006,9 +3006,9 @@ dependencies = [
 
 [[package]]
 name = "sea-orm-migration"
-version = "1.0.0-rc.4"
+version = "1.0.0-rc.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9ce5df1fc1cb6e6d0aeaef6d306ffa4642f9b8dbb25cfed45f844d501d697460"
+checksum = "0784cae06269cf00b8f22c69e882d0b1092d2f978ec50320efbef699acf1efb6"
 dependencies = [
  "async-trait",
  "clap",
