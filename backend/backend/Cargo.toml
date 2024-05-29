@@ -67,7 +67,7 @@ regex = { version = "1.10.4", features = ["std", "perf", "unicode"] }
 itertools = "0.13.0"
 bitflags = {  version = "2.5.0", features = ["std", "serde"] }
 paste = "1.0.15"
-utility = { path = "../utility" }
+utility.workspace = true
 
 # Future Utils
 futures-util = "0.3.30"

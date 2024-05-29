@@ -1,8 +1,17 @@
+use std::time::{SystemTime, UNIX_EPOCH};
+
 use chrono::{DateTime, FixedOffset, Local, Offset, TimeZone};
 use time::{OffsetDateTime, UtcOffset};
 
 pub fn get_now() -> OffsetDateTime {
     OffsetDateTime::now_local().unwrap_or(get_now_from_chrono())
+}
+
+pub fn get_now_timestamp_millis() -> u64 {
+    let now = SystemTime::now();
+    let since_the_epoch = now.duration_since(UNIX_EPOCH)
+        .expect("Time went backwards");
+    since_the_epoch.as_secs() * 1000 + u64::from(since_the_epoch.subsec_millis())
 }
 
 fn get_now_from_chrono() -> OffsetDateTime {

@@ -26,4 +26,4 @@ sea-orm-migration = { version = "1.0.0-rc.5", features = ["sqlx-postgres", "runt
 tracing.workspace = true
 
 # Utils
-utility = { path = "../utility" }
+utility.workspace = true

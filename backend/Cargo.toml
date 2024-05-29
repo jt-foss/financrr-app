@@ -48,8 +48,14 @@ sea-orm = { version = "1.0.0-rc.5", features = ["sqlx-postgres", "runtime-tokio-
 time = { version = "0.3.36", features = ["serde-human-readable", "local-offset"] }
 chrono = { version = "0.4.38", features = ["clock"] }
 
+# Error handling
+thiserror = "1.0.61"
+
 # Logging
 tracing = "0.1.40"
+
+# Utilities
+utility = { path = "utility" }
 
 # Config for 'cargo dist'
 [workspace.metadata.dist]
