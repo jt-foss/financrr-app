@@ -76,11 +76,11 @@ mod tests {
 
     #[test]
     fn test_new_snowflake_generator() {
-        let generator = SnowflakeGenerator::new(1, 0).unwrap();
+        let generator = SnowflakeGenerator::new(1, 0).expect("Failed to create SnowflakeGenerator");
         assert_eq!(generator.node_id, 1);
         assert_eq!(generator.epoch, 0);
-        assert_eq!(*generator.last_timestamp.lock().unwrap(), 0);
-        assert_eq!(*generator.sequence.lock().unwrap(), 0);
+        assert_eq!(*generator.last_timestamp.lock().expect("Could not lock mutex!"), 0);
+        assert_eq!(*generator.sequence.lock().expect("Could not lock mutex!"), 0);
     }
 
     #[test]
@@ -92,8 +92,8 @@ mod tests {
     #[test]
     fn test_next_id() {
         let generator = SnowflakeGenerator::new(1, 0).unwrap();
-        let id1 = generator.next_id().unwrap();
-        let id2 = generator.next_id().unwrap();
+        let id1 = generator.next_id().expect("Failed to generate ID");
+        let id2 = generator.next_id().expect("Failed to generate ID");
         assert!(id2 > id1);
     }
 }
