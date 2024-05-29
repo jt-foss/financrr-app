@@ -1,4 +1,5 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
+
 use utility::snowflake::SnowflakeGenerator;
 
 pub fn next_id_benchmark(c: &mut Criterion) {

@@ -54,9 +54,7 @@ impl SnowflakeGenerator {
 
         *last_timestamp = current_timestamp;
 
-        Ok((current_timestamp << (NODE_ID_BITS + SEQUENCE_BITS))
-            | (self.node_id << SEQUENCE_BITS)
-            | *sequence)
+        Ok((current_timestamp << (NODE_ID_BITS + SEQUENCE_BITS)) | (self.node_id << SEQUENCE_BITS) | *sequence)
     }
 
     fn timestamp(&self) -> u64 {
