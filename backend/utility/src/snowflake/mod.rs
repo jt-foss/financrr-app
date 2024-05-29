@@ -91,7 +91,7 @@ mod tests {
 
     #[test]
     fn test_next_id() {
-        let generator = SnowflakeGenerator::new(1, 0).unwrap();
+        let generator = SnowflakeGenerator::new(1, 0).expect("Failed to create SnowflakeGenerator");
         let id1 = generator.next_id().expect("Failed to generate ID");
         let id2 = generator.next_id().expect("Failed to generate ID");
         assert!(id2 > id1);
