@@ -1,4 +1,4 @@
-use std::sync::{Arc, Mutex};
+use std::sync::atomic::{AtomicU64, Ordering};
 
 use crate::datetime::get_now_timestamp_millis;
 use crate::snowflake::error::SnowflakeGeneratorError;
@@ -15,8 +15,8 @@ const MAX_SEQUENCE: u64 = (1 << SEQUENCE_BITS) - 1;
 pub struct SnowflakeGenerator {
     node_id: u64,
     epoch: u64,
-    last_timestamp: Arc<Mutex<u64>>,
-    sequence: Arc<Mutex<u64>>,
+    last_timestamp: AtomicU64,
+    sequence: AtomicU64,
 }
 
 impl SnowflakeGenerator {
@@ -28,33 +28,34 @@ impl SnowflakeGenerator {
         Ok(Self {
             node_id,
             epoch,
-            last_timestamp: Arc::new(Mutex::new(0)),
-            sequence: Arc::new(Mutex::new(0)),
+            last_timestamp: AtomicU64::new(0),
+            sequence: AtomicU64::new(0),
         })
     }
 
     pub fn next_id(&self) -> Result<u64, SnowflakeGeneratorError> {
         let mut current_timestamp = self.timestamp();
-        let mut last_timestamp = self.last_timestamp.lock().expect("Could not lock last_timestamp mutex!");
+        let last_timestamp = self.last_timestamp.load(Ordering::SeqCst);
 
-        if current_timestamp < *last_timestamp {
+        if current_timestamp < last_timestamp {
             return Err(SnowflakeGeneratorError::InvalidSystemClock);
         }
 
-        let mut sequence = self.sequence.lock().expect("Could not lock sequence mutex!");
+        let mut sequence = self.sequence.load(Ordering::SeqCst);
 
-        if current_timestamp == *last_timestamp {
-            *sequence = (*sequence + 1) & MAX_SEQUENCE;
-            if *sequence == 0 {
-                current_timestamp = self.wait_for_next_millis(current_timestamp, *last_timestamp);
+        if current_timestamp == last_timestamp {
+            sequence = (sequence + 1) & MAX_SEQUENCE;
+            if sequence == 0 {
+                current_timestamp = self.wait_for_next_millis(current_timestamp, last_timestamp);
             }
         } else {
-            *sequence = 0;
+            sequence = 0;
         }
 
-        *last_timestamp = current_timestamp;
+        self.last_timestamp.store(current_timestamp, Ordering::SeqCst);
+        self.sequence.store(sequence, Ordering::SeqCst);
 
-        Ok((current_timestamp << (NODE_ID_BITS + SEQUENCE_BITS)) | (self.node_id << SEQUENCE_BITS) | *sequence)
+        Ok((current_timestamp << (NODE_ID_BITS + SEQUENCE_BITS)) | (self.node_id << SEQUENCE_BITS) | sequence)
     }
 
     fn timestamp(&self) -> u64 {
@@ -79,8 +80,8 @@ mod tests {
         let generator = SnowflakeGenerator::new(1, 0).expect("Failed to create SnowflakeGenerator");
         assert_eq!(generator.node_id, 1);
         assert_eq!(generator.epoch, 0);
-        assert_eq!(*generator.last_timestamp.lock().expect("Could not lock mutex!"), 0);
-        assert_eq!(*generator.sequence.lock().expect("Could not lock mutex!"), 0);
+        assert_eq!(generator.last_timestamp.load(Ordering::SeqCst), 0);
+        assert_eq!(generator.sequence.load(Ordering::SeqCst), 0);
     }
 
     #[test]

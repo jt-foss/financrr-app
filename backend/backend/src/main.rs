@@ -25,6 +25,7 @@ use utoipauto::utoipauto;
 use entity::utility::loading::load_schema;
 use migration::Migrator;
 use migration::MigratorTrait;
+use utility::snowflake::SnowflakeGenerator;
 
 use crate::api::error::api::ApiError;
 use crate::api::routes::account::controller::account_controller;
@@ -54,6 +55,9 @@ pub(crate) mod wrapper;
 pub(crate) static DB: OnceLock<DatabaseConnection> = OnceLock::new();
 pub(crate) static REDIS: OnceLock<Client> = OnceLock::new();
 pub(crate) static CONFIG: OnceLock<Config> = OnceLock::new();
+pub(crate) static SNOWFLAKE_GENERATOR: OnceLock<SnowflakeGenerator> = OnceLock::new();
+
+const SNOWFLAKE_EPOCH: u64 = 1_705_247_483_000_000;
 
 #[utoipauto(paths = "./backend/src")]
 #[derive(OpenApi)]
@@ -98,6 +102,11 @@ async fn main() -> Result<()> {
 
     info!("Loading configuration...");
     CONFIG.set(Config::load()).expect("Could not load config!");
+
+    info!("Setting up Snowflake generator...");
+    SNOWFLAKE_GENERATOR
+        .set(SnowflakeGenerator::new(0, SNOWFLAKE_EPOCH).expect("Could not set Snowflake generator!"))
+        .expect("Could not set Snowflake generator!");
 
     info!("[*] Establishing database connection...");
     DB.set(establish_database_connection().await).expect("Could not set database!");
