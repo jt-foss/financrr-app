@@ -15,7 +15,7 @@ pub(crate) mod dto;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub(crate) enum RecurringRule {
-    #[serde(rename = "cronPattern")]
+    #[serde(rename = "cron_pattern")]
     CronPattern(CronPattern),
     #[serde(rename = "special")]
     Special(String),

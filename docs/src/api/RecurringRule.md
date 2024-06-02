@@ -5,7 +5,7 @@ Structure of a recurring rule:
 
 ```json
 {
-    "cronPattern": {
+    "cron_pattern": {
         "day_of_month": "*",
         "month": "*",
         "day_of_week": "*"
@@ -50,7 +50,7 @@ Simply build the cron and extract the `day_of_month`, `month`, and `day_of_week`
 
 ```json
 {
-    "cronPattern": {
+    "cron_pattern": {
         "day_of_month": "*",
         "month": "*",
         "day_of_week": "*"
@@ -62,7 +62,7 @@ Simply build the cron and extract the `day_of_month`, `month`, and `day_of_week`
 
 ```json
 {
-    "cronPattern": {
+    "cron_pattern": {
         "day_of_month": "*",
         "month": "*",
         "day_of_week": "*/4"
@@ -74,7 +74,7 @@ Simply build the cron and extract the `day_of_month`, `month`, and `day_of_week`
 
 ```json
 {
-    "cronPattern": {
+    "cron_pattern": {
         "day_of_month": "*",
         "month": "*",
         "day_of_week": "1,5"
@@ -94,7 +94,7 @@ Simply build the cron and extract the `day_of_month`, `month`, and `day_of_week`
 
 ```json
 {
-    "cronPattern": {
+    "cron_pattern": {
         "day_of_month": "*",
         "month": "*/3",
         "day_of_week": "1#2"
@@ -106,7 +106,7 @@ Simply build the cron and extract the `day_of_month`, `month`, and `day_of_week`
 
 ```json
 {
-    "cronPattern": {
+    "cron_pattern": {
         "day_of_month": "*",
         "month": "1,8",
         "day_of_week": "*"

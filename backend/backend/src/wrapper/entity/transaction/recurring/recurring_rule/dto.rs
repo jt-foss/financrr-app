@@ -8,7 +8,7 @@ const SPECIALS: [&str; 5] = ["@yearly", "@annually", "@monthly", "@weekly", "@da
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub(crate) enum RecurringRuleDTO {
-    #[serde(rename = "cronPattern")]
+    #[serde(rename = "cron_pattern")]
     CronPattern(CronPatternDTO),
     #[serde(rename = "special")]
     Special(String),
@@ -27,7 +27,7 @@ impl Validate for RecurringRuleDTO {
         match self {
             Self::CronPattern(inner) => {
                 if inner.day_of_month.eq("*") && inner.month.eq("*") && inner.day_of_week.eq("*") {
-                    errors.add("cronPattern", "Invalid cron pattern. At least one of day_of_month, month, day_of_week must be set to a value other than *");
+                    errors.add("cron_pattern", "Invalid cron pattern. At least one of day_of_month, month, day_of_week must be set to a value other than *");
                 }
             }
             Self::Special(special) => {
