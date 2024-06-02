@@ -73,7 +73,7 @@ class TransactionPageState extends ConsumerState<TransactionPage> {
         Padding(
           padding: const EdgeInsets.all(10),
           child: label.toText(
-            style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+            baseStyle: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
         ),
         Padding(

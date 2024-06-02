@@ -59,7 +59,7 @@ class _AppTextFieldState extends ConsumerState<FinancrrTextField> {
       children: [
         Row(
           children: [
-            Flexible(child: widget.label.toText(style: labelStyle)),
+            Flexible(child: widget.label.toText(baseStyle: labelStyle)),
             if (widget.required)
               Text(' *', style: labelStyle?.copyWith(fontWeight: FontWeight.w600, color: theme.financrrExtension.error)),
           ],

@@ -41,7 +41,7 @@ class FinancrrNavigationBar extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.only(top: 5),
               child: destination.label.toText(
-                  style: theme.textTheme.bodySmall?.copyWith(
+                  baseStyle: theme.textTheme.bodySmall?.copyWith(
                 color: isSelected ? theme.financrrExtension.primary : null,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
               )),

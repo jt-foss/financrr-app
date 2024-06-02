@@ -63,12 +63,12 @@ class _ThemeSettingsPageState extends ConsumerState<ThemeSettingsPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   appTheme.translationKey.toText(
-                      style: theme.textTheme.bodyMedium?.copyWith(
+                      baseStyle: theme.textTheme.bodyMedium?.copyWith(
                           color: currentTheme ? theme.financrrExtension.primary : null,
                           fontWeight: currentTheme ? FontWeight.bold : null)),
                   if (theme.mode == ThemeMode.system && (activeLight || activeDark))
                     (activeLight ? L10nKey.appearanceCurrentLightTheme : L10nKey.appearanceCurrentDarkTheme)
-                        .toText(style: theme.textTheme.labelSmall)
+                        .toText(baseStyle: theme.textTheme.labelSmall)
                 ],
               )),
               if (currentTheme) Icon(Icons.check, color: theme.financrrExtension.primary)
@@ -90,7 +90,7 @@ class _ThemeSettingsPageState extends ConsumerState<ThemeSettingsPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          L10nKey.appearanceUseDeviceTheme.toText(style: theme.textTheme.titleSmall),
+                          L10nKey.appearanceUseDeviceTheme.toText(baseStyle: theme.textTheme.titleSmall),
                           L10nKey.appearanceCurrentDeviceTheme.toText(
                               namedArgs: {'deviceTheme': WidgetsBinding.instance.platformDispatcher.platformBrightness.name})
                         ],

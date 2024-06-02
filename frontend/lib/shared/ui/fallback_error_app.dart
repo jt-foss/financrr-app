@@ -27,7 +27,7 @@ class FallbackErrorApp extends StatelessWidget {
                   const SizedBox(height: 10),
                   L10nKey.startupErrorTitle.toText(
                     textAlign: TextAlign.center,
-                    style: const TextStyle(fontWeight: FontWeight.w700),
+                    baseStyle: const TextStyle(fontWeight: FontWeight.w700),
                   ),
                   // TODO: parse URL & email to clickable links
                   L10nKey.startupErrorSubtitle.toText(textAlign: TextAlign.center),

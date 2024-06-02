@@ -63,7 +63,7 @@ class _AccountPageState extends ConsumerState<AccountPage> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          L10nKey.dashboardTransactions.toText(style: theme.textTheme.titleMedium),
+          L10nKey.dashboardTransactions.toText(baseStyle: theme.textTheme.titleMedium),
           Padding(
             padding: const EdgeInsets.only(top: 10),
             child: PaginatedWrapper(

@@ -1,10 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
 import 'package:flutter/material.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logging/logging.dart';
-import 'package:styled_text/styled_text.dart';
 
 enum L10nKey {
   // account
@@ -137,7 +134,7 @@ enum L10nKey {
   templatePropertiesTo('template_properties_to'),
   templateSchedule('template_schedule'),
   templateScheduled('template_scheduled', hasParams: true),
-  templateTitleTransfer('template_title_transfer', hasParams: true, hasStyleTags: true),
+  templateTitleTransfer('template_title_transfer', hasParams: true),
   templateNoneFoundBody('template_none_found_body'),
   templateNoneFoundTitle('template_none_found_title'),
   // theme
@@ -169,73 +166,41 @@ enum L10nKey {
 
   final String key;
   final bool hasParams;
-  final bool hasStyleTags;
-  const L10nKey(this.key, {this.hasParams = false, this.hasStyleTags = false});
+  const L10nKey(this.key, {this.hasParams = false});
 
-  Text toText({Map<String, String>? namedArgs, TextStyle? style, TextAlign? textAlign, bool? softWrap}) {
-    if (hasStyleTags) {
-      _log.warning('L10nKey $key has style tags, which are not supported by toText()');
-    }
+  Text toText(
+      {Map<String, String>? namedArgs,
+      Map<String, TextStyle Function(TextStyle)>? namedStyles,
+      TextStyle? baseStyle,
+      TextAlign? textAlign,
+      bool? softWrap}) {
     if (hasParams && namedArgs == null) {
       _log.warning('L10nKey $key has params, but namedArgs is null');
+    }
+    if (namedStyles != null) {
+      String remaining = key.tr(); // don't pass namedArgs here, we want to keep the placeholders
+      final List<(String, TextStyle?)> styles = [];
+
+      for (MapEntry<String, TextStyle Function(TextStyle)> entry in namedStyles.entries) {
+        String key = namedArgs?[entry.key] ?? entry.key;
+        int start = remaining.indexOf('{${entry.key}}');
+        int end = start + entry.key.length + 2;
+        // add part before found key
+        styles.add((remaining.substring(0, start), baseStyle));
+        // add found key
+        styles.add((key, entry.value.call(baseStyle ?? const TextStyle())));
+        // shrink remaining string
+        remaining = remaining.replaceRange(0, end, '');
+      }
+
+      return Text.rich(TextSpan(children: [for ((String, TextStyle?) pair in styles) TextSpan(text: pair.$1, style: pair.$2)]));
     }
     return Text(
       key,
-      style: style,
+      style: baseStyle,
       textAlign: textAlign,
       softWrap: softWrap,
     ).tr(namedArgs: namedArgs);
-  }
-
-  StyledText toStyledText(WidgetRef ref,
-      {Map<String, String>? namedArgs, TextStyle? style, TextAlign? textAlign, bool? softWrap}) {
-    if (hasParams && namedArgs == null) {
-      _log.warning('L10nKey $key has params, but namedArgs is null');
-    }
-    var theme = ref.watch(themeProvider);
-
-    styleIf(
-        {TextStyle? baseStyle,
-        Color? color,
-        FontWeight? fontWeight,
-        FontStyle? fontStyle,
-        TextDecoration? decoration,
-        bool invert = false}) {
-      return StyledTextCustomTag(
-          baseStyle: baseStyle,
-          parse: (baseStyle, attributes) {
-            final String? key = namedArgs?[attributes['key']];
-            final String? value = attributes['value'];
-            return (invert ? (key != value) : (key == value))
-                ? baseStyle?.copyWith(color: color, fontWeight: fontWeight, fontStyle: fontStyle, decoration: decoration)
-                : baseStyle;
-          });
-    }
-
-    return StyledText(
-      text: key.tr(namedArgs: namedArgs),
-      style: style,
-      textAlign: textAlign,
-      softWrap: softWrap,
-      tags: {
-        'bold': StyledTextTag(style: style?.copyWith(fontWeight: FontWeight.bold)),
-        'italic': StyledTextTag(style: style?.copyWith(fontStyle: FontStyle.italic)),
-        'underlined': StyledTextTag(style: style?.copyWith(decoration: TextDecoration.underline)),
-        'primary': StyledTextTag(style: style?.copyWith(color: theme.financrrExtension.primary)),
-        'error': StyledTextTag(style: style?.copyWith(color: theme.themeData.colorScheme.error)),
-        // conditional tags
-        'boldIf': styleIf(baseStyle: style, fontWeight: FontWeight.bold),
-        'italicIf': styleIf(baseStyle: style, fontStyle: FontStyle.italic),
-        'underlinedIf': styleIf(baseStyle: style, decoration: TextDecoration.underline),
-        'primaryIf': styleIf(baseStyle: style, color: theme.financrrExtension.primary),
-        'errorIf': styleIf(baseStyle: style, color: theme.themeData.colorScheme.error),
-        'boldIfNot': styleIf(baseStyle: style, fontWeight: FontWeight.bold, invert: true),
-        'italicIfNot': styleIf(baseStyle: style, fontStyle: FontStyle.italic, invert: true),
-        'underlinedIfNot': styleIf(baseStyle: style, decoration: TextDecoration.underline, invert: true),
-        'primaryIfNot': styleIf(baseStyle: style, color: theme.financrrExtension.primary, invert: true),
-        'errorIfNot': styleIf(baseStyle: style, color: theme.themeData.colorScheme.error, invert: true),
-      },
-    );
   }
 
   void showSnack(BuildContext context, {Map<String, String>? namedArgs}) {
@@ -244,9 +209,6 @@ enum L10nKey {
 
   @override
   String toString({Map<String, String>? namedArgs}) {
-    if (hasStyleTags) {
-      _log.warning('L10nKey $key has style tags, which are not supported by toString()');
-    }
     if (hasParams && namedArgs == null) {
       _log.warning('L10nKey $key has params, but namedArgs is null');
     }

@@ -130,7 +130,7 @@ class _CurrencyEditPageState extends ConsumerState<CurrencyEditPage> {
                               child: Padding(
                                 padding: const EdgeInsets.only(left: 10),
                                 child: L10nKey.currencyNotEditable
-                                    .toText(style: theme.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700)),
+                                    .toText(baseStyle: theme.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700)),
                               ),
                             ),
                           ],

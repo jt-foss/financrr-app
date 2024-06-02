@@ -68,7 +68,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
         children: [
           Padding(
             padding: const EdgeInsets.only(bottom: 10),
-            child: L10nKey.dashboardQuickActions.toText(style: theme.textTheme.titleMedium),
+            child: L10nKey.dashboardQuickActions.toText(baseStyle: theme.textTheme.titleMedium),
           ),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -90,7 +90,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                         ),
                       ),
                       const SizedBox(height: 5),
-                      action.title.toText(style: theme.textTheme.labelSmall, textAlign: TextAlign.center)
+                      action.title.toText(baseStyle: theme.textTheme.labelSmall, textAlign: TextAlign.center)
                     ],
                   ),
                 )
@@ -104,7 +104,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          L10nKey.dashboardTotal.toText(style: theme.textTheme.titleMedium),
+          L10nKey.dashboardTotal.toText(baseStyle: theme.textTheme.titleMedium),
           Text('0,00€', style: theme.textTheme.displaySmall?.copyWith(color: theme.financrrExtension.primary)),
           Container(
             width: size.width / 4,
@@ -124,7 +124,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: L10nKey.dashboardTransactions.toText(style: theme.textTheme.titleMedium),
+            child: L10nKey.dashboardTransactions.toText(baseStyle: theme.textTheme.titleMedium),
           ),
           StreamWrapper(
               stream: _transactionStreamController.stream,
@@ -171,7 +171,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      L10nKey.dashboardAccounts.toText(style: theme.textTheme.titleMedium),
+                      L10nKey.dashboardAccounts.toText(baseStyle: theme.textTheme.titleMedium),
                       PopupMenuButton(
                           icon: const Icon(Icons.more_horiz),
                           itemBuilder: (context) {
