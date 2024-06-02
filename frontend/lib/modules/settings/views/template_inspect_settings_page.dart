@@ -63,14 +63,6 @@ class _TemplateInspectSettingsPageState extends ConsumerState<TemplateInspectSet
       ]);
     }
 
-    formatAccountId(AccountId? id) {
-      return TextSpan(
-          text: id == null ? 'Somewhere' : id.get()!.name,
-          style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: id == null ? null : theme.financrrExtension.primary));
-    }
-
     buildVerticalLayout(TransactionTemplate template, Size size) {
       final Currency currency = (template.sourceId ?? template.destinationId!).get()!.currencyId.get()!;
       final String amountStr =
@@ -85,27 +77,18 @@ class _TemplateInspectSettingsPageState extends ConsumerState<TemplateInspectSet
               children: [
                 Column(
                   children: [
-                    Text.rich(
-                        style: theme.textTheme.titleMedium,
-                        TextSpan(children: [
-                          const TextSpan(text: 'Transfer '),
-                          TextSpan(
-                              text: amountStr,
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold, color: theme.financrrExtension.primary)),
-                          const TextSpan(text: ' from '),
-                          formatAccountId(template.sourceId),
-                          const TextSpan(text: ' to '),
-                          formatAccountId(template.destinationId),
-                        ])),
+                    L10nKey.templateTitleTransfer.toStyledText(ref, style: theme.textTheme.titleMedium, namedArgs: {
+                      'amount': amountStr,
+                      'source': template.sourceId?.get()?.name ?? 'N/A',
+                      'destination': template.destinationId?.get()?.name ?? 'N/A'
+                    }),
                     if (template.description != null) Text(template.description!),
                   ],
                 ),
                 const SizedBox(height: 20),
                 Row(
                   children: [
-                    IconButton(
-                        tooltip: 'Execute now', onPressed: () {}, icon: const Icon(Icons.play_arrow_outlined, size: 17)),
+                    IconButton(tooltip: 'Execute now', onPressed: () {}, icon: const Icon(Icons.play_arrow_outlined, size: 17)),
                     IconButton(
                       tooltip: 'Schedule',
                       onPressed: () {},

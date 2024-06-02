@@ -1,7 +1,6 @@
 import 'package:financrr_frontend/modules/settings/providers/theme.provider.dart';
 import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/shared/ui/custom_replacements/custom_card.dart';
-import 'package:financrr_frontend/shared/ui/custom_replacements/custom_text_button.dart';
 import 'package:financrr_frontend/shared/ui/links/account_link.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -46,9 +45,8 @@ class TransactionTemplateCard extends ConsumerWidget {
     var l10n = ref.watch(l10nProvider);
 
     final AccountId effectiveId = source ?? destination!;
-    final Restrr api = effectiveId.api;
     final Currency currency = effectiveId.get()!.currencyId.get()!;
-    final int scheduled = 3; // TODO: _api.getRecurringTransactions().where((r) => r.templateId == id).length;
+    const int scheduled = 3; // TODO: _api.getRecurringTransactions().where((r) => r.templateId == id).length;
 
     return FinancrrCard(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -78,10 +76,10 @@ class TransactionTemplateCard extends ConsumerWidget {
             mainAxisAlignment: scheduled > 0 ? MainAxisAlignment.spaceBetween : MainAxisAlignment.end,
             children: [
               if (scheduled > 0)
-                Row(
+                const Row(
                   children: [
-                    const Icon(Icons.schedule, size: 17),
-                    const SizedBox(width: 5),
+                    Icon(Icons.schedule, size: 17),
+                    SizedBox(width: 5),
                     Text('$scheduled scheduled')
                   ],
                 ),

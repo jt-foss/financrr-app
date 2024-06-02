@@ -10,7 +10,6 @@ import 'package:restrr/restrr.dart';
 import '../../../shared/ui/adaptive_scaffold.dart';
 import '../../../../routing/page_path.dart';
 import '../../../../modules/settings/views/settings_page.dart';
-import '../../../shared/ui/async_wrapper.dart';
 import '../../../shared/ui/paginated_wrapper.dart';
 
 class TemplateOverviewSettingsPage extends StatefulHookConsumerWidget {
