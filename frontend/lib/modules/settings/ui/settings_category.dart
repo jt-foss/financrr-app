@@ -50,7 +50,7 @@ class SettingsCategory extends ConsumerWidget {
           if (title != null)
             Padding(
               padding: const EdgeInsets.only(left: 5, bottom: 5),
-              child: title!.toText(baseStyle: theme.themeData.textTheme.titleMedium),
+              child: title!.toText(style: theme.themeData.textTheme.titleMedium),
             ),
           Container(
             decoration: BoxDecoration(

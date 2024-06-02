@@ -63,7 +63,7 @@ class AuthPageTemplateState extends ConsumerState<AuthPageTemplate> {
               ),
               _getRandomMessageKey().toText(
                   textAlign: TextAlign.center,
-                  baseStyle: theme.textTheme.titleLarge?.copyWith(color: theme.themeData.primaryColor)),
+                  style: theme.textTheme.titleLarge?.copyWith(color: theme.themeData.primaryColor)),
               widget.child
             ]),
           )));

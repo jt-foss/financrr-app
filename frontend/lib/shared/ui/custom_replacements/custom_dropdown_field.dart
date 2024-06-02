@@ -95,7 +95,7 @@ class _FinancrrDropdownFieldState<T> extends ConsumerState<FinancrrDropdownField
       children: [
         Row(
           children: [
-            Flexible(child: widget.label.toText(baseStyle: labelStyle)),
+            Flexible(child: widget.label.toText(style: labelStyle)),
             if (widget.required)
               Text(' *', style: labelStyle?.copyWith(fontWeight: FontWeight.w600, color: theme.financrrExtension.error)),
           ],

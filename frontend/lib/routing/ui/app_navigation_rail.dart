@@ -63,7 +63,7 @@ class FinancrrNavigationRail extends ConsumerWidget {
                     const SizedBox(width: 25),
                     destination.label.toText(
                         softWrap: true,
-                        baseStyle: theme.textTheme.bodyMedium?.copyWith(
+                        style: theme.textTheme.bodyMedium?.copyWith(
                             color: isSelected ? theme.financrrExtension.primary : null,
                             fontWeight: isSelected || isHovered ? FontWeight.w600 : FontWeight.w500))
                   ]

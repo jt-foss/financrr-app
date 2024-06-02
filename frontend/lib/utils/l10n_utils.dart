@@ -171,7 +171,7 @@ enum L10nKey {
   Text toText(
       {Map<String, String>? namedArgs,
       Map<String, TextStyle Function(TextStyle)>? namedStyles,
-      TextStyle? baseStyle,
+      TextStyle? style,
       TextAlign? textAlign,
       bool? softWrap}) {
     if (hasParams && namedArgs == null) {
@@ -186,9 +186,9 @@ enum L10nKey {
         int start = remaining.indexOf('{${entry.key}}');
         int end = start + entry.key.length + 2;
         // add part before found key
-        styles.add((remaining.substring(0, start), baseStyle));
+        styles.add((remaining.substring(0, start), style));
         // add found key
-        styles.add((key, entry.value.call(baseStyle ?? const TextStyle())));
+        styles.add((key, entry.value.call(style ?? const TextStyle())));
         // shrink remaining string
         remaining = remaining.replaceRange(0, end, '');
       }
@@ -197,7 +197,7 @@ enum L10nKey {
     }
     return Text(
       key,
-      style: baseStyle,
+      style: style,
       textAlign: textAlign,
       softWrap: softWrap,
     ).tr(namedArgs: namedArgs);

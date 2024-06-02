@@ -53,7 +53,7 @@ class _TemplateInspectSettingsPageState extends ConsumerState<TemplateInspectSet
         Padding(
           padding: const EdgeInsets.all(10),
           child: label.toText(
-            baseStyle: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+            style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
         ),
         Padding(
@@ -77,7 +77,7 @@ class _TemplateInspectSettingsPageState extends ConsumerState<TemplateInspectSet
               children: [
                 Column(
                   children: [
-                    L10nKey.templateTitleTransfer.toText(baseStyle: theme.textTheme.titleMedium, namedArgs: {
+                    L10nKey.templateTitleTransfer.toText(style: theme.textTheme.titleMedium, namedArgs: {
                       'amount': amountStr,
                       'source': template.sourceId?.get()?.name ?? L10nKey.commonNotAvailable.toString(),
                       'destination': template.destinationId?.get()?.name ?? L10nKey.commonNotAvailable.toString()
