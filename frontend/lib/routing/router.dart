@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:financrr_frontend/modules/settings/views/local_storage_settings_page.dart';
 import 'package:financrr_frontend/modules/settings/views/l10n_settings_page.dart';
+import 'package:financrr_frontend/modules/settings/views/template_inspect_settings_page.dart';
 import 'package:financrr_frontend/shared/views/splash_page.dart';
 import 'package:financrr_frontend/modules/accounts/views/account_create_page.dart';
 import 'package:financrr_frontend/modules/settings/views/currency_create_page.dart';
@@ -25,6 +26,7 @@ import '../modules/auth/views/server_config_page.dart';
 import '../modules/settings/views/currency_edit_page.dart';
 import '../modules/settings/views/currency_settings_page.dart';
 import '../modules/settings/views/log_settings_page.dart';
+import '../modules/settings/views/template_overview_settings_page.dart';
 import '../modules/transactions/views/transaction_create_page.dart';
 import '../modules/transactions/views/transaction_edit_page.dart';
 import '../modules/transactions/views/transaction_page.dart';
@@ -169,6 +171,22 @@ class AppRouter {
                               },
                               redirect: guards([_coreAuthGuard]))
                         ]),
+                    GoRoute(
+                      path: TemplateOverviewSettingsPage.pagePath.path,
+                      pageBuilder: _defaultPageBuilder(const TemplateOverviewSettingsPage()),
+                      redirect: guards([_coreAuthGuard]),
+                      routes: [
+                        GoRoute(
+                          path: TemplateInspectSettingsPage.pagePath.path,
+                          pageBuilder: (context, state) {
+                            final String templateId = state.pathParameters['templateId']!;
+                            return _buildDefaultPageTransition(context, state,
+                                TemplateInspectSettingsPage(key: ValueKey('template-$templateId'), templateId: templateId));
+                          },
+                          redirect: guards([_coreAuthGuard]),
+                        )
+                      ]
+                    ),
                     GoRoute(
                       path: LocalStorageSettingsPage.pagePath.path,
                       pageBuilder: _defaultPageBuilder(const LocalStorageSettingsPage()),

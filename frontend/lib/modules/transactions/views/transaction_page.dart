@@ -76,22 +76,17 @@ class TransactionPageState extends ConsumerState<TransactionPage> {
             style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
         ),
-        if (value is Account) ...[
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: AccountLink(account: value),
-          ),
-        ] else
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Text(value),
-          ),
+        Padding(
+          padding: const EdgeInsets.all(10),
+          child: value is Account ? AccountLink(account: value) : Text(value),
+        ),
       ]);
     }
 
     buildVerticalLayout(Account account, Transaction transaction, Size size) {
       final UnformattedAmount displayAmount = transaction.getDisplayAmount(account);
-      final String amountStr = displayAmount.formatWithCurrency(account.currencyId.get()!, l10n.decimalSeparator, thousandsSeparator: l10n.thousandSeparator);
+      final String amountStr = displayAmount.formatWithCurrency(account.currencyId.get()!, l10n.decimalSeparator,
+          thousandsSeparator: l10n.thousandSeparator);
       return Padding(
         padding: const EdgeInsets.only(top: 10, bottom: 20),
         child: Align(
@@ -109,7 +104,9 @@ class TransactionPageState extends ConsumerState<TransactionPage> {
                       children: [
                         Text(amountStr,
                             style: theme.textTheme.titleLarge?.copyWith(
-                                color: displayAmount.rawAmount > 0 ? theme.themeData.primaryColor : theme.themeData.colorScheme.error)),
+                                color: displayAmount.rawAmount > 0
+                                    ? theme.themeData.primaryColor
+                                    : theme.themeData.colorScheme.error)),
                         Text(transaction.description ?? StoreKey.dateTimeFormat.readSync()!.format(transaction.executedAt)),
                       ],
                     ),

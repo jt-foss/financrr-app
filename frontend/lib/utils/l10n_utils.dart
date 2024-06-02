@@ -115,9 +115,14 @@ enum L10nKey {
   settingsItemLocalStorage('settings_item_local_storage'),
   settingsItemLogs('settings_item_logs'),
   settingsItemSessions('settings_item_sessions'),
+  settingsItemTransactionTemplates('settings_item_transaction_templates'),
   // startup
   startupErrorSubtitle('startup_error_subtitle'),
   startupErrorTitle('startup_error_title'),
+  // template
+  templateNoneFoundBody('template_none_found_body'),
+  templateNoneFoundTitle('template_none_found_title'),
+  templateNotFound('template_not_found'), // TODO: add
   // theme
   themeDark('theme_dark'),
   themeLight('theme_light'),
