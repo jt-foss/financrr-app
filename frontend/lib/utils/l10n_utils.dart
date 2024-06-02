@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
+import 'package:financrr_frontend/utils/text_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 
@@ -177,30 +178,18 @@ enum L10nKey {
     if (hasParams && namedArgs == null) {
       _log.warning('L10nKey $key has params, but namedArgs is null');
     }
+    final String localized = key.tr(namedArgs: namedArgs);
     if (namedStyles != null) {
-      String remaining = key.tr(); // don't pass namedArgs here, we want to keep the placeholders
-      final List<(String, TextStyle?)> styles = [];
-
-      for (MapEntry<String, TextStyle Function(TextStyle)> entry in namedStyles.entries) {
-        String key = namedArgs?[entry.key] ?? entry.key;
-        int start = remaining.indexOf('{${entry.key}}');
-        int end = start + entry.key.length + 2;
-        // add part before found key
-        styles.add((remaining.substring(0, start), style));
-        // add found key
-        styles.add((key, entry.value.call(style ?? const TextStyle())));
-        // shrink remaining string
-        remaining = remaining.replaceRange(0, end, '');
-      }
-
-      return Text.rich(TextSpan(children: [for ((String, TextStyle?) pair in styles) TextSpan(text: pair.$1, style: pair.$2)]));
+      // don't pass namedArgs here, we want to keep the placeholders
+      return Text.rich(TextSpan(
+          children: TextUtils.richFormatL10nText(key.tr(), localized, namedStyles: namedStyles, namedArgs: namedArgs)));
     }
     return Text(
-      key,
+      localized,
       style: style,
       textAlign: textAlign,
       softWrap: softWrap,
-    ).tr(namedArgs: namedArgs);
+    );
   }
 
   void showSnack(BuildContext context, {Map<String, String>? namedArgs}) {
