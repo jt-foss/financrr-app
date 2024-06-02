@@ -108,7 +108,7 @@
   "template_properties_from": "From",
   "template_properties_name": "Name",
   "template_properties_to": "To",
-  "template_title_transfer": "Transfer <primary>{amount}</primary> from <primaryIfNotNull key=\"source\">{source}</primary> to <primaryIfNotNull key=\"destination\">{destination}</primary>",
+  "template_title_transfer": "Transfer <primary>{amount}</primary> from <primaryIfNot key=\"source\" value=\"N/A\">{source}</primary> to <primaryIfNot key=\"destination\" value=\"N/A\">{destination}</primary>",
   "templates_none_found_body": "You have not created any transaction templates yet.",
   "templates_none_found_title": "No templates",
   "theme_dark": "Dark",
