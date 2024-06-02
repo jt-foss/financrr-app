@@ -182,7 +182,8 @@ enum L10nKey {
     if (namedStyles != null) {
       // don't pass namedArgs here, we want to keep the placeholders
       return Text.rich(TextSpan(
-          children: TextUtils.richFormatL10nText(key.tr(), localized, namedStyles: namedStyles, namedArgs: namedArgs)));
+          children:
+              TextUtils.richFormatL10nText(key.tr(), localized, style: style, namedStyles: namedStyles, namedArgs: namedArgs)));
     }
     return Text(
       localized,
