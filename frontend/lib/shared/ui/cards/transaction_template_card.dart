@@ -50,7 +50,9 @@ class TransactionTemplateCard extends ConsumerWidget {
 
     return FinancrrCard(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      onTap: !interactive ? null : () => context.goPath(TemplateInspectSettingsPage.pagePath.build(params: {'templateId': id.toString()})),
+      onTap: !interactive
+          ? null
+          : () => context.goPath(TemplateInspectSettingsPage.pagePath.build(params: {'templateId': id.toString()})),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -77,11 +79,7 @@ class TransactionTemplateCard extends ConsumerWidget {
             children: [
               if (scheduled > 0)
                 const Row(
-                  children: [
-                    Icon(Icons.schedule, size: 17),
-                    SizedBox(width: 5),
-                    Text('$scheduled scheduled')
-                  ],
+                  children: [Icon(Icons.schedule, size: 17), SizedBox(width: 5), Text('$scheduled scheduled')],
                 ),
               Text(amount.formatWithCurrency(currency, l10n.decimalSeparator, thousandsSeparator: l10n.thousandSeparator),
                   style: theme.textTheme.titleMedium?.copyWith(

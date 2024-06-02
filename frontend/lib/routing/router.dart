@@ -172,21 +172,20 @@ class AppRouter {
                               redirect: guards([_coreAuthGuard]))
                         ]),
                     GoRoute(
-                      path: TemplateOverviewSettingsPage.pagePath.path,
-                      pageBuilder: _defaultPageBuilder(const TemplateOverviewSettingsPage()),
-                      redirect: guards([_coreAuthGuard]),
-                      routes: [
-                        GoRoute(
-                          path: TemplateInspectSettingsPage.pagePath.path,
-                          pageBuilder: (context, state) {
-                            final String templateId = state.pathParameters['templateId']!;
-                            return _buildDefaultPageTransition(context, state,
-                                TemplateInspectSettingsPage(key: ValueKey('template-$templateId'), templateId: templateId));
-                          },
-                          redirect: guards([_coreAuthGuard]),
-                        )
-                      ]
-                    ),
+                        path: TemplateOverviewSettingsPage.pagePath.path,
+                        pageBuilder: _defaultPageBuilder(const TemplateOverviewSettingsPage()),
+                        redirect: guards([_coreAuthGuard]),
+                        routes: [
+                          GoRoute(
+                            path: TemplateInspectSettingsPage.pagePath.path,
+                            pageBuilder: (context, state) {
+                              final String templateId = state.pathParameters['templateId']!;
+                              return _buildDefaultPageTransition(context, state,
+                                  TemplateInspectSettingsPage(key: ValueKey('template-$templateId'), templateId: templateId));
+                            },
+                            redirect: guards([_coreAuthGuard]),
+                          )
+                        ]),
                     GoRoute(
                       path: LocalStorageSettingsPage.pagePath.path,
                       pageBuilder: _defaultPageBuilder(const LocalStorageSettingsPage()),

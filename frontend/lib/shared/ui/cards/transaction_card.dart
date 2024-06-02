@@ -73,9 +73,10 @@ class TransactionCard extends ConsumerWidget {
             children: [
               Text(l10n.dateFormat.format(executedAt)),
               Text(
-                  amount.formatWithCurrency(account.currencyId.get()!, l10n.decimalSeparator, thousandsSeparator: l10n.thousandSeparator),
-                  style: theme.textTheme.titleMedium
-                      ?.copyWith(color: amount.rawAmount < 0 ? theme.financrrExtension.error : theme.financrrExtension.primary)),
+                  amount.formatWithCurrency(account.currencyId.get()!, l10n.decimalSeparator,
+                      thousandsSeparator: l10n.thousandSeparator),
+                  style: theme.textTheme.titleMedium?.copyWith(
+                      color: amount.rawAmount < 0 ? theme.financrrExtension.error : theme.financrrExtension.primary)),
             ],
           ),
         ],

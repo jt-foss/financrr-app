@@ -79,8 +79,8 @@ class _TemplateInspectSettingsPageState extends ConsumerState<TemplateInspectSet
                   children: [
                     L10nKey.templateTitleTransfer.toStyledText(ref, style: theme.textTheme.titleMedium, namedArgs: {
                       'amount': amountStr,
-                      'source': template.sourceId?.get()?.name ?? 'N/A',
-                      'destination': template.destinationId?.get()?.name ?? 'N/A'
+                      'source': template.sourceId?.get()?.name ?? L10nKey.commonNotAvailable.toString(),
+                      'destination': template.destinationId?.get()?.name ?? L10nKey.commonNotAvailable.toString()
                     }),
                     if (template.description != null) Text(template.description!),
                   ],
@@ -88,18 +88,24 @@ class _TemplateInspectSettingsPageState extends ConsumerState<TemplateInspectSet
                 const SizedBox(height: 20),
                 Row(
                   children: [
-                    IconButton(tooltip: 'Execute now', onPressed: () {}, icon: const Icon(Icons.play_arrow_outlined, size: 17)),
                     IconButton(
-                      tooltip: 'Schedule',
+                        tooltip: L10nKey.templateExecuteNow.toString(),
+                        onPressed: () {},
+                        icon: const Icon(Icons.play_arrow_outlined, size: 17)),
+                    IconButton(
+                      tooltip: L10nKey.templateSchedule.toString(),
                       onPressed: () {},
                       icon: const Icon(Icons.schedule_rounded, size: 17),
                     ),
                     const Spacer(),
                     IconButton(
-                        tooltip: 'Delete Template',
+                        tooltip: L10nKey.templateDelete.toString(),
                         onPressed: () => _deleteTemplate(template),
                         icon: const Icon(Icons.delete_outline, size: 17)),
-                    IconButton(tooltip: 'Edit Template', onPressed: () {}, icon: const Icon(Icons.create_outlined, size: 17))
+                    IconButton(
+                        tooltip: L10nKey.templateDelete.toString(),
+                        onPressed: () {},
+                        icon: const Icon(Icons.create_outlined, size: 17))
                   ],
                 ),
                 Padding(
@@ -108,13 +114,16 @@ class _TemplateInspectSettingsPageState extends ConsumerState<TemplateInspectSet
                     border: TableBorder.all(
                         borderRadius: BorderRadius.circular(10), color: theme.financrrExtension.surfaceVariant1, width: 3),
                     children: [
-                      buildTableRow(L10nKey.transactionPropertiesAmount, amountStr),
-                      buildTableRow(L10nKey.transactionPropertiesName, template.name),
-                      buildTableRow(L10nKey.transactionPropertiesDescription, template.description ?? 'N/A'),
-                      buildTableRow(L10nKey.transactionPropertiesFrom, template.sourceId?.get() ?? 'N/A'),
-                      buildTableRow(L10nKey.transactionPropertiesTo, template.destinationId?.get() ?? 'N/A'),
-                      buildTableRow(L10nKey.transactionPropertiesCreatedAt,
-                          StoreKey.dateTimeFormat.readSync()!.format(template.createdAt)),
+                      buildTableRow(L10nKey.templatePropertiesAmount, amountStr),
+                      buildTableRow(L10nKey.templatePropertiesName, template.name),
+                      buildTableRow(
+                          L10nKey.templatePropertiesDescription, template.description ?? L10nKey.commonNotAvailable.toString()),
+                      buildTableRow(
+                          L10nKey.templatePropertiesFrom, template.sourceId?.get() ?? L10nKey.commonNotAvailable.toString()),
+                      buildTableRow(
+                          L10nKey.templatePropertiesTo, template.destinationId?.get() ?? L10nKey.commonNotAvailable.toString()),
+                      buildTableRow(
+                          L10nKey.templatePropertiesCreatedAt, StoreKey.dateTimeFormat.readSync()!.format(template.createdAt)),
                     ],
                   ),
                 )

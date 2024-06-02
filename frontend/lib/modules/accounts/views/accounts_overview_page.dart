@@ -70,7 +70,9 @@ class _AccountsOverviewPageState extends ConsumerState<AccountsOverviewPage> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: _currencies.entries.map((entry) {
-                          return Text(entry.value.formatWithCurrency(entry.key, l10n.decimalSeparator, thousandsSeparator: l10n.thousandSeparator),
+                          return Text(
+                              entry.value.formatWithCurrency(entry.key, l10n.decimalSeparator,
+                                  thousandsSeparator: l10n.thousandSeparator),
                               style: theme.textTheme.titleSmall?.copyWith(color: theme.themeData.primaryColor));
                         }).toList(),
                       ),

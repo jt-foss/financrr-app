@@ -45,6 +45,7 @@ enum L10nKey {
   commonLogin('common_login'),
   commonLogout('common_logout'),
   commonNext('common_next'),
+  commonNotAvailable('common_not_available'),
   commonPassword('common_password'),
   commonPasswordNoMatch('common_password_no_match'),
   commonPasswordRepeat('common_password_repeat'),
@@ -124,6 +125,9 @@ enum L10nKey {
   startupErrorSubtitle('startup_error_subtitle'),
   startupErrorTitle('startup_error_title'),
   // template
+  templateDelete('template_delete'),
+  templateEdit('template_edit'),
+  templateExecuteNow('template_execute_now'),
   templateNotFound('template_not_found'),
   templatePropertiesAmount('template_properties_amount'),
   templatePropertiesCreatedAt('template_properties_created_at'),
@@ -131,6 +135,8 @@ enum L10nKey {
   templatePropertiesFrom('template_properties_from'),
   templatePropertiesName('template_properties_name'),
   templatePropertiesTo('template_properties_to'),
+  templateSchedule('template_schedule'),
+  templateScheduled('template_scheduled', hasParams: true),
   templateTitleTransfer('template_title_transfer', hasParams: true, hasStyleTags: true),
   templateNoneFoundBody('template_none_found_body'),
   templateNoneFoundTitle('template_none_found_title'),
@@ -189,7 +195,12 @@ enum L10nKey {
     var theme = ref.watch(themeProvider);
 
     styleIf(
-        {TextStyle? baseStyle, Color? color, FontWeight? fontWeight, FontStyle? fontStyle, TextDecoration? decoration, bool invert = false}) {
+        {TextStyle? baseStyle,
+        Color? color,
+        FontWeight? fontWeight,
+        FontStyle? fontStyle,
+        TextDecoration? decoration,
+        bool invert = false}) {
       return StyledTextCustomTag(
           baseStyle: baseStyle,
           parse: (baseStyle, attributes) {

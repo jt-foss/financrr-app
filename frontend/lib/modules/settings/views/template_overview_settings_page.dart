@@ -59,7 +59,8 @@ class _TemplateOverviewSettingsPageState extends ConsumerState<TemplateOverviewS
                   const SizedBox(height: 20),
                   PaginatedWrapper(
                     key: _paginatedTemplateKey,
-                    initialPageFunction: (forceRetrieve) => _api.retrieveAllTransactionTemplates(limit: 10, forceRetrieve: forceRetrieve),
+                    initialPageFunction: (forceRetrieve) =>
+                        _api.retrieveAllTransactionTemplates(limit: 10, forceRetrieve: forceRetrieve),
                     onSuccess: (context, snap) {
                       final PaginatedDataResult<TransactionTemplate> templates = snap.data!;
                       WidgetsBinding.instance.addPostFrameCallback((_) => _amount.value = templates.total);
