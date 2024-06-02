@@ -114,7 +114,7 @@
   "template_properties_to": "To",
   "template_schedule": "Schedule",
   "template_scheduled": "{amount} scheduled",
-  "template_title_transfer": "Transfer <primary>{amount}</primary> from <primaryIfNot key=\"source\" value=\"@:common_not_available\">{source}</primary> to <primaryIfNot key=\"destination\" value=\"@:common_not_available\">{destination}</primary>",
+  "template_title_transfer": "Transfer {amount} from {source} to {destination}",
   "templates_none_found_body": "You have not created any transaction templates yet.",
   "templates_none_found_title": "No templates",
   "theme_dark": "Dark",
