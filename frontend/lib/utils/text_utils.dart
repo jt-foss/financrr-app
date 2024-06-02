@@ -8,6 +8,8 @@ class TextUtils {
     return '${iban.substring(0, 4)} ${iban.substring(4, 8)} ${iban.substring(8, 12)} ${iban.substring(12, 16)} ${iban.substring(16, 20)} ${iban.substring(20)}';
   }
 
+  /// Converts a template string to a list of [InlineSpan]s with the localized text and styles.
+  /// The template string should contain placeholders in the form of `{key}` where `key` is the key of the localized string.
   static List<InlineSpan> richFormatL10nText(String template, String localized,
       {required Map<String, TextStyle Function(TextStyle)> namedStyles, TextStyle? style, Map<String, String>? namedArgs}) {
     if (namedStyles.isEmpty) {
