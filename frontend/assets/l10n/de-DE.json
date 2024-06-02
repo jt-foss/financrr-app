@@ -114,7 +114,7 @@
   "template_properties_to": "Zu",
   "template_schedule": "Wiederholen",
   "template_scheduled": "{amount} wiederkehrend",
-  "template_title_transfer": "Übertrage <primary>{amount}</primary> von <primaryIfNot key=\"source\" value=\"@:common_not_available\">{source}</primary> zu <primaryIfNot key=\"destination\" value=\"@:common_not_available\">{destination}</primary>",
+  "template_title_transfer": "Übertrage {amount} von {source} zu {destination}",
   "templates_none_found_body": "Du hast bisher keine Vorlagen erstellt.",
   "templates_none_found_title": "Keine Transaktionsvorlagen",
   "theme_dark": "Dunkel",
