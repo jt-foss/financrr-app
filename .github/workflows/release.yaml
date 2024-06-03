@@ -1,0 +1,180 @@
+name: Release
+
+on:
+  create:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'  # Regex to match vX.Y.Z tags
+
+concurrency:
+  group: "release"
+  cancel-in-progress: false
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  push-docker-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        config:
+          - { working_directory: './backend', dockerfile: './backend/docker/rust/Dockerfile', image_name: 'financrr/backend' }
+          - { working_directory: './frontend', dockerfile: './frontend/docker/Dockerfile', image_name: 'financrr/frontend' }
+    defaults:
+      run:
+        working-directory: ${{ matrix.config.working_directory }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ matrix.config.image_name }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.config.working_directory }}
+          file: ${{ matrix.config.dockerfile }}
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ matrix.config.image_name }}:${{ github.event.ref }}
+            ${{ env.REGISTRY }}/${{ matrix.config.image_name }}:latest
+          labels: ${{ steps.meta.outputs.labels }}
+
+  build-backend-binaries:
+    strategy:
+      matrix:
+        config:
+          - { target: 'aarch64-unknown-linux-gnu', os: 'ubuntu-latest' }
+          - { target: 'aarch64-unknown-linux-musl', os: 'ubuntu-latest' }
+          - { target: 'aarch64-apple-darwin', os: 'macos-latest' }
+          - { target: 'x86_64-unknown-linux-gnu', os: 'ubuntu-latest' }
+          - { target: 'x86_64-unknown-linux-musl', os: 'ubuntu-latest' }
+          - { target: 'x86_64-apple-darwin', os: 'macos-latest' }
+          - { target: 'universal-apple-darwin', os: 'macos-latest' }
+          - { target: 'x86_64-pc-windows-msvc', os: 'windows-latest' }
+    runs-on: ${{ matrix.config.os }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.config.target }}
+          override: true
+      - name: Build
+        run: cargo build --release --target ${{ matrix.config.target }}
+      - name: Move binaries
+        run: mv target/${{ matrix.config.target }}/release/* bin/
+      - name: Upload binaries
+        uses: actions/upload-artifact@v2
+        with:
+          name: binaries
+          path: bin/*
+
+  build-flutter-apps:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v1
+        with:
+          channel: 'stable'  # specify the Flutter version
+      - name: Build APK
+        run: flutter build apk --release
+      - name: Build IPA
+        run: flutter build ios --release --no-codesign # TODO sign binaries
+      - name: Upload APK
+        uses: actions/upload-artifact@v2
+        with:
+          name: financrr.apk
+          path: build/app/outputs/flutter-apk/financrr.apk
+      - name: Upload IPA
+        uses: actions/upload-artifact@v2
+        with:
+          name: financrr.ipa
+          path: build/ios/iphoneos/financrr.ipa
+
+  create-release:
+    needs: [ build-backend-binaries, build-flutter-apps ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Download binaries
+        uses: actions/download-artifact@v2
+        with:
+          name: binaries
+          path: bin/
+      - name: Download APK
+        uses: actions/download-artifact@v2
+        with:
+          name: financrr.apk
+          path: build/app/outputs/flutter-apk/
+      - name: Download IPA
+        uses: actions/download-artifact@v2
+        with:
+          name: financrr.ipa
+          path: build/ios/iphoneos/
+      - name: Parse CHANGELOG.md
+        id: changelog
+        run: |
+          BODY=$(awk '/^## Version/{flag=1;next}/^## /{flag=0}flag' CHANGELOG.md)
+          TITLE=$(echo "$BODY" | head -n 1)
+          echo ::set-output name=body::"${BODY//$TITLE/}"
+          echo ::set-output name=title::"$TITLE"
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.changelog.outputs.title }}
+          release_name: ${{ steps.changelog.outputs.title }}
+          body: ${{ steps.changelog.outputs.body }}
+          draft: false
+          prerelease: false
+      - name: Attach binaries to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: bin/*
+          asset_name: ${{ matrix.config.target }}
+          asset_content_type: application/octet-stream
+      - name: Attach APK to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/app/outputs/flutter-apk/financrr.apk
+          asset_name: financrr.apk
+          asset_content_type: application/vnd.android.package-archive
+      - name: Attach IPA to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/ios/iphoneos/financrr.ipa
+          asset_name: financrr.ipa
+          asset_content_type: application/octet-stream

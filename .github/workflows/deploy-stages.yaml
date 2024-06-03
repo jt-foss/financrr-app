@@ -1,0 +1,32 @@
+name: Deploy stages
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: [ "main" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+concurrency:
+  group: "deploy-stages"
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+    steps:
+      - name: Execute commands over SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd ${{ secrets.WORKING_DIRECTORY }}
+            git pull
+            bash backend/bin/deploy.bash &
+            bash frontend/scripts/deploy.bash &
+            wait

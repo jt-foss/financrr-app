@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      MDBOOK_VERSION: 0.4.36
+      MDBOOK_VERSION: 0.4.37
 
     permissions:
       contents: write

@@ -16,7 +16,7 @@ defaults:
     working-directory: ./frontend  # Change the working directory to /frontend
 
 jobs:
-  build:
+  analysis:
     name: Flutter Code Analysis
     runs-on: ubuntu-latest
     steps:

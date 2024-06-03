@@ -6,9 +6,6 @@ WORK_DIR="$(pwd)"
 cd "$(dirname "$0")"
 cd ..
 
-echo "Installing..."
-bin/install.bash
-
 echo "Building containers"
 docker compose build
 

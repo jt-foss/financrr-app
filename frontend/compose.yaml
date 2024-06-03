@@ -1,0 +1,11 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    init: true
+    restart: unless-stopped
+    environment:
+      TZ: ${TIMEZONE:-Europe/Berlin}
+    ports:
+      - "127.0.0.1:3442:80"
