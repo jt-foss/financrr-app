@@ -63,7 +63,7 @@ POST {{api_v1}}/transaction/from-template
 Authorization: Bearer {{admin_token}}
 Content-Type: application/json
 {
-    "template": {{template_id}},
+    "template_id": {{template_id}},
     "executed_at": "2024-05-21T21:03:23.251Z"
 }
 HTTP 201
