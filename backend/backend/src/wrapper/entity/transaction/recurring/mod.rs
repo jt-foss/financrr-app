@@ -49,7 +49,10 @@ const CHANNEL_SIZE: usize = 10240;
 pub(crate) struct RecurringTransaction {
     pub(crate) id: i32,
     pub(crate) template_id: Phantom<TransactionTemplate>,
+    #[serde(with = "time::serde::rfc3339::option")]
     pub(crate) last_executed_at: Option<OffsetDateTime>,
+    #[serde(with = "time::serde::rfc3339::option")]
+    pub(crate) next_executed_at: Option<OffsetDateTime>,
     pub(crate) recurring_rule: RecurringRule,
     #[serde(with = "time::serde::rfc3339")]
     pub(crate) created_at: OffsetDateTime,
@@ -277,6 +280,7 @@ impl From<recurring_transaction::Model> for RecurringTransaction {
             id: value.id,
             template_id: Phantom::new(value.template),
             last_executed_at: value.last_executed_at,
+            next_executed_at: recurring_rule.find_next_occurrence(&get_now()),
             recurring_rule,
             created_at: value.created_at,
         }
