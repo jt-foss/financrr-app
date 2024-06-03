@@ -51,6 +51,7 @@ pub(crate) struct RecurringTransaction {
     pub(crate) template_id: Phantom<TransactionTemplate>,
     pub(crate) last_executed_at: Option<OffsetDateTime>,
     pub(crate) recurring_rule: RecurringRule,
+    #[serde(with = "time::serde::rfc3339")]
     pub(crate) created_at: OffsetDateTime,
 }
 
