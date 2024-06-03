@@ -33,7 +33,7 @@ pub(crate) struct TransactionDTO {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Validate, ToSchema)]
 pub(crate) struct TransactionFromTemplate {
-    pub(crate) template: Phantom<TransactionTemplate>,
+    pub(crate) template_id: Phantom<TransactionTemplate>,
     #[serde(with = "time::serde::rfc3339")]
     pub(crate) executed_at: OffsetDateTime,
 }
