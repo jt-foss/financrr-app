@@ -80,7 +80,6 @@
   "navigation_statistics": "Statistics",
   "recurring_rule_template": "Repeat every {object}",
   "recurring_rule_template_double": "Repeat every {arg_1} {arg_2}",
-  "recurring_rule_template_triple": "Repeat every {arg_1} {arg_2}, on {arg_3}",
   "register_existing_account": "Already have an account?",
   "register_failed": "Registration failed. Please try again later",
   "register_message_1": "Let's get you going!",
