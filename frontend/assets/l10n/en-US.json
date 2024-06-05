@@ -115,6 +115,8 @@
   "template_schedule": "Schedule",
   "template_scheduled": "Scheduled",
   "template_scheduled_amount": "{amount} scheduled",
+  "template_scheduled_last_executed": "Last executed: {object}",
+  "template_scheduled_next_execution": "Next execution: {object}",
   "template_title_transfer": "Transfer {amount} from {source} to {destination}",
   "templates_none_found_body": "You have not created any transaction templates yet.",
   "templates_none_found_title": "No templates",
