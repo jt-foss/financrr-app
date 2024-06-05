@@ -104,7 +104,6 @@
   "startup_error_title": "Beim Initialisieren der App ist ein Fehler aufgetreten",
   "template_delete": "Vorlage löschen",
   "template_edit": "Vorlage bearbeiten",
-  "template_execute_now": "Jetzt ausführen",
   "template_not_found": "Diese Vorlage konnte nicht gefunden werden",
   "template_properties_amount": "Betrag",
   "template_properties_created_at": "Erstellt am",
