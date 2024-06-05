@@ -66,7 +66,7 @@ class _TemplateInspectSettingsPageState extends ConsumerState<TemplateInspectSet
       ]);
     }
 
-    buildRecurringTransactionCard(ScheduledTransactionTemplate scheduled) {
+    buildScheduledTransactionTemplateCard(ScheduledTransactionTemplate scheduled) {
       return FinancrrCard(
         padding: const EdgeInsets.all(10),
         child: Column(
@@ -187,7 +187,7 @@ class _TemplateInspectSettingsPageState extends ConsumerState<TemplateInspectSet
                 for (ScheduledTransactionTemplate scheduled in scheduledTemplates)
                   Padding(
                     padding: const EdgeInsets.only(top: 10),
-                    child: buildRecurringTransactionCard(scheduled),
+                    child: buildScheduledTransactionTemplateCard(scheduled),
                   )
               ],
             ),
