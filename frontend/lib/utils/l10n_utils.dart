@@ -123,9 +123,9 @@ enum L10nKey {
   startupErrorSubtitle('startup_error_subtitle'),
   startupErrorTitle('startup_error_title'),
   // template
+  templateCreateTransaction('template_create_transaction'),
   templateDelete('template_delete'),
   templateEdit('template_edit'),
-  templateExecuteNow('template_execute_now'),
   templateNotFound('template_not_found'),
   templatePropertiesAmount('template_properties_amount'),
   templatePropertiesCreatedAt('template_properties_created_at'),

@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:financrr_frontend/modules/auth/providers/authentication.provider.dart';
 import 'package:financrr_frontend/modules/settings/views/template_overview_settings_page.dart';
+import 'package:financrr_frontend/modules/transactions/views/transaction_create_page.dart';
+import 'package:financrr_frontend/routing/router_extensions.dart';
 import 'package:financrr_frontend/shared/ui/custom_replacements/custom_text_button.dart';
 import 'package:financrr_frontend/shared/ui/notice_card.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
@@ -74,7 +76,8 @@ class _TemplateInspectSettingsPageState extends ConsumerState<TemplateInspectSet
             Row(
               children: [
                 // TODO: localize this
-                Expanded(child: Text(scheduled.scheduleRule.cronPattern?.toJson().toString() ?? scheduled.scheduleRule.special!)),
+                Expanded(
+                    child: Text(scheduled.scheduleRule.cronPattern?.toJson().toString() ?? scheduled.scheduleRule.special!)),
                 IconButton(onPressed: () {}, icon: const Icon(Icons.delete_outline))
               ],
             ),
@@ -104,7 +107,8 @@ class _TemplateInspectSettingsPageState extends ConsumerState<TemplateInspectSet
     }
 
     buildVerticalLayout(TransactionTemplate template, Size size) {
-      final Currency currency = (template.sourceId ?? template.destinationId!).get()!.currencyId.get()!;
+      final AccountId effectiveId = template.sourceId ?? template.destinationId!;
+      final Currency currency = effectiveId.get()!.currencyId.get()!;
       final String amountStr =
           template.amount.formatWithCurrency(currency, l10n.decimalSeparator, thousandsSeparator: l10n.thousandSeparator);
       final List<ScheduledTransactionTemplate> scheduledTemplates =
@@ -139,9 +143,11 @@ class _TemplateInspectSettingsPageState extends ConsumerState<TemplateInspectSet
                 Row(
                   children: [
                     FinancrrTextButton(
-                      onPressed: () => _createTransactionFromTemplate(template),
+                      onPressed: () => context.goPath(
+                          TransactionCreatePage.pagePath.build(params: {'accountId': effectiveId.value.toString()}),
+                          extra: template),
                       icon: const Icon(Icons.play_arrow_outlined, size: 17),
-                      label: L10nKey.templateExecuteNow.toText(),
+                      label: L10nKey.templateCreateTransaction.toText(),
                     ),
                     const Spacer(),
                     IconButton(
@@ -209,16 +215,6 @@ class _TemplateInspectSettingsPageState extends ConsumerState<TemplateInspectSet
       resizeToAvoidBottomInset: false,
       verticalBuilder: (_, __, size) => handleTemplateStream(size),
     );
-  }
-
-  void _createTransactionFromTemplate(TransactionTemplate template) async {
-    try {
-      await template.createTransaction(executedAt: DateTime.now());
-      if (!mounted) return;
-      L10nKey.commonCreateObjectSuccess.showSnack(context, namedArgs: {'object': template.name});
-    } on RestrrException catch (e) {
-      context.showSnackBar(e.message!);
-    }
   }
 
   void _deleteTemplate(TransactionTemplate template) async {
