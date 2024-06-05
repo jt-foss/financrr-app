@@ -581,6 +581,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.8.0"
+  material_symbols_icons:
+    dependency: "direct main"
+    description:
+      name: material_symbols_icons
+      sha256: b2d3cbc3c42b8a217715b0d97ff03aebb14b2b4592875736e5599c603fb2db7e
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.2758.0"
   meta:
     dependency: transitive
     description:
@@ -755,7 +763,7 @@ packages:
     description:
       path: "."
       ref: "feature/templates-and-recurring-transactions"
-      resolved-ref: d9e5c1cd48798381147a5f48671bb68ced3eb6c1
+      resolved-ref: "3592414a8dc368d3922ad608aa3d5f8246e8fbea"
       url: "https://github.com/financrr/restrr.git"
     source: git
     version: "0.13.0"

@@ -74,7 +74,7 @@ class TransactionTemplateCard extends ConsumerWidget {
                   children: [
                     const Icon(Icons.schedule, size: 17),
                     const SizedBox(width: 5),
-                    L10nKey.templateScheduled.toText(namedArgs: {'amount': scheduled.toString()})
+                    L10nKey.templateScheduledAmount.toText(namedArgs: {'amount': scheduled.toString()})
                   ],
                 ),
               Text(amount.formatWithCurrency(currency, l10n.decimalSeparator, thousandsSeparator: l10n.thousandSeparator),

@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:financrr_frontend/modules/auth/providers/authentication.provider.dart';
 import 'package:financrr_frontend/modules/settings/views/template_overview_settings_page.dart';
+import 'package:financrr_frontend/shared/ui/custom_replacements/custom_text_button.dart';
+import 'package:financrr_frontend/shared/ui/notice_card.dart';
 import 'package:financrr_frontend/utils/extensions.dart';
 import 'package:financrr_frontend/utils/l10n_utils.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +14,7 @@ import '../../../shared/models/store.dart';
 import '../../../shared/ui/adaptive_scaffold.dart';
 import '../../../../routing/page_path.dart';
 import '../../../shared/ui/async_wrapper.dart';
+import '../../../shared/ui/custom_replacements/custom_card.dart';
 import '../../../shared/ui/links/account_link.dart';
 import '../providers/l10n.provider.dart';
 import '../providers/theme.provider.dart';
@@ -63,10 +66,51 @@ class _TemplateInspectSettingsPageState extends ConsumerState<TemplateInspectSet
       ]);
     }
 
+    buildRecurringTransactionCard(RecurringTransaction recurring) {
+      return FinancrrCard(
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.schedule),
+                const SizedBox(width: 5),
+                // TODO: localize this
+                Expanded(child: Text(recurring.recurringRule.cronPattern?.toJson().toString() ?? recurring.recurringRule.special!)),
+                IconButton(onPressed: () {}, icon: const Icon(Icons.delete_outline))
+              ],
+            ),
+            Row(
+              children: [
+                const Icon(Icons.share_arrival_time_outlined, size: 17),
+                const SizedBox(width: 5),
+                Expanded(
+                    child: L10nKey.templateScheduledLastExecuted.toText(namedArgs: {
+                  'object': recurring.lastExecutedAt == null
+                      ? L10nKey.commonNotAvailable.toString()
+                      : l10n.dateFormat.format(recurring.lastExecutedAt!)
+                }, style: theme.textTheme.labelMedium)),
+                const Icon(Icons.more_time, size: 17),
+                const SizedBox(width: 5),
+                Expanded(
+                    child: L10nKey.templateScheduledNextExecution.toText(namedArgs: {
+                  'object': recurring.nextExecutedAt == null
+                      ? L10nKey.commonNotAvailable.toString()
+                      : l10n.dateFormat.format(recurring.nextExecutedAt!)
+                }, style: theme.textTheme.labelMedium)),
+              ],
+            ),
+          ],
+        ),
+      );
+    }
+
     buildVerticalLayout(TransactionTemplate template, Size size) {
       final Currency currency = (template.sourceId ?? template.destinationId!).get()!.currencyId.get()!;
       final String amountStr =
           template.amount.formatWithCurrency(currency, l10n.decimalSeparator, thousandsSeparator: l10n.thousandSeparator);
+      final List<RecurringTransaction> recurringTransactions =
+          _api.getRecurringTransactions().where((element) => element.templateId.value == template.id.value).toList();
 
       return Padding(
         padding: const EdgeInsets.only(top: 10, bottom: 20),
@@ -96,14 +140,9 @@ class _TemplateInspectSettingsPageState extends ConsumerState<TemplateInspectSet
                 const SizedBox(height: 20),
                 Row(
                   children: [
-                    IconButton(
-                        tooltip: L10nKey.templateExecuteNow.toString(),
-                        onPressed: () {},
-                        icon: const Icon(Icons.play_arrow_outlined, size: 17)),
-                    IconButton(
-                      tooltip: L10nKey.templateSchedule.toString(),
-                      onPressed: () {},
-                      icon: const Icon(Icons.schedule_rounded, size: 17),
+                    FinancrrTextButton(
+                      icon: const Icon(Icons.play_arrow_outlined, size: 17),
+                      label: L10nKey.templateExecuteNow.toText(),
                     ),
                     const Spacer(),
                     IconButton(
@@ -116,25 +155,41 @@ class _TemplateInspectSettingsPageState extends ConsumerState<TemplateInspectSet
                         icon: const Icon(Icons.create_outlined, size: 17))
                   ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: Table(
-                    border: TableBorder.all(
-                        borderRadius: BorderRadius.circular(10), color: theme.financrrExtension.surfaceVariant1, width: 3),
-                    children: [
-                      buildTableRow(L10nKey.templatePropertiesAmount, amountStr),
-                      buildTableRow(L10nKey.templatePropertiesName, template.name),
-                      buildTableRow(
-                          L10nKey.templatePropertiesDescription, template.description ?? L10nKey.commonNotAvailable.toString()),
-                      buildTableRow(
-                          L10nKey.templatePropertiesFrom, template.sourceId?.get() ?? L10nKey.commonNotAvailable.toString()),
-                      buildTableRow(
-                          L10nKey.templatePropertiesTo, template.destinationId?.get() ?? L10nKey.commonNotAvailable.toString()),
-                      buildTableRow(
-                          L10nKey.templatePropertiesCreatedAt, StoreKey.dateTimeFormat.readSync()!.format(template.createdAt)),
-                    ],
+                const SizedBox(height: 10),
+                Table(
+                  border: TableBorder.all(
+                      borderRadius: BorderRadius.circular(10), color: theme.financrrExtension.surfaceVariant1, width: 3),
+                  children: [
+                    buildTableRow(L10nKey.templatePropertiesAmount, amountStr),
+                    buildTableRow(L10nKey.templatePropertiesName, template.name),
+                    buildTableRow(
+                        L10nKey.templatePropertiesDescription, template.description ?? L10nKey.commonNotAvailable.toString()),
+                    buildTableRow(
+                        L10nKey.templatePropertiesFrom, template.sourceId?.get() ?? L10nKey.commonNotAvailable.toString()),
+                    buildTableRow(
+                        L10nKey.templatePropertiesTo, template.destinationId?.get() ?? L10nKey.commonNotAvailable.toString()),
+                    buildTableRow(
+                        L10nKey.templatePropertiesCreatedAt, StoreKey.dateTimeFormat.readSync()!.format(template.createdAt)),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(child: L10nKey.templateScheduled.toText(style: theme.textTheme.titleMedium)),
+                    IconButton(
+                        onPressed: () {}, icon: const Icon(Icons.add, size: 17), tooltip: L10nKey.templateSchedule.toString())
+                  ],
+                ),
+                if (recurringTransactions.isEmpty)
+                  NoticeCard(
+                    title: L10nKey.templateNoneFoundTitle.toString(),
+                    description: L10nKey.templateNoneFoundBody.toString(),
                   ),
-                )
+                for (RecurringTransaction recurring in recurringTransactions)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: buildRecurringTransactionCard(recurring),
+                  )
               ],
             ),
           ),
