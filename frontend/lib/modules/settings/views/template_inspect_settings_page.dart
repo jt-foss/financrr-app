@@ -139,6 +139,7 @@ class _TemplateInspectSettingsPageState extends ConsumerState<TemplateInspectSet
                 Row(
                   children: [
                     FinancrrTextButton(
+                      onPressed: () => _createTransactionFromTemplate(template),
                       icon: const Icon(Icons.play_arrow_outlined, size: 17),
                       label: L10nKey.templateExecuteNow.toText(),
                     ),
@@ -208,6 +209,16 @@ class _TemplateInspectSettingsPageState extends ConsumerState<TemplateInspectSet
       resizeToAvoidBottomInset: false,
       verticalBuilder: (_, __, size) => handleTemplateStream(size),
     );
+  }
+
+  void _createTransactionFromTemplate(TransactionTemplate template) async {
+    try {
+      await template.createTransaction(executedAt: DateTime.now());
+      if (!mounted) return;
+      L10nKey.commonCreateObjectSuccess.showSnack(context, namedArgs: {'object': template.name});
+    } on RestrrException catch (e) {
+      context.showSnackBar(e.message!);
+    }
   }
 
   void _deleteTemplate(TransactionTemplate template) async {
