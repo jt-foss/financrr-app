@@ -116,7 +116,7 @@ pub(crate) async fn create_from_transaction_template(
     user: Phantom<User>,
     mut transaction_from_template: TransactionFromTemplate,
 ) -> Result<impl Responder, ApiError> {
-    let template = transaction_from_template.template.get_inner().await?;
+    let template = transaction_from_template.template_id.get_inner().await?;
     template.has_permission_or_error(user.get_id(), Permissions::READ).await?;
     let dto = TransactionDTO::from_template(template, transaction_from_template.executed_at).await?;
 

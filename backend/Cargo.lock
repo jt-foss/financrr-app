@@ -2844,9 +2844,9 @@ dependencies = [
 
 [[package]]
 name = "rustls"
-version = "0.23.8"
+version = "0.23.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "79adb16721f56eb2d843e67676896a61ce7a0fa622dc18d3e372477a029d2740"
+checksum = "a218f0f6d05669de4eabfb24f31ce802035c952429d037507b4a4a39f0e60c5b"
 dependencies = [
  "once_cell",
  "rustls-pki-types",
@@ -3728,7 +3728,7 @@ version = "0.26.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0c7bc40d0e5a97695bb96e27995cd3a08538541b0a846f65bba7a359f36700d4"
 dependencies = [
- "rustls 0.23.8",
+ "rustls 0.23.9",
  "rustls-pki-types",
  "tokio",
 ]
@@ -4026,18 +4026,18 @@ dependencies = [
 
 [[package]]
 name = "utoipauto"
-version = "0.1.10"
+version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0c8b0206d46c52c964fbbecbf0f4015941000ce1122a3cc6103a64496bc9997e"
+checksum = "8f07b41f3b7ce61fb6435d1d3e9b98b9e98e5233075726473676c5187d06ec0b"
 dependencies = [
  "utoipauto-macro",
 ]
 
 [[package]]
 name = "utoipauto-core"
-version = "0.1.10"
+version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f188b14783527b8694a62ac420f945049a8ad02ae403c59cd6d6d46ce70e7d00"
+checksum = "855accb167fff4ea3d31f31a9090ef801bfe8c7d59fcc6180f5d1af727cc3897"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -4046,9 +4046,9 @@ dependencies = [
 
 [[package]]
 name = "utoipauto-macro"
-version = "0.1.10"
+version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8441b6e9e8e22128550e718d08b9da55182e85920e3d307894300cb9fcd4791b"
+checksum = "3815cdcf6e647710b0333329337da3b177b9631a8b9e3c7913468a9064573774"
 dependencies = [
  "proc-macro2",
  "quote",

@@ -48,9 +48,13 @@ const CHANNEL_SIZE: usize = 10240;
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub(crate) struct RecurringTransaction {
     pub(crate) id: i32,
-    pub(crate) template: Phantom<TransactionTemplate>,
+    pub(crate) template_id: Phantom<TransactionTemplate>,
+    #[serde(with = "time::serde::rfc3339::option")]
     pub(crate) last_executed_at: Option<OffsetDateTime>,
+    #[serde(with = "time::serde::rfc3339::option")]
+    pub(crate) next_executed_at: Option<OffsetDateTime>,
     pub(crate) recurring_rule: RecurringRule,
+    #[serde(with = "time::serde::rfc3339")]
     pub(crate) created_at: OffsetDateTime,
 }
 
@@ -209,7 +213,7 @@ impl RecurringTransaction {
     }
 
     async fn recurring_transaction_job_task(&self, now: OffsetDateTime) -> Result<(), ApiError> {
-        let template = Arc::new(self.template.fetch_inner().await?);
+        let template = Arc::new(self.template_id.fetch_inner().await?);
         let dto = TransactionDTO::from_template(template, now).await?;
         Transaction::new(dto).await?;
 
@@ -227,7 +231,7 @@ impl RecurringTransaction {
     fn to_active_model(&self) -> recurring_transaction::ActiveModel {
         recurring_transaction::ActiveModel {
             id: Set(self.id),
-            template: Set(self.template.get_id()),
+            template: Set(self.template_id.get_id()),
             recurring_rule: Set(self.recurring_rule.to_json_value().expect("Could not parse recurring rule to json!")),
             last_executed_at: Set(self.last_executed_at),
             created_at: Set(self.created_at),
@@ -274,8 +278,9 @@ impl From<recurring_transaction::Model> for RecurringTransaction {
             RecurringRule::from_json_value(value.recurring_rule).expect("Failed to parse recurring rule");
         Self {
             id: value.id,
-            template: Phantom::new(value.template),
+            template_id: Phantom::new(value.template),
             last_executed_at: value.last_executed_at,
+            next_executed_at: recurring_rule.find_next_occurrence(&get_now()),
             recurring_rule,
             created_at: value.created_at,
         }
