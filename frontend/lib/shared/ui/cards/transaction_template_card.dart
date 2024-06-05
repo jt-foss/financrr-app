@@ -46,7 +46,7 @@ class TransactionTemplateCard extends ConsumerWidget {
 
     final AccountId effectiveId = source ?? destination!;
     final Currency currency = effectiveId.get()!.currencyId.get()!;
-    final int scheduled = effectiveId.api.getRecurringTransactions().where((r) => r.templateId.value == id).length;
+    final int scheduled = effectiveId.api.getScheduledTransactionTemplates().where((r) => r.templateId.value == id).length;
 
     return FinancrrCard(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),

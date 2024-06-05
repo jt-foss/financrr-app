@@ -66,17 +66,15 @@ class _TemplateInspectSettingsPageState extends ConsumerState<TemplateInspectSet
       ]);
     }
 
-    buildRecurringTransactionCard(RecurringTransaction recurring) {
+    buildRecurringTransactionCard(ScheduledTransactionTemplate scheduled) {
       return FinancrrCard(
         padding: const EdgeInsets.all(10),
         child: Column(
           children: [
             Row(
               children: [
-                const Icon(Icons.schedule),
-                const SizedBox(width: 5),
                 // TODO: localize this
-                Expanded(child: Text(recurring.recurringRule.cronPattern?.toJson().toString() ?? recurring.recurringRule.special!)),
+                Expanded(child: Text(scheduled.scheduleRule.cronPattern?.toJson().toString() ?? scheduled.scheduleRule.special!)),
                 IconButton(onPressed: () {}, icon: const Icon(Icons.delete_outline))
               ],
             ),
@@ -86,17 +84,17 @@ class _TemplateInspectSettingsPageState extends ConsumerState<TemplateInspectSet
                 const SizedBox(width: 5),
                 Expanded(
                     child: L10nKey.templateScheduledLastExecuted.toText(namedArgs: {
-                  'object': recurring.lastExecutedAt == null
+                  'object': scheduled.lastExecutedAt == null
                       ? L10nKey.commonNotAvailable.toString()
-                      : l10n.dateFormat.format(recurring.lastExecutedAt!)
+                      : l10n.dateFormat.format(scheduled.lastExecutedAt!)
                 }, style: theme.textTheme.labelMedium)),
                 const Icon(Icons.more_time, size: 17),
                 const SizedBox(width: 5),
                 Expanded(
                     child: L10nKey.templateScheduledNextExecution.toText(namedArgs: {
-                  'object': recurring.nextExecutedAt == null
+                  'object': scheduled.nextExecutedAt == null
                       ? L10nKey.commonNotAvailable.toString()
-                      : l10n.dateFormat.format(recurring.nextExecutedAt!)
+                      : l10n.dateFormat.format(scheduled.nextExecutedAt!)
                 }, style: theme.textTheme.labelMedium)),
               ],
             ),
@@ -109,8 +107,8 @@ class _TemplateInspectSettingsPageState extends ConsumerState<TemplateInspectSet
       final Currency currency = (template.sourceId ?? template.destinationId!).get()!.currencyId.get()!;
       final String amountStr =
           template.amount.formatWithCurrency(currency, l10n.decimalSeparator, thousandsSeparator: l10n.thousandSeparator);
-      final List<RecurringTransaction> recurringTransactions =
-          _api.getRecurringTransactions().where((element) => element.templateId.value == template.id.value).toList();
+      final List<ScheduledTransactionTemplate> scheduledTemplates =
+          _api.getScheduledTransactionTemplates().where((element) => element.templateId.value == template.id.value).toList();
 
       return Padding(
         padding: const EdgeInsets.only(top: 10, bottom: 20),
@@ -180,15 +178,16 @@ class _TemplateInspectSettingsPageState extends ConsumerState<TemplateInspectSet
                         onPressed: () {}, icon: const Icon(Icons.add, size: 17), tooltip: L10nKey.templateSchedule.toString())
                   ],
                 ),
-                if (recurringTransactions.isEmpty)
+                if (scheduledTemplates.isEmpty)
+                  // TODO: implement custom notice card
                   NoticeCard(
                     title: L10nKey.templateNoneFoundTitle.toString(),
                     description: L10nKey.templateNoneFoundBody.toString(),
                   ),
-                for (RecurringTransaction recurring in recurringTransactions)
+                for (ScheduledTransactionTemplate scheduled in scheduledTemplates)
                   Padding(
                     padding: const EdgeInsets.only(top: 10),
-                    child: buildRecurringTransactionCard(recurring),
+                    child: buildRecurringTransactionCard(scheduled),
                   )
               ],
             ),
