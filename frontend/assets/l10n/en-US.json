@@ -104,7 +104,6 @@
   "startup_error_title": "An error occurred while initializing the app",
   "template_delete": "Delete Template",
   "template_edit": "Edit Template",
-  "template_execute_now": "Execute now",
   "template_not_found": "Could not find transaction template",
   "template_properties_amount": "Amount",
   "template_properties_created_at": "Created At",
