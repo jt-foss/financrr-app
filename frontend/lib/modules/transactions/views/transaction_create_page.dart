@@ -87,8 +87,9 @@ class _TransactionCreatePageState extends ConsumerState<TransactionCreatePage> {
         thousandSeparator: l10n.thousandSeparator,
       );
       if (_amountController.text.isEmpty) {
-        _amountController.text =
-            moneyFormatter.formatEditUpdate(const TextEditingValue(text: ''), TextEditingValue(text: _amount.rawAmount.toString())).text;
+        _amountController.text = moneyFormatter
+            .formatEditUpdate(const TextEditingValue(text: ''), TextEditingValue(text: _amount.rawAmount.toString()))
+            .text;
       }
 
       return Padding(
