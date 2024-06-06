@@ -66,6 +66,7 @@ api_codes!(
     (1301, DB_ERROR, "Database error!");
     (1302, REDIS_ERROR, "Redis error!");
     (1303, CRON_BUILDER_ERROR, "Cron builder error!");
+    (1304, SNOWFLAKE_GENERATOR_ERROR, "Error while generating a snowflake.");
 );
 
 // misc

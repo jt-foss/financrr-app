@@ -8,9 +8,9 @@ use crate::permissions::find_all_by_user_id;
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
 #[sea_orm(table_name = "recurring_transaction")]
 pub struct Model {
-    #[sea_orm(primary_key)]
-    pub id: i32,
-    pub template: i32,
+    #[sea_orm(primary_key, auto_increment = false)]
+    pub id: i64,
+    pub template: i64,
     pub recurring_rule: Json,
     pub last_executed_at: Option<TimeDateTimeWithTimeZone>,
     pub created_at: TimeDateTimeWithTimeZone,

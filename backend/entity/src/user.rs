@@ -3,7 +3,9 @@
 use sea_orm::entity::prelude::*;
 use sea_orm::ActiveValue::Set;
 use serde::{Deserialize, Serialize};
-use time::OffsetDateTime;
+
+use utility::datetime::get_now;
+use utility::snowflake::SnowflakeGenerator;
 
 use crate::error::EntityError;
 use crate::utility::hashing::hash_string;
@@ -11,8 +13,8 @@ use crate::utility::hashing::hash_string;
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
 #[sea_orm(table_name = "user")]
 pub struct Model {
-    #[sea_orm(primary_key)]
-    pub id: i32,
+    #[sea_orm(primary_key, auto_increment = false)]
+    pub id: i64,
     #[sea_orm(column_type = "Text", unique)]
     pub username: String,
     #[sea_orm(column_type = "Text", nullable, unique)]
@@ -75,17 +77,17 @@ impl ActiveModel {
         email: Option<String>,
         display_name: Option<String>,
         password: String,
-        now: OffsetDateTime,
+        snowflake_generator: &SnowflakeGenerator,
     ) -> Result<Self, EntityError> {
         let hashed_password = hash_string(&password)?;
 
         Ok(Self {
-            id: Default::default(),
+            id: Set(snowflake_generator.next_id()?),
             username: Set(username),
             email: Set(email),
             display_name: Set(display_name),
             password: Set(hashed_password),
-            created_at: Set(now),
+            created_at: Set(get_now()),
             is_admin: Set(false),
         })
     }

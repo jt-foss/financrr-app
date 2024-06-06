@@ -1,3 +1,5 @@
+use std::borrow::Borrow;
+
 use actix_web::dev::Payload;
 use actix_web::{FromRequest, HttpRequest};
 use futures_util::future::LocalBoxFuture;
@@ -10,23 +12,22 @@ use dto::Credentials;
 use entity::prelude::User as DbUser;
 use entity::user;
 use entity::user::Model;
-use utility::datetime::get_now;
 
 use crate::api::error::api::ApiError;
 use crate::database::entity::{count, find_one, find_one_or_error, insert};
-use crate::permission_impl;
 use crate::util::auth::extract_bearer_token;
 use crate::wrapper::entity::session::Session;
 use crate::wrapper::entity::user::dto::UserRegistration;
 use crate::wrapper::entity::{TableName, WrapperEntity};
 use crate::wrapper::permission::{Permission, Permissions};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
+use crate::{permission_impl, SNOWFLAKE_GENERATOR};
 
 pub(crate) mod dto;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub(crate) struct User {
-    pub(crate) id: i32,
+    pub(crate) id: i64,
     pub(crate) username: String,
     pub(crate) email: Option<String>,
     pub(crate) display_name: Option<String>,
@@ -36,7 +37,7 @@ pub(crate) struct User {
 }
 
 impl User {
-    pub(crate) async fn exists(id: i32) -> Result<bool, ApiError> {
+    pub(crate) async fn exists(id: i64) -> Result<bool, ApiError> {
         Ok(count(user::Entity::find_by_id(id)).await? > 0)
     }
 
@@ -60,7 +61,7 @@ impl User {
             registration.email,
             registration.display_name,
             registration.password,
-            get_now(),
+            SNOWFLAKE_GENERATOR.borrow(),
         ) {
             Ok(user) => {
                 let model = insert(user).await?;
@@ -77,7 +78,7 @@ impl User {
 permission_impl!(User);
 
 impl Identifiable for User {
-    async fn find_by_id(id: i32) -> Result<Self, ApiError>
+    async fn find_by_id(id: i64) -> Result<Self, ApiError>
     where
         Self: Sized,
     {
@@ -92,7 +93,7 @@ impl TableName for User {
 }
 
 impl WrapperEntity for User {
-    fn get_id(&self) -> i32 {
+    fn get_id(&self) -> i64 {
         self.id
     }
 }

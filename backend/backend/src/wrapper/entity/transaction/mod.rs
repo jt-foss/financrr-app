@@ -14,13 +14,13 @@ use crate::api::pagination::PageSizeParam;
 use crate::database::entity::{count, delete, find_all_paginated, find_one_or_error, insert, update};
 use crate::event::lifecycle::transaction::{TransactionCreation, TransactionDeletion, TransactionUpdate};
 use crate::event::GenericEvent;
-use crate::permission_impl;
 use crate::wrapper::entity::account::Account;
 use crate::wrapper::entity::budget::Budget;
 use crate::wrapper::entity::currency::Currency;
 use crate::wrapper::entity::transaction::dto::TransactionDTO;
 use crate::wrapper::entity::{TableName, WrapperEntity};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
+use crate::{permission_impl, SNOWFLAKE_GENERATOR};
 
 pub(crate) mod dto;
 pub(crate) mod recurring;
@@ -28,7 +28,7 @@ pub(crate) mod template;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub(crate) struct Transaction {
-    pub(crate) id: i32,
+    pub(crate) id: i64,
     pub(crate) source_id: Option<Phantom<Account>>,
     pub(crate) destination_id: Option<Phantom<Account>>,
     pub(crate) amount: i64,
@@ -45,7 +45,7 @@ pub(crate) struct Transaction {
 impl Transaction {
     pub(crate) async fn new(dto: TransactionDTO) -> Result<Self, ApiError> {
         let active_model = transaction::ActiveModel {
-            id: Default::default(),
+            id: sea_orm::Set(SNOWFLAKE_GENERATOR.next_id()?),
             source: Set(dto.source_id.as_ref().map(|source| source.get_id())),
             destination: Set(dto.destination_id.as_ref().map(|destination| destination.get_id())),
             amount: Set(dto.amount),
@@ -109,7 +109,7 @@ impl Transaction {
     }
 
     pub(crate) async fn find_all_by_user_paginated(
-        user_id: i32,
+        user_id: i64,
         page_size: &PageSizeParam,
     ) -> Result<Vec<Self>, ApiError> {
         Ok(find_all_paginated(transaction::Entity::find_all_by_user_id(user_id), page_size)
@@ -119,7 +119,7 @@ impl Transaction {
             .collect())
     }
 
-    pub(crate) async fn count_all_by_user(user_id: i32) -> Result<u64, ApiError> {
+    pub(crate) async fn count_all_by_user(user_id: i64) -> Result<u64, ApiError> {
         count(transaction::Entity::find_all_by_user_id(user_id)).await
     }
 }
@@ -133,13 +133,13 @@ impl TableName for Transaction {
 }
 
 impl WrapperEntity for Transaction {
-    fn get_id(&self) -> i32 {
+    fn get_id(&self) -> i64 {
         self.id
     }
 }
 
 impl Identifiable for Transaction {
-    async fn find_by_id(id: i32) -> Result<Self, ApiError> {
+    async fn find_by_id(id: i64) -> Result<Self, ApiError> {
         find_one_or_error(transaction::Entity::find_by_id(id), "Transaction").await.map(Self::from)
     }
 }

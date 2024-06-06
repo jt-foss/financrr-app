@@ -61,7 +61,7 @@ pub(crate) async fn get_current_session(session: Session) -> Result<impl Respond
     tag = "Session"
 )]
 #[get("/{session_id}")]
-pub(crate) async fn get_one_session(user: Phantom<User>, session_id: Path<i32>) -> Result<impl Responder, ApiError> {
+pub(crate) async fn get_one_session(user: Phantom<User>, session_id: Path<i64>) -> Result<impl Responder, ApiError> {
     let session = Session::find_by_id(session_id.into_inner()).await?;
     session.has_permission_or_error(user.get_id(), Permissions::READ).await?;
 
@@ -147,7 +147,7 @@ pub(crate) async fn delete_current_session(session: Session) -> Result<impl Resp
     tag = "Session"
 )]
 #[delete("/{session_id}")]
-pub(crate) async fn delete_session(user: Phantom<User>, session_id: Path<i32>) -> Result<impl Responder, ApiError> {
+pub(crate) async fn delete_session(user: Phantom<User>, session_id: Path<i64>) -> Result<impl Responder, ApiError> {
     let session = Session::find_by_id(session_id.into_inner()).await?;
     session.has_permission_or_error(user.get_id(), Permissions::READ_DELETE).await?;
 

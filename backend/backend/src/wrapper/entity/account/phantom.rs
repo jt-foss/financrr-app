@@ -8,7 +8,7 @@ use crate::wrapper::permission::{HasPermissionOrError, Permission, PermissionByI
 use crate::wrapper::types::phantom::Phantom;
 
 impl WrapperEntity for Phantom<Account> {
-    fn get_id(&self) -> i32 {
+    fn get_id(&self) -> i64 {
         self.get_id()
     }
 }

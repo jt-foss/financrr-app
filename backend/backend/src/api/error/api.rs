@@ -13,6 +13,7 @@ use utoipa::ToSchema;
 use validator::{ValidationError, ValidationErrors};
 
 use entity::error::EntityError;
+use utility::snowflake::error::SnowflakeGeneratorError;
 
 use crate::api::error::api_codes::ApiCode;
 use crate::api::error::validation;
@@ -222,6 +223,17 @@ impl From<BuilderConfigBuilderError> for ApiError {
             api_code: ApiCode::CRON_BUILDER_ERROR,
             details: value.to_string(),
             reference: None,
+        }
+    }
+}
+
+impl From<SnowflakeGeneratorError> for ApiError {
+    fn from(value: SnowflakeGeneratorError) -> Self {
+        Self {
+            status_code: StatusCode::INTERNAL_SERVER_ERROR,
+            api_code: ApiCode::SNOWFLAKE_GENERATOR_ERROR,
+            details: value.to_string(),
+            reference: SerializableStruct::new(&value).ok(),
         }
     }
 }

@@ -22,7 +22,7 @@ pub(crate) trait DbValidator {
 }
 
 pub(crate) trait WrapperEntity: TableName {
-    fn get_id(&self) -> i32;
+    fn get_id(&self) -> i64;
 }
 
 pub(crate) trait TableName {

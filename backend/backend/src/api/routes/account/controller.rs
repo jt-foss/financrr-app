@@ -60,7 +60,7 @@ pub(crate) async fn get_all_accounts(
     path = "/api/v1/account/{account_id}",
     tag = "Account")]
 #[get("/{account_id}")]
-pub(crate) async fn get_one_account(user: Phantom<User>, account_id: Path<i32>) -> Result<impl Responder, ApiError> {
+pub(crate) async fn get_one_account(user: Phantom<User>, account_id: Path<i64>) -> Result<impl Responder, ApiError> {
     let account = Account::find_by_id(account_id.into_inner()).await?;
     account.has_permission_or_error(user.get_id(), Permissions::READ).await?;
 
@@ -83,7 +83,7 @@ pub(crate) async fn get_one_account(user: Phantom<User>, account_id: Path<i32>) 
 #[get("/{account_id}/transactions")]
 pub(crate) async fn get_transactions_from_account(
     user: Phantom<User>,
-    account_id: Path<i32>,
+    account_id: Path<i64>,
     page_size: PageSizeParam,
     uri: Uri,
 ) -> Result<impl Responder, ApiError> {
@@ -129,7 +129,7 @@ pub(crate) async fn create_account(user: Phantom<User>, account: AccountDTO) -> 
     path = "/api/v1/account/{account_id}",
     tag = "Account")]
 #[delete("/{account_id}")]
-pub(crate) async fn delete_account(user: Phantom<User>, account_id: Path<i32>) -> Result<impl Responder, ApiError> {
+pub(crate) async fn delete_account(user: Phantom<User>, account_id: Path<i64>) -> Result<impl Responder, ApiError> {
     let account = Account::find_by_id(account_id.into_inner()).await?;
     account.has_permission_or_error(user.get_id(), Permissions::READ_DELETE).await?;
 
@@ -156,7 +156,7 @@ tag = "Account")]
 pub(crate) async fn update_account(
     user: Phantom<User>,
     updated_account: AccountDTO,
-    account_id: Path<i32>,
+    account_id: Path<i64>,
 ) -> Result<impl Responder, ApiError> {
     let account = Account::find_by_id(account_id.into_inner()).await?;
     account.has_permission_or_error(user.get_id(), Permissions::READ_WRITE).await?;

@@ -60,7 +60,7 @@ pub(crate) async fn get_all_recurring_transactions(
 #[get("/{recurring_transaction_id}")]
 pub(crate) async fn get_one_recurring_transaction(
     user: Phantom<User>,
-    recurring_transaction_id: Path<i32>,
+    recurring_transaction_id: Path<i64>,
 ) -> Result<impl Responder, ApiError> {
     let transaction = RecurringTransaction::find_by_id(recurring_transaction_id.into_inner()).await?;
     transaction.has_permission_or_error(user.get_id(), Permissions::READ).await?;
@@ -111,7 +111,7 @@ pub(crate) async fn create_recurring_transaction(
 #[delete("/{recurring_transaction_id}")]
 pub(crate) async fn delete_recurring_transaction(
     user: Phantom<User>,
-    recurring_transaction_id: Path<i32>,
+    recurring_transaction_id: Path<i64>,
 ) -> Result<impl Responder, ApiError> {
     let transaction = RecurringTransaction::find_by_id(recurring_transaction_id.into_inner()).await?;
     transaction.has_permission_or_error(user.get_id(), Permissions::DELETE).await?;
@@ -136,7 +136,7 @@ tag = "Recurring-Transaction")]
 #[patch("/{recurring_transaction_id}")]
 pub(crate) async fn update_recurring_transaction(
     user: Phantom<User>,
-    recurring_transaction_id: Path<i32>,
+    recurring_transaction_id: Path<i64>,
     recurring_transaction_dto: RecurringTransactionDTO,
 ) -> Result<impl Responder, ApiError> {
     let transaction = RecurringTransaction::find_by_id(recurring_transaction_id.into_inner()).await?;

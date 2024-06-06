@@ -12,18 +12,18 @@ use entity::currency;
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
 use crate::database::entity::{count, delete, find_all_paginated, find_one_or_error, insert, update};
-use crate::permission_impl;
 use crate::wrapper::entity::currency::dto::CurrencyDTO;
 use crate::wrapper::entity::user::User;
 use crate::wrapper::entity::{TableName, WrapperEntity};
 use crate::wrapper::permission::{Permission, Permissions};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
+use crate::{permission_impl, SNOWFLAKE_GENERATOR};
 
 pub(crate) mod dto;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub(crate) struct Currency {
-    pub(crate) id: i32,
+    pub(crate) id: i64,
     pub(crate) name: String,
     pub(crate) symbol: String,
     pub(crate) iso_code: Option<String>,
@@ -32,13 +32,13 @@ pub(crate) struct Currency {
 }
 
 impl Currency {
-    pub(crate) async fn new(creation: CurrencyDTO, user_id: i32) -> Result<Self, ApiError> {
+    pub(crate) async fn new(creation: CurrencyDTO, user_id: i64) -> Result<Self, ApiError> {
         if !User::exists(user_id).await? {
             return Err(ApiError::ResourceNotFound("User"));
         }
 
         let currency = currency::ActiveModel {
-            id: Default::default(),
+            id: Set(SNOWFLAKE_GENERATOR.next_id()?),
             name: Set(creation.name),
             symbol: Set(creation.symbol),
             iso_code: Set(creation.iso_code),
@@ -58,7 +58,7 @@ impl Currency {
         Ok(())
     }
 
-    pub(crate) async fn find_by_id_include_user(id: i32, user_id: i32) -> Result<Self, ApiError> {
+    pub(crate) async fn find_by_id_include_user(id: i64, user_id: i64) -> Result<Self, ApiError> {
         Ok(Self::from(find_one_or_error(currency::Entity::find_by_id_include_user_id(id, user_id), "Currency").await?))
     }
 
@@ -75,7 +75,7 @@ impl Currency {
     }
 
     pub(crate) async fn find_all_with_no_user_and_user_paginated(
-        user_id: i32,
+        user_id: i64,
         page_size: &PageSizeParam,
     ) -> Result<Vec<Self>, ApiError> {
         Ok(find_all_paginated(currency::Entity::find_all_with_no_user_and_user_id(user_id), page_size)
@@ -85,7 +85,7 @@ impl Currency {
             .collect())
     }
 
-    pub(crate) async fn count_all_with_no_user_and_user(user_id: i32) -> Result<u64, ApiError> {
+    pub(crate) async fn count_all_with_no_user_and_user(user_id: i64) -> Result<u64, ApiError> {
         count(currency::Entity::find_all_with_no_user_and_user_id(user_id)).await
     }
 
@@ -114,13 +114,13 @@ impl TableName for Currency {
 }
 
 impl WrapperEntity for Currency {
-    fn get_id(&self) -> i32 {
+    fn get_id(&self) -> i64 {
         self.id
     }
 }
 
 impl Identifiable for Currency {
-    async fn find_by_id(id: i32) -> Result<Self, ApiError>
+    async fn find_by_id(id: i64) -> Result<Self, ApiError>
     where
         Self: Sized,
     {

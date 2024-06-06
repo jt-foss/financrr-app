@@ -61,7 +61,7 @@ pub(crate) async fn get_all_transaction_templates(
 #[get("/{template_id}")]
 pub(crate) async fn get_one_transaction_template(
     user: Phantom<User>,
-    template_id: Path<i32>,
+    template_id: Path<i64>,
 ) -> Result<impl Responder, ApiError> {
     let transaction = TransactionTemplate::find_by_id(template_id.into_inner()).await?;
     transaction.has_permission_or_error(user.get_id(), Permissions::READ).await?;
@@ -108,7 +108,7 @@ pub(crate) async fn create_transaction_template(
 #[delete("/{template_id}")]
 pub(crate) async fn delete_transaction_template(
     user: Phantom<User>,
-    template_id: Path<i32>,
+    template_id: Path<i64>,
 ) -> Result<impl Responder, ApiError> {
     let template = TransactionTemplate::find_by_id(template_id.into_inner()).await?;
     template.has_permission_or_error(user.get_id(), Permissions::READ_DELETE).await?;
@@ -134,7 +134,7 @@ tag = "Transaction-Template")]
 pub(crate) async fn update_transaction_template(
     user: Phantom<User>,
     update: TransactionTemplateDTO,
-    template_id: Path<i32>,
+    template_id: Path<i64>,
 ) -> Result<impl Responder, ApiError> {
     let template = TransactionTemplate::find_by_id(template_id.into_inner()).await?;
     template.has_permission_or_error(user.get_id(), Permissions::READ_WRITE).await?;

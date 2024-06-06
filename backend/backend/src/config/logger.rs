@@ -10,8 +10,10 @@ use tracing_subscriber::fmt;
 use tracing_subscriber::fmt::time::OffsetTime;
 use tracing_subscriber::fmt::writer::MakeWriterExt;
 
+use crate::util::init::expect_or_exit;
+
 pub(crate) fn configure() -> WorkerGuard {
-    LogTracer::init().expect("Failed to set  tracing-log adapter!");
+    expect_or_exit(LogTracer::init(), "Failed to set  tracing-log adapter!");
 
     // Time format: 2021-01-01 00:00:00
     let timer = format_description::parse("[year]-[month padding:zero]-[day padding:zero] [hour]:[minute]:[second]")

@@ -22,7 +22,6 @@ use utility::datetime::{convert_chrono_to_time, convert_time_to_chrono};
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
 use crate::database::entity::{count, delete, find_all_paginated, find_one_or_error, insert, update};
-use crate::permission_impl;
 use crate::util::cron::get_cron_builder_config_default;
 use crate::wrapper::entity::account::Account;
 use crate::wrapper::entity::transaction::dto::TransactionDTO;
@@ -34,11 +33,12 @@ use crate::wrapper::entity::{TableName, WrapperEntity};
 use crate::wrapper::processor::db_iterator;
 use crate::wrapper::processor::db_iterator::{CountAllFn, FindAllPaginatedFn, JobFn};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
+use crate::{permission_impl, SNOWFLAKE_GENERATOR};
 
 pub(crate) mod dto;
 pub(crate) mod recurring_rule;
 
-type JobMap = OnceCell<Arc<RwLock<HashMap<i32, Arc<Job>>>>>;
+type JobMap = OnceCell<Arc<RwLock<HashMap<i64, Arc<Job>>>>>;
 
 static SCHEDULER: OnceCell<Arc<RwLock<TokioScheduler>>> = OnceCell::new();
 static JOBS: JobMap = OnceCell::new();
@@ -47,7 +47,7 @@ const CHANNEL_SIZE: usize = 10240;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub(crate) struct RecurringTransaction {
-    pub(crate) id: i32,
+    pub(crate) id: i64,
     pub(crate) template_id: Phantom<TransactionTemplate>,
     #[serde(with = "time::serde::rfc3339::option")]
     pub(crate) last_executed_at: Option<OffsetDateTime>,
@@ -116,7 +116,7 @@ impl RecurringTransaction {
         let recurring_rule = RecurringRule::from(dto.recurring_rule);
         recurring_rule.to_cron()?; // doing this to check if the cron is valid
         let active_model = recurring_transaction::ActiveModel {
-            id: Default::default(),
+            id: Set(SNOWFLAKE_GENERATOR.next_id()?),
             template: Set(dto.template_id.get_id()),
             recurring_rule: Set(recurring_rule.to_json_value()?),
             last_executed_at: Set(None),
@@ -238,12 +238,12 @@ impl RecurringTransaction {
         }
     }
 
-    pub(crate) async fn count_all_by_user_id(user_id: i32) -> Result<u64, ApiError> {
+    pub(crate) async fn count_all_by_user_id(user_id: i64) -> Result<u64, ApiError> {
         count(recurring_transaction::Entity::find_all_by_user_id(user_id)).await
     }
 
     pub(crate) async fn find_all_by_user_id_paginated(
-        user_id: i32,
+        user_id: i64,
         page_size: &PageSizeParam,
     ) -> Result<Vec<Self>, ApiError> {
         Ok(find_all_paginated(recurring_transaction::Entity::find_all_by_user_id(user_id), page_size)
@@ -253,7 +253,7 @@ impl RecurringTransaction {
             .collect())
     }
 
-    pub(crate) async fn find_by_id(id: i32) -> Result<Self, ApiError> {
+    pub(crate) async fn find_by_id(id: i64) -> Result<Self, ApiError> {
         find_one_or_error(recurring_transaction::Entity::find_by_id(id), "RecurringTransaction").await.map(Self::from)
     }
 
@@ -288,7 +288,7 @@ impl From<recurring_transaction::Model> for RecurringTransaction {
 }
 
 impl Identifiable for RecurringTransaction {
-    async fn find_by_id(id: i32) -> Result<Self, ApiError> {
+    async fn find_by_id(id: i64) -> Result<Self, ApiError> {
         find_one_or_error(recurring_transaction::Entity::find_by_id(id), "RecurringTransaction").await.map(Self::from)
     }
 }
@@ -300,7 +300,7 @@ impl TableName for RecurringTransaction {
 }
 
 impl WrapperEntity for RecurringTransaction {
-    fn get_id(&self) -> i32 {
+    fn get_id(&self) -> i64 {
         self.id
     }
 }
@@ -309,7 +309,7 @@ pub(crate) fn get_recurring_transaction_scheduler() -> Arc<RwLock<TokioScheduler
     SCHEDULER.get_or_init(|| Arc::new(RwLock::new(create_tokio_scheduler()))).clone()
 }
 
-pub(crate) fn get_jobs() -> Arc<RwLock<HashMap<i32, Arc<Job>>>> {
+pub(crate) fn get_jobs() -> Arc<RwLock<HashMap<i64, Arc<Job>>>> {
     JOBS.get_or_init(|| Arc::new(RwLock::new(HashMap::new()))).clone()
 }
 

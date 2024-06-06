@@ -1,9 +1,12 @@
+use std::env::var;
 use std::sync::atomic::{AtomicU64, Ordering};
 
 use crate::datetime::get_now_timestamp_millis;
 use crate::snowflake::error::SnowflakeGeneratorError;
 
 pub mod error;
+
+pub const FINANCRR_SNOWFLAKE_EPOCH: u64 = 1_705_247_483_000;
 
 const NODE_ID_BITS: u8 = 10;
 const SEQUENCE_BITS: u8 = 12;
@@ -33,7 +36,13 @@ impl SnowflakeGenerator {
         })
     }
 
-    pub fn next_id(&self) -> Result<u64, SnowflakeGeneratorError> {
+    pub fn new_from_env() -> Result<Self, SnowflakeGeneratorError> {
+        let node_id = var("NODE_ID")?.parse()?;
+
+        Self::new(node_id, FINANCRR_SNOWFLAKE_EPOCH)
+    }
+
+    pub fn next_id(&self) -> Result<i64, SnowflakeGeneratorError> {
         let mut current_timestamp = self.timestamp();
         let last_timestamp = self.last_timestamp.load(Ordering::SeqCst);
 
@@ -55,7 +64,7 @@ impl SnowflakeGenerator {
         self.last_timestamp.store(current_timestamp, Ordering::SeqCst);
         self.sequence.store(sequence, Ordering::SeqCst);
 
-        Ok((current_timestamp << (NODE_ID_BITS + SEQUENCE_BITS)) | (self.node_id << SEQUENCE_BITS) | sequence)
+        Ok(((current_timestamp << (NODE_ID_BITS + SEQUENCE_BITS)) | (self.node_id << SEQUENCE_BITS) | sequence) as i64)
     }
 
     fn timestamp(&self) -> u64 {
@@ -73,6 +82,8 @@ impl SnowflakeGenerator {
 
 #[cfg(test)]
 mod tests {
+    use std::env::set_var;
+
     use super::*;
 
     #[test]
@@ -93,6 +104,25 @@ mod tests {
     #[test]
     fn test_next_id() {
         let generator = SnowflakeGenerator::new(1, 0).expect("Failed to create SnowflakeGenerator");
+        let id1 = generator.next_id().expect("Failed to generate ID");
+        let id2 = generator.next_id().expect("Failed to generate ID");
+        assert!(id2 > id1);
+    }
+
+    #[test]
+    fn test_new_snowflake_generator_from_env() {
+        set_var("NODE_ID", "1");
+        let generator = SnowflakeGenerator::new_from_env().expect("Failed to create SnowflakeGenerator from env");
+        assert_eq!(generator.node_id, 1);
+        assert_eq!(generator.epoch, FINANCRR_SNOWFLAKE_EPOCH);
+        assert_eq!(generator.last_timestamp.load(Ordering::SeqCst), 0);
+        assert_eq!(generator.sequence.load(Ordering::SeqCst), 0);
+    }
+
+    #[test]
+    fn test_next_id_from_env() {
+        set_var("NODE_ID", "1");
+        let generator = SnowflakeGenerator::new_from_env().expect("Failed to create SnowflakeGenerator from env");
         let id1 = generator.next_id().expect("Failed to generate ID");
         let id2 = generator.next_id().expect("Failed to generate ID");
         assert!(id2 > id1);

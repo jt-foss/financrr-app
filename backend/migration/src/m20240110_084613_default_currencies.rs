@@ -1,5 +1,3 @@
-use std::default::Default;
-
 use sea_orm::ActiveModelTrait;
 use sea_orm::ActiveValue::Set;
 use sea_orm_migration::prelude::*;
@@ -8,6 +6,7 @@ use tracing::info;
 use entity::currency;
 use entity::currency::ActiveModel as Currency;
 use entity::utility::loading::load_schema;
+use utility::snowflake::SnowflakeGenerator;
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;
@@ -15,7 +14,8 @@ pub struct Migration;
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        // Replace the sample below with your own migration scripts
+        let snowflake_generator = SnowflakeGenerator::new_from_env().expect("Could not create Snowflake generator");
+
         let data = include_str!("currencies.csv");
         let lines: Vec<&str> = data.lines().collect();
 
@@ -27,7 +27,7 @@ impl MigrationTrait for Migration {
             let parts: Vec<&str> = line.split(',').collect();
             if parts.len() == 4 {
                 let currency = Currency {
-                    id: Default::default(),
+                    id: Set(snowflake_generator.next_id().expect("Could not generate snowflake id")),
                     name: Set(parts[0].to_string()),
                     symbol: Set(parts[1].to_string()),
                     iso_code: Set(Some(parts[2].to_string())),

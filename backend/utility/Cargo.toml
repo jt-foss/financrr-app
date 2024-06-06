@@ -22,6 +22,9 @@ harness = false
 time.workspace = true
 chrono.workspace = true
 
+# Serialization and deserialization
+serde.workspace = true
+
 # Error handling
 thiserror.workspace = true
 

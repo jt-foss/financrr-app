@@ -6,26 +6,26 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use crate::api::error::api::ApiError;
 
 pub(crate) trait Identifiable {
-    fn find_by_id(id: i32) -> impl Future<Output = Result<Self, ApiError>> + Send
+    fn find_by_id(id: i64) -> impl Future<Output = Result<Self, ApiError>> + Send
     where
         Self: Sized;
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct Phantom<T: Identifiable + Send + 'static> {
-    id: i32,
+    id: i64,
     inner: Option<Arc<T>>,
 }
 
 impl<T: Identifiable + Send + 'static> Phantom<T> {
-    pub(crate) fn new(id: i32) -> Self {
+    pub(crate) fn new(id: i64) -> Self {
         Self {
             id,
             inner: None,
         }
     }
 
-    pub(crate) fn from_option(id: Option<i32>) -> Option<Self> {
+    pub(crate) fn from_option(id: Option<i64>) -> Option<Self> {
         id.map(|id| Self::new(id))
     }
 
@@ -50,7 +50,7 @@ impl<T: Identifiable + Send + 'static> Phantom<T> {
         self.inner = Some(inner);
     }
 
-    pub(crate) fn get_id(&self) -> i32 {
+    pub(crate) fn get_id(&self) -> i64 {
         self.id
     }
 }
@@ -69,7 +69,7 @@ impl<'de, T: Identifiable + Send + 'static + Deserialize<'de>> Deserialize<'de> 
     where
         D: Deserializer<'de>,
     {
-        let id = i32::deserialize(deserializer)?;
+        let id = i64::deserialize(deserializer)?;
         Ok(Self::new(id))
     }
 }

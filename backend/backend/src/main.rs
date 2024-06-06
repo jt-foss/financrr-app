@@ -13,6 +13,7 @@ use actix_web::{
 use actix_web_prom::{PrometheusMetrics, PrometheusMetricsBuilder};
 use actix_web_validator5::{Error, JsonConfig, PathConfig, QueryConfig};
 use dotenvy::dotenv;
+use once_cell::sync::Lazy;
 use redis::Client;
 use sea_orm::DatabaseConnection;
 use tracing::info;
@@ -38,6 +39,7 @@ use crate::api::status::controller::status_controller;
 use crate::config::{logger, Config};
 use crate::database::connection::{create_redis_client, establish_database_connection, get_database_connection};
 use crate::database::redis::clear_redis;
+use crate::util::init::expect_or_exit;
 use crate::util::panic::install_panic_hook;
 use crate::util::validation::ValidationErrorJsonPayload;
 use crate::wrapper::entity::session::Session;
@@ -55,9 +57,8 @@ pub(crate) mod wrapper;
 pub(crate) static DB: OnceLock<DatabaseConnection> = OnceLock::new();
 pub(crate) static REDIS: OnceLock<Client> = OnceLock::new();
 pub(crate) static CONFIG: OnceLock<Config> = OnceLock::new();
-pub(crate) static SNOWFLAKE_GENERATOR: OnceLock<SnowflakeGenerator> = OnceLock::new();
-
-const SNOWFLAKE_EPOCH: u64 = 1_705_247_483_000_000;
+pub(crate) static SNOWFLAKE_GENERATOR: Lazy<SnowflakeGenerator> =
+    Lazy::new(|| expect_or_exit(SnowflakeGenerator::new_from_env(), "Could not create Snowflake generator!"));
 
 #[utoipauto(paths = "./backend/src")]
 #[derive(OpenApi)]
@@ -104,9 +105,7 @@ async fn main() -> Result<()> {
     CONFIG.set(Config::load()).expect("Could not load config!");
 
     info!("Setting up Snowflake generator...");
-    SNOWFLAKE_GENERATOR
-        .set(SnowflakeGenerator::new(0, SNOWFLAKE_EPOCH).expect("Could not set Snowflake generator!"))
-        .expect("Could not set Snowflake generator!");
+    Lazy::force(&SNOWFLAKE_GENERATOR);
 
     info!("[*] Establishing database connection...");
     DB.set(establish_database_connection().await).expect("Could not set database!");
