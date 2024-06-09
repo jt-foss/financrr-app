@@ -17,7 +17,7 @@ workspace = true
 
 [dependencies]
 # Actix
-actix-web = { version = "4.6.0", features = ["rustls-0_23"] }
+actix-web = { version = "4.7.0", features = ["rustls-0_23"] }
 actix-cors = "0.7.0"
 actix-limitation = "0.5.1"
 actix-web-prom = "0.8.0"
@@ -63,7 +63,7 @@ chrono.workspace = true
 # Utils
 dotenvy = "0.15.7"
 derive_more = { version = "1.0.0-beta.6", features = ["display", "error"] }
-regex = { version = "1.10.4", features = ["std", "perf", "unicode"] }
+regex = { version = "1.10.5", features = ["std", "perf", "unicode"] }
 itertools = "0.13.0"
 bitflags = {  version = "2.5.0", features = ["std", "serde"] }
 paste = "1.0.15"
