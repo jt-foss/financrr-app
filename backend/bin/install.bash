@@ -6,9 +6,10 @@ WORK_DIR="$(pwd)"
 cd "$(dirname "$0")"
 cd ..
 
-echo "Creating .env file..."
+echo "Creating config files..."
 set +e
 cp -n .env.dist .env
+cp -n config.toml.dist config.toml
 set -e
 
 echo "Creating logs directory..."

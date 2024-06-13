@@ -3,11 +3,12 @@ use std::collections::HashMap;
 
 use actix_web_validator5::error::flatten_errors;
 use iban::Iban;
-use regex::Regex;
+use lazy_regex::regex;
 use sea_orm::EntityTrait;
 use serde::Serialize;
 use serde_json::Value;
 use time::OffsetDateTime;
+use tracing::error;
 use utoipa::ToSchema;
 use validator::ValidationError;
 
@@ -15,9 +16,9 @@ use entity::currency;
 use entity::prelude::User;
 use utility::datetime::get_now;
 
-use crate::database::connection::get_database_connection;
+use crate::database::entity::find_one;
 
-pub(crate) const MIN_PASSWORD_LENGTH: usize = 16;
+pub(crate) const MIN_PASSWORD_LENGTH: usize = 8;
 pub(crate) const MAX_PASSWORD_LENGTH: usize = 128;
 
 #[derive(Debug, Serialize, ToSchema)]
@@ -76,22 +77,22 @@ pub(crate) fn validate_password(password: &str) -> Result<(), ValidationError> {
         error.add_param(Cow::from("max"), &MAX_PASSWORD_LENGTH);
     }
 
-    let uppercase = Regex::new(r"[A-Z]").expect("Failed to compile regex");
+    let uppercase = regex!("[A-Z]");
     if !uppercase.is_match(password) {
         error.add_param(Cow::from("uppercase"), &"Must contain at least one uppercase letter");
     }
 
-    let lowercase = Regex::new(r"[a-z]").expect("Failed to compile regex");
+    let lowercase = regex!("[a-z]");
     if !lowercase.is_match(password) {
         error.add_param(Cow::from("lowercase"), &"Must contain at least one lowercase letter");
     }
 
-    let digit = Regex::new(r"\d").expect("Failed to compile regex");
+    let digit = regex!(r"\d");
     if !digit.is_match(password) {
         error.add_param(Cow::from("digit"), &"Must contain at least one digit");
     }
 
-    let special_character = Regex::new("[€§!@#$%^&*(),.?\":{}|<>]").expect("Failed to compile regex");
+    let special_character = regex!("[€§!@#$%^&*(),.?\":{}|<>]");
     if !special_character.is_match(password) {
         error.add_param(Cow::from("special_character"), &"Must contain at least one special character");
     }
@@ -104,7 +105,7 @@ pub(crate) fn validate_password(password: &str) -> Result<(), ValidationError> {
 }
 
 pub(crate) async fn validate_unique_username(username: &str) -> Result<(), ValidationError> {
-    match User::find_by_username(username).one(get_database_connection()).await {
+    match find_one(User::find_by_username(username)).await {
         Ok(Some(_)) => Err(ValidationError::new("Username is not unique")),
         Err(_) => Err(ValidationError::new("Internal server error")),
         _ => Ok(()),
@@ -119,14 +120,20 @@ pub(crate) fn validate_iban(iban: &str) -> Result<(), ValidationError> {
 }
 
 pub(crate) fn validate_datetime_not_in_future(datetime: &OffsetDateTime) -> Result<(), ValidationError> {
-    if datetime > &get_now() {
+    let now = get_now().map_err(|err| {
+        error!("Failed to get current time: {:?}", err);
+        ValidationError::new(concat!("Internal Server Error"))
+    })?;
+
+    if datetime > &now {
         return Err(ValidationError::new("Date and time cannot be in the future"));
     }
+
     Ok(())
 }
 
 pub(crate) async fn validate_currency_exists(id: i64) -> Result<(), ValidationError> {
-    match currency::Entity::find_by_id(id).one(get_database_connection()).await {
+    match find_one(currency::Entity::find_by_id(id)).await {
         Ok(Some(_)) => Ok(()),
         _ => Err(ValidationError::new("Currency does not exist")),
     }

@@ -37,7 +37,7 @@ impl SnowflakeGenerator {
     }
 
     pub fn new_from_env() -> Result<Self, SnowflakeGeneratorError> {
-        let node_id = var("NODE_ID")?.parse()?;
+        let node_id = var("NODE_ID").unwrap_or("1".to_string()).parse()?;
 
         Self::new(node_id, FINANCRR_SNOWFLAKE_EPOCH)
     }

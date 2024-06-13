@@ -18,7 +18,7 @@ use redis::Client;
 use sea_orm::DatabaseConnection;
 use tracing::info;
 use utoipa::openapi::security::{Http, HttpAuthScheme, SecurityScheme};
-use utoipa::openapi::OpenApi as OpenApiStruct;
+use utoipa::openapi::{Components, OpenApi as OpenApiStruct};
 use utoipa::{Modify, OpenApi};
 use utoipa_swagger_ui::SwaggerUi;
 use utoipauto::utoipauto;
@@ -36,7 +36,7 @@ use crate::api::routes::session::controller::session_controller;
 use crate::api::routes::transaction::controller::transaction_controller;
 use crate::api::routes::user::controller::user_controller;
 use crate::api::status::controller::status_controller;
-use crate::config::{logger, Config};
+use crate::config::{get_config, logger, Config};
 use crate::database::connection::{create_redis_client, establish_database_connection, get_database_connection};
 use crate::database::redis::clear_redis;
 use crate::util::init::expect_or_exit;
@@ -86,8 +86,8 @@ pub(crate) struct BearerTokenAddon;
 
 impl Modify for BearerTokenAddon {
     fn modify(&self, openapi: &mut OpenApiStruct) {
-        let components = openapi.components.as_mut().expect("Components not found!");
-        components.add_security_scheme("bearer_token", SecurityScheme::Http(Http::new(HttpAuthScheme::Bearer)))
+        let components = openapi.components.get_or_insert_with(Components::default);
+        components.add_security_scheme("bearer_token", SecurityScheme::Http(Http::new(HttpAuthScheme::Bearer)));
     }
 }
 
@@ -99,24 +99,24 @@ async fn main() -> Result<()> {
     info!("Starting up...");
 
     info!("Installing panic hook...");
-    install_panic_hook();
+    // install_panic_hook();
 
     info!("Loading configuration...");
-    CONFIG.set(Config::load()).expect("Could not load config!");
+    CONFIG.set(Config::load().unwrap()).expect("Could not load config!");
 
     info!("Setting up Snowflake generator...");
     Lazy::force(&SNOWFLAKE_GENERATOR);
 
     info!("[*] Establishing database connection...");
-    DB.set(establish_database_connection().await).expect("Could not set database!");
+    DB.set(establish_database_connection().await.unwrap()).expect("Could not set database!");
     info!("[*] Establishing redis connection...");
-    REDIS.set(create_redis_client().await).expect("Could not set redis!");
+    REDIS.set(create_redis_client().unwrap()).expect("Could not set redis!");
 
     info!("[*] Cleaning redis...");
     clear_redis().await.expect("Could not clear redis!");
 
     info!("[*] Loading schema...");
-    load_schema(get_database_connection()).await;
+    load_schema(get_database_connection()).await.unwrap();
 
     info!("[*] Migrating database...");
     Migrator::up(get_database_connection(), None).await.expect("Could not migrate database!");
@@ -142,7 +142,7 @@ async fn main() -> Result<()> {
     info!("[*] Starting wrapper...");
     start_wrapper().await;
 
-    info!("Starting server... Listening on: {}", Config::get_config().address);
+    info!("Starting server... Listening on: {}", get_config().address);
 
     HttpServer::new(move || {
         App::new()
@@ -156,7 +156,7 @@ async fn main() -> Result<()> {
             .configure(configure_api)
             .service(SwaggerUi::new("/swagger-ui/{_:.*}").url("/api-docs/openapi.json", openapi.clone()))
     })
-    .bind(&Config::get_config().address)?
+    .bind(&get_config().address)?
     .run()
     .await
 }
@@ -200,7 +200,7 @@ fn configure_api_v1(cfg: &mut web::ServiceConfig) {
 }
 
 fn build_cors() -> Cors {
-    let cors_config = &Config::get_config().cors;
+    let cors_config = &get_config().cors;
     let mut cors = Cors::default()
         .allowed_methods(vec!["GET", "POST", "PATCH", "DELETE"])
         .allowed_headers(vec!["Authorization", "Content-Type", "Accept"])
@@ -223,14 +223,21 @@ fn build_cors() -> Cors {
 }
 
 fn build_rate_limiter() -> Limiter {
-    Limiter::builder(Config::get_config().cache.get_url())
-        .key_by(|req| Some(req.peer_addr().map(|addr| addr.ip().to_string()).unwrap_or_else(|| "unknown".to_string())))
-        .limit(Config::get_config().rate_limiter.limit as usize)
-        .period(Duration::from_secs(Config::get_config().rate_limiter.duration_seconds)) // 60 minutes
-        .build()
-        .expect("Could not build rate limiter!")
+    expect_or_exit(
+        Limiter::builder(get_config().cache.get_url())
+            .key_by(|req| {
+                Some(req.peer_addr().map(|addr| addr.ip().to_string()).unwrap_or_else(|| "unknown".to_string()))
+            })
+            .limit(get_config().rate_limiter.limit as usize)
+            .period(Duration::from_secs(get_config().rate_limiter.duration_seconds)) // 60 minutes
+            .build(),
+        "Could not build rate limiter!",
+    )
 }
 
 fn build_prometheus_metrics() -> PrometheusMetrics {
-    PrometheusMetricsBuilder::new("api").endpoint("/metrics").build().expect("Could not build prometheus metrics!")
+    expect_or_exit(
+        PrometheusMetricsBuilder::new("api").endpoint("/metrics").build(),
+        "Could not build prometheus metrics!",
+    )
 }

@@ -2,6 +2,7 @@ use argon2::Error;
 use sea_orm::error::DbErr;
 use thiserror::Error;
 
+use utility::datetime::error::TimeError;
 use utility::snowflake::error::SnowflakeGeneratorError;
 
 #[derive(Debug, Error)]
@@ -14,4 +15,12 @@ pub enum EntityError {
     ParsingError,
     #[error("Error while generating a new Snowflake")]
     SnowflakeGeneratorError(#[from] SnowflakeGeneratorError),
+    #[error("Error while handling time")]
+    TimeError(#[from] TimeError),
+}
+
+impl EntityError {
+    pub fn into_db_err(self) -> DbErr {
+        DbErr::Custom(self.to_string())
+    }
 }

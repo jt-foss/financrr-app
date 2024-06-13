@@ -1,44 +1,44 @@
-use std::time::Duration;
-
+use anyhow::anyhow;
 use redis::aio::MultiplexedConnection;
 use redis::Client;
-use sea_orm::{ConnectOptions, Database, DatabaseConnection};
+use sea_orm::{ConnectOptions, Database, DatabaseConnection, DbErr};
+use tracing::log::LevelFilter;
 
 use crate::api::error::api::ApiError;
-use crate::config::Config;
+use crate::config::get_config;
 use crate::{DB, REDIS};
 
-pub(crate) fn get_database_connection<'a>() -> &'a DatabaseConnection {
-    DB.get().expect("Could not get database connection!")
-}
-
 pub(crate) async fn get_redis_connection() -> Result<MultiplexedConnection, ApiError> {
-    let pool = REDIS.get().expect("Could not get redis pool!");
-    pool.get_multiplexed_tokio_connection().await.map_err(ApiError::from)
+    REDIS.get().unwrap().get_multiplexed_tokio_connection().await.map_err(ApiError::from)
 }
 
-pub(crate) async fn create_redis_client() -> Client {
-    let config = Config::get_config();
-    Client::open(config.cache.get_url()).expect("Could not open redis connection!")
+pub(crate) fn create_redis_client() -> Result<Client, anyhow::Error> {
+    Client::open(get_config().cache.get_url())
+        .map_err(|err| anyhow!("Could not create redis client. Error: {}", err.to_string()))
 }
 
-pub(crate) async fn establish_database_connection() -> DatabaseConnection {
-    let db = Database::connect(get_connection_options()).await.expect("Could not open database connection!");
+pub(crate) async fn establish_database_connection() -> Result<DatabaseConnection, anyhow::Error> {
+    // Connect
+    let db = Database::connect(get_connection_options())
+        .await
+        .map_err(|err| anyhow!("Could not open database connection! Error: {}", err.to_string()))?;
+
+    // Perform checks
     assert!(db.ping().await.is_ok());
-    db
+
+    Ok(db)
 }
 
 fn get_connection_options() -> ConnectOptions {
-    let config = Config::get_config();
-    let mut opt = ConnectOptions::new(config.get_database_url());
-    opt.max_connections(config.database.max_connections)
-        .min_connections(config.database.min_connections)
-        .connect_timeout(Duration::from_secs(8))
-        .acquire_timeout(Duration::from_secs(8))
-        .idle_timeout(Duration::from_secs(8))
-        .max_lifetime(Duration::from_secs(8))
-        .sqlx_logging(config.database.sqlx_logging)
-        .sqlx_logging_level(config.database.sqlx_log_level)
-        .set_schema_search_path(&config.database.schema)
+    let mut opt = ConnectOptions::new(get_config().get_database_url());
+    opt.max_connections(get_config().database.max_connections)
+        .min_connections(get_config().database.min_connections)
+        .sqlx_logging(get_config().database.sqlx_logging)
+        .sqlx_logging_level(LevelFilter::Info)
+        .set_schema_search_path(&get_config().database.schema)
         .clone()
+}
+
+pub(crate) fn get_database_connection<'a>() -> &'a DatabaseConnection {
+    DB.get().unwrap()
 }

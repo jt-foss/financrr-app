@@ -2,6 +2,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use tokio::time::interval;
+use tracing::error;
 
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
@@ -27,7 +28,9 @@ async fn clean_up() {
         Box::pin(async move { clean_up_entity(permissions).await })
     });
 
-    process_entity(count_all, find_all_paginated, job).await;
+    if let Err(err) = process_entity(count_all, find_all_paginated, job).await {
+        error!("Error while cleaning up permissions: {:?}", err);
+    }
 }
 
 async fn clean_up_entity(entity: PermissionsEntity) -> Result<(), ApiError> {

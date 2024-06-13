@@ -62,7 +62,7 @@ impl RecurringRule {
 
     pub(crate) fn to_cron(&self) -> Result<Cron, ApiError> {
         match self {
-            Self::CronPattern(pattern) => Self::build_cron(pattern, get_cron_builder_default()),
+            Self::CronPattern(pattern) => Self::build_cron(pattern, get_cron_builder_default()?),
             Self::Special(special) => Self::build_special(special),
         }
     }
@@ -83,17 +83,21 @@ impl RecurringRule {
         Cron::new(special).parse().map_err(ApiError::from)
     }
 
-    pub(crate) fn find_next_occurrence(&self, now: &OffsetDateTime) -> Option<OffsetDateTime> {
-        self.to_cron().ok().and_then(|cron| {
-            cron.find_next_occurrence(&convert_time_to_chrono(now), false)
-                .ok()
-                .map(|next_occurrence| convert_chrono_to_time(&next_occurrence))
-        })
+    pub(crate) fn find_next_occurrence(&self, now: &OffsetDateTime) -> Result<Option<OffsetDateTime>, ApiError> {
+        let cron = self.to_cron()?;
+
+        Ok(cron
+            .find_next_occurrence(&convert_time_to_chrono(now)?, false)
+            .ok()
+            .map(|next_occurrence| convert_chrono_to_time(&next_occurrence))
+            .transpose()?)
     }
 }
 
-impl From<RecurringRuleDTO> for RecurringRule {
-    fn from(dto: RecurringRuleDTO) -> Self {
-        Self::from_recurring_ruled_dto(dto, get_now())
+impl TryFrom<RecurringRuleDTO> for RecurringRule {
+    type Error = ApiError;
+
+    fn try_from(value: RecurringRuleDTO) -> Result<Self, Self::Error> {
+        Ok(Self::from_recurring_ruled_dto(value, get_now()?))
     }
 }

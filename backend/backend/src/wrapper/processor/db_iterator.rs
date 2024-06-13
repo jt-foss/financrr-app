@@ -17,17 +17,21 @@ pub(crate) type FindAllPaginatedFn<T> = Arc<
 pub(crate) type JobFn<T> =
     Arc<dyn Fn(T) -> Pin<Box<dyn Future<Output = Result<(), ApiError>> + Send + 'static>> + Send + Sync>;
 
-pub(crate) async fn process_entity<T>(count_all: CountAllFn, find_all_paginated: FindAllPaginatedFn<T>, job: JobFn<T>)
+pub(crate) async fn process_entity<T>(
+    count_all: CountAllFn,
+    find_all_paginated: FindAllPaginatedFn<T>,
+    job: JobFn<T>,
+) -> Result<(), ApiError>
 where
     T: Send + 'static,
 {
     let limit: u64 = 500;
-    let count = count_all().await.expect("Failed to count all");
+    let count = count_all().await?;
     let pages = (count as f64 / limit as f64).ceil() as u64;
 
     for page in 1..=pages {
         let page_size = PageSizeParam::new(page, limit);
-        let data = find_all_paginated(page_size).await.expect("Failed to find all paginated");
+        let data = find_all_paginated(page_size).await?;
 
         let tasks: Vec<JoinHandle<Result<(), ApiError>>> = data
             .into_iter()
@@ -48,4 +52,6 @@ where
             }
         }
     }
+
+    Ok(())
 }

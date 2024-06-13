@@ -4,13 +4,13 @@ services:
       context: .
       dockerfile: docker/rust/Dockerfile
     init: true
-    env_file:
-      - .env
     environment:
-      TZ: ${TIMEZONE}
+      TZ: ${TZ:-UTC}
+      NODE_ID: ${NODE_ID:-1}
     volumes:
       - ./:/usr/src/financrr
       - ./logs:/home/financrr/logs
+      - ./config.toml:/home/financrr/config.toml
     ports:
       - "127.0.0.1:3000:8080"
     healthcheck:
@@ -29,7 +29,7 @@ services:
     init: true
     restart: unless-stopped
     environment:
-      TZ: ${TIMEZONE}
+      TZ: UTC
       POSTGRES_USER: ${DATABASE_USER}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       POSTGRES_DB: ${DATABASE_NAME}
@@ -48,6 +48,8 @@ services:
     image: ghcr.io/dragonflydb/dragonfly:v1.19.0
     init: true
     restart: unless-stopped
+    environment:
+      TZ: UTC
     ulimits:
       memlock: -1
     ports:

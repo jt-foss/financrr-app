@@ -8,22 +8,24 @@ use entity::utility::hashing::hash_string;
 use utility::datetime::get_now;
 use utility::snowflake::SnowflakeGenerator;
 
+use crate::util::error::map_snowflake_error;
+
 #[derive(DeriveMigrationName)]
 pub struct Migration;
 
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        let snowflake_generator = SnowflakeGenerator::new_from_env().expect("Could not create Snowflake generator");
+        let snowflake_generator = map_snowflake_error(SnowflakeGenerator::new_from_env())?;
 
-        let hashed_password = hash_string("Financrr123").expect("Could not hash password Financrr123");
+        let hashed_password = hash_string("Financrr123").map_err(|err| err.into_db_err())?;
         let user = user::ActiveModel {
-            id: Set(snowflake_generator.next_id().expect("Could not generate snowflake id")),
+            id: Set(map_snowflake_error(snowflake_generator.next_id())?),
             username: Set("admin".to_string()),
             email: Set(None),
             display_name: Set(None),
             password: Set(hashed_password.to_string()),
-            created_at: Set(get_now()),
+            created_at: Set(get_now().map_err(|err| err.into_db_err())?),
             is_admin: Set(true),
         };
         match user.insert(manager.get_connection()).await {

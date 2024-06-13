@@ -54,7 +54,7 @@ impl Transaction {
             description: Set(dto.description),
             budget: Set(dto.budget_id.map(|budget| budget.get_id())),
             executed_at: Set(dto.executed_at),
-            created_at: Set(get_now()),
+            created_at: Set(get_now()?),
         };
         let model = insert(active_model).await?;
 
@@ -69,8 +69,9 @@ impl Transaction {
         }
 
         // check if execute_at is in the future
-        if transaction.executed_at > get_now() {
-            let delay = transaction.executed_at - get_now();
+        let now = get_now()?;
+        if transaction.executed_at > now {
+            let delay = transaction.executed_at - now;
             let delay = Duration::new(delay.whole_seconds() as u64, 0);
             TransactionCreation::fire_scheduled(TransactionCreation::new(transaction.clone()), delay);
         } else {

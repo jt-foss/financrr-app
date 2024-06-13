@@ -23,6 +23,7 @@ use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
 use crate::database::entity::{count, delete, find_all_paginated, find_one_or_error, insert, update};
 use crate::util::cron::get_cron_builder_config_default;
+use crate::util::init::expect_or_exit;
 use crate::wrapper::entity::account::Account;
 use crate::wrapper::entity::transaction::dto::TransactionDTO;
 use crate::wrapper::entity::transaction::recurring::dto::RecurringTransactionDTO;
@@ -71,7 +72,9 @@ impl RecurringTransaction {
             Box::pin(async move { transaction.redo_missed_transactions_job().await })
         });
 
-        process_entity(count_all, find_all_paginated, job).await;
+        if let Err(err) = process_entity(count_all, find_all_paginated, job).await {
+            error!("Could not redo missed transactions. Error: {:?}", err);
+        }
     }
 
     async fn schedule_recurring_transactions() {
@@ -81,7 +84,9 @@ impl RecurringTransaction {
             Box::pin(async move { transaction.start_recurring_transaction().await })
         });
 
-        process_entity(count_all, find_all_paginated, job).await;
+        if let Err(err) = process_entity(count_all, find_all_paginated, job).await {
+            error!("Could not schedule recurring transactions. Error: {:?}", err);
+        }
     }
 
     fn get_count_all_and_find_all_fns() -> (CountAllFn, FindAllPaginatedFn<Self>) {
@@ -96,13 +101,13 @@ impl RecurringTransaction {
 
     async fn redo_missed_transactions_job(&self) -> Result<(), ApiError> {
         if let Some(last_executed) = self.last_executed_at {
-            let now_chrono = convert_time_to_chrono(&get_now());
+            let now_chrono = convert_time_to_chrono(&get_now()?)?;
             let cron = self.recurring_rule.to_cron()?;
-            let last_executed = convert_time_to_chrono(&last_executed);
+            let last_executed = convert_time_to_chrono(&last_executed)?;
             let mut next_occurrence = cron.find_next_occurrence(&last_executed, false)?;
 
             while next_occurrence < now_chrono {
-                let next_occurrence_time = convert_chrono_to_time(&next_occurrence);
+                let next_occurrence_time = convert_chrono_to_time(&next_occurrence)?;
                 self.handle_job(next_occurrence_time).await;
 
                 next_occurrence = self.recurring_rule.to_cron()?.find_next_occurrence(&next_occurrence, false)?;
@@ -113,17 +118,17 @@ impl RecurringTransaction {
     }
 
     pub(crate) async fn new(dto: RecurringTransactionDTO) -> Result<Self, ApiError> {
-        let recurring_rule = RecurringRule::from(dto.recurring_rule);
+        let recurring_rule = RecurringRule::try_from(dto.recurring_rule)?;
         recurring_rule.to_cron()?; // doing this to check if the cron is valid
         let active_model = recurring_transaction::ActiveModel {
             id: Set(SNOWFLAKE_GENERATOR.next_id()?),
             template: Set(dto.template_id.get_id()),
             recurring_rule: Set(recurring_rule.to_json_value()?),
             last_executed_at: Set(None),
-            created_at: Set(get_now()),
+            created_at: Set(get_now()?),
         };
         let model = insert(active_model).await?;
-        let transaction = Self::from(model);
+        let transaction = Self::try_from(model)?;
 
         let template = dto.template_id.fetch_inner().await?;
         //grant permission
@@ -153,7 +158,7 @@ impl RecurringTransaction {
     }
 
     pub(crate) async fn update(&self, dto: RecurringTransactionDTO) -> Result<Self, ApiError> {
-        let recurring_rule = RecurringRule::from(dto.recurring_rule);
+        let recurring_rule = RecurringRule::try_from(dto.recurring_rule)?;
         recurring_rule.to_cron()?; // doing this to check if the cron is valid
         let active_model = recurring_transaction::ActiveModel {
             id: Set(self.id),
@@ -163,7 +168,7 @@ impl RecurringTransaction {
             created_at: Set(self.created_at),
         };
         let model = update(active_model).await?;
-        let transaction = Self::from(model);
+        let transaction = Self::try_from(model)?;
 
         self.stop_recurring_transaction().await?;
         transaction.start_recurring_transaction().await?;
@@ -179,8 +184,10 @@ impl RecurringTransaction {
         let job = Job::new_async(Box::new(move |now| {
             let transaction = transaction.clone();
             Box::pin(async move {
-                let now = convert_chrono_to_time(&now);
-                transaction.handle_job(now).await;
+                match convert_chrono_to_time(&now) {
+                    Ok(now) => transaction.handle_job(now).await,
+                    Err(err) => error!("Could not convert chrono to time. Error: {:?}", err),
+                }
             })
         }));
 
@@ -221,21 +228,21 @@ impl RecurringTransaction {
     }
 
     async fn update_last_run(&self, last_run: OffsetDateTime) -> Result<(), ApiError> {
-        let mut active_model = self.to_active_model();
+        let mut active_model = self.try_to_active_model()?;
         active_model.last_executed_at = Set(Some(last_run));
         update(active_model).await?;
 
         Ok(())
     }
 
-    fn to_active_model(&self) -> recurring_transaction::ActiveModel {
-        recurring_transaction::ActiveModel {
+    fn try_to_active_model(&self) -> Result<recurring_transaction::ActiveModel, ApiError> {
+        Ok(recurring_transaction::ActiveModel {
             id: Set(self.id),
             template: Set(self.template_id.get_id()),
-            recurring_rule: Set(self.recurring_rule.to_json_value().expect("Could not parse recurring rule to json!")),
+            recurring_rule: Set(self.recurring_rule.to_json_value()?),
             last_executed_at: Set(self.last_executed_at),
             created_at: Set(self.created_at),
-        }
+        })
     }
 
     pub(crate) async fn count_all_by_user_id(user_id: i64) -> Result<u64, ApiError> {
@@ -249,12 +256,15 @@ impl RecurringTransaction {
         Ok(find_all_paginated(recurring_transaction::Entity::find_all_by_user_id(user_id), page_size)
             .await?
             .into_iter()
-            .map(Self::from)
+            .map(Self::try_from)
+            .filter_map(Result::ok)
             .collect())
     }
 
     pub(crate) async fn find_by_id(id: i64) -> Result<Self, ApiError> {
-        find_one_or_error(recurring_transaction::Entity::find_by_id(id), "RecurringTransaction").await.map(Self::from)
+        find_one_or_error(recurring_transaction::Entity::find_by_id(id), "RecurringTransaction")
+            .await
+            .map(Self::try_from)?
     }
 
     pub(crate) async fn count_all() -> Result<u64, ApiError> {
@@ -265,31 +275,36 @@ impl RecurringTransaction {
         Ok(find_all_paginated(recurring_transaction::Entity::find(), &page_size)
             .await?
             .into_iter()
-            .map(Self::from)
+            .map(Self::try_from)
+            .filter_map(Result::ok)
             .collect())
     }
 }
 
 permission_impl!(RecurringTransaction);
 
-impl From<recurring_transaction::Model> for RecurringTransaction {
-    fn from(value: Model) -> Self {
-        let recurring_rule: RecurringRule =
-            RecurringRule::from_json_value(value.recurring_rule).expect("Failed to parse recurring rule");
-        Self {
+impl TryFrom<recurring_transaction::Model> for RecurringTransaction {
+    type Error = ApiError;
+
+    fn try_from(value: Model) -> Result<Self, Self::Error> {
+        let recurring_rule: RecurringRule = RecurringRule::from_json_value(value.recurring_rule)?;
+
+        Ok(Self {
             id: value.id,
             template_id: Phantom::new(value.template),
             last_executed_at: value.last_executed_at,
-            next_executed_at: recurring_rule.find_next_occurrence(&get_now()),
+            next_executed_at: recurring_rule.find_next_occurrence(&get_now()?)?,
             recurring_rule,
             created_at: value.created_at,
-        }
+        })
     }
 }
 
 impl Identifiable for RecurringTransaction {
     async fn find_by_id(id: i64) -> Result<Self, ApiError> {
-        find_one_or_error(recurring_transaction::Entity::find_by_id(id), "RecurringTransaction").await.map(Self::from)
+        find_one_or_error(recurring_transaction::Entity::find_by_id(id), "RecurringTransaction")
+            .await
+            .map(Self::try_from)?
     }
 }
 
@@ -306,15 +321,16 @@ impl WrapperEntity for RecurringTransaction {
 }
 
 pub(crate) fn get_recurring_transaction_scheduler() -> Arc<RwLock<TokioScheduler>> {
-    SCHEDULER.get_or_init(|| Arc::new(RwLock::new(create_tokio_scheduler()))).clone()
+    let scheduler = expect_or_exit(create_tokio_scheduler(), "Could not create tokio scheduler");
+    SCHEDULER.get_or_init(|| Arc::new(RwLock::new(scheduler))).clone()
 }
 
 pub(crate) fn get_jobs() -> Arc<RwLock<HashMap<i64, Arc<Job>>>> {
     JOBS.get_or_init(|| Arc::new(RwLock::new(HashMap::new()))).clone()
 }
 
-fn create_tokio_scheduler() -> TokioScheduler {
-    let builder_config = get_cron_builder_config_default();
+fn create_tokio_scheduler() -> Result<TokioScheduler, ApiError> {
+    let builder_config = get_cron_builder_config_default()?;
     let config = TokioSchedulerConfig {
         channel_size: CHANNEL_SIZE,
         builder_config,
@@ -323,5 +339,5 @@ fn create_tokio_scheduler() -> TokioScheduler {
     let mut scheduler = TokioScheduler::new(config);
     scheduler.start();
 
-    scheduler
+    Ok(scheduler)
 }

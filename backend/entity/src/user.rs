@@ -87,7 +87,7 @@ impl ActiveModel {
             email: Set(email),
             display_name: Set(display_name),
             password: Set(hashed_password),
-            created_at: Set(get_now()),
+            created_at: Set(get_now()?),
             is_admin: Set(false),
         })
     }

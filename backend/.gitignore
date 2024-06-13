@@ -2,6 +2,7 @@
 /system
 /logs
 .env
+config.toml
 
 # IDEs / Codeeditors
 /.idea

@@ -1,0 +1,36 @@
+# App configuration
+address = "0.0.0.0:8080"
+
+[session]
+# Session configuration
+lifetime_hours = 168
+limit = 25
+
+[rate_limiter]
+# Ratelimiter configuration
+limit = 5000
+duration_seconds = 3600
+
+# Database configuration
+[database]
+host = "127.0.0.1"
+port = 5432
+user = "financrr"
+name = "financrr"
+password = "password"
+schema = "public"
+min_connections = 5
+max_connections = 100
+
+# SQLx configuration
+sqlx_logging = false
+
+# Redis configuration
+[cache]
+host = "127.0.0.1"
+port = 6379
+
+# Cors configuration
+[cors]
+allowed_origins = ["*"]
+allow_any_origin = true

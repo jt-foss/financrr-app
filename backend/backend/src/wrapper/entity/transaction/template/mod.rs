@@ -45,7 +45,7 @@ impl TransactionTemplate {
             name: Set(dto.name),
             description: Set(dto.description),
             budget: Set(dto.budget_id.map(|budget| budget.get_id())),
-            created_at: Set(get_now()),
+            created_at: Set(get_now()?),
         };
         let model = insert(active_model).await?;
         let template = Self::from(model);
@@ -81,7 +81,7 @@ impl TransactionTemplate {
             name: Set(updated_dto.name),
             description: Set(updated_dto.description),
             budget: Set(updated_dto.budget_id.map(|budget| budget.get_id())),
-            created_at: Set(get_now()),
+            created_at: Set(get_now()?),
         };
         let model = update(active_model).await?;
         let template = Self::from(model);

@@ -45,7 +45,7 @@ impl Account {
             balance: Set(dto.original_balance),
             original_balance: Set(dto.original_balance),
             currency: Set(dto.currency_id),
-            created_at: Set(get_now()),
+            created_at: Set(get_now()?),
         };
         let model = insert(active_model).await?;
 

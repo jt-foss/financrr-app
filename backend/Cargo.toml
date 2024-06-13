@@ -20,19 +20,20 @@ rust-version = "1.78.0"
 
 [workspace.lints.clippy]
 # Restriction
-absolute_paths = "warn"
-unwrap_used = "warn"
+absolute_paths = "deny"
+unwrap_used = "deny"
+expect_used = "deny"
 
 # Pedantic
 wildcard-imports = "deny"
-cloned_instead_of_copied = "warn"
-explicit_iter_loop = "warn"
-unnecessary_wraps = "warn"
-unused_self = "warn"
+cloned_instead_of_copied = "deny"
+explicit_iter_loop = "deny"
+unnecessary_wraps = "deny"
+unused_self = "deny"
 
 # Nursey
 cognitive_complexity = "deny"
-use_self = "warn"
+use_self = "deny"
 
 [workspace.dependencies]
 # Async runtime
@@ -42,10 +43,10 @@ tokio = { version = "1.38.0", features = ["macros", "rt", "rt-multi-thread", "sy
 serde = { version = "1.0.203", features = ["derive"] }
 
 # ORM
-sea-orm = { version = "1.0.0-rc.5", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros", "mock"] }
+sea-orm = { version = "1.0.0-rc.5", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros"] }
 
 # Date/Time
-time = { version = "0.3.36", features = ["serde-human-readable", "local-offset"] }
+time = { version = "0.3.36", features = ["serde", "serde-human-readable", "local-offset"] }
 chrono = { version = "0.4.38", features = ["clock"] }
 
 # Error handling

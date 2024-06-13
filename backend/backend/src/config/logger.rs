@@ -10,15 +10,18 @@ use tracing_subscriber::fmt;
 use tracing_subscriber::fmt::time::OffsetTime;
 use tracing_subscriber::fmt::writer::MakeWriterExt;
 
+use utility::datetime::get_utc_offset;
+
 use crate::util::init::expect_or_exit;
 
 pub(crate) fn configure() -> WorkerGuard {
     expect_or_exit(LogTracer::init(), "Failed to set  tracing-log adapter!");
 
     // Time format: 2021-01-01 00:00:00
-    let timer = format_description::parse("[year]-[month padding:zero]-[day padding:zero] [hour]:[minute]:[second]")
-        .expect("Failed to parse format description");
-    let time_offset = UtcOffset::current_local_offset().unwrap_or(UtcOffset::UTC);
+    let timer = format_description::parse("[year]-[month padding:zero]-[day padding:zero] [hour]:[minute]:[second]");
+    let timer = expect_or_exit(timer, "Failed to parse format description");
+
+    let time_offset = get_utc_offset().unwrap_or(UtcOffset::UTC);
     let timer = OffsetTime::new(time_offset, timer);
 
     let file_appender = RollingFileAppender::builder()
@@ -26,8 +29,9 @@ pub(crate) fn configure() -> WorkerGuard {
         .filename_prefix("financrr")
         .filename_suffix("log")
         .max_log_files(30)
-        .build("logs")
-        .expect("Failed to create rolling file appender");
+        .build("logs");
+    let file_appender = expect_or_exit(file_appender, "Failed to create rolling file appender");
+
     let (non_blocking_file_appender, file_appender_guard) =
         NonBlockingBuilder::default().lossy(false).finish(file_appender);
 
@@ -39,7 +43,7 @@ pub(crate) fn configure() -> WorkerGuard {
         .with_timer(timer)
         .finish();
 
-    subscriber::set_global_default(subscriber).expect("Setting default subscriber failed");
+    expect_or_exit(subscriber::set_global_default(subscriber), "Setting default subscriber failed");
 
     file_appender_guard
 }

@@ -46,8 +46,7 @@ pub(crate) async fn coffee() -> impl Responder {
 }
 
 async fn is_psql_reachable() -> bool {
-    let db = get_database_connection();
-    db.ping().await.is_ok()
+    get_database_connection().ping().await.is_ok()
 }
 
 async fn is_redis_reachable() -> bool {

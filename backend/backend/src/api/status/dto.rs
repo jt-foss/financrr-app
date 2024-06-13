@@ -4,6 +4,8 @@ use utoipa::ToSchema;
 
 use utility::datetime::get_now;
 
+use crate::api::error::api::ApiError;
+
 #[derive(Serialize, ToSchema)]
 pub(crate) struct HealthResponse {
     pub(crate) healthy: bool,
@@ -14,12 +16,12 @@ pub(crate) struct HealthResponse {
 }
 
 impl HealthResponse {
-    pub(crate) fn new(healthy: bool, details: Option<String>) -> Self {
-        Self {
+    pub(crate) fn new(healthy: bool, details: Option<String>) -> Result<Self, ApiError> {
+        Ok(Self {
             healthy,
             api_version: 1,
-            local_time_now: get_now(),
+            local_time_now: get_now()?,
             details,
-        }
+        })
     }
 }

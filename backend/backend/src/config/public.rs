@@ -1,7 +1,7 @@
 use serde::Serialize;
 use utoipa::ToSchema;
 
-use crate::config::Config;
+use crate::config::{get_config, Config};
 
 #[derive(Debug, Serialize, ToSchema)]
 pub(crate) struct PublicConfig {
@@ -12,9 +12,7 @@ pub(crate) struct PublicConfig {
 
 impl PublicConfig {
     pub(crate) fn get() -> Self {
-        let config = Config::get_config();
-
-        config.into()
+        Self::from(get_config())
     }
 }
 

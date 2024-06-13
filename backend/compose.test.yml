@@ -13,8 +13,6 @@ services:
   rust:
     ports: []
     container_name: financrr-backend-test
-    env_file:
-      - .env.test
 
   db:
     volumes:

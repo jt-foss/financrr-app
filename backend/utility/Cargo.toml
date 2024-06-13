@@ -18,9 +18,16 @@ name = "snowflake"
 harness = false
 
 [dependencies]
+# Async runtime
+tokio.workspace = true
+futures = "0.3.30"
+
 # Date/Time
 time.workspace = true
 chrono.workspace = true
+
+# ORM
+sea-orm.workspace = true
 
 # Serialization and deserialization
 serde.workspace = true

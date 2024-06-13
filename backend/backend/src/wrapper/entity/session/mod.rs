@@ -18,7 +18,7 @@ use utility::datetime::get_now;
 
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
-use crate::config::Config;
+use crate::config::get_config;
 use crate::database::entity::{count, delete, find_all_paginated, find_one_or_error, insert, update};
 use crate::database::redis::{del, get, set_ex, zadd};
 use crate::util::auth::extract_bearer_token;
@@ -62,7 +62,7 @@ impl Session {
             description: Set(credentials.description),
             platform: Set(credentials.platform),
             user: Set(user.id),
-            created_at: Set(get_now()),
+            created_at: Set(get_now()?),
         };
         let model = insert(session).await?;
 
@@ -85,7 +85,7 @@ impl Session {
     }
 
     pub(crate) async fn renew(mut self) -> Result<Self, ApiError> {
-        self.expires_at = get_now().add(TimeDuration::hours(Config::get_config().session.lifetime_hours as i64));
+        self.expires_at = get_now()?.add(TimeDuration::hours(get_config().session.lifetime_hours as i64));
         self.insert_into_redis().await?;
 
         let active_model = session::ActiveModel {
@@ -95,7 +95,7 @@ impl Session {
             description: Set(self.description.clone()),
             platform: Set(self.platform.clone()),
             user: Set(self.user.id),
-            created_at: Set(get_now()),
+            created_at: Set(get_now()?),
         };
         let model = update(active_model).await?;
 
@@ -206,7 +206,7 @@ impl Session {
     pub(crate) async fn reached_session_limit(user_id: i64) -> Result<bool, ApiError> {
         let sessions = Self::count_all_by_user(user_id).await?;
 
-        Ok(sessions >= Config::get_config().session.limit)
+        Ok(sessions >= get_config().session.limit)
     }
 
     pub(crate) async fn init() -> Result<(), ApiError> {
@@ -230,7 +230,7 @@ impl Session {
     }
 
     async fn schedule_deletion(self) -> Result<(), ApiError> {
-        let now = get_now().unix_timestamp();
+        let now = get_now()?.unix_timestamp();
         let expiration_timestamp = self.expires_at.unix_timestamp();
         let delay = expiration_timestamp - now;
         if delay > 0 {
@@ -268,7 +268,7 @@ impl Session {
             platform: model.platform,
             token: model.token,
             user,
-            expires_at: model.created_at.add(TimeDuration::hours(Config::get_config().session.lifetime_hours as i64)),
+            expires_at: model.created_at.add(TimeDuration::hours(get_config().session.lifetime_hours as i64)),
             created_at: model.created_at,
         })
     }

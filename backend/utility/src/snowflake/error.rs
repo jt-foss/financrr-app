@@ -11,9 +11,9 @@ pub enum SnowflakeGeneratorError {
     #[error("Invalid system clock")]
     InvalidSystemClock,
     #[error("Environment variable error")]
-    EnvVarError(#[serde(with = "var_error")] VarError),
+    EnvVarError(#[serde(with = "crate::util::serde::var_error")] VarError),
     #[error("Parse int error")]
-    ParseIntError(#[serde(with = "parse_int_error")] ParseIntError),
+    ParseIntError(#[serde(with = "crate::util::serde::parse_int_error")] ParseIntError),
 }
 
 impl From<VarError> for SnowflakeGeneratorError {
@@ -25,47 +25,5 @@ impl From<VarError> for SnowflakeGeneratorError {
 impl From<ParseIntError> for SnowflakeGeneratorError {
     fn from(error: ParseIntError) -> Self {
         Self::ParseIntError(error)
-    }
-}
-
-pub mod var_error {
-    use serde::de::Error;
-    use serde::{Deserializer, Serializer};
-
-    use super::VarError;
-
-    pub fn serialize<S>(value: &VarError, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        serializer.serialize_str(&value.to_string())
-    }
-
-    pub fn deserialize<'de, D>(_deserializer: D) -> Result<VarError, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        Err(Error::custom("VarError cannot be deserialized"))
-    }
-}
-
-pub mod parse_int_error {
-    use serde::de::Error;
-    use serde::{Deserializer, Serializer};
-
-    use super::ParseIntError;
-
-    pub fn serialize<S>(value: &ParseIntError, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        serializer.serialize_str(&value.to_string())
-    }
-
-    pub fn deserialize<'de, D>(_deserializer: D) -> Result<ParseIntError, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        Err(Error::custom("ParseIntError cannot be deserialized"))
     }
 }
