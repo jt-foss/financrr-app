@@ -13,7 +13,7 @@ COPY . .
 RUN cargo build --release
 
 # Final stage: create a minimal runtime image
-FROM alpine:3.20.0
+FROM alpine:3.20.1
 
 # Update package repositories
 RUN apk add --no-cache curl
