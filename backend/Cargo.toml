@@ -43,7 +43,7 @@ tokio = { version = "1.38.0", features = ["macros", "rt", "rt-multi-thread", "sy
 serde = { version = "1.0.203", features = ["derive"] }
 
 # ORM
-sea-orm = { version = "1.0.0-rc.5", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros"] }
+sea-orm = { version = "1.0.0-rc.7", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros", "mock"] }
 
 # Date/Time
 time = { version = "0.3.36", features = ["serde", "serde-human-readable", "local-offset"] }
