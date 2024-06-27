@@ -13,7 +13,7 @@ pub async fn does_table_exists(table_name: &str, db: &impl ConnectionTrait) -> R
     }
 }
 
-pub async fn does_entity_exist(table_name: &str, id: i32, db: &impl ConnectionTrait) -> Result<bool, DbErr> {
+pub async fn does_entity_exist(table_name: &str, id: i64, db: &impl ConnectionTrait) -> Result<bool, DbErr> {
     let query = format!("SELECT EXISTS (SELECT 1 FROM {} WHERE id = {})", table_name, id);
     let statement = Statement::from_string(DbBackend::Postgres, query);
     let query_results = db.query_one(statement).await?;

@@ -58,15 +58,16 @@ tracing-appender = "0.2.3"
 
 # Date/Time
 time.workspace = true
-chrono = { version = "0.4.38", features = ["clock"]}
+chrono.workspace = true
 
 # Utils
-dotenvy = "0.15.7"
+dotenvy.workspace = true
 derive_more = { version = "1.0.0-beta.6", features = ["display", "error"] }
 regex = { version = "1.10.5", features = ["std", "perf", "unicode"] }
 itertools = "0.13.0"
 bitflags = {  version = "2.6.0", features = ["std", "serde"] }
 paste = "1.0.15"
+utility.workspace = true
 
 # Future Utils
 futures-util = "0.3.30"

@@ -13,6 +13,7 @@ use actix_web::{
 use actix_web_prom::{PrometheusMetrics, PrometheusMetricsBuilder};
 use actix_web_validator5::{Error, JsonConfig, PathConfig, QueryConfig};
 use dotenvy::dotenv;
+use once_cell::sync::Lazy;
 use redis::Client;
 use sea_orm::DatabaseConnection;
 use tracing::info;
@@ -25,6 +26,7 @@ use utoipauto::utoipauto;
 use entity::utility::loading::load_schema;
 use migration::Migrator;
 use migration::MigratorTrait;
+use utility::snowflake::SnowflakeGenerator;
 
 use crate::api::error::api::ApiError;
 use crate::api::routes::account::controller::account_controller;
@@ -54,6 +56,8 @@ pub(crate) mod wrapper;
 pub(crate) static DB: OnceLock<DatabaseConnection> = OnceLock::new();
 pub(crate) static REDIS: OnceLock<Client> = OnceLock::new();
 pub(crate) static CONFIG: OnceLock<Config> = OnceLock::new();
+pub(crate) static SNOWFLAKE_GENERATOR: Lazy<SnowflakeGenerator> =
+    Lazy::new(|| SnowflakeGenerator::new_from_env().expect("Could not create snowflake generator!"));
 
 #[utoipauto(paths = "./backend/src")]
 #[derive(OpenApi)]

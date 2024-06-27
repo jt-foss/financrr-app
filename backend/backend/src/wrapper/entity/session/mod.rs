@@ -21,7 +21,6 @@ use crate::api::pagination::PageSizeParam;
 use crate::config::Config;
 use crate::database::entity::{count, delete, find_all_paginated, find_one_or_error, insert, update};
 use crate::database::redis::{del, get, set_ex, zadd};
-use crate::permission_impl;
 use crate::util::auth::extract_bearer_token;
 use crate::wrapper::entity::user::dto::Credentials;
 use crate::wrapper::entity::user::User;
@@ -29,12 +28,13 @@ use crate::wrapper::entity::{TableName, WrapperEntity};
 use crate::wrapper::permission::{Permission, Permissions};
 use crate::wrapper::types::phantom::Identifiable;
 use crate::wrapper::util::handle_async_result_vec;
+use crate::{permission_impl, SNOWFLAKE_GENERATOR};
 
 pub(crate) mod dto;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub(crate) struct Session {
-    pub(crate) id: i32,
+    pub(crate) id: i64,
     pub(crate) token: String,
     pub(crate) name: String,
     pub(crate) description: Option<String>,
@@ -54,9 +54,10 @@ impl Session {
             Self::delete_oldest_session(user.id).await?;
         }
 
+        let snowflake = SNOWFLAKE_GENERATOR.next_id()?;
         // insert into database
         let session = session::ActiveModel {
-            id: Default::default(),
+            id: Set(snowflake),
             token: Set(session_token.clone()),
             name: Set(credentials.name),
             description: Set(credentials.description),
@@ -102,7 +103,7 @@ impl Session {
         Self::from_model(model).await
     }
 
-    pub(crate) async fn find_user_id(token: String) -> Result<i32, ApiError> {
+    pub(crate) async fn find_user_id(token: String) -> Result<i64, ApiError> {
         let user_id = Self::find_user_id_from_redis(token.to_owned()).await?;
 
         match user_id {
@@ -111,8 +112,8 @@ impl Session {
         }
     }
 
-    async fn find_user_id_from_redis(token: String) -> Result<Option<i32>, ApiError> {
-        let user_id = get::<Option<i32>>(token.to_owned()).await?;
+    async fn find_user_id_from_redis(token: String) -> Result<Option<i64>, ApiError> {
+        let user_id = get::<Option<i64>>(token.to_owned()).await?;
 
         match user_id {
             Some(id) => Ok(Some(id)),
@@ -138,7 +139,7 @@ impl Session {
         Ok(())
     }
 
-    pub(crate) async fn delete_all_with_user(user_id: i32) -> Result<(), ApiError> {
+    pub(crate) async fn delete_all_with_user(user_id: i64) -> Result<(), ApiError> {
         let sessions = Self::find_all_by_user(user_id).await?;
 
         for session in sessions {
@@ -157,7 +158,7 @@ impl Session {
     }
 
     pub(crate) async fn find_all_by_user_paginated(
-        user_id: i32,
+        user_id: i64,
         page_size: &PageSizeParam,
     ) -> Result<Vec<Self>, ApiError> {
         let results = join_all(
@@ -171,7 +172,7 @@ impl Session {
         handle_async_result_vec(results)
     }
 
-    pub(crate) async fn find_all_by_user(user_id: i32) -> Result<Vec<Self>, ApiError> {
+    pub(crate) async fn find_all_by_user(user_id: i64) -> Result<Vec<Self>, ApiError> {
         let results = join_all(
             find_all_paginated(session::Entity::find_by_user_id(user_id), &PageSizeParam::default())
                 .await?
@@ -183,14 +184,14 @@ impl Session {
         handle_async_result_vec(results)
     }
 
-    pub(crate) async fn find_by_id(id: i32) -> Result<Self, ApiError> {
-        let model = find_one_or_error(session::Entity::find_by_id(id), "Session").await?;
+    pub(crate) async fn find_by_id(id: i64) -> Result<Self, ApiError> {
+        let model = find_one_or_error(session::Entity::find_by_id(id)).await?;
 
         Self::from_model(model).await
     }
 
     pub(crate) async fn find_by_token(token: String) -> Result<Self, ApiError> {
-        let model = find_one_or_error(session::Entity::find_by_token(token), "Session").await?;
+        let model = find_one_or_error(session::Entity::find_by_token(token)).await?;
 
         Self::from_model(model).await
     }
@@ -199,11 +200,11 @@ impl Session {
         count(session::Entity::find()).await
     }
 
-    pub(crate) async fn count_all_by_user(user_id: i32) -> Result<u64, ApiError> {
+    pub(crate) async fn count_all_by_user(user_id: i64) -> Result<u64, ApiError> {
         count(session::Entity::find_by_user_id(user_id)).await
     }
 
-    pub(crate) async fn reached_session_limit(user_id: i32) -> Result<bool, ApiError> {
+    pub(crate) async fn reached_session_limit(user_id: i64) -> Result<bool, ApiError> {
         let sessions = Self::count_all_by_user(user_id).await?;
 
         Ok(sessions >= Config::get_config().session.limit)
@@ -251,8 +252,8 @@ impl Session {
         });
     }
 
-    async fn delete_oldest_session(user_id: i32) -> Result<(), ApiError> {
-        let model = find_one_or_error(session::Entity::find_oldest_session_from_user_id(user_id), "Session").await?;
+    async fn delete_oldest_session(user_id: i64) -> Result<(), ApiError> {
+        let model = find_one_or_error(session::Entity::find_oldest_session_from_user_id(user_id)).await?;
         let session = Self::from_model(model).await?;
         session.delete().await?;
 
@@ -287,7 +288,7 @@ impl TableName for Session {
 }
 
 impl WrapperEntity for Session {
-    fn get_id(&self) -> i32 {
+    fn get_id(&self) -> i64 {
         self.id
     }
 }

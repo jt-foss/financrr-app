@@ -12,11 +12,12 @@ use tracing::error;
 use utoipa::ToSchema;
 use validator::{ValidationError, ValidationErrors};
 
-use entity::error::EntityError;
-
 use crate::api::error::api_codes::ApiCode;
 use crate::api::error::validation;
 use crate::util::validation::ValidationErrorJsonPayload;
+use entity::error::EntityError;
+use utility::datetime::error::TimeError;
+use utility::snowflake::error::SnowflakeGeneratorError;
 
 #[derive(Debug, Display, Error, Serialize, ToSchema)]
 #[display("{}", serde_json::to_string(self).expect("Failed to serialize ApiError"))]
@@ -222,6 +223,28 @@ impl From<BuilderConfigBuilderError> for ApiError {
             api_code: ApiCode::CRON_BUILDER_ERROR,
             details: value.to_string(),
             reference: None,
+        }
+    }
+}
+
+impl From<TimeError> for ApiError {
+    fn from(value: TimeError) -> Self {
+        Self {
+            status_code: StatusCode::INTERNAL_SERVER_ERROR,
+            api_code: ApiCode::TIME_ERROR,
+            details: value.to_string(),
+            reference: SerializableStruct::new(&value).ok(),
+        }
+    }
+}
+
+impl From<SnowflakeGeneratorError> for ApiError {
+    fn from(value: SnowflakeGeneratorError) -> Self {
+        Self {
+            status_code: StatusCode::INTERNAL_SERVER_ERROR,
+            api_code: ApiCode::SNOWFLAKE_ERROR,
+            details: value.to_string(),
+            reference: SerializableStruct::new(&value).ok(),
         }
     }
 }

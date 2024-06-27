@@ -1,5 +1,5 @@
 [package]
-name = "migration"
+name = "utility"
 version.workspace = true
 authors.workspace = true
 description.workspace = true
@@ -13,21 +13,27 @@ rust-version.workspace = true
 [lints]
 workspace = true
 
+[[bench]]
+name = "snowflake"
+harness = false
+
 [dependencies]
 # Async runtime
 tokio.workspace = true
-
-# Entity
-entity = { path = "../entity" }
-
-# Sea-orm
-sea-orm.workspace = true
-sea-orm-migration = { version = "1.0.0-rc.7", features = ["sqlx-postgres", "runtime-tokio-rustls"] }
-tracing.workspace = true
+futures = "0.3.30"
 
 # Date/Time
 time.workspace = true
+chrono.workspace = true
 
-# Utils
-dotenvy.workspace = true
-utility.workspace = true
+# ORM
+sea-orm.workspace = true
+
+# Serialization and deserialization
+serde.workspace = true
+
+# Error handling
+thiserror.workspace = true
+
+[dev-dependencies]
+criterion = "0.5.1"

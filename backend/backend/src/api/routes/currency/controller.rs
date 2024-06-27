@@ -70,7 +70,7 @@ pub(crate) async fn get_all_currencies(
 #[get("/{currency_id}")]
 pub(crate) async fn get_one_currency(
     user: Option<Phantom<User>>,
-    currency_id: Path<i32>,
+    currency_id: Path<i64>,
 ) -> Result<impl Responder, ApiError> {
     let currency_id = currency_id.into_inner();
     let user_id = user.map_or(-1, |user| user.get_id());
@@ -111,7 +111,7 @@ pub(crate) async fn create_currency(
     path = "/api/v1/currency/{currency_id}",
     tag = "Currency")]
 #[delete("/{currency_id}")]
-pub(crate) async fn delete_currency(user: Phantom<User>, currency_id: Path<i32>) -> Result<impl Responder, ApiError> {
+pub(crate) async fn delete_currency(user: Phantom<User>, currency_id: Path<i64>) -> Result<impl Responder, ApiError> {
     let currency = Currency::find_by_id(currency_id.into_inner()).await?;
     currency.has_permission_or_error(user.get_id(), Permissions::READ_DELETE).await?;
 
@@ -136,7 +136,7 @@ tag = "Currency")]
 pub(crate) async fn update_currency(
     user: Phantom<User>,
     update_currency: CurrencyDTO,
-    currency_id: Path<i32>,
+    currency_id: Path<i64>,
 ) -> Result<impl Responder, ApiError> {
     let currency = Currency::find_by_id(currency_id.into_inner()).await?;
     currency.has_permission_or_error(user.get_id(), Permissions::READ_WRITE).await?;

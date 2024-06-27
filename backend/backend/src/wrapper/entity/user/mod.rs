@@ -25,7 +25,7 @@ pub(crate) mod dto;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub(crate) struct User {
-    pub(crate) id: i32,
+    pub(crate) id: i64,
     pub(crate) username: String,
     pub(crate) email: Option<String>,
     pub(crate) display_name: Option<String>,
@@ -35,7 +35,7 @@ pub(crate) struct User {
 }
 
 impl User {
-    pub(crate) async fn exists(id: i32) -> Result<bool, ApiError> {
+    pub(crate) async fn exists(id: i64) -> Result<bool, ApiError> {
         Ok(count(user::Entity::find_by_id(id)).await? > 0)
     }
 
@@ -75,11 +75,11 @@ impl User {
 permission_impl!(User);
 
 impl Identifiable for User {
-    async fn find_by_id(id: i32) -> Result<Self, ApiError>
+    async fn find_by_id(id: i64) -> Result<Self, ApiError>
     where
         Self: Sized,
     {
-        find_one_or_error(user::Entity::find_by_id(id), "User").await.map(Self::from)
+        find_one_or_error(user::Entity::find_by_id(id)).await.map(Self::from)
     }
 }
 
@@ -90,7 +90,7 @@ impl TableName for User {
 }
 
 impl WrapperEntity for User {
-    fn get_id(&self) -> i32 {
+    fn get_id(&self) -> i64 {
         self.id
     }
 }
@@ -127,7 +127,7 @@ impl FromRequest for Phantom<User> {
     }
 }
 
-impl From<user::Model> for User {
+impl From<Model> for User {
     fn from(value: Model) -> Self {
         Self {
             id: value.id,

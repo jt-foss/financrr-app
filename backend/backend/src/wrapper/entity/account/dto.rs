@@ -19,7 +19,7 @@ pub(crate) struct AccountDTO {
     #[validate(custom(function = validate_iban))]
     pub(crate) iban: Option<String>,
     pub(crate) original_balance: i64,
-    pub(crate) currency_id: i32,
+    pub(crate) currency_id: i64,
 }
 
 impl FromRequest for AccountDTO {

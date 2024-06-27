@@ -13,7 +13,7 @@ pub(crate) async fn check_transaction_permissions(
     budget_id: &Option<Phantom<Budget>>,
     source_id: &Option<Phantom<Account>>,
     destination_id: &Option<Phantom<Account>>,
-    user_id: i32,
+    user_id: i64,
 ) -> Result<bool, ApiError> {
     if let Some(budget) = budget_id {
         let budget = Budget::find_by_id(budget.get_id()).await?;

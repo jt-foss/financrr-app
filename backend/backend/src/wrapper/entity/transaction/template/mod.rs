@@ -10,19 +10,19 @@ use entity::utility::time::get_now;
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
 use crate::database::entity::{count, delete, find_all_paginated, find_one_or_error, insert, update};
-use crate::permission_impl;
 use crate::wrapper::entity::account::Account;
 use crate::wrapper::entity::budget::Budget;
 use crate::wrapper::entity::currency::Currency;
 use crate::wrapper::entity::{TableName, WrapperEntity};
 use crate::wrapper::permission::{Permission, Permissions};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
+use crate::{permission_impl, SNOWFLAKE_GENERATOR};
 
 pub(crate) mod dto;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub(crate) struct TransactionTemplate {
-    pub(crate) id: i32,
+    pub(crate) id: i64,
     pub(crate) source_id: Option<Phantom<Account>>,
     pub(crate) destination_id: Option<Phantom<Account>>,
     pub(crate) amount: i64,
@@ -35,9 +35,10 @@ pub(crate) struct TransactionTemplate {
 }
 
 impl TransactionTemplate {
-    pub(crate) async fn new(dto: TransactionTemplateDTO, user_id: i32) -> Result<Self, ApiError> {
+    pub(crate) async fn new(dto: TransactionTemplateDTO, user_id: i64) -> Result<Self, ApiError> {
+        let snowflake = SNOWFLAKE_GENERATOR.next_id()?;
         let active_model = transaction_template::ActiveModel {
-            id: Default::default(),
+            id: Set(snowflake),
             source: Set(dto.source_id.map(|source| source.get_id())),
             destination: Set(dto.destination_id.map(|destination| destination.get_id())),
             amount: Set(dto.amount),
@@ -56,12 +57,12 @@ impl TransactionTemplate {
         Ok(template)
     }
 
-    pub(crate) async fn count_all_by_user_id(user_id: i32) -> Result<u64, ApiError> {
+    pub(crate) async fn count_all_by_user_id(user_id: i64) -> Result<u64, ApiError> {
         count(transaction_template::Entity::find_all_by_user_id(user_id)).await
     }
 
     pub(crate) async fn find_all_by_user_id_paginated(
-        user_id: i32,
+        user_id: i64,
         page_size: &PageSizeParam,
     ) -> Result<Vec<Self>, ApiError> {
         Ok(find_all_paginated(transaction_template::Entity::find_all_by_user_id(user_id), page_size)
@@ -115,8 +116,8 @@ impl From<transaction_template::Model> for TransactionTemplate {
 }
 
 impl Identifiable for TransactionTemplate {
-    async fn find_by_id(id: i32) -> Result<Self, ApiError> {
-        find_one_or_error(transaction_template::Entity::find_by_id(id), "TransactionTemplate").await.map(Self::from)
+    async fn find_by_id(id: i64) -> Result<Self, ApiError> {
+        find_one_or_error(transaction_template::Entity::find_by_id(id)).await.map(Self::from)
     }
 }
 
@@ -127,7 +128,7 @@ impl TableName for TransactionTemplate {
 }
 
 impl WrapperEntity for TransactionTemplate {
-    fn get_id(&self) -> i32 {
+    fn get_id(&self) -> i64 {
         self.id
     }
 }

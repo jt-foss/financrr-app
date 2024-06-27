@@ -9,20 +9,20 @@ use entity::{budget, transaction};
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
 use crate::database::entity::{count, delete, find_all_paginated, find_one_or_error, insert, update};
-use crate::permission_impl;
 use crate::wrapper::entity::budget::dto::BudgetDTO;
 use crate::wrapper::entity::transaction::Transaction;
 use crate::wrapper::entity::user::User;
 use crate::wrapper::entity::{TableName, WrapperEntity};
 use crate::wrapper::permission::{Permission, Permissions};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
+use crate::{permission_impl, SNOWFLAKE_GENERATOR};
 
 pub(crate) mod dto;
 pub(crate) mod event_listener;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub(crate) struct Budget {
-    pub(crate) id: i32,
+    pub(crate) id: i64,
     pub(crate) user_id: Phantom<User>,
     pub(crate) amount: i64,
     pub(crate) name: String,
@@ -32,9 +32,10 @@ pub(crate) struct Budget {
 }
 
 impl Budget {
-    pub(crate) async fn new(user_id: i32, dto: BudgetDTO) -> Result<Self, ApiError> {
+    pub(crate) async fn new(user_id: i64, dto: BudgetDTO) -> Result<Self, ApiError> {
+        let snowflake = SNOWFLAKE_GENERATOR.next_id()?;
         let model = budget::ActiveModel {
-            id: Default::default(),
+            id: Set(snowflake),
             user: Set(user_id),
             amount: Set(dto.amount),
             name: Set(dto.name),
@@ -49,12 +50,12 @@ impl Budget {
         Ok(budget)
     }
 
-    pub(crate) async fn exists(id: i32) -> Result<bool, ApiError> {
+    pub(crate) async fn exists(id: i64) -> Result<bool, ApiError> {
         count(budget::Entity::find_by_id(id)).await.map(|count| count > 0)
     }
 
     pub(crate) async fn find_all_by_user_paginated(
-        user_id: i32,
+        user_id: i64,
         page_size_param: &PageSizeParam,
     ) -> Result<Vec<Self>, ApiError> {
         Ok(find_all_paginated(budget::Entity::find_all_by_user_id(user_id), page_size_param)
@@ -64,7 +65,7 @@ impl Budget {
             .collect())
     }
 
-    pub(crate) async fn count_all_by_user(user_id: i32) -> Result<u64, ApiError> {
+    pub(crate) async fn count_all_by_user(user_id: i64) -> Result<u64, ApiError> {
         count(budget::Entity::find_all_by_user_id(user_id)).await
     }
 
@@ -86,7 +87,7 @@ impl Budget {
     }
 
     pub(crate) async fn find_related_transactions_paginated(
-        budget_id: i32,
+        budget_id: i64,
         page_size: &PageSizeParam,
     ) -> Result<Vec<Transaction>, ApiError> {
         let transactions = find_all_paginated(transaction::Entity::find_all_by_budget_id(budget_id), page_size)
@@ -98,7 +99,7 @@ impl Budget {
         Ok(transactions)
     }
 
-    pub(crate) async fn count_related_transactions(budget_id: i32) -> Result<u64, ApiError> {
+    pub(crate) async fn count_related_transactions(budget_id: i64) -> Result<u64, ApiError> {
         count(transaction::Entity::find_all_by_budget_id(budget_id)).await
     }
 }
@@ -106,8 +107,8 @@ impl Budget {
 permission_impl!(Budget);
 
 impl Identifiable for Budget {
-    async fn find_by_id(id: i32) -> Result<Self, ApiError> {
-        Ok(Self::from(find_one_or_error(budget::Entity::find_by_id(id), "Budget").await?))
+    async fn find_by_id(id: i64) -> Result<Self, ApiError> {
+        Ok(Self::from(find_one_or_error(budget::Entity::find_by_id(id)).await?))
     }
 }
 
@@ -118,7 +119,7 @@ impl TableName for Budget {
 }
 
 impl WrapperEntity for Budget {
-    fn get_id(&self) -> i32 {
+    fn get_id(&self) -> i64 {
         self.id
     }
 }

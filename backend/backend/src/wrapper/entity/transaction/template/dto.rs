@@ -25,7 +25,7 @@ pub(crate) struct TransactionTemplateDTO {
 }
 
 impl TransactionTemplateDTO {
-    pub(crate) async fn check_permissions(&self, user_id: i32) -> Result<bool, ApiError> {
+    pub(crate) async fn check_permissions(&self, user_id: i64) -> Result<bool, ApiError> {
         check_transaction_permissions(&self.budget_id, &self.source_id, &self.destination_id, user_id).await
     }
 

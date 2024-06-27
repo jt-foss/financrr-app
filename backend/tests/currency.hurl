@@ -4,8 +4,14 @@ HTTP 200
 [Captures]
 total: jsonpath "$['_metadata']['total']"
 
+# Get the id from the first currency
+GET {{api_v1}}/currency
+HTTP 200
+[Captures]
+first_currency_id: jsonpath "$['_items'][0]['id']"
+
 # Get the currency with id 1
-GET {{api_v1}}/currency/1
+GET {{api_v1}}/currency/{{first_currency_id}}
 HTTP 200
 [Asserts]
 body == "{\"id\":1,\"name\":\"U.S. dollar\",\"symbol\":\"US$\",\"iso_code\":\"USD\",\"decimal_places\":2,\"user\":null}"

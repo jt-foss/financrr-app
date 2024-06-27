@@ -125,7 +125,7 @@ pub(crate) fn validate_datetime_not_in_future(datetime: &OffsetDateTime) -> Resu
     Ok(())
 }
 
-pub(crate) async fn validate_currency_exists(id: i32) -> Result<(), ValidationError> {
+pub(crate) async fn validate_currency_exists(id: i64) -> Result<(), ValidationError> {
     match currency::Entity::find_by_id(id).one(get_database_connection()).await {
         Ok(Some(_)) => Ok(()),
         _ => Err(ValidationError::new("Currency does not exist")),

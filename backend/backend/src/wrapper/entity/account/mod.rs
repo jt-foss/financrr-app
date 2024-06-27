@@ -10,13 +10,13 @@ use entity::{account, transaction};
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
 use crate::database::entity::{count, delete, find_all, find_all_paginated, find_one_or_error, insert, update};
-use crate::permission_impl;
 use crate::wrapper::entity::account::dto::AccountDTO;
 use crate::wrapper::entity::currency::Currency;
 use crate::wrapper::entity::transaction::Transaction;
 use crate::wrapper::entity::{TableName, WrapperEntity};
 use crate::wrapper::permission::{Permission, Permissions, PermissionsEntity};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
+use crate::{permission_impl, SNOWFLAKE_GENERATOR};
 
 pub(crate) mod dto;
 pub(crate) mod event_listener;
@@ -24,7 +24,7 @@ pub(crate) mod phantom;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub(crate) struct Account {
-    pub(crate) id: i32,
+    pub(crate) id: i64,
     pub(crate) name: String,
     pub(crate) description: Option<String>,
     pub(crate) iban: Option<String>,
@@ -36,9 +36,10 @@ pub(crate) struct Account {
 }
 
 impl Account {
-    pub(crate) async fn new(dto: AccountDTO, user_id: i32) -> Result<Self, ApiError> {
+    pub(crate) async fn new(dto: AccountDTO, user_id: i64) -> Result<Self, ApiError> {
+        let snowflake = SNOWFLAKE_GENERATOR.next_id()?;
         let active_model = account::ActiveModel {
-            id: Default::default(),
+            id: Set(snowflake),
             name: Set(dto.name),
             description: Set(dto.description),
             iban: Set(dto.iban),
@@ -87,20 +88,20 @@ impl Account {
         balance + new_original_balance - old_original_balance
     }
 
-    pub(crate) async fn exists(id: i32) -> Result<bool, ApiError> {
+    pub(crate) async fn exists(id: i64) -> Result<bool, ApiError> {
         Ok(count(account::Entity::find_by_id(id)).await? > 0)
     }
 
-    pub(crate) async fn find_all_by_user(user_id: i32) -> Result<Vec<Self>, ApiError> {
+    pub(crate) async fn find_all_by_user(user_id: i64) -> Result<Vec<Self>, ApiError> {
         Ok(find_all(account::Entity::find_all_by_user_id(user_id)).await?.into_iter().map(Self::from).collect())
     }
 
-    pub(crate) async fn count_all_by_user(user_id: i32) -> Result<u64, ApiError> {
+    pub(crate) async fn count_all_by_user(user_id: i64) -> Result<u64, ApiError> {
         count(account::Entity::find_all_by_user_id(user_id)).await
     }
 
     pub(crate) async fn find_transactions_by_account_id_paginated(
-        account_id: i32,
+        account_id: i64,
         page_size: &PageSizeParam,
     ) -> Result<Vec<Transaction>, ApiError> {
         let results = find_all_paginated(transaction::Entity::find_all_by_account_id(account_id), page_size)
@@ -112,13 +113,13 @@ impl Account {
         Ok(results)
     }
 
-    pub(crate) async fn count_transactions_by_account_id(account_id: i32) -> Result<u64, ApiError> {
+    pub(crate) async fn count_transactions_by_account_id(account_id: i64) -> Result<u64, ApiError> {
         count(transaction::Entity::find_all_by_account_id(account_id)).await
     }
 
     pub(crate) async fn assign_permissions_from_account(
         obj: &impl Permission,
-        account_id: i32,
+        account_id: i64,
     ) -> Result<(), ApiError> {
         let permissions = PermissionsEntity::find_all_by_type_and_id(Self::table_name(), account_id).await?;
         for permission in permissions {
@@ -134,7 +135,7 @@ impl Account {
 permission_impl!(Account);
 
 impl WrapperEntity for Account {
-    fn get_id(&self) -> i32 {
+    fn get_id(&self) -> i64 {
         self.id
     }
 }
@@ -146,11 +147,11 @@ impl TableName for Account {
 }
 
 impl Identifiable for Account {
-    async fn find_by_id(id: i32) -> Result<Self, ApiError>
+    async fn find_by_id(id: i64) -> Result<Self, ApiError>
     where
         Self: Sized,
     {
-        find_one_or_error(account::Entity::find_by_id(id), "Account").await.map(Self::from)
+        find_one_or_error(account::Entity::find_by_id(id)).await.map(Self::from)
     }
 }
 
