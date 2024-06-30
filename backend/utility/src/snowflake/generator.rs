@@ -3,6 +3,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 
 use crate::datetime::error::TimeError;
 use crate::datetime::get_epoch_millis;
+use crate::snowflake::entity::Snowflake;
 use crate::snowflake::error::SnowflakeGeneratorError;
 
 pub const FINANCRR_SNOWFLAKE_EPOCH: u64 = 1_705_247_483_000;
@@ -41,6 +42,10 @@ impl SnowflakeGenerator {
         Self::new(node_id, FINANCRR_SNOWFLAKE_EPOCH)
     }
 
+    pub fn next(&self) -> Result<Snowflake, SnowflakeGeneratorError> {
+        Ok(Snowflake::new(self.next_id()?))
+    }
+
     pub fn next_id(&self) -> Result<i64, SnowflakeGeneratorError> {
         let mut current_timestamp = self.timestamp()?;
         let last_timestamp = self.last_timestamp.load(Ordering::SeqCst);
@@ -70,7 +75,11 @@ impl SnowflakeGenerator {
         Ok(get_epoch_millis()? - self.epoch)
     }
 
-    fn wait_for_next_millis(&self, mut current_timestamp: u64, last_timestamp: u64) -> Result<u64, SnowflakeGeneratorError> {
+    fn wait_for_next_millis(
+        &self,
+        mut current_timestamp: u64,
+        last_timestamp: u64,
+    ) -> Result<u64, SnowflakeGeneratorError> {
         while current_timestamp == last_timestamp {
             current_timestamp = self.timestamp()?;
         }

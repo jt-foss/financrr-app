@@ -22,6 +22,9 @@ harness = false
 tokio.workspace = true
 futures = "0.3.30"
 
+# OpenApi
+utoipa.workspace = true
+
 # Date/Time
 time.workspace = true
 chrono.workspace = true
@@ -31,6 +34,7 @@ sea-orm.workspace = true
 
 # Serialization and deserialization
 serde.workspace = true
+serde_json.workspace = true
 
 # Error handling
 thiserror.workspace = true

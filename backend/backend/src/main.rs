@@ -58,7 +58,7 @@ pub(crate) static CONFIG: OnceLock<Config> = OnceLock::new();
 pub(crate) static SNOWFLAKE_GENERATOR: Lazy<SnowflakeGenerator> =
     Lazy::new(|| SnowflakeGenerator::new_from_env().expect("Could not create snowflake generator!"));
 
-#[utoipauto(paths = "./backend/src")]
+#[utoipauto(paths = "./backend/src, ./utility/src from utility")]
 #[derive(OpenApi)]
 #[openapi(
     schemas(

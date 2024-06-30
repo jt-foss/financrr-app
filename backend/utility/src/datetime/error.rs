@@ -17,12 +17,14 @@ pub enum TimeError {
     #[error("Out of bounds error")]
     OutOfBounds,
     #[error("Mapped local time error")]
-    MappedLocalTime(#[serde(with = "crate::util::serde::time_error::local_result")] MappedLocalTime<DateTime<FixedOffset>>),
+    MappedLocalTime(
+        #[serde(with = "crate::util::serde::time_error::local_result")] MappedLocalTime<DateTime<FixedOffset>>,
+    ),
     #[error("System time error")]
     SystemTimeError(
         #[from]
         #[serde(with = "crate::util::serde::time_error::system_time_error")]
-        SystemTimeError
+        SystemTimeError,
     ),
 }
 

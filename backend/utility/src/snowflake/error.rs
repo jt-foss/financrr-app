@@ -15,13 +15,15 @@ pub enum SnowflakeGeneratorError {
     #[error("Environment variable error")]
     EnvVarError(
         #[from]
-        #[serde(with = "crate::util::serde::env_error::var_error")] VarError
+        #[serde(with = "crate::util::serde::env_error::var_error")]
+        VarError,
     ),
     #[error("Parse int error")]
     ParseIntError(
         #[from]
-        #[serde(with = "crate::util::serde::number_error::parse_int_error")] ParseIntError
+        #[serde(with = "crate::util::serde::number_error::parse_int_error")]
+        ParseIntError,
     ),
     #[error("Time error")]
-    TimeError(#[from] TimeError)
+    TimeError(#[from] TimeError),
 }

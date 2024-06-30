@@ -1,8 +1,8 @@
 use std::env::VarError;
 
 pub mod var_error {
-    use serde::{Deserializer, Serializer};
     use serde::de::Error;
+    use serde::{Deserializer, Serializer};
 
     use super::VarError;
 

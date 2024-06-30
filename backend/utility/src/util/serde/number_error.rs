@@ -1,8 +1,8 @@
 use std::num::ParseIntError;
 
 pub mod parse_int_error {
-    use serde::{Deserializer, Serializer};
     use serde::de::Error;
+    use serde::{Deserializer, Serializer};
 
     use super::ParseIntError;
 

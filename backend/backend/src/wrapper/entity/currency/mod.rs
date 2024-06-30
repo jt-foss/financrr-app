@@ -8,6 +8,7 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
 use entity::currency;
+use utility::snowflake::entity::Snowflake;
 
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
@@ -23,7 +24,8 @@ pub(crate) mod dto;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub(crate) struct Currency {
-    pub(crate) id: i64,
+    #[serde(rename = "id")]
+    pub(crate) snowflake: Snowflake,
     pub(crate) name: String,
     pub(crate) symbol: String,
     pub(crate) iso_code: Option<String>,
@@ -36,10 +38,10 @@ impl Currency {
         if !User::exists(user_id).await? {
             return Err(ApiError::ResourceNotFound("User"));
         }
-        let snowflake = SNOWFLAKE_GENERATOR.next_id()?;
+        let snowflake = SNOWFLAKE_GENERATOR.next()?;
 
         let currency = currency::ActiveModel {
-            id: Set(snowflake),
+            id: Set(snowflake.id),
             name: Set(creation.name),
             symbol: Set(creation.symbol),
             iso_code: Set(creation.iso_code),
@@ -54,7 +56,7 @@ impl Currency {
     }
 
     pub(crate) async fn delete(self) -> Result<(), ApiError> {
-        delete(currency::Entity::delete_by_id(self.id)).await?;
+        delete(currency::Entity::delete_by_id(self.snowflake.id)).await?;
 
         Ok(())
     }
@@ -93,7 +95,7 @@ impl Currency {
     pub(crate) async fn update(self, update_dto: CurrencyDTO) -> Result<Self, ApiError> {
         let user_option = self.user.map(|user| user.get_id());
         let active_model = currency::ActiveModel {
-            id: Set(self.id),
+            id: Set(self.snowflake.id),
             name: Set(update_dto.name),
             symbol: Set(update_dto.symbol),
             iso_code: Set(update_dto.iso_code),
@@ -116,7 +118,7 @@ impl TableName for Currency {
 
 impl WrapperEntity for Currency {
     fn get_id(&self) -> i64 {
-        self.id
+        self.snowflake.id
     }
 }
 
@@ -143,7 +145,7 @@ impl FromRequest for Currency {
 impl From<currency::Model> for Currency {
     fn from(value: currency::Model) -> Self {
         Self {
-            id: value.id,
+            snowflake: Snowflake::from(value.id),
             name: value.name,
             symbol: value.symbol,
             iso_code: value.iso_code,

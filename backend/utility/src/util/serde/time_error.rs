@@ -1,6 +1,6 @@
 pub mod component_range {
-    use serde::{Deserializer, Serializer};
     use serde::de::Error;
+    use serde::{Deserializer, Serializer};
     use time::error::ComponentRange;
 
     pub fn serialize<S>(value: &ComponentRange, serializer: S) -> Result<S::Ok, S::Error>
@@ -21,8 +21,8 @@ pub mod component_range {
 pub mod system_time_error {
     use std::time::SystemTimeError;
 
-    use serde::{Deserializer, Serializer};
     use serde::de::Error;
+    use serde::{Deserializer, Serializer};
 
     pub fn serialize<S>(value: &SystemTimeError, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -41,9 +41,9 @@ pub mod system_time_error {
 
 pub mod local_result {
     use chrono::{DateTime, FixedOffset, LocalResult};
-    use serde::{Deserializer, Serializer};
     use serde::de::Error;
     use serde::ser::SerializeSeq;
+    use serde::{Deserializer, Serializer};
 
     pub fn serialize<S>(value: &LocalResult<DateTime<FixedOffset>>, serializer: S) -> Result<S::Ok, S::Error>
     where
