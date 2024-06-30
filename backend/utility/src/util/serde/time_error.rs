@@ -1,51 +1,6 @@
-use std::env::VarError;
-use std::num::ParseIntError;
-
-pub mod var_error {
-    use serde::de::Error;
-    use serde::{Deserializer, Serializer};
-
-    use super::VarError;
-
-    pub fn serialize<S>(value: &VarError, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        serializer.serialize_str(&value.to_string())
-    }
-
-    pub fn deserialize<'de, D>(_deserializer: D) -> Result<VarError, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        Err(Error::custom("VarError cannot be deserialized"))
-    }
-}
-
-pub mod parse_int_error {
-    use serde::de::Error;
-    use serde::{Deserializer, Serializer};
-
-    use super::ParseIntError;
-
-    pub fn serialize<S>(value: &ParseIntError, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        serializer.serialize_str(&value.to_string())
-    }
-
-    pub fn deserialize<'de, D>(_deserializer: D) -> Result<ParseIntError, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        Err(Error::custom("ParseIntError cannot be deserialized"))
-    }
-}
-
 pub mod component_range {
-    use serde::de::Error;
     use serde::{Deserializer, Serializer};
+    use serde::de::Error;
     use time::error::ComponentRange;
 
     pub fn serialize<S>(value: &ComponentRange, serializer: S) -> Result<S::Ok, S::Error>
@@ -63,11 +18,32 @@ pub mod component_range {
     }
 }
 
+pub mod system_time_error {
+    use std::time::SystemTimeError;
+
+    use serde::{Deserializer, Serializer};
+    use serde::de::Error;
+
+    pub fn serialize<S>(value: &SystemTimeError, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_str(&value.to_string())
+    }
+
+    pub fn deserialize<'de, D>(_deserializer: D) -> Result<SystemTimeError, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        Err(Error::custom("SystemTimeError cannot be deserialized"))
+    }
+}
+
 pub mod local_result {
     use chrono::{DateTime, FixedOffset, LocalResult};
+    use serde::{Deserializer, Serializer};
     use serde::de::Error;
     use serde::ser::SerializeSeq;
-    use serde::{Deserializer, Serializer};
 
     pub fn serialize<S>(value: &LocalResult<DateTime<FixedOffset>>, serializer: S) -> Result<S::Ok, S::Error>
     where

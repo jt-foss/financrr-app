@@ -1,7 +1,8 @@
 use std::env::var;
 use std::sync::atomic::{AtomicU64, Ordering};
 
-use crate::datetime::get_now_timestamp_millis;
+use crate::datetime::error::TimeError;
+use crate::datetime::get_epoch_millis;
 use crate::snowflake::error::SnowflakeGeneratorError;
 
 pub const FINANCRR_SNOWFLAKE_EPOCH: u64 = 1_705_247_483_000;
@@ -41,7 +42,7 @@ impl SnowflakeGenerator {
     }
 
     pub fn next_id(&self) -> Result<i64, SnowflakeGeneratorError> {
-        let mut current_timestamp = self.timestamp();
+        let mut current_timestamp = self.timestamp()?;
         let last_timestamp = self.last_timestamp.load(Ordering::SeqCst);
 
         if current_timestamp < last_timestamp {
@@ -53,7 +54,7 @@ impl SnowflakeGenerator {
         if current_timestamp == last_timestamp {
             sequence = (sequence + 1) & MAX_SEQUENCE;
             if sequence == 0 {
-                current_timestamp = self.wait_for_next_millis(current_timestamp, last_timestamp);
+                current_timestamp = self.wait_for_next_millis(current_timestamp, last_timestamp)?;
             }
         } else {
             sequence = 0;
@@ -65,16 +66,16 @@ impl SnowflakeGenerator {
         Ok(((current_timestamp << (NODE_ID_BITS + SEQUENCE_BITS)) | (self.node_id << SEQUENCE_BITS) | sequence) as i64)
     }
 
-    fn timestamp(&self) -> u64 {
-        get_now_timestamp_millis() - self.epoch
+    fn timestamp(&self) -> Result<u64, TimeError> {
+        Ok(get_epoch_millis()? - self.epoch)
     }
 
-    fn wait_for_next_millis(&self, mut current_timestamp: u64, last_timestamp: u64) -> u64 {
+    fn wait_for_next_millis(&self, mut current_timestamp: u64, last_timestamp: u64) -> Result<u64, SnowflakeGeneratorError> {
         while current_timestamp == last_timestamp {
-            current_timestamp = self.timestamp();
+            current_timestamp = self.timestamp()?;
         }
 
-        current_timestamp
+        Ok(current_timestamp)
     }
 }
 
