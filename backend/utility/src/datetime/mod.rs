@@ -1,5 +1,6 @@
-use chrono::{DateTime, FixedOffset, Local, Offset, TimeZone};
 use std::time::SystemTime;
+
+use chrono::{DateTime, FixedOffset, Local, Offset, TimeZone};
 use time::{OffsetDateTime, UtcOffset};
 
 use crate::datetime::error::TimeError;

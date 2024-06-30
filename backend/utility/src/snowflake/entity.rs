@@ -1,7 +1,9 @@
 use serde::de::Error;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde_json::json;
-use utoipa::openapi::{KnownFormat, ObjectBuilder, RefOr, Schema, SchemaFormat, SchemaType};
+use utoipa::openapi::path::{Parameter, ParameterBuilder, ParameterIn};
+use utoipa::openapi::{KnownFormat, ObjectBuilder, RefOr, Required, Schema, SchemaFormat, SchemaType};
+use utoipa::{IntoParams, ToSchema};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Snowflake {
@@ -22,8 +24,8 @@ impl From<i64> for Snowflake {
     }
 }
 
-impl<'__s> utoipa::ToSchema<'__s> for Snowflake {
-    fn schema() -> (&'__s str, RefOr<Schema>) {
+impl ToSchema<'static> for Snowflake {
+    fn schema() -> (&'static str, RefOr<Schema>) {
         (
             "Snowflake",
             ObjectBuilder::new()
@@ -35,6 +37,18 @@ impl<'__s> utoipa::ToSchema<'__s> for Snowflake {
                 .build()
                 .into(),
         )
+    }
+}
+
+impl IntoParams for Snowflake {
+    fn into_params(parameter_in_provider: impl Fn() -> Option<ParameterIn>) -> Vec<Parameter> {
+        vec![ParameterBuilder::new()
+            .name("Snowflake")
+            .description(Some("The snowflake ID."))
+            .required(Required::True)
+            .parameter_in(parameter_in_provider().unwrap_or(ParameterIn::Path))
+            .schema(Some(Self::schema().1))
+            .build()]
     }
 }
 

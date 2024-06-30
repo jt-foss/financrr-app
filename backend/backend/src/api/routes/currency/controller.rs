@@ -3,6 +3,8 @@ use actix_web::web::Path;
 use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
 use actix_web_validator5::Json;
 
+use utility::snowflake::entity::Snowflake;
+
 use crate::api::documentation::response::{InternalServerError, ResourceNotFound, Unauthorized, ValidationError};
 use crate::api::error::api::ApiError;
 use crate::api::pagination::{PageSizeParam, Pagination};
@@ -65,17 +67,18 @@ pub(crate) async fn get_all_currencies(
     security(
         ("bearer_token" = [])
     ),
+    params(("currency_id" = Snowflake,)),
     path = "/api/v1/currency/{currency_id}",
     tag = "Currency")]
 #[get("/{currency_id}")]
 pub(crate) async fn get_one_currency(
     user: Option<Phantom<User>>,
-    currency_id: Path<i64>,
+    currency_id: Path<Snowflake>,
 ) -> Result<impl Responder, ApiError> {
     let currency_id = currency_id.into_inner();
     let user_id = user.map_or(-1, |user| user.get_id());
 
-    Ok(HttpResponse::Ok().json(Currency::find_by_id_include_user(currency_id, user_id).await?))
+    Ok(HttpResponse::Ok().json(Currency::find_by_id_include_user(currency_id.id, user_id).await?))
 }
 
 #[utoipa::path(post,

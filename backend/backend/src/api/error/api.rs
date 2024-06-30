@@ -12,12 +12,13 @@ use tracing::error;
 use utoipa::ToSchema;
 use validator::{ValidationError, ValidationErrors};
 
-use crate::api::error::api_codes::ApiCode;
-use crate::api::error::validation;
-use crate::util::validation::ValidationErrorJsonPayload;
 use entity::error::EntityError;
 use utility::datetime::error::TimeError;
 use utility::snowflake::error::SnowflakeGeneratorError;
+
+use crate::api::error::api_codes::ApiCode;
+use crate::api::error::validation;
+use crate::util::validation::ValidationErrorJsonPayload;
 
 #[derive(Debug, Display, Error, Serialize, ToSchema)]
 #[display("{}", serde_json::to_string(self).expect("Failed to serialize ApiError"))]
