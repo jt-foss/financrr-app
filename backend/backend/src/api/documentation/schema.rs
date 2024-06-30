@@ -10,7 +10,7 @@ impl<'__s> ToSchema<'__s> for PhantomSchema {
             "Phantom",
             schema!(
                 #[inline]
-                i32
+                i64
             )
             .nullable(false)
             .into(),

@@ -12,12 +12,12 @@ use entity::currency;
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
 use crate::database::entity::{count, delete, find_all_paginated, find_one_or_error, insert, update};
-use crate::permission_impl;
 use crate::wrapper::entity::currency::dto::CurrencyDTO;
 use crate::wrapper::entity::user::User;
 use crate::wrapper::entity::{TableName, WrapperEntity};
 use crate::wrapper::permission::{Permission, Permissions};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
+use crate::{permission_impl, SNOWFLAKE_GENERATOR};
 
 pub(crate) mod dto;
 
@@ -36,9 +36,10 @@ impl Currency {
         if !User::exists(user_id).await? {
             return Err(ApiError::ResourceNotFound("User"));
         }
+        let snowflake = SNOWFLAKE_GENERATOR.next_id()?;
 
         let currency = currency::ActiveModel {
-            id: Default::default(),
+            id: Set(snowflake),
             name: Set(creation.name),
             symbol: Set(creation.symbol),
             iso_code: Set(creation.iso_code),

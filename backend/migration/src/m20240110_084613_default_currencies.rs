@@ -6,7 +6,7 @@ use tracing::info;
 use entity::currency;
 use entity::currency::ActiveModel as Currency;
 use entity::utility::loading::load_schema;
-use utility::snowflake::SnowflakeGenerator;
+use utility::snowflake::generator::SnowflakeGenerator;
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;

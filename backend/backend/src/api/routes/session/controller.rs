@@ -7,7 +7,6 @@ use crate::api::documentation::response::ValidationError;
 use crate::api::documentation::response::{InternalServerError, ResourceNotFound, Unauthorized};
 use crate::api::error::api::ApiError;
 use crate::api::pagination::{PageSizeParam, Pagination};
-use crate::api::routes::currency::controller::get_one_currency;
 use crate::wrapper::entity::session::dto::PublicSession;
 use crate::wrapper::entity::session::Session;
 use crate::wrapper::entity::user::dto::Credentials;
@@ -25,7 +24,7 @@ pub(crate) fn session_controller(cfg: &mut web::ServiceConfig) {
             .service(delete_session)
             .service(delete_all_sessions)
             .service(create_session)
-            .service(get_one_currency),
+            .service(get_one_session),
     );
 }
 

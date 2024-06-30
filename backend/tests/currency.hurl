@@ -1,3 +1,10 @@
+# Get current user id
+GET {{api_v1}}/user/@me
+Authorization: Bearer {{admin_token}}
+HTTP 200
+[Captures]
+user_id: jsonpath "$['id']"
+
 # Get the total of public currencies
 GET {{api_v1}}/currency
 HTTP 200
@@ -14,7 +21,7 @@ first_currency_id: jsonpath "$['data'][0]['id']"
 GET {{api_v1}}/currency/{{first_currency_id}}
 HTTP 200
 [Asserts]
-body == "{\"id\":1,\"name\":\"U.S. dollar\",\"symbol\":\"US$\",\"iso_code\":\"USD\",\"decimal_places\":2,\"user\":null}"
+body == "{\"id\":{{first_currency_id}},\"name\":\"U.S. dollar\",\"symbol\":\"US$\",\"iso_code\":\"USD\",\"decimal_places\":2,\"user\":null}"
 
 # Create a new currency
 POST {{api_v1}}/currency
@@ -39,7 +46,7 @@ GET {{api_v1}}/currency/{{id}}
 Authorization: Bearer {{admin_token}}
 HTTP 200
 [Asserts]
-body == "{\"id\":{{id}},\"name\":\"Test Euro\",\"symbol\":\"€€\",\"iso_code\":\"EUR\",\"decimal_places\":2,\"user\":1}"
+body == "{\"id\":{{id}},\"name\":\"Test Euro\",\"symbol\":\"€€\",\"iso_code\":\"EUR\",\"decimal_places\":2,\"user\":{{user_id}}}"
 
 # Get the total of amount of currencies and check if it has increased
 GET {{api_v1}}/currency
@@ -67,7 +74,7 @@ GET {{api_v1}}/currency/{{id}}
 Authorization: Bearer {{admin_token}}
 HTTP 200
 [Asserts]
-body == "{\"id\":{{id}},\"name\":\"Test Euro Updated\",\"symbol\":\"€€€\",\"iso_code\":\"EUR\",\"decimal_places\":2,\"user\":1}"
+body == "{\"id\":{{id}},\"name\":\"Test Euro Updated\",\"symbol\":\"€€€\",\"iso_code\":\"EUR\",\"decimal_places\":2,\"user\":{{user_id}}}"
 
 # Check if the total of currencies is still the same
 GET {{api_v1}}/currency

@@ -6,7 +6,7 @@ use entity::prelude::User;
 use entity::user;
 use entity::utility::hashing::hash_string;
 use entity::utility::time::get_now;
-use utility::snowflake::SnowflakeGenerator;
+use utility::snowflake::generator::SnowflakeGenerator;
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;

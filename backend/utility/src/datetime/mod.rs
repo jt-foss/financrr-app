@@ -1,4 +1,6 @@
 use chrono::{DateTime, FixedOffset, Local, Offset, TimeZone};
+use std::alloc::System;
+use std::time::SystemTime;
 use time::{OffsetDateTime, UtcOffset};
 
 use crate::datetime::error::TimeError;
@@ -10,7 +12,8 @@ pub fn get_now() -> Result<OffsetDateTime, TimeError> {
 }
 
 pub fn get_now_timestamp_millis() -> u64 {
-    Local::now().timestamp_millis() as u64
+    SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_millis() as u64
+    // Local::now().timestamp_millis() as u64
 }
 
 fn get_now_from_chrono() -> Result<OffsetDateTime, TimeError> {

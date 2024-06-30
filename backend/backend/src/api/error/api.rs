@@ -194,6 +194,17 @@ impl From<serde_json::Error> for ApiError {
     }
 }
 
+impl From<serde_yml::Error> for ApiError {
+    fn from(value: serde_yml::Error) -> Self {
+        Self {
+            status_code: StatusCode::INTERNAL_SERVER_ERROR,
+            api_code: ApiCode::SERIALIZATION_ERROR,
+            details: value.to_string(),
+            reference: None,
+        }
+    }
+}
+
 impl From<actix_web::Error> for ApiError {
     fn from(error: actix_web::Error) -> Self {
         Self {

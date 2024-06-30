@@ -20,18 +20,13 @@ use tracing::info;
 use utoipa::openapi::security::{Http, HttpAuthScheme, SecurityScheme};
 use utoipa::openapi::OpenApi as OpenApiStruct;
 use utoipa::{Modify, OpenApi};
-use utoipa_swagger_ui::SwaggerUi;
 use utoipauto::utoipauto;
-
-use entity::utility::loading::load_schema;
-use migration::Migrator;
-use migration::MigratorTrait;
-use utility::snowflake::SnowflakeGenerator;
 
 use crate::api::error::api::ApiError;
 use crate::api::routes::account::controller::account_controller;
 use crate::api::routes::budget::controller::budget_controller;
 use crate::api::routes::currency::controller::currency_controller;
+use crate::api::routes::openapi::controller::configure_openapi;
 use crate::api::routes::session::controller::session_controller;
 use crate::api::routes::transaction::controller::transaction_controller;
 use crate::api::routes::user::controller::user_controller;
@@ -44,6 +39,10 @@ use crate::util::validation::ValidationErrorJsonPayload;
 use crate::wrapper::entity::session::Session;
 use crate::wrapper::entity::start_wrapper;
 use crate::wrapper::permission::cleanup::schedule_clean_up_task;
+use entity::utility::loading::load_schema;
+use migration::Migrator;
+use migration::MigratorTrait;
+use utility::snowflake::generator::SnowflakeGenerator;
 
 pub(crate) mod api;
 pub(crate) mod config;
@@ -67,6 +66,7 @@ pub(crate) static SNOWFLAKE_GENERATOR: Lazy<SnowflakeGenerator> =
     ),
     tags(
         (name = "Status", description = "Endpoints that contain information about the health status of the server."),
+        (name = "OpenAPI", description = "Endpoints for OpenAPI documentation."),
         (name = "Metrics", description = "Endpoints for prometheus metrics."),
         (name = "Session", description = "Endpoints for session management."),
         (name = "User", description = "Endpoints for user management."),
@@ -126,9 +126,6 @@ async fn main() -> Result<()> {
     info!("[*] Scheduling clean up task...");
     schedule_clean_up_task();
 
-    // Make instance variable of ApiDoc so all worker threads gets the same instance.
-    let openapi = ApiDoc::openapi();
-
     info!("\t[*] Initializing rate limiter...");
     let limiter = Data::new(build_rate_limiter());
 
@@ -141,6 +138,9 @@ async fn main() -> Result<()> {
     info!("Starting server... Listening on: {}", Config::get_config().address);
 
     HttpServer::new(move || {
+        let default_headers =
+            DefaultHeaders::new().add(("Content-Type", "application/json")).add(("Accept", "application/json"));
+
         App::new()
             .wrap(Compress::default())
             .wrap(build_cors())
@@ -149,8 +149,10 @@ async fn main() -> Result<()> {
             .app_data(QueryConfig::default().error_handler(|err, _| handle_validation_error(err).into()))
             .app_data(PathConfig::default().error_handler(|err, _| handle_validation_error(err).into()))
             .app_data(limiter.clone())
+            .wrap(RateLimiter::default())
+            .wrap(default_headers)
             .configure(configure_api)
-            .service(SwaggerUi::new("/swagger-ui/{_:.*}").url("/api-docs/openapi.json", openapi.clone()))
+            .configure(configure_openapi)
     })
     .bind(&Config::get_config().address)?
     .run()
@@ -170,13 +172,8 @@ fn handle_validation_error(err: Error) -> ApiError {
 }
 
 fn configure_api(cfg: &mut web::ServiceConfig) {
-    let default_headers =
-        DefaultHeaders::new().add(("Content-Type", "application/json")).add(("Accept", "application/json"));
-
     cfg.service(
         web::scope("/api")
-            .wrap(RateLimiter::default())
-            .wrap(default_headers)
             .wrap(NormalizePath::new(TrailingSlash::Trim))
             .configure(configure_api_v1)
             .configure(status_controller),
