@@ -22,8 +22,8 @@ pub(crate) struct PublicSession {
 impl From<Session> for PublicSession {
     fn from(value: Session) -> Self {
         Self {
-            id: value.id,
-            user_id: value.user.id,
+            id: value.snowflake.id,
+            user_id: value.user.snowflake.id,
             name: value.name,
             description: value.description,
             platform: value.platform,

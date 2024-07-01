@@ -4,6 +4,8 @@ use sea_orm::entity::prelude::*;
 use sea_orm::Condition;
 use serde::{Deserialize, Serialize};
 
+use utility::snowflake::entity::Snowflake;
+
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
 #[sea_orm(table_name = "currency")]
 pub struct Model {
@@ -68,23 +70,23 @@ impl Entity {
         Self::find().filter(Column::User.is_null())
     }
 
-    pub fn find_all_with_user_id(user_id: i64) -> Select<Self> {
+    pub fn find_all_with_user_id(user_id: Snowflake) -> Select<Self> {
         Self::find().filter(Column::User.eq(user_id))
     }
 
-    pub fn find_all_with_no_user_and_user_id(user_id: i64) -> Select<Self> {
+    pub fn find_all_with_no_user_and_user_id(user_id: Snowflake) -> Select<Self> {
         Self::find().filter(Condition::any().add(Column::User.is_null()).add(Column::User.eq(user_id)))
     }
 
-    pub fn find_by_id_with_no_user(id: i64) -> Select<Self> {
+    pub fn find_by_id_with_no_user(id: Snowflake) -> Select<Self> {
         Self::find().filter(Column::Id.eq(id)).filter(Column::User.is_null())
     }
 
-    pub fn find_by_id_related_with_user_id(id: i64, user_id: i64) -> Select<Self> {
+    pub fn find_by_id_related_with_user_id(id: Snowflake, user_id: Snowflake) -> Select<Self> {
         Self::find().filter(Column::Id.eq(id)).filter(Column::User.eq(user_id))
     }
 
-    pub fn find_by_id_include_user_id(id: i64, user_id: i64) -> Select<Self> {
+    pub fn find_by_id_include_user_id(id: Snowflake, user_id: Snowflake) -> Select<Self> {
         Self::find()
             .filter(Column::Id.eq(id))
             .filter(Condition::any().add(Column::User.is_null()).add(Column::User.eq(user_id)))

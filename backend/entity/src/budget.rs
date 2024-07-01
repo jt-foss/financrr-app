@@ -3,6 +3,8 @@
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
+use utility::snowflake::entity::Snowflake;
+
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
 #[sea_orm(table_name = "budget")]
 pub struct Model {
@@ -54,7 +56,7 @@ impl Related<super::user::Entity> for Entity {
 impl ActiveModelBehavior for ActiveModel {}
 
 impl Entity {
-    pub fn find_all_by_user_id(user_id: i64) -> Select<Self> {
+    pub fn find_all_by_user_id(user_id: Snowflake) -> Select<Self> {
         Self::find().filter(Column::User.eq(user_id))
     }
 }

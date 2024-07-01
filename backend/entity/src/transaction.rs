@@ -4,6 +4,8 @@ use sea_orm::entity::prelude::*;
 use sea_orm::{Condition, Order, QueryOrder};
 use serde::{Deserialize, Serialize};
 
+use utility::snowflake::entity::Snowflake;
+
 use crate::permissions::find_all_by_user_id;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
@@ -77,13 +79,13 @@ impl ActiveModelBehavior for ActiveModel {}
 find_all_by_user_id!(Entity);
 
 impl Entity {
-    pub fn find_all_by_account_id(account_id: i64) -> Select<Self> {
+    pub fn find_all_by_account_id(account_id: Snowflake) -> Select<Self> {
         Self::find()
             .filter(Condition::any().add(Column::Source.eq(account_id)).add(Column::Destination.eq(account_id)))
             .order_by(Column::Id, Order::Desc)
     }
 
-    pub fn find_all_by_budget_id(budget_id: i64) -> Select<Self> {
+    pub fn find_all_by_budget_id(budget_id: Snowflake) -> Select<Self> {
         Self::find().filter(Column::Budget.eq(budget_id)).order_by(Column::Id, Order::Desc)
     }
 }

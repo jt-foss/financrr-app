@@ -6,6 +6,8 @@ use sea_orm::ActiveValue::Set;
 use sea_orm::{JoinType, QuerySelect};
 use serde::{Deserialize, Serialize};
 
+use utility::snowflake::entity::Snowflake;
+
 use crate::permissions;
 use crate::permissions::find_all_by_user_id;
 use crate::utility::time::get_now;
@@ -50,7 +52,7 @@ impl ActiveModelBehavior for ActiveModel {}
 find_all_by_user_id!(Entity);
 
 impl Entity {
-    pub fn find_by_id_and_user_id(id: i32, user_id: i32) -> Select<Self> {
+    pub fn find_by_id_and_user_id(id: Snowflake, user_id: Snowflake) -> Select<Self> {
         Self::find()
             .join_rev(
                 JoinType::InnerJoin,
@@ -69,21 +71,21 @@ impl Entity {
 
 impl ActiveModel {
     pub fn new(
-        snowflake: i64,
+        snowflake: Snowflake,
         name: &str,
         description: &Option<String>,
         iban: &Option<String>,
         balance: i64,
-        currency_id: i64,
+        currency_id: Snowflake,
     ) -> Self {
         Self {
-            id: Set(snowflake),
+            id: Set(snowflake.id),
             name: Set(name.to_string()),
             description: Set(description.to_owned()),
             iban: Set(iban.to_owned()),
             balance: Set(balance.to_owned()),
             original_balance: Set(balance),
-            currency: Set(currency_id),
+            currency: Set(currency_id.id),
             created_at: Set(get_now()),
         }
     }

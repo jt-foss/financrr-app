@@ -4,6 +4,8 @@ use sea_orm::entity::prelude::*;
 use sea_orm::QuerySelect;
 use serde::{Deserialize, Serialize};
 
+use utility::snowflake::entity::Snowflake;
+
 use crate::account;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
@@ -47,27 +49,27 @@ impl Entity {
         Self::find().column(Column::UserId)
     }
 
-    pub fn find_permission(user_id: i64, entity_type: &str, entity_id: i64) -> Select<Self> {
+    pub fn find_permission(user_id: Snowflake, entity_type: &str, entity_id: Snowflake) -> Select<Self> {
         Self::find()
             .filter(Column::UserId.eq(user_id))
             .filter(Column::EntityType.eq(entity_type))
             .filter(Column::EntityId.eq(entity_id))
     }
 
-    pub fn find_all_accounts_for_user_id(user_id: i64) -> Select<Self> {
+    pub fn find_all_accounts_for_user_id(user_id: Snowflake) -> Select<Self> {
         Self::find()
             .filter(Column::UserId.eq(user_id))
             .filter(Column::EntityType.eq(account::Entity.table_name().to_string()))
     }
 
-    pub fn find_account_by_id_and_user_id(account_id: i64, user_id: i64) -> Select<Self> {
+    pub fn find_account_by_id_and_user_id(account_id: Snowflake, user_id: Snowflake) -> Select<Self> {
         Self::find()
             .filter(Column::UserId.eq(user_id))
             .filter(Column::EntityId.eq(account_id))
             .filter(Column::EntityType.eq(account::Entity.table_name().to_string()))
     }
 
-    pub fn find_all_by_type_and_id(entity_type: &str, entity_id: i64) -> Select<Self> {
+    pub fn find_all_by_type_and_id(entity_type: &str, entity_id: Snowflake) -> Select<Self> {
         Self::find().filter(Column::EntityType.eq(entity_type)).filter(Column::EntityId.eq(entity_id))
     }
 }
@@ -75,7 +77,7 @@ impl Entity {
 macro_rules! find_all_by_user_id {
     ($entity:ty) => {
         impl $entity {
-            pub fn find_all_by_user_id(user_id: i64) -> Select<Self> {
+            pub fn find_all_by_user_id(user_id: utility::snowflake::entity::Snowflake) -> Select<Self> {
                 use sea_orm::QuerySelect;
 
                 Self::find()

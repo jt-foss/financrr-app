@@ -32,3 +32,6 @@ thiserror.workspace = true
 
 # Date/Time
 time.workspace = true
+
+# Utilities
+utility.workspace = true

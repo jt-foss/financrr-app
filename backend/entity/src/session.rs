@@ -4,6 +4,8 @@ use sea_orm::entity::prelude::*;
 use sea_orm::{DeleteMany, QueryOrder, QuerySelect};
 use serde::{Deserialize, Serialize};
 
+use utility::snowflake::entity::Snowflake;
+
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
 #[sea_orm(table_name = "session")]
 pub struct Model {
@@ -46,11 +48,11 @@ impl Entity {
         Self::find().filter(Column::Token.eq(token))
     }
 
-    pub fn find_by_user_id(user_id: i64) -> Select<Self> {
+    pub fn find_by_user_id(user_id: Snowflake) -> Select<Self> {
         Self::find().filter(Column::User.eq(user_id))
     }
 
-    pub fn find_oldest_session_from_user_id(user_id: i64) -> Select<Self> {
+    pub fn find_oldest_session_from_user_id(user_id: Snowflake) -> Select<Self> {
         Self::find().filter(Column::User.eq(user_id)).order_by_asc(Column::CreatedAt).limit(1)
     }
 
