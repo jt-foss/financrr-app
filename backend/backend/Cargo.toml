@@ -43,7 +43,7 @@ redis = {  version = "0.25.4", features = ["aio", "tokio-comp"] }
 
 # Serialization and deserialization
 serde.workspace = true
-serde_json = "1.0.118"
+serde_json = "1.0.119"
 
 # Generating openapi spec
 utoipa = { version = "4.2.3", features = ["actix_extras", "openapi_extensions", "time", "preserve_order", "preserve_path_order", "non_strict_integers"] }
