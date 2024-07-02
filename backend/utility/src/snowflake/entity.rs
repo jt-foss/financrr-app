@@ -1,3 +1,7 @@
+use std::fmt;
+use std::fmt::{Display, Formatter};
+
+use sea_orm::Value;
 use serde::de::Error;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde_json::json;
@@ -5,7 +9,7 @@ use utoipa::openapi::path::{Parameter, ParameterBuilder, ParameterIn};
 use utoipa::openapi::{KnownFormat, ObjectBuilder, RefOr, Required, Schema, SchemaFormat, SchemaType};
 use utoipa::{IntoParams, ToSchema};
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Copy)]
 pub struct Snowflake {
     pub id: i64,
 }
@@ -21,6 +25,24 @@ impl Snowflake {
 impl From<i64> for Snowflake {
     fn from(value: i64) -> Self {
         Self::new(value)
+    }
+}
+
+impl From<Snowflake> for i64 {
+    fn from(value: Snowflake) -> Self {
+        value.id
+    }
+}
+
+impl From<Snowflake> for Value {
+    fn from(value: Snowflake) -> Self {
+        Self::BigInt(Some(value.id))
+    }
+}
+
+impl Display for Snowflake {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.id)
     }
 }
 

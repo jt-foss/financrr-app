@@ -15,6 +15,7 @@ use uuid::Uuid;
 
 use entity::session;
 use entity::utility::time::get_now;
+use utility::snowflake::entity::Snowflake;
 
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
@@ -34,7 +35,8 @@ pub(crate) mod dto;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub(crate) struct Session {
-    pub(crate) id: i64,
+    #[serde(rename = "id")]
+    pub(crate) snowflake: Snowflake,
     pub(crate) token: String,
     pub(crate) name: String,
     pub(crate) description: Option<String>,
@@ -50,8 +52,8 @@ impl Session {
     pub(crate) async fn new(user: User, credentials: Credentials) -> Result<Self, ApiError> {
         let session_token = Self::generate_session_key();
 
-        if Self::reached_session_limit(user.id).await? {
-            Self::delete_oldest_session(user.id).await?;
+        if Self::reached_session_limit(user.snowflake).await? {
+            Self::delete_oldest_session(user.snowflake).await?;
         }
 
         let snowflake = SNOWFLAKE_GENERATOR.next_id()?;
@@ -62,7 +64,7 @@ impl Session {
             name: Set(credentials.name),
             description: Set(credentials.description),
             platform: Set(credentials.platform),
-            user: Set(user.id),
+            user: Set(user.snowflake.id),
             created_at: Set(get_now()),
         };
         let model = insert(session).await?;
@@ -73,13 +75,13 @@ impl Session {
         session.insert_into_redis().await?;
 
         //grant permissions to user
-        session.add_permission(user.id, Permissions::all()).await?;
+        session.add_permission(user.snowflake, Permissions::all()).await?;
 
         Ok(session)
     }
 
     async fn insert_into_redis(&self) -> Result<(), ApiError> {
-        set_ex(self.token.to_owned(), self.user.id.to_string(), self.expires_at.unix_timestamp() as u64).await?;
+        set_ex(self.token.to_owned(), self.user.snowflake.to_string(), self.expires_at.unix_timestamp() as u64).await?;
         zadd("sessions".to_owned(), self.token.to_owned(), self.expires_at.unix_timestamp() as f64).await?;
 
         Ok(())
@@ -90,12 +92,12 @@ impl Session {
         self.insert_into_redis().await?;
 
         let active_model = session::ActiveModel {
-            id: Set(self.id),
+            id: Set(self.snowflake.id),
             token: Set(self.token.to_owned()),
             name: Set(self.name.clone()),
             description: Set(self.description.clone()),
             platform: Set(self.platform.clone()),
-            user: Set(self.user.id),
+            user: Set(self.user.snowflake.id),
             created_at: Set(get_now()),
         };
         let model = update(active_model).await?;
@@ -103,11 +105,11 @@ impl Session {
         Self::from_model(model).await
     }
 
-    pub(crate) async fn find_user_id(token: String) -> Result<i64, ApiError> {
+    pub(crate) async fn find_user_id(token: String) -> Result<Snowflake, ApiError> {
         let user_id = Self::find_user_id_from_redis(token.to_owned()).await?;
 
         match user_id {
-            Some(id) => Ok(id),
+            Some(id) => Ok(Snowflake::from(id)),
             None => Err(ApiError::InvalidSession()),
         }
     }
@@ -125,7 +127,7 @@ impl Session {
         if let Err(e) = del(self.token.to_owned()).await {
             error!("Could not delete session {}: {}", self.token, e);
         }
-        delete(session::Entity::delete_by_id(self.id)).await?;
+        delete(session::Entity::delete_by_id(self.snowflake)).await?;
 
         Ok(())
     }
@@ -139,7 +141,7 @@ impl Session {
         Ok(())
     }
 
-    pub(crate) async fn delete_all_with_user(user_id: i64) -> Result<(), ApiError> {
+    pub(crate) async fn delete_all_with_user(user_id: Snowflake) -> Result<(), ApiError> {
         let sessions = Self::find_all_by_user(user_id).await?;
 
         for session in sessions {
@@ -158,7 +160,7 @@ impl Session {
     }
 
     pub(crate) async fn find_all_by_user_paginated(
-        user_id: i64,
+        user_id: Snowflake,
         page_size: &PageSizeParam,
     ) -> Result<Vec<Self>, ApiError> {
         let results = join_all(
@@ -172,7 +174,7 @@ impl Session {
         handle_async_result_vec(results)
     }
 
-    pub(crate) async fn find_all_by_user(user_id: i64) -> Result<Vec<Self>, ApiError> {
+    pub(crate) async fn find_all_by_user(user_id: Snowflake) -> Result<Vec<Self>, ApiError> {
         let results = join_all(
             find_all_paginated(session::Entity::find_by_user_id(user_id), &PageSizeParam::default())
                 .await?
@@ -184,7 +186,7 @@ impl Session {
         handle_async_result_vec(results)
     }
 
-    pub(crate) async fn find_by_id(id: i64) -> Result<Self, ApiError> {
+    pub(crate) async fn find_by_id(id: Snowflake) -> Result<Self, ApiError> {
         let model = find_one_or_error(session::Entity::find_by_id(id)).await?;
 
         Self::from_model(model).await
@@ -200,11 +202,11 @@ impl Session {
         count(session::Entity::find()).await
     }
 
-    pub(crate) async fn count_all_by_user(user_id: i64) -> Result<u64, ApiError> {
+    pub(crate) async fn count_all_by_user(user_id: Snowflake) -> Result<u64, ApiError> {
         count(session::Entity::find_by_user_id(user_id)).await
     }
 
-    pub(crate) async fn reached_session_limit(user_id: i64) -> Result<bool, ApiError> {
+    pub(crate) async fn reached_session_limit(user_id: Snowflake) -> Result<bool, ApiError> {
         let sessions = Self::count_all_by_user(user_id).await?;
 
         Ok(sessions >= Config::get_config().session.limit)
@@ -252,7 +254,7 @@ impl Session {
         });
     }
 
-    async fn delete_oldest_session(user_id: i64) -> Result<(), ApiError> {
+    async fn delete_oldest_session(user_id: Snowflake) -> Result<(), ApiError> {
         let model = find_one_or_error(session::Entity::find_oldest_session_from_user_id(user_id)).await?;
         let session = Self::from_model(model).await?;
         session.delete().await?;
@@ -261,9 +263,9 @@ impl Session {
     }
 
     async fn from_model(model: session::Model) -> Result<Self, ApiError> {
-        let user = User::find_by_id(model.user).await?;
+        let user = User::find_by_id(Snowflake::from(model.user)).await?;
         Ok(Self {
-            id: model.id,
+            snowflake: Snowflake::from(model.id),
             name: model.name,
             description: model.description,
             platform: model.platform,
@@ -288,8 +290,8 @@ impl TableName for Session {
 }
 
 impl WrapperEntity for Session {
-    fn get_id(&self) -> i64 {
-        self.id
+    fn get_id(&self) -> Snowflake {
+        self.snowflake
     }
 }
 

@@ -6,6 +6,7 @@ use utoipa::ToSchema;
 
 use entity::utility::time::get_now;
 use entity::{account, transaction};
+use utility::snowflake::entity::Snowflake;
 
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
@@ -24,7 +25,8 @@ pub(crate) mod phantom;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub(crate) struct Account {
-    pub(crate) id: i64,
+    #[serde(rename = "id")]
+    pub(crate) snowflake: Snowflake,
     pub(crate) name: String,
     pub(crate) description: Option<String>,
     pub(crate) iban: Option<String>,
@@ -36,7 +38,7 @@ pub(crate) struct Account {
 }
 
 impl Account {
-    pub(crate) async fn new(dto: AccountDTO, user_id: i64) -> Result<Self, ApiError> {
+    pub(crate) async fn new(dto: AccountDTO, user_id: Snowflake) -> Result<Self, ApiError> {
         let snowflake = SNOWFLAKE_GENERATOR.next_id()?;
         let active_model = account::ActiveModel {
             id: Set(snowflake),
@@ -45,7 +47,7 @@ impl Account {
             iban: Set(dto.iban),
             balance: Set(dto.original_balance),
             original_balance: Set(dto.original_balance),
-            currency: Set(dto.currency_id),
+            currency: Set(dto.currency_id.id),
             created_at: Set(get_now()),
         };
         let model = insert(active_model).await?;
@@ -57,7 +59,7 @@ impl Account {
     }
 
     pub(crate) async fn delete(self) -> Result<(), ApiError> {
-        delete(account::Entity::delete_by_id(self.id)).await
+        delete(account::Entity::delete_by_id(self.snowflake.id)).await
     }
 
     pub(crate) async fn update(&self, dto: AccountDTO) -> Result<Self, ApiError> {
@@ -67,13 +69,13 @@ impl Account {
     pub(crate) async fn update_with_balance(&self, dto: AccountDTO, balance: i64) -> Result<Self, ApiError> {
         let balance = Self::calculate_new_balance(balance, dto.original_balance, self.original_balance);
         let active_model = account::ActiveModel {
-            id: Set(self.id),
+            id: Set(self.snowflake.id),
             name: Set(dto.name),
             description: Set(dto.description),
             iban: Set(dto.iban),
             balance: Set(balance),
             original_balance: Set(dto.original_balance),
-            currency: Set(dto.currency_id),
+            currency: Set(dto.currency_id.id),
             created_at: Set(self.created_at),
         };
         let model = update(active_model).await?;
@@ -88,20 +90,20 @@ impl Account {
         balance + new_original_balance - old_original_balance
     }
 
-    pub(crate) async fn exists(id: i64) -> Result<bool, ApiError> {
+    pub(crate) async fn exists(id: Snowflake) -> Result<bool, ApiError> {
         Ok(count(account::Entity::find_by_id(id)).await? > 0)
     }
 
-    pub(crate) async fn find_all_by_user(user_id: i64) -> Result<Vec<Self>, ApiError> {
+    pub(crate) async fn find_all_by_user(user_id: Snowflake) -> Result<Vec<Self>, ApiError> {
         Ok(find_all(account::Entity::find_all_by_user_id(user_id)).await?.into_iter().map(Self::from).collect())
     }
 
-    pub(crate) async fn count_all_by_user(user_id: i64) -> Result<u64, ApiError> {
+    pub(crate) async fn count_all_by_user(user_id: Snowflake) -> Result<u64, ApiError> {
         count(account::Entity::find_all_by_user_id(user_id)).await
     }
 
     pub(crate) async fn find_transactions_by_account_id_paginated(
-        account_id: i64,
+        account_id: Snowflake,
         page_size: &PageSizeParam,
     ) -> Result<Vec<Transaction>, ApiError> {
         let results = find_all_paginated(transaction::Entity::find_all_by_account_id(account_id), page_size)
@@ -113,13 +115,13 @@ impl Account {
         Ok(results)
     }
 
-    pub(crate) async fn count_transactions_by_account_id(account_id: i64) -> Result<u64, ApiError> {
+    pub(crate) async fn count_transactions_by_account_id(account_id: Snowflake) -> Result<u64, ApiError> {
         count(transaction::Entity::find_all_by_account_id(account_id)).await
     }
 
     pub(crate) async fn assign_permissions_from_account(
         obj: &impl Permission,
-        account_id: i64,
+        account_id: Snowflake,
     ) -> Result<(), ApiError> {
         let permissions = PermissionsEntity::find_all_by_type_and_id(Self::table_name(), account_id).await?;
         for permission in permissions {
@@ -135,8 +137,8 @@ impl Account {
 permission_impl!(Account);
 
 impl WrapperEntity for Account {
-    fn get_id(&self) -> i64 {
-        self.id
+    fn get_id(&self) -> Snowflake {
+        self.snowflake
     }
 }
 
@@ -147,7 +149,7 @@ impl TableName for Account {
 }
 
 impl Identifiable for Account {
-    async fn find_by_id(id: i64) -> Result<Self, ApiError>
+    async fn find_by_id(id: Snowflake) -> Result<Self, ApiError>
     where
         Self: Sized,
     {
@@ -158,13 +160,13 @@ impl Identifiable for Account {
 impl From<account::Model> for Account {
     fn from(value: account::Model) -> Self {
         Self {
-            id: value.id,
+            snowflake: Snowflake::from(value.id),
             name: value.name,
             description: value.description,
             iban: value.iban,
             balance: value.balance,
             original_balance: value.original_balance,
-            currency_id: Phantom::new(value.currency),
+            currency_id: Phantom::from(value.currency),
             created_at: value.created_at,
         }
     }

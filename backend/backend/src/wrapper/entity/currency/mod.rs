@@ -34,7 +34,7 @@ pub(crate) struct Currency {
 }
 
 impl Currency {
-    pub(crate) async fn new(creation: CurrencyDTO, user_id: i64) -> Result<Self, ApiError> {
+    pub(crate) async fn new(creation: CurrencyDTO, user_id: Snowflake) -> Result<Self, ApiError> {
         if !User::exists(user_id).await? {
             return Err(ApiError::ResourceNotFound("User"));
         }
@@ -46,7 +46,7 @@ impl Currency {
             symbol: Set(creation.symbol),
             iso_code: Set(creation.iso_code),
             decimal_places: Set(creation.decimal_places),
-            user: Set(Some(user_id)),
+            user: Set(Some(user_id.id)),
         };
         let model = insert(currency).await?;
         let currency = Self::from(model);
@@ -61,7 +61,7 @@ impl Currency {
         Ok(())
     }
 
-    pub(crate) async fn find_by_id_include_user(id: i64, user_id: i64) -> Result<Self, ApiError> {
+    pub(crate) async fn find_by_id_include_user(id: Snowflake, user_id: Snowflake) -> Result<Self, ApiError> {
         Ok(Self::from(find_one_or_error(currency::Entity::find_by_id_include_user_id(id, user_id)).await?))
     }
 
@@ -78,7 +78,7 @@ impl Currency {
     }
 
     pub(crate) async fn find_all_with_no_user_and_user_paginated(
-        user_id: i64,
+        user_id: Snowflake,
         page_size: &PageSizeParam,
     ) -> Result<Vec<Self>, ApiError> {
         Ok(find_all_paginated(currency::Entity::find_all_with_no_user_and_user_id(user_id), page_size)
@@ -88,7 +88,7 @@ impl Currency {
             .collect())
     }
 
-    pub(crate) async fn count_all_with_no_user_and_user(user_id: i64) -> Result<u64, ApiError> {
+    pub(crate) async fn count_all_with_no_user_and_user(user_id: Snowflake) -> Result<u64, ApiError> {
         count(currency::Entity::find_all_with_no_user_and_user_id(user_id)).await
     }
 
@@ -100,7 +100,7 @@ impl Currency {
             symbol: Set(update_dto.symbol),
             iso_code: Set(update_dto.iso_code),
             decimal_places: Set(update_dto.decimal_places),
-            user: Set(user_option),
+            user: Set(user_option.map(|user_id| user_id.id)),
         };
         let model = update(active_model).await?;
 
@@ -117,13 +117,13 @@ impl TableName for Currency {
 }
 
 impl WrapperEntity for Currency {
-    fn get_id(&self) -> i64 {
-        self.snowflake.id
+    fn get_id(&self) -> Snowflake {
+        self.snowflake
     }
 }
 
 impl Identifiable for Currency {
-    async fn find_by_id(id: i64) -> Result<Self, ApiError>
+    async fn find_by_id(id: Snowflake) -> Result<Self, ApiError>
     where
         Self: Sized,
     {
@@ -150,7 +150,7 @@ impl From<currency::Model> for Currency {
             symbol: value.symbol,
             iso_code: value.iso_code,
             decimal_places: value.decimal_places,
-            user: value.user.map(Phantom::new),
+            user: value.user.map(Phantom::from),
         }
     }
 }

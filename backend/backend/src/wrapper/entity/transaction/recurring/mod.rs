@@ -18,6 +18,7 @@ use entity::recurring_transaction;
 use entity::recurring_transaction::Model;
 use entity::utility::time::get_now;
 use utility::datetime::{convert_chrono_to_time, convert_time_to_chrono};
+use utility::snowflake::entity::Snowflake;
 
 use crate::api::error::api::ApiError;
 use crate::api::pagination::PageSizeParam;
@@ -38,7 +39,7 @@ use crate::{permission_impl, SNOWFLAKE_GENERATOR};
 pub(crate) mod dto;
 pub(crate) mod recurring_rule;
 
-type JobMap = OnceCell<Arc<RwLock<HashMap<i64, Arc<Job>>>>>;
+type JobMap = OnceCell<Arc<RwLock<HashMap<Snowflake, Arc<Job>>>>>;
 
 static SCHEDULER: OnceCell<Arc<RwLock<TokioScheduler>>> = OnceCell::new();
 static JOBS: JobMap = OnceCell::new();
@@ -47,7 +48,8 @@ const CHANNEL_SIZE: usize = 10240;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub(crate) struct RecurringTransaction {
-    pub(crate) id: i64,
+    #[serde(rename = "id")]
+    pub(crate) snowflake: Snowflake,
     pub(crate) template_id: Phantom<TransactionTemplate>,
     #[serde(with = "time::serde::rfc3339::option")]
     pub(crate) last_executed_at: Option<OffsetDateTime>,
@@ -119,7 +121,7 @@ impl RecurringTransaction {
         let snowflake = SNOWFLAKE_GENERATOR.next_id()?;
         let active_model = recurring_transaction::ActiveModel {
             id: Set(snowflake),
-            template: Set(dto.template_id.get_id()),
+            template: Set(dto.template_id.get_id().id),
             recurring_rule: Set(recurring_rule.to_json_value()?),
             last_executed_at: Set(None),
             created_at: Set(get_now()),
@@ -144,11 +146,11 @@ impl RecurringTransaction {
     }
 
     pub(crate) async fn delete(self) -> Result<(), ApiError> {
-        delete(recurring_transaction::Entity::delete_by_id(self.id)).await?;
+        delete(recurring_transaction::Entity::delete_by_id(self.snowflake)).await?;
 
         let map = get_jobs();
         let map = map.write().await;
-        if let Some(job) = map.get(&self.id) {
+        if let Some(job) = map.get(&self.snowflake) {
             job.interrupt();
         }
 
@@ -159,8 +161,8 @@ impl RecurringTransaction {
         let recurring_rule = RecurringRule::from(dto.recurring_rule);
         recurring_rule.to_cron()?; // doing this to check if the cron is valid
         let active_model = recurring_transaction::ActiveModel {
-            id: Set(self.id),
-            template: Set(dto.template_id.get_id()),
+            id: Set(self.snowflake.id),
+            template: Set(dto.template_id.get_id().id),
             recurring_rule: Set(recurring_rule.to_json_value()?),
             last_executed_at: Set(self.last_executed_at),
             created_at: Set(self.created_at),
@@ -192,7 +194,7 @@ impl RecurringTransaction {
         scheduler.schedule_job(cron, job.clone());
 
         let binding = get_jobs();
-        binding.write().await.insert(self.id, job);
+        binding.write().await.insert(self.snowflake, job);
 
         Ok(())
     }
@@ -200,7 +202,7 @@ impl RecurringTransaction {
     async fn stop_recurring_transaction(&self) -> Result<(), ApiError> {
         let binding = get_jobs();
         let mut jobs = binding.write().await;
-        if let Some(job) = jobs.remove(&self.id) {
+        if let Some(job) = jobs.remove(&self.snowflake) {
             job.interrupt();
         }
 
@@ -233,20 +235,20 @@ impl RecurringTransaction {
 
     fn to_active_model(&self) -> recurring_transaction::ActiveModel {
         recurring_transaction::ActiveModel {
-            id: Set(self.id),
-            template: Set(self.template_id.get_id()),
+            id: Set(self.snowflake.id),
+            template: Set(self.template_id.get_id().id),
             recurring_rule: Set(self.recurring_rule.to_json_value().expect("Could not parse recurring rule to json!")),
             last_executed_at: Set(self.last_executed_at),
             created_at: Set(self.created_at),
         }
     }
 
-    pub(crate) async fn count_all_by_user_id(user_id: i64) -> Result<u64, ApiError> {
+    pub(crate) async fn count_all_by_user_id(user_id: Snowflake) -> Result<u64, ApiError> {
         count(recurring_transaction::Entity::find_all_by_user_id(user_id)).await
     }
 
     pub(crate) async fn find_all_by_user_id_paginated(
-        user_id: i64,
+        user_id: Snowflake,
         page_size: &PageSizeParam,
     ) -> Result<Vec<Self>, ApiError> {
         Ok(find_all_paginated(recurring_transaction::Entity::find_all_by_user_id(user_id), page_size)
@@ -256,7 +258,7 @@ impl RecurringTransaction {
             .collect())
     }
 
-    pub(crate) async fn find_by_id(id: i64) -> Result<Self, ApiError> {
+    pub(crate) async fn find_by_id(id: Snowflake) -> Result<Self, ApiError> {
         find_one_or_error(recurring_transaction::Entity::find_by_id(id)).await.map(Self::from)
     }
 
@@ -280,8 +282,8 @@ impl From<Model> for RecurringTransaction {
         let recurring_rule: RecurringRule =
             RecurringRule::from_json_value(value.recurring_rule).expect("Failed to parse recurring rule");
         Self {
-            id: value.id,
-            template_id: Phantom::new(value.template),
+            snowflake: Snowflake::from(value.id),
+            template_id: Phantom::from(value.template),
             last_executed_at: value.last_executed_at,
             next_executed_at: recurring_rule.find_next_occurrence(&get_now()),
             recurring_rule,
@@ -291,7 +293,7 @@ impl From<Model> for RecurringTransaction {
 }
 
 impl Identifiable for RecurringTransaction {
-    async fn find_by_id(id: i64) -> Result<Self, ApiError> {
+    async fn find_by_id(id: Snowflake) -> Result<Self, ApiError> {
         find_one_or_error(recurring_transaction::Entity::find_by_id(id)).await.map(Self::from)
     }
 }
@@ -303,8 +305,8 @@ impl TableName for RecurringTransaction {
 }
 
 impl WrapperEntity for RecurringTransaction {
-    fn get_id(&self) -> i64 {
-        self.id
+    fn get_id(&self) -> Snowflake {
+        self.snowflake
     }
 }
 
@@ -312,7 +314,7 @@ pub(crate) fn get_recurring_transaction_scheduler() -> Arc<RwLock<TokioScheduler
     SCHEDULER.get_or_init(|| Arc::new(RwLock::new(create_tokio_scheduler()))).clone()
 }
 
-pub(crate) fn get_jobs() -> Arc<RwLock<HashMap<i64, Arc<Job>>>> {
+pub(crate) fn get_jobs() -> Arc<RwLock<HashMap<Snowflake, Arc<Job>>>> {
     JOBS.get_or_init(|| Arc::new(RwLock::new(HashMap::new()))).clone()
 }
 
