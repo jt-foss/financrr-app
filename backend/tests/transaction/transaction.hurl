@@ -56,12 +56,13 @@ Content-Type: application/json
   "source_id": null,
   "destination_id": "{{test_acc1_id}}",
   "amount": 1000,
-  "currency_id": 2,
+  "currency_id": "{{currency_id}}",
   "name": "10€ Deposit",
   "description": null,
   "budget_id": null,
   "executed_at": "2024-05-19T15:39:03.013Z"
 }
+HTTP 201
 
 # Assert that account balance is now 11000
 GET {{api_v1}}/account/{{test_acc1_id}}
@@ -77,15 +78,16 @@ POST {{api_v1}}/transaction
 Authorization: Bearer {{admin_token}}
 Content-Type: application/json
 {
-  "source_id": {{test_acc1_id}},
+  "source_id": "{{test_acc1_id}}",
   "destination_id": null,
   "amount": 1000,
-  "currency_id": 2,
-  "name": "10€ Withdrawal",
+  "currency_id": "{{currency_id}}",
+  "name": "10€ Deposit",
   "description": null,
   "budget_id": null,
   "executed_at": "2024-05-19T15:39:03.013Z"
 }
+HTTP 201
 
 # Assert that account balance is now 10000
 GET {{api_v1}}/account/{{test_acc1_id}}
@@ -144,15 +146,16 @@ PATCH {{api_v1}}/transaction/{{transfer_transaction_id}}
 Authorization: Bearer {{admin_token}}
 Content-Type: application/json
 {
-  "source_id": {{test_acc1_id}},
-  "destination_id": {{test_acc2_id}},
+  "source_id": "{{test_acc1_id}}",
+  "destination_id": "{{test_acc2_id}}",
   "amount": 1500,
-  "currency_id": 2,
+  "currency_id": "{{currency_id}}",
   "name": "10€ Transfer",
   "description": null,
   "budget_id": null,
   "executed_at": "2024-05-19T15:39:03.013Z"
 }
+HTTP 200
 
 # Assert that test1 account balance is now 7500
 GET {{api_v1}}/account/{{test_acc1_id}}
