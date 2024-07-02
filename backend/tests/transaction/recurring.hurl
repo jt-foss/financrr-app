@@ -27,7 +27,7 @@ Content-Type: application/json
   "description": null,
   "iban": null,
   "original_balance": 10000,
-  "currency_id": {{currency_id}}
+  "currency_id": "{{currency_id}}"
 }
 HTTP 201
 [Captures]
@@ -39,9 +39,9 @@ Authorization: Bearer {{admin_token}}
 Content-Type: application/json
 {
   "source_id": null,
-  "destination_id": {{test_acc_id}},
+  "destination_id": "{{test_acc_id}}",
   "amount": 1000,
-  "currency_id": {{currency_id}},
+  "currency_id": "{{currency_id}}",
   "name": "10€ Deposit",
   "description": "A longer description bla bla",
   "budget_id": null
@@ -55,7 +55,7 @@ POST {{api_v1}}/transaction/recurring
 Authorization: Bearer {{admin_token}}
 Content-Type: application/json
 {
-  "template_id": {{template_id}},
+  "template_id": "{{template_id}}",
   "recurring_rule": {
     "cron_pattern": {
       "day_of_month": "*",
@@ -80,7 +80,7 @@ PATCH {{api_v1}}/transaction/recurring/{{recurring_id}}
 Authorization: Bearer {{admin_token}}
 Content-Type: application/json
 {
-    "template_id": {{template_id}},
+    "template_id": "{{template_id}}",
     "recurring_rule": {
         "cron_pattern": {
         "day_of_month": "*",
@@ -116,9 +116,9 @@ Authorization: Bearer {{admin_token}}
 Content-Type: application/json
 {
   "source_id": null,
-  "destination_id": {{test_acc_id}},
+  "destination_id": "{{test_acc_id}}",
   "amount": 1000,
-  "currency_id": {{currency_id}},
+  "currency_id": "{{currency_id}}",
   "name": "10€ Deposit",
   "description": "A longer description bla bla",
   "budget_id": null
@@ -132,7 +132,7 @@ POST {{api_v1}}/transaction/recurring
 Authorization: Bearer {{admin_token}}
 Content-Type: application/json
 {
-  "template_id": {{template_id}},
+  "template_id": "{{template_id}}",
   "recurring_rule": {
     "cron_pattern": {
       "day_of_month": "*",

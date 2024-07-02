@@ -27,7 +27,7 @@ Content-Type: application/json
   "description": null,
   "iban": null,
   "original_balance": 10000,
-  "currency_id": {{currency_id}}
+  "currency_id": "{{currency_id}}"
 }
 HTTP 201
 [Captures]
@@ -42,7 +42,7 @@ Content-Type: application/json
   "description": null,
   "iban": null,
   "original_balance": 10000,
-  "currency_id": {{currency_id}}
+  "currency_id": "{{currency_id}}"
 }
 HTTP 201
 [Captures]
@@ -54,7 +54,7 @@ Authorization: Bearer {{admin_token}}
 Content-Type: application/json
 {
   "source_id": null,
-  "destination_id": {{test_acc1_id}},
+  "destination_id": "{{test_acc1_id}}",
   "amount": 1000,
   "currency_id": 2,
   "name": "10€ Deposit",
@@ -101,10 +101,10 @@ POST {{api_v1}}/transaction
 Authorization: Bearer {{admin_token}}
 Content-Type: application/json
 {
-  "source_id": {{test_acc1_id}},
-  "destination_id": {{test_acc2_id}},
+  "source_id": "{{test_acc1_id}}",
+  "destination_id": "{{test_acc2_id}}",
   "amount": 1000,
-  "currency_id": {{currency_id}},
+  "currency_id": "{{currency_id}}",
   "name": "10€ Transfer",
   "description": null,
   "budget_id": null,

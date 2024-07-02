@@ -27,7 +27,7 @@ Content-Type: application/json
   "description": null,
   "iban": null,
   "original_balance": 10000,
-  "currency_id": {{currency_id}}
+  "currency_id": "{{currency_id}}"
 }
 HTTP 201
 [Captures]
@@ -42,7 +42,7 @@ Content-Type: application/json
   "description": null,
   "iban": null,
   "original_balance": 10000,
-  "currency_id": {{currency_id}}
+  "currency_id": "{{currency_id}}"
 }
 HTTP 201
 [Captures]
@@ -54,9 +54,9 @@ Authorization: Bearer {{admin_token}}
 Content-Type: application/json
 {
   "source_id": null,
-  "destination_id": {{test_acc1_id}},
+  "destination_id": "{{test_acc1_id}}",
   "amount": 1000,
-  "currency_id":  {{currency_id}},
+  "currency_id":  "{{currency_id}}",
   "name": "10€ Deposit",
   "description": "A longer description bla bla",
   "budget_id": null
@@ -70,7 +70,7 @@ POST {{api_v1}}/transaction/from-template
 Authorization: Bearer {{admin_token}}
 Content-Type: application/json
 {
-    "template_id": {{template_id}},
+    "template_id": "{{template_id}}",
     "executed_at": "2024-05-21T21:03:23.251Z"
 }
 HTTP 201
@@ -91,10 +91,10 @@ PATCH {{api_v1}}/transaction/template/{{template_id}}
 Authorization: Bearer {{admin_token}}
 Content-Type: application/json
 {
-  "source_id": {{test_acc1_id}},
-  "destination_id": {{test_acc2_id}},
+  "source_id": "{{test_acc1_id}}",
+  "destination_id": "{{test_acc2_id}}",
   "amount": 2000,
-  "currency_id": {{currency_id}},
+  "currency_id": "{{currency_id}}",
   "name": "20€ Deposit",
   "description": "A longer description bla bla",
   "budget_id": null
