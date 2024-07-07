@@ -38,7 +38,7 @@ use_self = "warn"
 tokio = { version = "1.38.0", features = ["macros", "rt", "rt-multi-thread", "sync", "time", "parking_lot"] }
 
 # Serialization/Deserialization
-serde = { version = "1.0.203", features = ["derive"] }
+serde = { version = "1.0.204", features = ["derive"] }
 
 # ORM
 sea-orm = { version = "1.0.0-rc.7", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros", "mock"] }
