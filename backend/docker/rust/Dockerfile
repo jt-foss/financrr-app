@@ -37,6 +37,9 @@ RUN chmod +x /home/financrr/migrator
 RUN mkdir "./logs"
 RUN chown -R financrr:financrr "./logs"
 
+# Expose the port
+EXPOSE 8080
+
 # Switch to non-root user
 USER financrr
 
