@@ -15,6 +15,11 @@ workspace = true
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[features]
+# Enable mimalloc memory allocator to replace the default malloc
+# This can improve performance for Alpine builds
+enable_mimalloc = ["mimalloc"]
+
 [dependencies]
 # Actix
 actix-web = { version = "4.8.0", features = ["rustls-0_23"] }
@@ -39,7 +44,7 @@ sea-orm.workspace = true
 entity = { path = "../entity" }
 migration = { path = "../migration" }
 # Redis
-redis = {  version = "0.25.4", features = ["aio", "tokio-comp"] }
+redis = { version = "0.25.4", features = ["aio", "tokio-comp"] }
 
 # Serialization and deserialization
 serde.workspace = true
@@ -67,7 +72,7 @@ dotenvy.workspace = true
 derive_more = { version = "1.0.0-beta.6", features = ["display", "error"] }
 regex = { version = "1.10.5", features = ["std", "perf", "unicode"] }
 itertools = "0.13.0"
-bitflags = {  version = "2.6.0", features = ["std", "serde"] }
+bitflags = { version = "2.6.0", features = ["std", "serde"] }
 paste = "1.0.15"
 utility.workspace = true
 
@@ -79,3 +84,7 @@ once_cell = "1.19.0"
 
 # Security utils
 uuid = { version = "1.10.0", features = ["v4"] }
+
+# mimalloc
+# Replaces musl malloc since it is very slow
+mimalloc = { version = "0.1.43", optional = true }

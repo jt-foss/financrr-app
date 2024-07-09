@@ -13,6 +13,9 @@ use actix_web::{
 use actix_web_prom::{PrometheusMetrics, PrometheusMetricsBuilder};
 use actix_web_validator5::{Error, JsonConfig, PathConfig, QueryConfig};
 use dotenvy::dotenv;
+// When enabled use MiMalloc as malloc instead of the default malloc
+#[cfg(feature = "enable_mimalloc")]
+use mimalloc::MiMalloc;
 use once_cell::sync::Lazy;
 use redis::Client;
 use sea_orm::DatabaseConnection;
@@ -52,6 +55,10 @@ pub(crate) mod event;
 pub(crate) mod scheduling;
 pub(crate) mod util;
 pub(crate) mod wrapper;
+
+#[cfg(feature = "enable_mimalloc")]
+#[cfg_attr(feature = "enable_mimalloc", global_allocator)]
+static GLOBAL: MiMalloc = MiMalloc;
 
 pub(crate) static DB: OnceLock<DatabaseConnection> = OnceLock::new();
 pub(crate) static REDIS: OnceLock<Client> = OnceLock::new();

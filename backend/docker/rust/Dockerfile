@@ -10,7 +10,7 @@ RUN apk update
 WORKDIR /usr/src/financrr
 COPY . .
 
-RUN cargo build --release
+RUN cargo build --release --features "mimalloc"
 
 # Final stage: create a minimal runtime image
 FROM alpine:3.20.1
