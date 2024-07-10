@@ -2,6 +2,7 @@
 
 use sea_orm::entity::prelude::*;
 use sea_orm::ActiveValue::Set;
+use sea_orm::{Order, QueryOrder};
 use serde::{Deserialize, Serialize};
 
 use crate::error::EntityError;
@@ -92,6 +93,6 @@ impl ActiveModel {
 
 impl Entity {
     pub fn find_by_username(username: &str) -> Select<Self> {
-        Self::find().filter(Column::Username.eq(username.to_string()))
+        Self::find().filter(Column::Username.eq(username.to_string())).order_by(Column::Id, Order::Desc)
     }
 }

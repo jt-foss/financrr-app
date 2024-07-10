@@ -15,7 +15,7 @@ total: jsonpath "$['_metadata']['total']"
 GET {{api_v1}}/currency
 HTTP 200
 [Captures]
-first_currency_id: jsonpath "$['data'][0]['id']"
+first_currency_id: jsonpath "$['data'][29]['id']"
 
 # Get the currency with id 1
 GET {{api_v1}}/currency/{{first_currency_id}}

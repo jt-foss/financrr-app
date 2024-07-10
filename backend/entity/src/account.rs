@@ -3,7 +3,7 @@
 use sea_orm::entity::prelude::*;
 use sea_orm::sea_query::IntoCondition;
 use sea_orm::ActiveValue::Set;
-use sea_orm::{JoinType, QuerySelect};
+use sea_orm::{JoinType, Order, QueryOrder, QuerySelect};
 use serde::{Deserialize, Serialize};
 
 use utility::snowflake::entity::Snowflake;
@@ -66,6 +66,7 @@ impl Entity {
             )
             .filter(permissions::Column::UserId.eq(user_id))
             .filter(Column::Id.eq(id))
+            .order_by(Column::Id, Order::Desc)
     }
 }
 
