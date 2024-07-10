@@ -84,8 +84,8 @@ macro_rules! find_all_by_user_id {
     ($entity:ty) => {
         impl $entity {
             pub fn find_all_by_user_id(user_id: utility::snowflake::entity::Snowflake) -> Select<Self> {
-                use sea_orm::QuerySelect;
                 use sea_orm::QueryOrder;
+                use sea_orm::QuerySelect;
 
                 Self::find()
                     .join_rev(
