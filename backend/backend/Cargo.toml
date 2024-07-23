@@ -38,6 +38,7 @@ croner = "2.0.5"
 # Validation
 validator = { version = "0.18.1", features = ["derive"] }
 actix-web-validator5 = "1.0.0"
+actix-web-validation = { version = "0.3.0", features = ["validator"]}
 iban = "0.1.7"
 
 # Database / ORM

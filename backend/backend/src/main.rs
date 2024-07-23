@@ -1,17 +1,15 @@
 use std::io::Result;
-use std::sync::OnceLock;
+use std::sync::{Arc, OnceLock};
 use std::time::Duration;
 
 use actix_cors::Cors;
 use actix_limitation::{Limiter, RateLimiter};
+use actix_web::{App, HttpRequest, HttpServer, web::{self}};
+use actix_web::http::StatusCode;
 use actix_web::middleware::{Compress, DefaultHeaders, NormalizePath, TrailingSlash};
 use actix_web::web::Data;
-use actix_web::{
-    web::{self},
-    App, HttpServer,
-};
 use actix_web_prom::{PrometheusMetrics, PrometheusMetricsBuilder};
-use actix_web_validator5::{Error, JsonConfig, PathConfig, QueryConfig};
+use actix_web_validation::validator::ValidatorErrorHandlerExt;
 use dotenvy::dotenv;
 // When enabled use MiMalloc as malloc instead of the default malloc
 #[cfg(feature = "enable_mimalloc")]
@@ -20,9 +18,9 @@ use once_cell::sync::Lazy;
 use redis::Client;
 use sea_orm::DatabaseConnection;
 use tracing::info;
-use utoipa::openapi::security::{Http, HttpAuthScheme, SecurityScheme};
-use utoipa::openapi::OpenApi as OpenApiStruct;
 use utoipa::{Modify, OpenApi};
+use utoipa::openapi::OpenApi as OpenApiStruct;
+use utoipa::openapi::security::{Http, HttpAuthScheme, SecurityScheme};
 use utoipauto::utoipauto;
 
 use entity::utility::loading::load_schema;
@@ -30,7 +28,8 @@ use migration::Migrator;
 use migration::MigratorTrait;
 use utility::snowflake::generator::SnowflakeGenerator;
 
-use crate::api::error::api::ApiError;
+use crate::api::error::api::{ApiError, SerializableStruct};
+use crate::api::error::api_codes::ApiCode;
 use crate::api::routes::account::controller::account_controller;
 use crate::api::routes::budget::controller::budget_controller;
 use crate::api::routes::currency::controller::currency_controller;
@@ -39,11 +38,10 @@ use crate::api::routes::session::controller::session_controller;
 use crate::api::routes::transaction::controller::transaction_controller;
 use crate::api::routes::user::controller::user_controller;
 use crate::api::status::controller::status_controller;
-use crate::config::{logger, Config};
+use crate::config::{Config, logger};
 use crate::database::connection::{create_redis_client, establish_database_connection, get_database_connection};
 use crate::database::redis::clear_redis;
 use crate::util::panic::install_panic_hook;
-use crate::util::validation::ValidationErrorJsonPayload;
 use crate::wrapper::entity::session::Session;
 use crate::wrapper::entity::start_wrapper;
 use crate::wrapper::permission::cleanup::schedule_clean_up_task;
@@ -153,9 +151,7 @@ async fn main() -> Result<()> {
             .wrap(Compress::default())
             .wrap(build_cors())
             .wrap(prometheus_metrics.clone())
-            .app_data(JsonConfig::default().error_handler(|err, _| handle_validation_error(err).into()))
-            .app_data(QueryConfig::default().error_handler(|err, _| handle_validation_error(err).into()))
-            .app_data(PathConfig::default().error_handler(|err, _| handle_validation_error(err).into()))
+            .validator_error_handler(Arc::new(error_handler))
             .app_data(limiter.clone())
             .wrap(RateLimiter::default())
             .wrap(default_headers)
@@ -167,16 +163,19 @@ async fn main() -> Result<()> {
     .await
 }
 
-fn handle_validation_error(err: Error) -> ApiError {
-    let json_error = match &err {
-        Error::Validate(error) => ValidationErrorJsonPayload::from(error),
-        _ => ValidationErrorJsonPayload {
-            message: err.to_string(),
-            fields: Vec::new(),
-        },
-    };
+fn error_handler(errors: ::validator::ValidationErrors, _req: &HttpRequest) -> actix_web::Error {
+    let error_vec = errors
+        .errors()
+        .iter()
+        .map(|(err, _)| err.to_string())
+        .collect::<Vec<String>>();
 
-    ApiError::from(json_error)
+    ApiError {
+        status_code: StatusCode::BAD_REQUEST,
+        api_code: ApiCode::JSON_PAYLOAD_VALIDATION_ERROR,
+        details: "Validation error".to_string(),
+        reference: SerializableStruct::new(&error_vec).ok(),
+    }.into()
 }
 
 fn configure_api(cfg: &mut web::ServiceConfig) {

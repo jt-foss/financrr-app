@@ -1,15 +1,15 @@
+use actix_web::{delete, get, HttpResponse, patch, post, Responder, web};
 use actix_web::http::Uri;
-use actix_web::web::Path;
-use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
-use actix_web_validator5::Json;
+use actix_web::web::{Json, Path};
+use actix_web_validation::Validated;
 
 use utility::snowflake::entity::Snowflake;
 
 use crate::api::documentation::response::{InternalServerError, ResourceNotFound, Unauthorized, ValidationError};
 use crate::api::error::api::ApiError;
 use crate::api::pagination::{PageSizeParam, Pagination};
-use crate::wrapper::entity::budget::dto::BudgetDTO;
 use crate::wrapper::entity::budget::Budget;
+use crate::wrapper::entity::budget::dto::BudgetDTO;
 use crate::wrapper::entity::user::User;
 use crate::wrapper::permission::{HasPermissionByIdOrError, HasPermissionOrError, Permissions};
 use crate::wrapper::types::phantom::{Identifiable, Phantom};
@@ -121,7 +121,7 @@ pub(crate) async fn get_transactions_from_budget(
     tag = "Budget"
 )]
 #[post("")]
-pub(crate) async fn create_budget(user: Phantom<User>, budget: Json<BudgetDTO>) -> Result<impl Responder, ApiError> {
+pub(crate) async fn create_budget(user: Phantom<User>, budget: Validated<Json<BudgetDTO>>) -> Result<impl Responder, ApiError> {
     let budget = Budget::new(user.get_id(), budget.into_inner()).await?;
 
     Ok(HttpResponse::Created().json(budget))
