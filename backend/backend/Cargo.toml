@@ -24,6 +24,7 @@ enable_mimalloc = ["mimalloc"]
 [dependencies]
 # Actix
 actix-web = { version = "4.8.0", features = ["rustls-0_23"] }
+actix-ws = "0.2.5"
 actix-cors = "0.7.0"
 actix-limitation = "0.5.1"
 actix-web-prom = "0.8.0"

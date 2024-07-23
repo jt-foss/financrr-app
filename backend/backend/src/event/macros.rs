@@ -8,7 +8,7 @@ macro_rules! lifecycle_event {
     ) => {
         paste::paste! {
             #[allow(non_upper_case_globals)]
-            static [< $name EventBus >]: once_cell::sync::OnceCell<$crate::event::EventBus<$name>> = once_cell::sync::OnceCell::new();
+            static [< $name EventBus >]: once_cell::sync::Lazy<$crate::event::EventBus<$name>> = once_cell::sync::Lazy::new($crate::event::EventBus::new);
         }
 
         $(#[$meta])*
@@ -27,7 +27,7 @@ macro_rules! lifecycle_event {
         impl $crate::event::GenericEvent for $name {
             paste::paste! {
                 fn get_event_bus() -> &'static $crate::event::EventBus<Self> {
-                    [< $name EventBus >].get_or_init($crate::event::EventBus::new)
+                    &*[< $name EventBus >]
                 }
             }
         }

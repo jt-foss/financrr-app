@@ -53,6 +53,7 @@ api_codes!(
     (1101, SERIALIZATION_ERROR, "Serialization error!");
     (1102, MISSING_PERMISSIONS, "Missing permissions!");
     (1103, CRON_ERROR, "Error while parsing to cron!");
+    (1104, INVALID_EVENT, "Invalid event provided!");
 );
 
 //validation errors

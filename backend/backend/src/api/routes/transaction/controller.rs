@@ -1,6 +1,6 @@
+use actix_web::{delete, get, HttpResponse, patch, post, Responder, web};
 use actix_web::http::Uri;
 use actix_web::web::Path;
-use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
 
 use utility::snowflake::entity::Snowflake;
 
@@ -9,6 +9,8 @@ use crate::api::error::api::ApiError;
 use crate::api::pagination::{PageSizeParam, Pagination};
 use crate::api::routes::transaction::recurring::controller::recurring_transaction_controller;
 use crate::api::routes::transaction::template::controller::transaction_template_controller;
+use crate::event::GenericEvent;
+use crate::event::lifecycle::transaction::{TransactionCreation, TransactionEvents};
 use crate::wrapper::entity::transaction::dto::{TransactionDTO, TransactionFromTemplate};
 use crate::wrapper::entity::transaction::Transaction;
 use crate::wrapper::entity::user::User;
@@ -177,4 +179,34 @@ pub(crate) async fn update_transaction(
     let transaction = transaction.update(transaction_dto).await?;
 
     Ok(HttpResponse::Ok().json(transaction))
+}
+
+#[utoipa::path(post,
+    responses(
+        (status = 200, description = "Successfully subscribed to Transaction.", content_type = "application/json", body = String),
+        Unauthorized,
+        InternalServerError,
+    ),
+    security(
+        ("bearer_token" = [])
+    ),
+    params(("event" = String,)),
+    path = "/api/v1/transaction/subscribe/{event}",
+    tag = "Transaction")]
+#[post("/subscribe/{event}")]
+pub(crate) async fn subscribe(user: Phantom<User>, event: Path<TransactionEvents>) -> Result<impl Responder, ApiError> {
+    let user_id = user.get_id();
+    match event.into_inner() {
+        TransactionEvents::Create => TransactionCreation::subscribe(subscribe_to_transaction_events),
+        _ => {}
+    }
+
+    Ok(HttpResponse::Ok())
+}
+
+async fn subscribe_to_transaction_events(event: TransactionCreation) -> Result<(), ApiError> {
+    // Do something with the event
+    println!("{:?}", event);
+
+    Ok(())
 }

@@ -10,6 +10,8 @@ pub(crate) mod controller;
 pub(crate) mod recurring;
 pub(crate) mod template;
 pub(crate) mod validation;
+pub(crate) mod events;
+mod event_handler;
 
 pub(crate) async fn check_transaction_permissions(
     budget_id: &Option<Phantom<Budget>>,

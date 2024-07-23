@@ -83,6 +83,7 @@ api_errors!(
     (StatusCode::UNAUTHORIZED, ApiCode::UNAUTHORIZED, "Unauthorized!", Unauthorized);
     (StatusCode::FORBIDDEN, ApiCode::MISSING_PERMISSIONS, "Missing permissions!", MissingPermissions);
     (StatusCode::UNAUTHORIZED, ApiCode::NO_TOKEN_PROVIDED, "No token provided!", NoTOkenProvided);
+    (StatusCode::BAD_REQUEST, ApiCode::INVALID_EVENT, "Invalid event provided!", InvalidEvent);
 );
 
 impl ApiError {
