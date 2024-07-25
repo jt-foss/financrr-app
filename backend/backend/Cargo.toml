@@ -54,9 +54,10 @@ serde_json.workspace = true
 serde_yml = "0.0.11"
 
 # Generating openapi spec
+# todo replace with versions from crates when *-alpha.1 is published
 utoipa.workspace = true
-utoipa-swagger-ui = { version = "7.1.0", features = ["actix-web", "debug-embed", "reqwest"] }
-utoipa-scalar = { version = "0.1", features = ["actix-web"] }
+utoipa-swagger-ui = { version = "7.1.1-alpha.0", git = "https://github.com/juhaku/utoipa", branch = "master", features = ["actix-web", "debug-embed", "reqwest"] }
+utoipa-scalar = { version = "0.2.0-alpha.0", git = "https://github.com/juhaku/utoipa", branch = "master", features = ["actix-web"] }
 utoipauto = { version = "0.1.12", features = ["generic_full_path"] }
 
 # Logging
