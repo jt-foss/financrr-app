@@ -122,7 +122,7 @@ pub(crate) async fn get_transactions_from_budget(
 )]
 #[post("")]
 pub(crate) async fn create_budget(user: Phantom<User>, budget: Validated<Json<BudgetDTO>>) -> Result<impl Responder, ApiError> {
-    let budget = Budget::new(user.get_id(), budget.into_inner()).await?;
+    let budget = Budget::new(user.get_id(), budget.into_inner().into_inner()).await?;
 
     Ok(HttpResponse::Created().json(budget))
 }
