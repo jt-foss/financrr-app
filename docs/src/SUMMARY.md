@@ -11,4 +11,5 @@ Everything here is still work in progress and subject to change!
 - [API](api/README.md)
   - [Api Error](api/Error.md)
   - [Recurring Rule](api/RecurringRule.md)
+  - [Websocket API](api/Websocket%20API.md)
 - [Database](db/README.md) 
