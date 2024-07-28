@@ -1,5 +1,5 @@
 use std::io::Result;
-use std::sync::OnceLock;
+use std::sync::{LazyLock, OnceLock};
 use std::time::Duration;
 
 use actix_cors::Cors;
@@ -16,7 +16,6 @@ use dotenvy::dotenv;
 // When enabled use MiMalloc as malloc instead of the default malloc
 #[cfg(feature = "enable_mimalloc")]
 use mimalloc::MiMalloc;
-use once_cell::sync::Lazy;
 use redis::Client;
 use sea_orm::DatabaseConnection;
 use tracing::info;
@@ -63,8 +62,8 @@ static GLOBAL: MiMalloc = MiMalloc;
 pub(crate) static DB: OnceLock<DatabaseConnection> = OnceLock::new();
 pub(crate) static REDIS: OnceLock<Client> = OnceLock::new();
 pub(crate) static CONFIG: OnceLock<Config> = OnceLock::new();
-pub(crate) static SNOWFLAKE_GENERATOR: Lazy<SnowflakeGenerator> =
-    Lazy::new(|| SnowflakeGenerator::new_from_env().expect("Could not create snowflake generator!"));
+pub(crate) static SNOWFLAKE_GENERATOR: LazyLock<SnowflakeGenerator> =
+    LazyLock::new(|| SnowflakeGenerator::new_from_env().expect("Could not create snowflake generator!"));
 
 #[utoipauto(paths = "./backend/src, ./utility/src from utility")]
 #[derive(OpenApi)]

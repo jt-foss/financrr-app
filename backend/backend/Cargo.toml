@@ -80,9 +80,6 @@ utility.workspace = true
 # Future Utils
 futures-util = "0.3.30"
 
-# Async utils
-once_cell = "1.19.0"
-
 # Security utils
 uuid = { version = "1.10.0", features = ["v4"] }
 
