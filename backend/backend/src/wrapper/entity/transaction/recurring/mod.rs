@@ -1,11 +1,11 @@
 use std::collections::HashMap;
-use std::sync::Arc;
+use std::ops::Deref;
+use std::sync::{Arc, LazyLock, OnceLock};
 
 use deschuler::scheduler::job::Job;
 use deschuler::scheduler::tokio_scheduler::config::TokioSchedulerConfig;
 use deschuler::scheduler::tokio_scheduler::TokioScheduler;
 use deschuler::scheduler::Scheduler;
-use once_cell::sync::OnceCell;
 use sea_orm::{EntityName, EntityTrait, Set};
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
@@ -39,10 +39,10 @@ use crate::{permission_impl, SNOWFLAKE_GENERATOR};
 pub(crate) mod dto;
 pub(crate) mod recurring_rule;
 
-type JobMap = OnceCell<Arc<RwLock<HashMap<Snowflake, Arc<Job>>>>>;
+type JobMap = LazyLock<Arc<RwLock<HashMap<Snowflake, Arc<Job>>>>>;
 
-static SCHEDULER: OnceCell<Arc<RwLock<TokioScheduler>>> = OnceCell::new();
-static JOBS: JobMap = OnceCell::new();
+static SCHEDULER: OnceLock<Arc<RwLock<TokioScheduler>>> = OnceLock::new();
+static JOBS: JobMap = LazyLock::new(|| Arc::new(RwLock::new(HashMap::new())));
 
 const CHANNEL_SIZE: usize = 10240;
 
@@ -315,7 +315,7 @@ pub(crate) fn get_recurring_transaction_scheduler() -> Arc<RwLock<TokioScheduler
 }
 
 pub(crate) fn get_jobs() -> Arc<RwLock<HashMap<Snowflake, Arc<Job>>>> {
-    JOBS.get_or_init(|| Arc::new(RwLock::new(HashMap::new()))).clone()
+    JOBS.deref().clone()
 }
 
 fn create_tokio_scheduler() -> TokioScheduler {

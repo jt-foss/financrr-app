@@ -16,7 +16,7 @@ repository = "https://github.com/financrr/backend"
 homepage = "https://github.com/financrr/backend"
 readme = "README.md"
 edition = "2021"
-rust-version = "1.79.0"
+rust-version = "1.80.0"
 
 [workspace.lints.rust]
 # Forbid
@@ -41,7 +41,7 @@ use_self = "warn"
 
 [workspace.dependencies]
 # Async runtime
-tokio = { version = "1.39.1", features = ["macros", "rt", "rt-multi-thread", "sync", "time", "parking_lot"] }
+tokio = { version = "1.39.2", features = ["macros", "rt", "rt-multi-thread", "sync", "time", "parking_lot"] }
 
 # OpenApi
 #utoipa = { version = "5.0.0-alpha.0", features = ["actix_extras", "openapi_extensions", "time", "preserve_order", "preserve_path_order", "non_strict_integers"] }
@@ -50,7 +50,7 @@ utoipa = { version = "5.0.0-alpha.0", git = "https://github.com/juhaku/utoipa", 
 
 # Serialization/Deserialization
 serde = { version = "1.0.204", features = ["derive"] }
-serde_json = "1.0.120"
+serde_json = "1.0.121"
 
 # ORM
 sea-orm = { version = "1.0.0-rc.7", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros", "mock"] }
