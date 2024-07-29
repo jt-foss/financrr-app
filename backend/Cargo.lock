@@ -269,6 +269,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "actix-web-validation"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f70b4753ee6dcf004c142d84b1290108d85e5bf1b550aebeaa0b29d692334377"
+dependencies = [
+ "actix-web",
+ "futures-core",
+ "thiserror",
+ "validator",
+]
+
+[[package]]
 name = "actix-web-validator5"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -559,6 +571,7 @@ dependencies = [
  "actix-limitation",
  "actix-web",
  "actix-web-prom",
+ "actix-web-validation",
  "actix-web-validator5",
  "bitflags 2.6.0",
  "chrono",
@@ -4264,9 +4277,9 @@ dependencies = [
 
 [[package]]
 name = "utoipa"
-version = "4.2.3"
+version = "5.0.0-alpha.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c5afb1a60e207dca502682537fefcfd9921e71d0b83e9576060f09abc6efab23"
+checksum = "c082de846a4d434a9dcfe3358dbe4a0aa5d4f826c3af29cdbd97404e1ffe71f4"
 dependencies = [
  "indexmap",
  "serde",
@@ -4276,11 +4289,10 @@ dependencies = [
 
 [[package]]
 name = "utoipa-gen"
-version = "4.3.0"
+version = "5.0.0-alpha.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7bf0e16c02bc4bf5322ab65f10ab1149bdbcaa782cba66dc7057370a3f8190be"
+checksum = "84a71c23e17df16027cc552b5b249a2a5e6a1ea36ab37363a1ac29b69ab36035"
 dependencies = [
- "proc-macro-error",
  "proc-macro2",
  "quote",
  "regex",
@@ -4289,9 +4301,9 @@ dependencies = [
 
 [[package]]
 name = "utoipa-scalar"
-version = "0.1.0"
+version = "0.2.0-alpha.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b3ab4b7269d14d93626b0bfedf212f1b0995cb7d13d35daba21d579511e7fae8"
+checksum = "9c851bc855ea797c92d61de0cd4d36195c01657bc92e42a02fd1373897d6bfe7"
 dependencies = [
  "actix-web",
  "serde",
@@ -4301,9 +4313,9 @@ dependencies = [
 
 [[package]]
 name = "utoipa-swagger-ui"
-version = "7.1.0"
+version = "7.1.1-alpha.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "943e0ff606c6d57d410fd5663a4d7c074ab2c5f14ab903b9514565e59fa1189e"
+checksum = "be05f58341ccce730a08897e273a71604b477d3ac4700af731a2fe97dbb8dd5e"
 dependencies = [
  "actix-web",
  "mime_guess",

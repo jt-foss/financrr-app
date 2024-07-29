@@ -44,9 +44,7 @@ use_self = "warn"
 tokio = { version = "1.39.2", features = ["macros", "rt", "rt-multi-thread", "sync", "time", "parking_lot"] }
 
 # OpenApi
-#utoipa = { version = "5.0.0-alpha.0", features = ["actix_extras", "openapi_extensions", "time", "preserve_order", "preserve_path_order", "non_strict_integers"] }
-# Use the line above when the version acutally was published
-utoipa = { version = "5.0.0-alpha.0", git = "https://github.com/juhaku/utoipa", branch = "master", features = ["actix_extras", "openapi_extensions", "time", "preserve_order", "preserve_path_order", "non_strict_integers"] }
+utoipa = { version = "5.0.0-alpha.1", features = ["actix_extras", "openapi_extensions", "time", "preserve_order", "preserve_path_order", "non_strict_integers"] }
 
 # Serialization/Deserialization
 serde = { version = "1.0.204", features = ["derive"] }

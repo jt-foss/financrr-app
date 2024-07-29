@@ -1,6 +1,6 @@
 use std::io::Result;
 use std::sync::{Arc, OnceLock};
-use std::sync::{LazyLock, OnceLock};
+use std::sync::LazyLock;
 use std::time::Duration;
 
 use actix_cors::Cors;
@@ -10,7 +10,6 @@ use actix_web::http::StatusCode;
 use actix_web::middleware::{Compress, DefaultHeaders, NormalizePath, TrailingSlash};
 use actix_web::web::Data;
 use actix_web_prom::{PrometheusMetrics, PrometheusMetricsBuilder};
-use actix_web_validation::validator::ValidatorErrorHandlerExt;
 use dotenvy::dotenv;
 // When enabled use MiMalloc as malloc instead of the default malloc
 #[cfg(feature = "enable_mimalloc")]
@@ -23,6 +22,7 @@ use utoipa::openapi::OpenApi as OpenApiStruct;
 use utoipa::openapi::security::{Http, HttpAuthScheme, SecurityScheme};
 use utoipauto::utoipauto;
 
+use actix_web_validation::validator::ValidatorErrorHandlerExt;
 use entity::utility::loading::load_schema;
 use migration::Migrator;
 use migration::MigratorTrait;
