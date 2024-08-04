@@ -43,7 +43,7 @@ dependencies:
   # Routing
   # Data
   flutter_secure_storage: ^9.2.2
-  shared_preferences: ^2.2.3
+  shared_preferences: ^2.3.1
   # State Management
   riverpod: ^2.5.1
   hooks_riverpod: ^2.5.1
