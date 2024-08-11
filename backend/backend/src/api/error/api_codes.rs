@@ -14,7 +14,7 @@ impl ToSchema<'static> for ApiCode {
             "ApiCode",
             schema!(
                 #[inline]
-                i32
+                u16
             )
             .nullable(false)
             .into(),
@@ -57,7 +57,7 @@ api_codes!(
 
 //validation errors
 api_codes!(
-    (1200, JSON_PAYLOAD_VALIDATION_ERROR, "JSON payload validation error!");
+    (1200, VALIDATION_ERROR, "Validation error!");
 );
 
 // internal server-errors

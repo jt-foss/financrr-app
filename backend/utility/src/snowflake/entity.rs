@@ -30,6 +30,12 @@ impl From<i64> for Snowflake {
 
 impl From<Snowflake> for i64 {
     fn from(value: Snowflake) -> Self {
+        Self::from(&value)
+    }
+}
+
+impl From<&Snowflake> for i64 {
+    fn from(value: &Snowflake) -> Self {
         value.id
     }
 }

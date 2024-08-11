@@ -5,6 +5,9 @@ members = [
     "backend",
     "utility",
 ]
+default-members = [
+    "backend"
+]
 resolver = "2"
 
 [workspace.package]

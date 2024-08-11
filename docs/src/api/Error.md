@@ -40,9 +40,9 @@ We call these custom error codes `Api Codes`.
 
 ### Validation errors
 
-| Code | Description                   |
-|------|-------------------------------|
-| 1200 | JSON payload validation error | 
+| Code | Description       |
+|------|-------------------|
+| 1200 | Validation error! | 
 
 ### Internal server errors
 
@@ -61,3 +61,8 @@ We call these custom error codes `Api Codes`.
 |------|---------------|
 | 9000 | Actix error   |
 | 9999 | Unknown error |
+
+## Validation Codes
+
+Validation codes are just like `Api Codes` but instead of just a number, they contain String code and a message.  
+They are used to provide more detailed information about the validation-error that occurred.

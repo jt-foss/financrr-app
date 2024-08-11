@@ -1,7 +1,7 @@
 use actix_web::http::Uri;
-use actix_web::web::Path;
+use actix_web::web::{Json, Path};
 use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
-use actix_web_validator5::Json;
+use actix_web_validation::Validated;
 use utility::snowflake::entity::Snowflake;
 
 use crate::api::documentation::response::{InternalServerError, ResourceNotFound, Unauthorized, ValidationError};
@@ -95,9 +95,9 @@ tag = "Currency")]
 #[post("")]
 pub(crate) async fn create_currency(
     user: Phantom<User>,
-    currency: Json<CurrencyDTO>,
+    currency: Validated<Json<CurrencyDTO>>,
 ) -> Result<impl Responder, ApiError> {
-    Ok(HttpResponse::Created().json(Currency::new(currency.into_inner(), user.get_id()).await?))
+    Ok(HttpResponse::Created().json(Currency::new(currency.into_inner().into_inner(), user.get_id()).await?))
 }
 
 #[utoipa::path(delete,
