@@ -1,5 +1,6 @@
 use std::io::Result;
-use std::sync::{LazyLock, OnceLock};
+use std::sync::LazyLock;
+use std::sync::{Arc, OnceLock};
 use std::time::Duration;
 
 use actix_cors::Cors;
@@ -8,10 +9,9 @@ use actix_web::middleware::{Compress, DefaultHeaders, NormalizePath, TrailingSla
 use actix_web::web::Data;
 use actix_web::{
     web::{self},
-    App, HttpServer,
+    App, HttpRequest, HttpServer,
 };
 use actix_web_prom::{PrometheusMetrics, PrometheusMetricsBuilder};
-use actix_web_validator5::{Error, JsonConfig, PathConfig, QueryConfig};
 use dotenvy::dotenv;
 // When enabled use MiMalloc as malloc instead of the default malloc
 #[cfg(feature = "enable_mimalloc")]
@@ -24,6 +24,7 @@ use utoipa::openapi::OpenApi as OpenApiStruct;
 use utoipa::{Modify, OpenApi};
 use utoipauto::utoipauto;
 
+use actix_web_validation::validator::ValidatorErrorHandlerExt;
 use entity::utility::loading::load_schema;
 use migration::Migrator;
 use migration::MigratorTrait;
@@ -42,7 +43,6 @@ use crate::config::{logger, Config};
 use crate::database::connection::{create_redis_client, establish_database_connection, get_database_connection};
 use crate::database::redis::clear_redis;
 use crate::util::panic::install_panic_hook;
-use crate::util::validation::ValidationErrorJsonPayload;
 use crate::wrapper::entity::session::Session;
 use crate::wrapper::entity::start_wrapper;
 use crate::wrapper::permission::cleanup::schedule_clean_up_task;
@@ -152,9 +152,7 @@ async fn main() -> Result<()> {
             .wrap(Compress::default())
             .wrap(build_cors())
             .wrap(prometheus_metrics.clone())
-            .app_data(JsonConfig::default().error_handler(|err, _| handle_validation_error(err).into()))
-            .app_data(QueryConfig::default().error_handler(|err, _| handle_validation_error(err).into()))
-            .app_data(PathConfig::default().error_handler(|err, _| handle_validation_error(err).into()))
+            .validator_error_handler(Arc::new(validation_error_handler))
             .app_data(limiter.clone())
             .wrap(RateLimiter::default())
             .wrap(default_headers)
@@ -166,16 +164,8 @@ async fn main() -> Result<()> {
     .await
 }
 
-fn handle_validation_error(err: Error) -> ApiError {
-    let json_error = match &err {
-        Error::Validate(error) => ValidationErrorJsonPayload::from(error),
-        _ => ValidationErrorJsonPayload {
-            message: err.to_string(),
-            fields: Vec::new(),
-        },
-    };
-
-    ApiError::from(json_error)
+fn validation_error_handler(errors: validator::ValidationErrors, _req: &HttpRequest) -> actix_web::Error {
+    ApiError::from(errors).into()
 }
 
 fn configure_api(cfg: &mut web::ServiceConfig) {

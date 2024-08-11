@@ -1,7 +1,7 @@
 use actix_web::http::Uri;
-use actix_web::web::Path;
+use actix_web::web::{Json, Path};
 use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
-
+use actix_web_validation::Validated;
 use utility::snowflake::entity::Snowflake;
 
 use crate::api::documentation::response::{InternalServerError, Unauthorized, ValidationError};
@@ -93,8 +93,10 @@ tag = "Transaction")]
 #[post("")]
 pub(crate) async fn create_transaction(
     user: Phantom<User>,
-    transaction: TransactionDTO,
+    transaction: Validated<Json<TransactionDTO>>,
 ) -> Result<impl Responder, ApiError> {
+    let transaction = transaction.into_inner().into_inner();
+
     if !transaction.check_permissions(user.get_id()).await? {
         return Err(ApiError::Unauthorized());
     }
@@ -117,8 +119,10 @@ tag = "Transaction")]
 #[post("/from-template")]
 pub(crate) async fn create_from_transaction_template(
     user: Phantom<User>,
-    mut transaction_from_template: TransactionFromTemplate,
+    transaction_from_template: Validated<Json<TransactionFromTemplate>>,
 ) -> Result<impl Responder, ApiError> {
+    let mut transaction_from_template = transaction_from_template.into_inner().into_inner();
+
     let template = transaction_from_template.template_id.get_inner().await?;
     template.has_permission_or_error(user.get_id(), Permissions::READ).await?;
     let dto = TransactionDTO::from_template(template, transaction_from_template.executed_at).await?;
@@ -168,9 +172,11 @@ tag = "Transaction")]
 #[patch("/{transaction_id}")]
 pub(crate) async fn update_transaction(
     user: Phantom<User>,
-    transaction_dto: TransactionDTO,
+    transaction_dto: Validated<Json<TransactionDTO>>,
     transaction_id: Path<Snowflake>,
 ) -> Result<impl Responder, ApiError> {
+    let transaction_dto = transaction_dto.into_inner().into_inner();
+
     let transaction = Transaction::find_by_id(transaction_id.into_inner()).await?;
     transaction.has_permission_or_error(user.get_id(), Permissions::READ_WRITE).await?;
 

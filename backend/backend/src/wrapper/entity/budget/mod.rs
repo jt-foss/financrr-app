@@ -20,6 +20,7 @@ use crate::{permission_impl, SNOWFLAKE_GENERATOR};
 
 pub(crate) mod dto;
 pub(crate) mod event_listener;
+pub(crate) mod validation;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub(crate) struct Budget {

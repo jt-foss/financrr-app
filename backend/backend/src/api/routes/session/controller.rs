@@ -1,8 +1,7 @@
 use actix_web::http::Uri;
-use actix_web::web::Path;
+use actix_web::web::{Json, Path};
 use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
-use actix_web_validator5::Json;
-
+use actix_web_validation::Validated;
 use utility::snowflake::entity::Snowflake;
 
 use crate::api::documentation::response::ValidationError;
@@ -195,8 +194,8 @@ pub(crate) async fn delete_all_sessions(user: Phantom<User>) -> Result<impl Resp
     tag = "Session"
 )]
 #[post("")]
-pub(crate) async fn create_session(credentials: Json<Credentials>) -> Result<impl Responder, ApiError> {
-    let credentials = credentials.into_inner();
+pub(crate) async fn create_session(credentials: Validated<Json<Credentials>>) -> Result<impl Responder, ApiError> {
+    let credentials = credentials.into_inner().into_inner();
     let user = User::authenticate(&credentials).await?;
     let session = Session::new(user, credentials).await?;
 

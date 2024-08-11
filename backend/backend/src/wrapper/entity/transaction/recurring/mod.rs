@@ -38,6 +38,7 @@ use crate::{permission_impl, SNOWFLAKE_GENERATOR};
 
 pub(crate) mod dto;
 pub(crate) mod recurring_rule;
+pub(crate) mod validation;
 
 type JobMap = LazyLock<Arc<RwLock<HashMap<Snowflake, Arc<Job>>>>>;
 

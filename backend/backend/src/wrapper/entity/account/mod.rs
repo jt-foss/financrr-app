@@ -90,10 +90,6 @@ impl Account {
         balance + new_original_balance - old_original_balance
     }
 
-    pub(crate) async fn exists(id: Snowflake) -> Result<bool, ApiError> {
-        Ok(count(account::Entity::find_by_id(id)).await? > 0)
-    }
-
     pub(crate) async fn find_all_by_user(user_id: Snowflake) -> Result<Vec<Self>, ApiError> {
         Ok(find_all(account::Entity::find_all_by_user_id(user_id)).await?.into_iter().map(Self::from).collect())
     }

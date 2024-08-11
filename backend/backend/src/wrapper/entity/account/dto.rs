@@ -21,6 +21,7 @@ pub(crate) struct AccountDTO {
     #[validate(custom(function = validate_iban))]
     pub(crate) iban: Option<String>,
     pub(crate) original_balance: i64,
+    #[validate(custom(function = "validate_currency_exists"))]
     pub(crate) currency_id: Snowflake,
 }
 
@@ -34,7 +35,6 @@ impl FromRequest for AccountDTO {
             let fut = fut.await?;
             let dto = fut.into_inner();
             dto.validate()?;
-            validate_currency_exists(dto.currency_id).await?;
 
             Ok(dto)
         })

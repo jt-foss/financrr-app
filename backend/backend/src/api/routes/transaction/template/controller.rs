@@ -1,5 +1,7 @@
 use actix_web::http::Uri;
+use actix_web::web::Json;
 use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
+use actix_web_validation::Validated;
 use web::{Path, ServiceConfig};
 
 use utility::snowflake::entity::Snowflake;
@@ -88,8 +90,10 @@ tag = "Transaction-Template")]
 #[post("")]
 pub(crate) async fn create_transaction_template(
     user: Phantom<User>,
-    template: TransactionTemplateDTO,
+    template: Validated<Json<TransactionTemplateDTO>>,
 ) -> Result<impl Responder, ApiError> {
+    let template = template.into_inner().into_inner();
+
     if !template.check_permissions(user.get_id()).await? {
         return Err(ApiError::Unauthorized());
     }
@@ -138,9 +142,11 @@ tag = "Transaction-Template")]
 #[patch("/{template_id}")]
 pub(crate) async fn update_transaction_template(
     user: Phantom<User>,
-    update: TransactionTemplateDTO,
+    update: Validated<Json<TransactionTemplateDTO>>,
     template_id: Path<Snowflake>,
 ) -> Result<impl Responder, ApiError> {
+    let update = update.into_inner().into_inner();
+
     let template = TransactionTemplate::find_by_id(template_id.into_inner()).await?;
     template.has_permission_or_error(user.get_id(), Permissions::READ_WRITE).await?;
 
