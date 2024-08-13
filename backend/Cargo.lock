@@ -271,12 +271,11 @@ dependencies = [
 
 [[package]]
 name = "actix-web-validation"
-version = "0.4.1"
+version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f5f0084d4e707801a46783b21dc54d154e5e708d19d5a956ac86f7e833112105"
+checksum = "487a9004ddf2bdd66457939bdeeb623f596cc5e50f660618a437bab9a189975d"
 dependencies = [
  "actix-web",
- "futures-core",
  "thiserror",
  "validator",
 ]
