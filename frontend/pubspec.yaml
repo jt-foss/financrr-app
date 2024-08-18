@@ -46,7 +46,7 @@ dependencies:
   shared_preferences: ^2.2.3
   # State Management
   riverpod: ^2.5.1
-  hooks_riverpod: ^2.5.1
+  hooks_riverpod: ^2.5.2
   # Other
   flutter_svg: ^2.0.10+1
   logging: ^1.2.0
