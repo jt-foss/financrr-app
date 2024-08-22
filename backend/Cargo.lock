@@ -271,9 +271,9 @@ dependencies = [
 
 [[package]]
 name = "actix-web-validation"
-version = "0.5.0"
+version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "487a9004ddf2bdd66457939bdeeb623f596cc5e50f660618a437bab9a189975d"
+checksum = "f4e9d088741c961f70e21140a895bee80d851d0924d201e761935d3955fc9967"
 dependencies = [
  "actix-web",
  "thiserror",
