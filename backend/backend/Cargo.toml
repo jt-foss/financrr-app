@@ -54,7 +54,7 @@ serde_yml = "0.0.11"
 
 # Generating openapi spec
 utoipa.workspace = true
-utoipa-swagger-ui = { version = "7.1.1-alpha.0", features = ["actix-web", "debug-embed", "reqwest"] }
+utoipa-swagger-ui = { version = "7.1.1-alpha.1", features = ["actix-web", "debug-embed", "reqwest"] }
 utoipa-scalar = { version = "0.2.0-alpha.0", features = ["actix-web"] }
 utoipauto = { version = "0.1.14", features = ["generic_full_path"] }
 
