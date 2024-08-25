@@ -50,7 +50,7 @@ redis = { version = "0.26.1", features = ["aio", "tokio-comp"] }
 # Serialization and deserialization
 serde.workspace = true
 serde_json.workspace = true
-serde_yml = "0.0.11"
+serde_yml = "0.0.12"
 
 # Generating openapi spec
 utoipa.workspace = true
