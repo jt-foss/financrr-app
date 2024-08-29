@@ -18,11 +18,11 @@ workspace = true
 tokio.workspace = true
 
 # Entity
-entity = { path = "../entity" }
+entity = { path = "../domain_model" }
 
 # Sea-orm
 sea-orm.workspace = true
-sea-orm-migration = { version = "1.0.1", features = ["sqlx-postgres", "runtime-tokio-rustls"] }
+sea-orm-migration = { version = "1.1.0-rc.1", features = ["sqlx-sqlite", "sqlx-mysql", "sqlx-postgres", "runtime-tokio-rustls"] }
 tracing.workspace = true
 
 # Date/Time

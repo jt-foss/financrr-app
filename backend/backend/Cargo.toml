@@ -42,7 +42,7 @@ iban = "0.1.7"
 
 # Database / ORM
 sea-orm.workspace = true
-entity = { path = "../entity" }
+entity = { path = "../domain_model" }
 migration = { path = "../migration" }
 # Redis
 redis = { version = "0.26.1", features = ["aio", "tokio-comp"] }
@@ -51,6 +51,7 @@ redis = { version = "0.26.1", features = ["aio", "tokio-comp"] }
 serde.workspace = true
 serde_json.workspace = true
 serde_yml = "0.0.12"
+serde_with = "3.9.0"
 
 # Generating openapi spec
 utoipa.workspace = true
@@ -72,9 +73,14 @@ chrono.workspace = true
 lazy-regex = { version = "3.3.0", features = ["std", "perf", "unicode"] }
 regex = { version = "1.10.6", features = ["std", "perf", "unicode"] }
 
+# Error handling
+thiserror.workspace = true
+
+# Dervies
+derive_more = { version = "1.0.0", features = ["display", "error"] }
+
 # Utils
 dotenvy.workspace = true
-derive_more = { version = "1.0.0", features = ["display", "error"] }
 itertools = "0.13.0"
 bitflags = { version = "2.6.0", features = ["std", "serde"] }
 paste = "1.0.15"
@@ -84,8 +90,10 @@ const_format = "0.2.32"
 # Future Utils
 futures-util = "0.3.30"
 
-# Security utils
+# Security & Encryption utils
 uuid = { version = "1.10.0", features = ["v4"] }
+rand = "0.8.5"
+rust-argon2 = { version = "2.1.0", features = ["serde"] }
 
 # mimalloc
 # Replaces musl malloc since it is very slow

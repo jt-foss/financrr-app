@@ -2,7 +2,7 @@ use serde::Serialize;
 use utoipa::openapi::{RefOr, Schema};
 use utoipa::{schema, ToSchema};
 
-#[derive(Debug, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Ord, PartialOrd, Hash, ToSchema, Serialize)]
 pub(crate) struct ApiCode {
     pub(crate) code: u16,
     pub(crate) message: &'static str,
@@ -16,8 +16,8 @@ impl ToSchema<'static> for ApiCode {
                 #[inline]
                 u16
             )
-            .nullable(false)
-            .into(),
+                .nullable(false)
+                .into(),
         )
     }
 }
@@ -68,6 +68,9 @@ api_codes!(
     (1303, CRON_BUILDER_ERROR, "Cron builder error!");
     (1304, TIME_ERROR, "An internal time-error!");
     (1305, SNOWFLAKE_ERROR, "An internal error that occurs when a snowflake could not be generated!");
+    (1306, HASHING_ERROR, "An internal error occurred while hashing passwords!");
+    (1307, INVALID_TRANSACTION_TYPE, "An invalid transaction type was found inside the database!");
+    (1308, INVALID_REUCCRING_RULE, "An invalid recurring rule json was found inside the database!");
 );
 
 // misc

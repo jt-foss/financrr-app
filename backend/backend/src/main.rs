@@ -17,7 +17,7 @@ use dotenvy::dotenv;
 #[cfg(feature = "enable_mimalloc")]
 use mimalloc::MiMalloc;
 use redis::Client;
-use sea_orm::DatabaseConnection;
+use sea_orm::{ConnectionTrait, DatabaseConnection};
 use tracing::info;
 use utoipa::openapi::security::{Http, HttpAuthScheme, SecurityScheme};
 use utoipa::openapi::OpenApi as OpenApiStruct;
@@ -42,6 +42,8 @@ use crate::api::status::controller::status_controller;
 use crate::config::{logger, Config};
 use crate::database::connection::{create_redis_client, establish_database_connection, get_database_connection};
 use crate::database::redis::clear_redis;
+use crate::repository::configure_repository_app_data;
+use crate::service::configure_service_app_data;
 use crate::util::panic::install_panic_hook;
 use crate::wrapper::entity::session::Session;
 use crate::wrapper::entity::start_wrapper;
@@ -54,6 +56,11 @@ pub(crate) mod event;
 pub(crate) mod scheduling;
 pub(crate) mod util;
 pub(crate) mod wrapper;
+pub(crate) mod snowflake;
+pub(crate) mod entity;
+pub(crate) mod repository;
+pub(crate) mod service;
+pub(crate) mod error;
 
 #[cfg(feature = "enable_mimalloc")]
 #[cfg_attr(feature = "enable_mimalloc", global_allocator)]
@@ -156,16 +163,13 @@ async fn main() -> Result<()> {
             .app_data(limiter.clone())
             .wrap(RateLimiter::default())
             .wrap(default_headers)
+            .configure(|cfg| configure_app_data(cfg, DB.get().unwrap()))
             .configure(configure_api)
             .configure(configure_openapi)
     })
-    .bind(&Config::get_config().address)?
-    .run()
-    .await
-}
-
-fn validation_error_handler(errors: validator::ValidationErrors, _req: &HttpRequest) -> actix_web::Error {
-    ApiError::from(errors).into()
+        .bind(&Config::get_config().address)?
+        .run()
+        .await
 }
 
 fn configure_api(cfg: &mut web::ServiceConfig) {
@@ -187,6 +191,15 @@ fn configure_api_v1(cfg: &mut web::ServiceConfig) {
             .configure(budget_controller)
             .configure(session_controller),
     );
+}
+
+fn configure_app_data(cfg: &mut web::ServiceConfig, conn: &impl ConnectionTrait) {
+    configure_repository_app_data(cfg, conn);
+    configure_service_app_data(cfg);
+}
+
+fn validation_error_handler(errors: validator::ValidationErrors, _req: &HttpRequest) -> actix_web::Error {
+    ApiError::from(errors).into()
 }
 
 fn build_cors() -> Cors {
@@ -216,7 +229,7 @@ fn build_rate_limiter() -> Limiter {
     Limiter::builder(Config::get_config().cache.get_url())
         .key_by(|req| Some(req.peer_addr().map(|addr| addr.ip().to_string()).unwrap_or_else(|| "unknown".to_string())))
         .limit(Config::get_config().rate_limiter.limit as usize)
-        .period(Duration::from_secs(Config::get_config().rate_limiter.duration_seconds)) // 60 minutes
+        .period(Duration::from_secs(Config::get_config().rate_limiter.duration_seconds))
         .build()
         .expect("Could not build rate limiter!")
 }

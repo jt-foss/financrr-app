@@ -1,41 +1,21 @@
--- =============================================
--- =               DOMAINS                     =
--- =============================================
-
-DO
-$$
-    BEGIN
-        CREATE DOMAIN uint32 AS bigint
-            CHECK (VALUE >= 0 AND VALUE < 4294967296);
-    EXCEPTION
-        WHEN duplicate_object THEN null;
-    END
-$$;
-
--- =============================================
--- =               TABLES                      =
--- =============================================
-
 CREATE TABLE IF NOT EXISTS "user"
 (
     id           BIGINT PRIMARY KEY,
-    username     TEXT UNIQUE              NOT NULL,
-    email        TEXT UNIQUE,
+    username     TEXT UNIQUE NOT NULL,
     display_name TEXT,
-    password     TEXT                     NOT NULL,
-    created_at   timestamp with time zone NOT NULL DEFAULT current_timestamp,
-    is_admin     BOOLEAN                  NOT NULL DEFAULT FALSE
+    email        TEXT UNIQUE,
+    password     TEXT        NOT NULL,
+    permissions  INTEGER     NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS session
 (
     id          BIGINT PRIMARY KEY,
-    token       TEXT UNIQUE                                                        NOT NULL,
-    name        TEXT                                                               NOT NULL,
+    token       TEXT UNIQUE                                                       NOT NULL,
+    name        TEXT                                                              NOT NULL,
     description TEXT,
     platform    TEXT,
-    "user"      BIGINT REFERENCES "user" (id) ON UPDATE CASCADE ON DELETE CASCADE NOT NULL,
-    created_at  timestamp with time zone                                           NOT NULL DEFAULT current_timestamp
+    "user"      BIGINT REFERENCES "user" (id) ON UPDATE CASCADE ON DELETE CASCADE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS permissions
@@ -57,6 +37,14 @@ CREATE TABLE IF NOT EXISTS currency
     "user"         BIGINT REFERENCES "user" (id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS currency_conversion_rate
+(
+    source_currency BIGINT REFERENCES currency (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    target_currency BIGINT REFERENCES currency (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    conversion_rate INTEGER NOT NULL,
+    PRIMARY KEY (source_currency, target_currency)
+);
+
 CREATE TABLE IF NOT EXISTS account
 (
     id               BIGINT PRIMARY KEY,
@@ -65,8 +53,7 @@ CREATE TABLE IF NOT EXISTS account
     iban             TEXT UNIQUE,
     balance          BIGINT                                                              NOT NULL DEFAULT 0,
     original_balance BIGINT                                                              NOT NULL DEFAULT 0,
-    currency         BIGINT REFERENCES Currency (id) ON UPDATE CASCADE ON DELETE CASCADE NOT NULL,
-    created_at       timestamp with time zone                                            NOT NULL DEFAULT current_timestamp
+    currency         BIGINT REFERENCES Currency (id) ON UPDATE CASCADE ON DELETE CASCADE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS budget
@@ -75,8 +62,7 @@ CREATE TABLE IF NOT EXISTS budget
     "user"      BIGINT REFERENCES "user" (id) ON UPDATE CASCADE ON DELETE CASCADE NOT NULL,
     amount      BIGINT                                                            NOT NULL,
     name        TEXT                                                              NOT NULL,
-    description TEXT,
-    created_at  timestamp with time zone                                          NOT NULL DEFAULT current_timestamp
+    description TEXT
 );
 
 CREATE TABLE IF NOT EXISTS transaction_template
@@ -88,10 +74,7 @@ CREATE TABLE IF NOT EXISTS transaction_template
     currency    BIGINT REFERENCES currency (id) ON UPDATE CASCADE ON DELETE CASCADE NOT NULL,
     name        TEXT                                                                NOT NULL,
     description TEXT,
-    budget      BIGINT REFERENCES budget (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    created_at  timestamp with time zone                                            NOT NULL DEFAULT current_timestamp,
-
-    CHECK (source IS NOT NULL OR destination IS NOT NULL)
+    budget      BIGINT                                                              REFERENCES budget (id) ON UPDATE SET NULL ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS recurring_transaction
@@ -99,8 +82,7 @@ CREATE TABLE IF NOT EXISTS recurring_transaction
     id               BIGINT PRIMARY KEY,
     template         BIGINT REFERENCES transaction_template (id) ON UPDATE CASCADE ON DELETE CASCADE NOT NULL,
     recurring_rule   json                                                                            NOT NULL,
-    last_executed_at timestamp with time zone,
-    created_at       timestamp with time zone                                                        NOT NULL DEFAULT current_timestamp
+    last_executed_at timestamp with time zone
 );
 
 CREATE TABLE IF NOT EXISTS transaction
@@ -112,8 +94,6 @@ CREATE TABLE IF NOT EXISTS transaction
     currency    BIGINT REFERENCES Currency (id) ON UPDATE CASCADE ON DELETE CASCADE NOT NULL,
     name        TEXT                                                                NOT NULL,
     description TEXT,
-    budget      BIGINT REFERENCES budget (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    executed_at timestamp with time zone                                            NOT NULL DEFAULT current_timestamp,
-    created_at  timestamp with time zone                                            NOT NULL DEFAULT current_timestamp,
-    CHECK (source IS NOT NULL OR destination IS NOT NULL)
+    budget      BIGINT                                                              REFERENCES budget (id) ON UPDATE SET NULL ON DELETE SET NULL,
+    executed_at timestamp with time zone                                            NOT NULL DEFAULT current_timestamp
 );

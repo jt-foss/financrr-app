@@ -84,6 +84,11 @@ api_errors!(
     (StatusCode::UNAUTHORIZED, ApiCode::NO_TOKEN_PROVIDED, "No token provided!", NoTOkenProvided);
 );
 
+api_errors!(
+    (StatusCode::INTERNAL_SERVER_ERROR, ApiCode::INVALID_TRANSACTION_TYPE, "Invalid transaction type!", InvalidTransactionType);
+    (StatusCode::INTERNAL_SERVER_ERROR, ApiCode::INVALID_REUCCRING_RULE, "Invalid recurring rule!", InvalidRecurringRule);
+);
+
 impl ApiError {
     #[allow(non_snake_case)]
     pub(crate) fn ResourceNotFound(resource_name: &str) -> Self {
@@ -241,6 +246,17 @@ impl From<SnowflakeGeneratorError> for ApiError {
         Self {
             status_code: StatusCode::INTERNAL_SERVER_ERROR,
             api_code: ApiCode::SNOWFLAKE_ERROR,
+            details: value.to_string(),
+            reference: SerializableStruct::new(&value).ok(),
+        }
+    }
+}
+
+impl From<argon2::Error> for ApiError {
+    fn from(value: argon2::Error) -> Self {
+        Self {
+            status_code: StatusCode::INTERNAL_SERVER_ERROR,
+            api_code: ApiCode::HASHING_ERROR,
             details: value.to_string(),
             reference: SerializableStruct::new(&value).ok(),
         }
