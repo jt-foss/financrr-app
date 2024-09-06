@@ -79,7 +79,7 @@ itertools = "0.13.0"
 bitflags = { version = "2.6.0", features = ["std", "serde"] }
 paste = "1.0.15"
 utility.workspace = true
-const_format = "0.2.32"
+const_format = "0.2.33"
 
 # Future Utils
 futures-util = "0.3.30"
