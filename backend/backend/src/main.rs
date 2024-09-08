@@ -61,6 +61,7 @@ pub(crate) mod entity;
 pub(crate) mod repository;
 pub(crate) mod service;
 pub(crate) mod error;
+pub(crate) mod controller;
 
 #[cfg(feature = "enable_mimalloc")]
 #[cfg_attr(feature = "enable_mimalloc", global_allocator)]
