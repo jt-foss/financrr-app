@@ -572,7 +572,7 @@ dependencies = [
  "mimalloc",
  "paste",
  "rand",
- "redis 0.26.1",
+ "redis 0.27.1",
  "regex",
  "rust-argon2",
  "sea-orm",
@@ -836,9 +836,9 @@ dependencies = [
 
 [[package]]
 name = "chrono-tz"
-version = "0.9.0"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "93698b29de5e97ad0ae26447b344c482a7284c737d9ddc5f9e52b74a336671bb"
+checksum = "cd6dd8046d00723a59a2f8c5f295c515b9bb9a331ee4f8f3d4dd49e428acd3b6"
 dependencies = [
  "chrono",
  "chrono-tz-build",
@@ -847,12 +847,11 @@ dependencies = [
 
 [[package]]
 name = "chrono-tz-build"
-version = "0.3.0"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0c088aee841df9c3041febbb73934cfc39708749bf96dc827e3359cd39ef11b1"
+checksum = "e94fea34d77a245229e7746bd2beb786cd2a896f306ff491fb8cecb3074b10a7"
 dependencies = [
  "parse-zoneinfo",
- "phf",
  "phf_codegen",
 ]
 
@@ -970,18 +969,18 @@ checksum = "c2459377285ad874054d797f3ccebf984978aa39129f6eafde5cdc8315b612f8"
 
 [[package]]
 name = "const_format"
-version = "0.2.32"
+version = "0.2.33"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e3a214c7af3d04997541b18d432afaff4c455e79e2029079647e72fc2bd27673"
+checksum = "50c655d81ff1114fb0dcdea9225ea9f0cc712a6f8d189378e82bdf62a473a64b"
 dependencies = [
  "const_format_proc_macros",
 ]
 
 [[package]]
 name = "const_format_proc_macros"
-version = "0.2.32"
+version = "0.2.33"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c7f6ff08fd20f4f299298a28e2dfa8a8ba1036e6cd2460ac1de7b425d76f2500"
+checksum = "eff1a44b93f47b1bac19a27932f5c591e43d1ba357ee4f61526c8a25603f0eb1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1326,9 +1325,9 @@ dependencies = [
 
 [[package]]
 name = "deschuler"
-version = "0.4.0"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e3b162f44b68106e1e17cc202b2b5935a3e139b5385be7b8602620c96e7f5874"
+checksum = "377fc41c9c2d829137ca527c5b0b26346edc3823e3c5cf051cb00da3b637d6b9"
 dependencies = [
  "chrono",
  "chrono-tz",
@@ -2861,9 +2860,9 @@ dependencies = [
 
 [[package]]
 name = "redis"
-version = "0.26.1"
+version = "0.27.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e902a69d09078829137b4a5d9d082e0490393537badd7c91a3d69d14639e115f"
+checksum = "198ada44e3af95b6b5b59e5b6d188ec4de43dc83c449543eb52f90bc72f0cb70"
 dependencies = [
  "arc-swap",
  "async-trait",
@@ -4362,9 +4361,9 @@ dependencies = [
 
 [[package]]
 name = "utoipa"
-version = "5.0.0-alpha.2"
+version = "5.0.0-beta.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cba8a777adb4d042176d5ad9259b484ecaf6f0b2f3ca6cb49b7fe357ff43a1da"
+checksum = "86fac56d240b49c629b9083c932ac20a23d926937e67c21ba209f836e2983d4f"
 dependencies = [
  "indexmap 2.4.0",
  "serde",
@@ -4374,9 +4373,9 @@ dependencies = [
 
 [[package]]
 name = "utoipa-gen"
-version = "5.0.0-alpha.2"
+version = "5.0.0-beta.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "59849befa84b0caa1bbfe94119f78e14ce25d3c495bc4befd34b43cdfb0061bb"
+checksum = "31d88270777931b8133b119c953062bd41665bb8507841f7d433f46d2765e9d4"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -4386,9 +4385,9 @@ dependencies = [
 
 [[package]]
 name = "utoipa-scalar"
-version = "0.2.0-alpha.0"
+version = "0.2.0-beta.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9c851bc855ea797c92d61de0cd4d36195c01657bc92e42a02fd1373897d6bfe7"
+checksum = "bc86065a210b8540e46d15e0844765d1d14eec7fd6221c2b0de8f6edde990648"
 dependencies = [
  "actix-web",
  "serde",
@@ -4398,9 +4397,9 @@ dependencies = [
 
 [[package]]
 name = "utoipa-swagger-ui"
-version = "7.1.1-alpha.1"
+version = "7.1.1-beta.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "65b6e619d2a6f3ff81e5cd5d14435fb34fb171dd1f9c94e81b436238ac1e4096"
+checksum = "29b029ce8a80bdcea303d138951a23a33303d1a3365b20c32a9e0ac3876aa6d7"
 dependencies = [
  "actix-web",
  "mime_guess",

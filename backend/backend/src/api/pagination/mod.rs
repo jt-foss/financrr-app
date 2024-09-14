@@ -7,12 +7,12 @@ use futures_util::future::LocalBoxFuture;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use utoipa::openapi::path::{Parameter, ParameterBuilder, ParameterIn};
-use utoipa::openapi::{KnownFormat, ObjectBuilder, Required, SchemaFormat, SchemaType};
+use utoipa::openapi::{KnownFormat, ObjectBuilder, Required, SchemaFormat, Type};
 use utoipa::{IntoParams, ToSchema};
 use validator::Validate;
 
 use crate::api::error::api::ApiError;
-use crate::wrapper::entity::account::Account;
+use crate::entity::account_entity::Account;
 use crate::wrapper::entity::budget::Budget;
 use crate::wrapper::entity::currency::Currency;
 use crate::wrapper::entity::session::Session;
@@ -151,7 +151,7 @@ impl IntoParams for PageSizeParam {
                 .schema(Some(
                     ObjectBuilder::new()
                         .default(Some(Value::from(DEFAULT_PAGE)))
-                        .schema_type(SchemaType::Integer)
+                        .schema_type(Type::Integer)
                         .format(Some(SchemaFormat::KnownFormat(KnownFormat::Int64)))
                         .build(),
                 ))
@@ -164,7 +164,7 @@ impl IntoParams for PageSizeParam {
                 .schema(Some(
                     ObjectBuilder::new()
                         .default(Some(Value::from(DEFAULT_LIMIT)))
-                        .schema_type(SchemaType::Integer)
+                        .schema_type(Type::Integer)
                         .format(Some(SchemaFormat::KnownFormat(KnownFormat::Int64)))
                         .build(),
                 ))

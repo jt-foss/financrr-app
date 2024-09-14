@@ -6,4 +6,6 @@ pub(crate) trait Repository<M: EntityTrait, E> {
     fn table_name() -> &'static str {
         M::default().table_name()
     }
+
+    fn get_conn(&self) -> &dyn ConnectionTrait;
 }

@@ -32,7 +32,7 @@ actix-web-prom = "0.8.0"
 tokio.workspace = true
 
 # Scheduling
-deschuler = "0.4.0"
+deschuler = "0.4.1"
 croner = "2.0.5"
 
 # Validation
@@ -45,7 +45,7 @@ sea-orm.workspace = true
 entity = { path = "../domain_model" }
 migration = { path = "../migration" }
 # Redis
-redis = { version = "0.26.1", features = ["aio", "tokio-comp"] }
+redis = { version = "0.27.1", features = ["aio", "tokio-comp"] }
 
 # Serialization and deserialization
 serde.workspace = true
@@ -55,8 +55,8 @@ serde_with = "3.9.0"
 
 # Generating openapi spec
 utoipa.workspace = true
-utoipa-swagger-ui = { version = "7.1.1-alpha.1", features = ["actix-web", "debug-embed", "reqwest"] }
-utoipa-scalar = { version = "0.2.0-alpha.0", features = ["actix-web"] }
+utoipa-swagger-ui = { version = "7.1.1-beta.0", features = ["actix-web", "debug-embed", "reqwest"] }
+utoipa-scalar = { version = "0.2.0-beta.0", features = ["actix-web"] }
 utoipauto = { version = "0.1.14", features = ["generic_full_path"] }
 
 # Logging
@@ -85,7 +85,7 @@ itertools = "0.13.0"
 bitflags = { version = "2.6.0", features = ["std", "serde"] }
 paste = "1.0.15"
 utility.workspace = true
-const_format = "0.2.32"
+const_format = "0.2.33"
 
 # Future Utils
 futures-util = "0.3.30"

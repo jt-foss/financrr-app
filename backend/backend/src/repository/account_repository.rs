@@ -6,6 +6,7 @@ use crate::repository::traits::Repository;
 use migration::{Expr, JoinType, Order};
 use sea_orm::sea_query::IntoCondition;
 use sea_orm::{ConnectionTrait, EntityName, EntityTrait, QuerySelect};
+use crate::util::permissions::find_all_by_user_id;
 
 #[derive(Clone, Debug, PartialEq, Eq, Ord, PartialOrd, Hash)]
 pub(crate) struct AccountRepository<'a> {
@@ -28,17 +29,23 @@ impl AccountRepository {
             .filter(permissions::Column::UserId.eq(user_id))
             .filter(Column::Id.eq(id))
             .order_by(Column::Id, Order::Desc)
-            .one(self.conn)
+            .one(self.get_conn())
             .await?
             .map(Account::from)
         )
     }
 }
 
+find_all_by_user_id!(Entity, Account, AccountRepository);
+
 impl Repository<Model, Account> for AccountRepository {
     fn new(conn: &impl ConnectionTrait) -> Self {
         AccountRepository {
             conn
         }
+    }
+
+    fn get_conn(&self) -> &dyn ConnectionTrait {
+        self.conn
     }
 }

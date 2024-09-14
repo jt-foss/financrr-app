@@ -9,7 +9,7 @@ use utoipa::openapi::path::{Parameter, ParameterBuilder, ParameterIn};
 use utoipa::openapi::{KnownFormat, ObjectBuilder, RefOr, Required, Schema, SchemaFormat, SchemaType};
 use utoipa::{IntoParams, ToSchema};
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Copy)]
+#[derive(Clone, Debug, PartialEq, Eq, Ord, PartialOrd, Hash)]
 pub struct Snowflake {
     pub id: i64,
 }

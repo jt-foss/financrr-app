@@ -7,7 +7,7 @@ use utoipa::ToSchema;
 
 #[derive(Clone, Debug, PartialEq, Eq, Ord, PartialOrd, Hash, ToSchema, Serialize)]
 pub(crate) struct User {
-    pub(crate) id: Snowflake,
+    pub(crate) snowflake: Snowflake,
     pub(crate) username: String,
     pub(crate) email: Option<String>,
     pub(crate) display_name: Option<String>,
@@ -25,7 +25,7 @@ impl User {
 impl From<Model> for User {
     fn from(value: Model) -> Self {
         Self {
-            id: Snowflake::from(value.id),
+            snowflake: Snowflake::from(value.id),
             username: value.username,
             email: value.email,
             display_name: value.display_name,
